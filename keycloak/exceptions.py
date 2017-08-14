@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import requests
 
 class KeycloakError(Exception):
     def __init__(self, error_message="", response_code=None,
@@ -86,7 +87,10 @@ class KeycloakBlockError(KeycloakOperationError):
 
 
 def raise_error_from_response(response, error, expected_code=200):
+
     if expected_code == response.status_code:
+        if expected_code == requests.codes.no_content:
+            return {}
         return response.json()
 
     try:

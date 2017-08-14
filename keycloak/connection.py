@@ -3,7 +3,7 @@
 """
 
 import requests
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 from .exceptions import *
 
 
