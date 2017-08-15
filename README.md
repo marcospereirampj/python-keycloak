@@ -10,16 +10,11 @@ Python Keycloak
 
 ### Via Pypi Package:
 
-```
-$ pip install python-keycloak
-
-```
+``` $ pip install python-keycloak ```
 
 ### Manually
 
-```
-$ python setup.py install
-```
+``` $ python setup.py install ```
 
 ## Dependencies
 
