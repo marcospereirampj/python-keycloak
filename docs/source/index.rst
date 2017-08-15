@@ -63,6 +63,11 @@ Documentation
 
 The documentation for python-keycloak is available on `readthedocs <http://python-keycloak.readthedocs.io>`_.
 
+Contributors
+==================
+
+* `Agriness Team <http://www.agriness.com/pt/>`_
+
 Usage
 =====
 

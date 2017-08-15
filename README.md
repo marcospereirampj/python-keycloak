@@ -37,6 +37,10 @@ https://github.com/marcospereirampj/python-keycloak/issues
 
 The documentation for python-keycloak is available on [readthedocs](http://python-keycloak.readthedocs.io).
 
+## Contributors
+
+* [Agriness Team](http://www.agriness.com/pt/)
+
 ## Usage
 
 ```python
