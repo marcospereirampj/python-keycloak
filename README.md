@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/marcospereirampj/python-keycloak.svg?branch=master)](https://travis-ci.org/marcospereirampj/python-keycloak)
-[![Documentation Status](https://readthedocs.org/projects/python-toggl/badge/?version=latest)](http://python-toggl.readthedocs.org/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/python-keycloak/badge/?version=latest)](http://python-keycloak.readthedocs.io/en/latest/?badge=latest)
 
 Python Keycloak
 ====================
@@ -28,4 +28,4 @@ https://github.com/marcospereirampj/python-keycloak/issues
 
 ## Documentation ##
 
-The documentation for python-keycloak is available on [readthedocs](http://python-toggl.readthedocs.org/en/latest/).
+The documentation for python-keycloak is available on [readthedocs](http://python-keycloak.readthedocs.io).
