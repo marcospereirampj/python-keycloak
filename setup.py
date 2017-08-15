@@ -12,7 +12,7 @@ setup(
     keywords='keycloak openid',
     description=u'python-keycloak is a Python package providing access to the Keycloak API.',
     packages=['keycloak'],
-    install_requires=['requests==2.18.3', 'httmock==1.2.5'],
+    install_requires=['requests==2.18.3', 'httmock==1.2.5', 'PyJWT==1.5.2'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
