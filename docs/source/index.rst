@@ -45,6 +45,7 @@ python-keycloak depends on:
 
 * Python 3
 * `requests <http://docs.python-requests.org/en/master/>`_
+* `PyJWT <https://github.com/jpadilla/pyjwt>`_
 
 Tests Dependencies
 ------------------
