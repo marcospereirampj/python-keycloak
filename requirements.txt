@@ -1,1 +1,2 @@
 requests==2.18.3
+httmock==1.2.5

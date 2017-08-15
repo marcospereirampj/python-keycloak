@@ -17,6 +17,7 @@
 
 import requests
 
+
 class KeycloakError(Exception):
     def __init__(self, error_message="", response_code=None,
                  response_body=None):
