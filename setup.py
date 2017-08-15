@@ -4,12 +4,11 @@ from setuptools import setup
 
 setup(
     name='python-keycloak',
-    version='0.1.0',
+    version='0.2.0',
     url='https://github.com/marcospereirampj/python-keycloak',
     license='GNU General Public License - V3',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',
-    copyright='Copyright (c) 2017 Marcos Pereira',
     keywords='keycloak openid',
     description=u'python-keycloak is a Python package providing access to the Keycloak API.',
     packages=['keycloak'],
