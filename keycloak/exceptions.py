@@ -67,23 +67,11 @@ class KeycloakDeleteError(KeycloakOperationError):
     pass
 
 
-class KeycloakProtectError(KeycloakOperationError):
+class KeycloakSecretNotFound(KeycloakOperationError):
     pass
 
 
-class KeycloakTransferProjectError(KeycloakOperationError):
-    pass
-
-
-class KeycloakBuildCancelError(KeycloakOperationError):
-    pass
-
-
-class KeycloakBuildRetryError(KeycloakOperationError):
-    pass
-
-
-class KeycloakBlockError(KeycloakOperationError):
+class KeycloakRPTNotFound(KeycloakOperationError):
     pass
 
 

@@ -100,6 +100,10 @@ Main methods::
     token = keycloak.token("user", "password")
     rpt = keycloak.entitlement(token['access_token'], "resource_id")
 
-    # Instropect
-    keycloak.instropect(token['access_token'], rpt['rpt'])
+    # Instropect RPT
+    token_rpt_info = keycloak.instropect(keycloak.instropect(token['access_token'], rpt=rpt['rpt'],
+                                         token_type_hint="requesting_party_token"))
+
+    # Instropect Token
+    token_info = keycloak.instropect(token['access_token']))
 
