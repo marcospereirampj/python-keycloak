@@ -9,7 +9,7 @@ setup(
     license='GNU General Public License - V3',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',
-    copyright = 'Copyright (c) 2017 Marcos Pereira',
+    copyright='Copyright (c) 2017 Marcos Pereira',
     keywords='keycloak openid',
     description=u'python-keycloak is a Python package providing access to the Keycloak API.',
     packages=['keycloak'],
