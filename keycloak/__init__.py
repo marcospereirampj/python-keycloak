@@ -4,7 +4,7 @@
 
 from keycloak.exceptions import raise_error_from_response, KeycloakGetError
 from .urls_patterns import URL_AUTH, URL_TOKEN, URL_USERINFO, URL_WELL_KNOWN, URL_LOGOUT, \
-    URL_CERTS, URL_ENTITLEMENT
+    URL_CERTS, URL_ENTITLEMENT, URL_INTROSPECT
 from .connection import ConnectionManager
 
 
@@ -131,7 +131,7 @@ class Keycloak:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def instropect(self, token, token_type_hint="requesting_party_token"):
+    def instropect(self, token, rpt, token_type_hint="requesting_party_token"):
         """
         The introspection endpoint is used to retrieve the active state of a token. It is can only be
         invoked by confidential clients.
@@ -139,6 +139,20 @@ class Keycloak:
         https://tools.ietf.org/html/rfc7662
 
         :param token:
+        :param rpt:
+        :param token_type_hint:
+
         :return:
         """
-        return None
+        params_path = {"realm-name": self.__realm_name}
+        payload = {"client_id": self.__client_id, "token": rpt,
+                   'token_type_hint': token_type_hint}
+
+        if self.__client_secret_key:
+            payload.update({"client_secret": self.__client_secret_key})
+
+        self.__connection.add_param_headers("Authorization", "Bearer " + token)
+        data_raw = self.__connection.raw_post(URL_INTROSPECT.format(**params_path),
+                                              data=payload)
+
+        return raise_error_from_response(data_raw, KeycloakGetError)
