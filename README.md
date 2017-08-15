@@ -39,7 +39,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 
 ## Usage
 
-```
+```python
 from keycloak import Keycloak
 
 # Configure client
