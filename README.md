@@ -6,43 +6,43 @@ Python Keycloak
 
 **python-keycloak** is a Python package providing access to the Keycloak API.
 
-# Installation
+## Installation
 
-## Via Pypi Package:
+### Via Pypi Package:
 
 ```
 $ pip install python-keycloak
 
 ```
 
-## Manually
+### Manually
 
 ```
 $ python setup.py install
 ```
 
-# Dependencies
+## Dependencies
 
 python-keycloak depends on:
 
 * Python 3
 * [requests](http://docs.python-requests.org/en/master/)
 
-## Tests Dependencies
+### Tests Dependencies
 
 * unittest
 * [httmock](https://github.com/patrys/httmock)
 
-# Bug reports
+## Bug reports
 
 Please report bugs and feature requests at
 https://github.com/marcospereirampj/python-keycloak/issues
 
-# Documentation
+## Documentation
 
 The documentation for python-keycloak is available on [readthedocs](http://python-keycloak.readthedocs.io).
 
-# Usage
+## Usage
 
 ```
 from keycloak import Keycloak
