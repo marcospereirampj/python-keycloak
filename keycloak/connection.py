@@ -61,9 +61,9 @@ class ConnectionManager(object):
         :arg
             key (str): Key of the header parameters.
         :return:
-            If the header parameters exist, return value him.
+            If the header parameters exist, return its value.
         """
-        return self.__headers[key] if key in self.__headers.keys() else None
+        return self.__headers.get(key)
 
     def clean_headers(self):
         """ Clear header parameters. """
@@ -76,7 +76,7 @@ class ConnectionManager(object):
         :return:
             If the header parameters exist, return True.
         """
-        return True if self.get_param_headers(key) else False
+        return self.get_param_headers(key) is not None
 
     def add_param_headers(self, key, value):
         """ Add a single parameter in header.
