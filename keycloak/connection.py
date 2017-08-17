@@ -27,7 +27,7 @@ import requests
 class ConnectionManager(object):
     """ Represents a simple server connection.
     Args:
-        base_url (str): The URL server
+        base_url (str): The server URL.
         headers (dict): The header parameters of the requests to the server.
         timeout (int): Timeout to use for requests to the server.
     """
@@ -57,9 +57,9 @@ class ConnectionManager(object):
         return self.__headers
 
     def get_param_headers(self, key):
-        """ Return a single header parameter.
+        """ Return a specific header parameter.
         :arg
-            key (str): Key of the header parameters.
+            key (str): Header parameters key.
         :return:
             If the header parameters exist, return its value.
         """
@@ -70,31 +70,28 @@ class ConnectionManager(object):
         self.__headers = {}
 
     def exist_param_headers(self, key):
-        """ Check if the parameter exist in header.
+        """ Check if the parameter exists in the header.
         :arg
-            key (str): Key of the header parameters.
+            key (str): Header parameters key.
         :return:
             If the header parameters exist, return True.
         """
         return self.get_param_headers(key) is not None
 
     def add_param_headers(self, key, value):
-        """ Add a single parameter in header.
+        """ Add a single parameter inside the header.
         :arg
-            key (str): Key of the header parameters.
-            value (str): Value for the header parameter.
+            key (str): Header parameters key.
+            value (str): Value to be added.
         """
-        request_headers = self.__headers.copy()
-        request_headers.update({key: value})
-        self.set_headers(request_headers)
+        self.__headers[key] = value
 
     def del_param_headers(self, key):
-        """ Remove a single header parameter.
+        """ Remove a specific parameter.
         :arg
             key (str): Key of the header parameters.
         """
-        if self.get_param_headers(key):
-            del self.__headers[key]
+        self.__headers.pop(key, None)
 
     def raw_get(self, path, **kwargs):
         """ Submit get request to the path.
