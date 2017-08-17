@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from json.decoder import JSONDecodeError
 
 import requests
 
@@ -80,7 +81,11 @@ def raise_error_from_response(response, error, expected_code=200):
     if expected_code == response.status_code:
         if expected_code == requests.codes.no_content:
             return {}
-        return response.json()
+
+        try:
+            return response.json()
+        except JSONDecodeError as e:
+            return response.content
 
     try:
         message = response.json()['message']
