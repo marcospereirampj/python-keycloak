@@ -45,7 +45,7 @@ python-keycloak depends on:
 
 * Python 3
 * `requests <http://docs.python-requests.org/en/master/>`_
-* `PyJWT <https://github.com/jpadilla/pyjwt>`_
+* `python-jose <http://python-jose.readthedocs.io/en/latest/>`_
 
 Tests Dependencies
 ------------------
@@ -107,4 +107,9 @@ Main methods::
 
     # Instropect Token
     token_info = keycloak.instropect(token['access_token']))
+
+    # Decode Token
+    KEYCLOAK_PUBLIC_KEY = "secret"
+    options = {"verify_signature": True, "verify_aud": True, "exp": True}
+    token_info = keycloak.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
