@@ -21,7 +21,7 @@ from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSec
 from .urls_patterns import URL_AUTH, URL_TOKEN, URL_USERINFO, URL_WELL_KNOWN, URL_LOGOUT, \
     URL_CERTS, URL_ENTITLEMENT, URL_INTROSPECT
 from .connection import ConnectionManager
-import jwt
+from jose import jwt
 
 
 class Keycloak:
@@ -69,7 +69,7 @@ class Keycloak:
         """
         return NotImplemented
 
-    def token(self, username, password, grant_type=["password",]):
+    def token(self, username, password, grant_type=["password"]):
         """
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -186,7 +186,7 @@ class Keycloak:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def decode_token(self, token, secret='', verify=False, algorithms=['RS256']):
+    def decode_token(self, token, key, algorithms=['RS256'], **kwargs):
         """
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data
         structure that represents a cryptographic key.  This specification
@@ -198,16 +198,10 @@ class Keycloak:
         https://tools.ietf.org/html/rfc7517
 
         :param token:
-        :param secret:
-        :param verify:
+        :param key:
         :param algorithms:
         :return:
         """
 
-        if verify:
-            if secret:
-                return jwt.decode(token, secret=secret, verify=verify, algorithms=algorithms)
-
-            raise KeycloakSecretNotFound("Can't found secret key.")
-
-        return jwt.decode(token, verify=verify, algorithms=algorithms)
+        return jwt.decode(token, key, algorithms=algorithms,
+                          audience=self.__client_id, **kwargs)
