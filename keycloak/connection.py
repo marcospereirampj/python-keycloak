@@ -33,28 +33,24 @@ class ConnectionManager(object):
     """
 
     def __init__(self, base_url, headers={}, timeout=60):
-        self.__base_url = base_url
-        self.__headers = headers
-        self.__timeout = timeout
+        self.base_url = base_url
+        self.headers = headers
+        self.timeout = timeout
 
-    def get_url(self):
+    @property
+    def get_base_url(self):
         """ Return base url in use for requests to the server. """
-        return self.__base_url
+        return self.base_url
 
+    @property
     def get_timeout(self):
         """ Return timeout in use for request to the server. """
-        return self.__timeout
+        return self.timeout
 
-    def set_headers(self, params):
-        """ Update header request to the server.
-        :arg
-            params (dict): Parameters header request.
-        """
-        self.__headers = params
-
+    @property
     def get_headers(self):
         """ Return header request to the server. """
-        return self.__headers
+        return self.headers
 
     def get_param_headers(self, key):
         """ Return a specific header parameter.
@@ -63,11 +59,11 @@ class ConnectionManager(object):
         :return:
             If the header parameters exist, return its value.
         """
-        return self.__headers.get(key)
+        return self.headers.get(key)
 
     def clean_headers(self):
         """ Clear header parameters. """
-        self.__headers = {}
+        self.headers = {}
 
     def exist_param_headers(self, key):
         """ Check if the parameter exists in the header.
@@ -84,14 +80,14 @@ class ConnectionManager(object):
             key (str): Header parameters key.
             value (str): Value to be added.
         """
-        self.__headers[key] = value
+        self.headers[key] = value
 
     def del_param_headers(self, key):
         """ Remove a specific parameter.
         :arg
             key (str): Key of the header parameters.
         """
-        self.__headers.pop(key, None)
+        self.headers.pop(key, None)
 
     def raw_get(self, path, **kwargs):
         """ Submit get request to the path.
@@ -104,10 +100,10 @@ class ConnectionManager(object):
         """
 
         try:
-            return requests.get(urljoin(self.get_url(), path),
+            return requests.get(urljoin(self.base_url, path),
                                 params=kwargs,
-                                headers=self.get_headers(),
-                                timeout=self.get_timeout())
+                                headers=self.headers,
+                                timeout=self.timeout)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -123,11 +119,11 @@ class ConnectionManager(object):
             HttpError: Can't connect to server.
         """
         try:
-            return requests.post(urljoin(self.get_url(), path),
+            return requests.post(urljoin(self.base_url, path),
                                  params=kwargs,
                                  data=data,
-                                 headers=self.get_headers(),
-                                 timeout=self.get_timeout())
+                                 headers=self.headers,
+                                 timeout=self.timeout)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -143,11 +139,11 @@ class ConnectionManager(object):
             HttpError: Can't connect to server.
         """
         try:
-            return requests.put(urljoin(self.get_url(), path),
+            return requests.put(urljoin(self.base_url, path),
                                 params=kwargs,
                                 data=data,
-                                headers=self.get_headers(),
-                                timeout=self.get_timeout())
+                                headers=self.headers,
+                                timeout=self.timeout)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)

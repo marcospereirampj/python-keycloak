@@ -18,8 +18,16 @@
 
 from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSecretNotFound, \
     KeycloakRPTNotFound
-from .urls_patterns import URL_AUTH, URL_TOKEN, URL_USERINFO, URL_WELL_KNOWN, URL_LOGOUT, \
-    URL_CERTS, URL_ENTITLEMENT, URL_INTROSPECT
+from .urls_patterns import (
+    URL_AUTH,
+    URL_TOKEN,
+    URL_USERINFO,
+    URL_WELL_KNOWN,
+    URL_LOGOUT,
+    URL_CERTS,
+    URL_ENTITLEMENT,
+    URL_INTROSPECT
+)
 from .connection import ConnectionManager
 from jose import jwt
 
@@ -27,23 +35,39 @@ from jose import jwt
 class Keycloak:
 
     def __init__(self, server_url, client_id, realm_name, client_secret_key=None):
-        self.__client_id = client_id
-        self.__client_secret_key = client_secret_key
-        self.__realm_name = realm_name
+        self.client_id = client_id
+        self.client_secret_key = client_secret_key
+        self.realm_name = realm_name
 
-        self.__connection = ConnectionManager(base_url=server_url,
-                                              headers={},
-                                              timeout=60)
+        self.connection = ConnectionManager(base_url=server_url,
+                                            headers={},
+                                            timeout=60)
 
-    def __add_secret_key(self, payload):
+    @property
+    def get_client_id(self):
+        return self.client_id
+
+    @property
+    def get_client_secret_key(self):
+        return self.client_secret_key
+
+    @property
+    def get_realm_name(self):
+        return self.realm_name
+
+    @property
+    def get_connection(self):
+        return self.connection
+
+    def _add_secret_key(self, payload):
         """
         Add secret key if exist.
 
         :param payload:
         :return:
         """
-        if self.__client_secret_key:
-            payload.update({"client_secret": self.__client_secret_key})
+        if self.client_secret_key:
+            payload.update({"client_secret": self.client_secret_key})
 
         return payload
 
@@ -55,8 +79,8 @@ class Keycloak:
             :return It lists endpoints and other configuration options relevant.
         """
 
-        params_path = {"realm-name": self.__realm_name}
-        data_raw = self.__connection.raw_get(URL_WELL_KNOWN.format(**params_path))
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_WELL_KNOWN.format(**params_path))
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -83,13 +107,13 @@ class Keycloak:
         :param grant_type:
         :return:
         """
-        params_path = {"realm-name": self.__realm_name}
+        params_path = {"realm-name": self.realm_name}
         payload = {"username": username, "password": password,
-                   "client_id": self.__client_id, "grant_type": grant_type}
+                   "client_id": self.client_id, "grant_type": grant_type}
 
-        payload = self.__add_secret_key(payload)
-        data_raw = self.__connection.raw_post(URL_TOKEN.format(**params_path),
-                                              data=payload)
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path),
+                                            data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def userinfo(self, token):
@@ -103,10 +127,10 @@ class Keycloak:
         :return:
         """
 
-        self.__connection.add_param_headers("Authorization", "Bearer " + token)
-        params_path = {"realm-name": self.__realm_name}
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        params_path = {"realm-name": self.realm_name}
 
-        data_raw = self.__connection.raw_get(URL_USERINFO.format(**params_path))
+        data_raw = self.connection.raw_get(URL_USERINFO.format(**params_path))
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -116,12 +140,12 @@ class Keycloak:
         :param refresh_token:
         :return:
         """
-        params_path = {"realm-name": self.__realm_name}
-        payload = {"client_id": self.__client_id, "refresh_token": refresh_token}
+        params_path = {"realm-name": self.realm_name}
+        payload = {"client_id": self.client_id, "refresh_token": refresh_token}
 
-        payload = self.__add_secret_key(payload)
-        data_raw = self.__connection.raw_post(URL_LOGOUT.format(**params_path),
-                                              data=payload)
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_LOGOUT.format(**params_path),
+                                            data=payload)
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
@@ -135,8 +159,8 @@ class Keycloak:
 
         :return:
         """
-        params_path = {"realm-name": self.__realm_name}
-        data_raw = self.__connection.raw_get(URL_CERTS.format(**params_path))
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def entitlement(self, token, resource_server_id):
@@ -149,9 +173,9 @@ class Keycloak:
 
         :return:
         """
-        self.__connection.add_param_headers("Authorization", "Bearer " + token)
-        params_path = {"realm-name": self.__realm_name, "resource-server-id": resource_server_id}
-        data_raw = self.__connection.raw_get(URL_ENTITLEMENT.format(**params_path))
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
+        data_raw = self.connection.raw_get(URL_ENTITLEMENT.format(**params_path))
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -168,21 +192,21 @@ class Keycloak:
 
         :return:
         """
-        params_path = {"realm-name": self.__realm_name}
+        params_path = {"realm-name": self.realm_name}
 
-        payload = {"client_id": self.__client_id, "token": token}
+        payload = {"client_id": self.client_id, "token": token}
 
         if token_type_hint == 'requesting_party_token':
             if rpt:
                 payload.update({"token": rpt, "token_type_hint": token_type_hint})
-                self.__connection.add_param_headers("Authorization", "Bearer " + token)
+                self.connection.add_param_headers("Authorization", "Bearer " + token)
             else:
                 raise KeycloakRPTNotFound("Can't found RPT.")
 
-        payload = self.__add_secret_key(payload)
+        payload = self._add_secret_key(payload)
 
-        data_raw = self.__connection.raw_post(URL_INTROSPECT.format(**params_path),
-                                              data=payload)
+        data_raw = self.connection.raw_post(URL_INTROSPECT.format(**params_path),
+                                            data=payload)
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -204,4 +228,4 @@ class Keycloak:
         """
 
         return jwt.decode(token, key, algorithms=algorithms,
-                          audience=self.__client_id, **kwargs)
+                          audience=self.client_id, **kwargs)
