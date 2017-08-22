@@ -32,7 +32,7 @@ python-keycloak depends on:
 ## Bug reports
 
 Please report bugs and feature requests at
-https://github.com/marcospereirampj/python-keycloak/issues
+https://bitbucket.org/agriness/python-keycloak/issues
 
 ## Documentation
 
