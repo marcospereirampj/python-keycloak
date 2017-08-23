@@ -33,26 +33,41 @@ class ConnectionManager(object):
     """
 
     def __init__(self, base_url, headers={}, timeout=60):
-        self.base_url = base_url
-        self.headers = headers
-        self.timeout = timeout
+        self._base_url = base_url
+        self._headers = headers
+        self._timeout = timeout
 
     @property
-    def get_base_url(self):
+    def base_url(self):
         """ Return base url in use for requests to the server. """
-        return self.base_url
+        return self._base_url
+
+    @base_url.setter
+    def base_url(self, value):
+        """ """
+        self._base_url = value
 
     @property
-    def get_timeout(self):
+    def timeout(self):
         """ Return timeout in use for request to the server. """
-        return self.timeout
+        return self._timeout
+
+    @timeout.setter
+    def timeout(self, value):
+        """ """
+        self._timeout = value
 
     @property
-    def get_headers(self):
+    def headers(self):
         """ Return header request to the server. """
-        return self.headers
+        return self._headers
 
-    def get_param_headers(self, key):
+    @headers.setter
+    def headers(self, value):
+        """ """
+        self._headers = value
+
+    def param_headers(self, key):
         """ Return a specific header parameter.
         :arg
             key (str): Header parameters key.

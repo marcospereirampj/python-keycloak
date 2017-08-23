@@ -14,8 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+from keycloak.authorization import Authorization
+from keycloak.exceptions import KeycloakAuthorizationConfigError
 from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSecretNotFound, \
     KeycloakRPTNotFound
 from .urls_patterns import (
@@ -30,34 +30,61 @@ from .urls_patterns import (
 )
 from .connection import ConnectionManager
 from jose import jwt
+import json
 
 
 class Keycloak:
 
     def __init__(self, server_url, client_id, realm_name, client_secret_key=None):
-        self.client_id = client_id
-        self.client_secret_key = client_secret_key
-        self.realm_name = realm_name
+        self._client_id = client_id
+        self._client_secret_key = client_secret_key
+        self._realm_name = realm_name
 
-        self.connection = ConnectionManager(base_url=server_url,
+        self._connection = ConnectionManager(base_url=server_url,
                                             headers={},
                                             timeout=60)
 
-    @property
-    def get_client_id(self):
-        return self.client_id
+        self._authorization = Authorization()
 
     @property
-    def get_client_secret_key(self):
-        return self.client_secret_key
+    def client_id(self):
+        return self._client_id
+
+    @client_id.setter
+    def client_id(self, value):
+        self._client_id = value
 
     @property
-    def get_realm_name(self):
-        return self.realm_name
+    def client_secret_key(self):
+        return self._client_secret_key
+
+    @client_secret_key.setter
+    def client_secret_key(self, value):
+        self._client_secret_key = value
 
     @property
-    def get_connection(self):
-        return self.connection
+    def realm_name(self):
+        return self._realm_name
+
+    @realm_name.setter
+    def realm_name(self, value):
+        self._realm_name = value
+
+    @property
+    def connection(self):
+        return self._connection
+
+    @connection.setter
+    def connection(self, value):
+        self._connection = value
+
+    @property
+    def authorization(self):
+        return self._authorization
+
+    @authorization.setter
+    def authorization(self, value):
+        self._authorization = value
 
     def _add_secret_key(self, payload):
         """
@@ -229,3 +256,27 @@ class Keycloak:
 
         return jwt.decode(token, key, algorithms=algorithms,
                           audience=self.client_id, **kwargs)
+
+    def load_authorization_config(self, path):
+        """
+        Load Keycloak settings (authorization)
+
+        :param path: settings file (json)
+        :return:
+        """
+        authorization_file = open(path, 'r')
+        authorization_json = json.loads(authorization_file.read())
+        self.authorization.load_config(authorization_json)
+        authorization_file.close()
+
+    def get_permissions(self):
+
+        if not self.authorization.policies:
+            raise KeycloakAuthorizationConfigError(
+                "Keycloak settings not found. Load Authorization Keycloak settings."
+            )
+
+        return 
+
+
+

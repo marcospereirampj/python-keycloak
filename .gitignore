@@ -102,3 +102,4 @@ ENV/
 
 .idea/
 main.py
+s3air-authz-config.json

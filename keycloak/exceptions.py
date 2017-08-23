@@ -76,6 +76,10 @@ class KeycloakRPTNotFound(KeycloakOperationError):
     pass
 
 
+class KeycloakAuthorizationConfigError(KeycloakOperationError):
+    pass
+
+
 def raise_error_from_response(response, error, expected_code=200):
 
     if expected_code == response.status_code:
