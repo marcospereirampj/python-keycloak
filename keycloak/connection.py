@@ -87,7 +87,7 @@ class ConnectionManager(object):
         :return:
             If the header parameters exist, return True.
         """
-        return self.get_param_headers(key) is not None
+        return self.param_headers(key) is not None
 
     def add_param_headers(self, key, value):
         """ Add a single parameter inside the header.

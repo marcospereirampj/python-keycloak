@@ -97,7 +97,7 @@ class TestConnection(unittest.TestCase):
                  
         with HTTMock(response_post_fail):
             resp = self._conn.raw_post("/known_path",
-                                        {'field': 'value'})
+                                       {'field': 'value'})
         self.assertEqual(resp.content, str(["Start can't be blank"]).encode("utf-8"))
         self.assertEqual(resp.status_code, 404)
 
