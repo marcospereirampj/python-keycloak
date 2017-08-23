@@ -113,3 +113,8 @@ Main methods::
     options = {"verify_signature": True, "verify_aud": True, "exp": True}
     token_info = keycloak.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
+    # Get permissions by token
+    token = keycloak.token("user", "password")
+    keycloak.load_authorization_config("example-authz-config.json")
+    permissions = keycloak.get_permissions(token['access_token'])
+
