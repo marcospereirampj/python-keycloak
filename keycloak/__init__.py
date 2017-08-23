@@ -271,6 +271,40 @@ class Keycloak:
         self.authorization.load_config(authorization_json)
         authorization_file.close()
 
+    def get_policies(self, token):
+        """
+        Get policies by user token
+
+        :param token: user token
+        :return: policies list
+        """
+
+        if not self.authorization.policies:
+            raise KeycloakAuthorizationConfigError(
+                "Keycloak settings not found. Load Authorization Keycloak settings."
+            )
+
+        token_info = self.instropect(token)
+
+        if not token_info['active']:
+            raise KeycloakInvalidTokenError(
+                "Token expired or invalid."
+            )
+
+        user_resources = token_info['resource_access'].get(self.client_id)
+
+        if not user_resources:
+            return None
+
+        policies = []
+
+        for policy_name, policy in self.authorization.policies.items():
+            for role in user_resources['roles']:
+                if self._build_name_role(role) in policy.roles:
+                    policies.append(policy)
+
+        return list(set(policies))
+
     def get_permissions(self, token):
         """
         Get permission by user token
