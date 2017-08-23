@@ -14,10 +14,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from keycloak.authorization import Authorization
-from keycloak.exceptions import KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
+from .authorization import Authorization
 from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSecretNotFound, \
-    KeycloakRPTNotFound
+    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
 from .urls_patterns import (
     URL_AUTH,
     URL_TOKEN,
