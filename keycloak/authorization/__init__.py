@@ -24,6 +24,12 @@ from keycloak.authorization.role import Role
 
 
 class Authorization:
+    """
+    Keycloak Authorization (policies, roles, scopes and resources).
+
+    https://keycloak.gitbooks.io/documentation/authorization_services/index.html
+
+    """
 
     def __init__(self):
         self._policies = {}
@@ -38,8 +44,9 @@ class Authorization:
 
     def load_config(self, data):
         """
+        Load policies, roles and permissions (scope/resources).
 
-        :param data:
+        :param data: keycloak authorization data (dict)
         :return:
         """
         for pol in data['policies']:

@@ -48,23 +48,7 @@ class KeycloakOperationError(KeycloakError):
     pass
 
 
-class KeycloakListError(KeycloakOperationError):
-    pass
-
-
 class KeycloakGetError(KeycloakOperationError):
-    pass
-
-
-class KeycloakCreateError(KeycloakOperationError):
-    pass
-
-
-class KeycloakUpdateError(KeycloakOperationError):
-    pass
-
-
-class KeycloakDeleteError(KeycloakOperationError):
     pass
 
 
@@ -77,6 +61,10 @@ class KeycloakRPTNotFound(KeycloakOperationError):
 
 
 class KeycloakAuthorizationConfigError(KeycloakOperationError):
+    pass
+
+
+class KeycloakInvalidTokenError(KeycloakOperationError):
     pass
 
 

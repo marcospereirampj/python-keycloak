@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from keycloak.authorization import Authorization
-from keycloak.exceptions import KeycloakAuthorizationConfigError
+from keycloak.exceptions import KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
 from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSecretNotFound, \
     KeycloakRPTNotFound
 from .urls_patterns import (
@@ -97,6 +97,9 @@ class Keycloak:
             payload.update({"client_secret": self.client_secret_key})
 
         return payload
+
+    def _build_name_role(self, role):
+        return self.client_id + "/" + role
 
     def well_know(self):
         """ The most important endpoint to understand is the well-known configuration
@@ -269,14 +272,39 @@ class Keycloak:
         self.authorization.load_config(authorization_json)
         authorization_file.close()
 
-    def get_permissions(self):
+    def get_permissions(self, token):
+        """
+        Get permission by user token
+
+        :param token: user token
+        :return: permissions list
+        """
 
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        return 
+        token_info = self.instropect(token)
+
+        if not token_info['active']:
+            raise KeycloakInvalidTokenError(
+                "Token expired or invalid."
+            )
+
+        user_resources = token_info['resource_access'].get(self.client_id)
+
+        if not user_resources:
+            return None
+
+        permissions = []
+
+        for policy_name, policy in self.authorization.policies.items():
+            for role in user_resources['roles']:
+                if self._build_name_role(role) in policy.roles:
+                    permissions += policy.permissions
+
+        return list(set(permissions))
 
 
 
