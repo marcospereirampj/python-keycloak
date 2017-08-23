@@ -116,5 +116,6 @@ Main methods::
     # Get permissions by token
     token = keycloak.token("user", "password")
     keycloak.load_authorization_config("example-authz-config.json")
+    policies = keycloak.get_policies(token['access_token'])
     permissions = keycloak.get_permissions(token['access_token'])
 
