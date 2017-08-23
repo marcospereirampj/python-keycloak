@@ -17,7 +17,7 @@
 
 from httmock import urlmatch, response, HTTMock, all_requests
 
-from keycloak.connection import ConnectionManager
+from ..connection import ConnectionManager
 
 
 try:

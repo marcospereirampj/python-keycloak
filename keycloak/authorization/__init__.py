@@ -18,9 +18,9 @@
 import ast
 import json
 
-from keycloak.authorization.permission import Permission
-from keycloak.authorization.policy import Policy
-from keycloak.authorization.role import Role
+from .permission import Permission
+from .policy import Policy
+from .role import Role
 
 
 class Authorization:
