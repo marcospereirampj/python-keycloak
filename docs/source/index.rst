@@ -105,8 +105,8 @@ Main methods::
     token_rpt_info = keycloak.instropect(keycloak.instropect(token['access_token'], rpt=rpt['rpt'],
                                          token_type_hint="requesting_party_token"))
 
-    # Instropect Token
-    token_info = keycloak.instropect(token['access_token']))
+    # Introspect Token
+    token_info = keycloak.introspect(token['access_token']))
 
     # Decode Token
     KEYCLOAK_PUBLIC_KEY = "secret"
@@ -117,5 +117,5 @@ Main methods::
     token = keycloak.token("user", "password")
     keycloak.load_authorization_config("example-authz-config.json")
     policies = keycloak.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
-    permissions = keycloak.get_permissions(token['access_token'], method_token_info='instrospect')
+    permissions = keycloak.get_permissions(token['access_token'], method_token_info='introspect')
 
