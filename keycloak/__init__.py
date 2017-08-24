@@ -113,8 +113,8 @@ class Keycloak:
         :param kwargs:
         :return:
         """
-        if method_token_info == 'instropect':
-            token_info = self.instropect(token)
+        if method_token_info == 'introspect':
+            token_info = self.introspect(token)
         else:
             token_info = self.decode_token(token, **kwargs)
 
@@ -228,7 +228,7 @@ class Keycloak:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def instropect(self, token, rpt=None, token_type_hint=None):
+    def introspect(self, token, rpt=None, token_type_hint=None):
         """
         The introspection endpoint is used to retrieve the active state of a token. It is can only be
         invoked by confidential clients.
@@ -291,7 +291,7 @@ class Keycloak:
         self.authorization.load_config(authorization_json)
         authorization_file.close()
 
-    def get_policies(self, token, method_token_info='instropect', **kwargs):
+    def get_policies(self, token, method_token_info='introspect', **kwargs):
         """
         Get policies by user token
 
@@ -306,7 +306,7 @@ class Keycloak:
 
         token_info = self._token_info(token, method_token_info, **kwargs)
 
-        if method_token_info == 'instropect' and not token_info['active']:
+        if method_token_info == 'introspect' and not token_info['active']:
             raise KeycloakInvalidTokenError(
                 "Token expired or invalid."
             )
@@ -325,7 +325,7 @@ class Keycloak:
 
         return list(set(policies))
 
-    def get_permissions(self, token, method_token_info='instropect', **kwargs):
+    def get_permissions(self, token, method_token_info='introspect', **kwargs):
         """
         Get permission by user token
 
@@ -342,7 +342,7 @@ class Keycloak:
 
         token_info = self._token_info(token, method_token_info, **kwargs)
 
-        if method_token_info == 'instropect' and not token_info['active']:
+        if method_token_info == 'introspect' and not token_info['active']:
             raise KeycloakInvalidTokenError(
                 "Token expired or invalid."
             )
