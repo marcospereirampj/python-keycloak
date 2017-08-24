@@ -4,8 +4,8 @@ from setuptools import setup
 
 setup(
     name='python-keycloak',
-    version='0.8.2',
-    url='https://github.com/marcospereirampj/python-keycloak',
+    version='0.8.4',
+    url='https://bitbucket.org/agriness/python-keycloak',
     license='GNU General Public License - V3',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',
