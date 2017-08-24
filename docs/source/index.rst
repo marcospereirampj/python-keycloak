@@ -15,9 +15,6 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. image:: https://travis-ci.org/marcospereirampj/python-keycloak.svg?branch=master
-    :target: https://travis-ci.org/marcospereirampj/python-keycloak
-
 .. image:: https://readthedocs.org/projects/python-keycloak/badge/?version=latest
     :target: http://python-keycloak.readthedocs.io/en/latest/?badge=latest
 
@@ -57,7 +54,7 @@ Bug reports
 ==================
 
 Please report bugs and feature requests at
-`https://github.com/marcospereirampj/python-keycloak/issues <https://github.com/marcospereirampj/python-keycloak/issues>`_
+`https://bitbucket.org/agriness/python-keycloak/issues <https://bitbucket.org/agriness/python-keycloak/issues>`_
 
 Documentation
 ==================
