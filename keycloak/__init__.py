@@ -98,7 +98,27 @@ class Keycloak:
         return payload
 
     def _build_name_role(self, role):
+        """
+
+        :param role:
+        :return:
+        """
         return self.client_id + "/" + role
+
+    def _token_info(self, token, method_token_info, **kwargs):
+        """
+
+        :param token:
+        :param method_token_info:
+        :param kwargs:
+        :return:
+        """
+        if method_token_info == 'instropect':
+            token_info = self.instropect(token)
+        else:
+            token_info = self.decode_token(token, **kwargs)
+
+        return token_info
 
     def well_know(self):
         """ The most important endpoint to understand is the well-known configuration
@@ -271,7 +291,7 @@ class Keycloak:
         self.authorization.load_config(authorization_json)
         authorization_file.close()
 
-    def get_policies(self, token):
+    def get_policies(self, token, method_token_info='instropect', **kwargs):
         """
         Get policies by user token
 
@@ -284,9 +304,9 @@ class Keycloak:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self.instropect(token)
+        token_info = self._token_info(token, method_token_info, **kwargs)
 
-        if not token_info['active']:
+        if method_token_info == 'instropect' and not token_info['active']:
             raise KeycloakInvalidTokenError(
                 "Token expired or invalid."
             )
@@ -305,11 +325,13 @@ class Keycloak:
 
         return list(set(policies))
 
-    def get_permissions(self, token):
+    def get_permissions(self, token, method_token_info='instropect', **kwargs):
         """
         Get permission by user token
 
         :param token: user token
+        :param method_token_info: Decode token method
+        :param kwargs: parameters for decode
         :return: permissions list
         """
 
@@ -318,9 +340,9 @@ class Keycloak:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self.instropect(token)
+        token_info = self._token_info(token, method_token_info, **kwargs)
 
-        if not token_info['active']:
+        if method_token_info == 'instropect' and not token_info['active']:
             raise KeycloakInvalidTokenError(
                 "Token expired or invalid."
             )
