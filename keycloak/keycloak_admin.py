@@ -14,20 +14,19 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from keycloak.urls_patterns import URL_ADMIN_USERS_COUNT, URL_ADMIN_USER, URL_ADMIN_USER_CONSENTS, \
+
+from .urls_patterns import URL_ADMIN_USERS_COUNT, URL_ADMIN_USER, URL_ADMIN_USER_CONSENTS, \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
-    URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS
+    URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES
 from .keycloak_openid import KeycloakOpenID
 
-from .exceptions import raise_error_from_response, KeycloakGetError, KeycloakSecretNotFound, \
-    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
+from .exceptions import raise_error_from_response, KeycloakGetError
 
 from .urls_patterns import (
     URL_ADMIN_USERS,
 )
 
 from .connection import ConnectionManager
-from jose import jwt
 import json
 
 
@@ -96,7 +95,7 @@ class KeycloakAdmin:
     def token(self, value):
         self._token = value
 
-    def list_users(self, query=None):
+    def get_users(self, query=None):
         """
         Get users Returns a list of users, filtered according to query parameters
 
@@ -122,7 +121,7 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
-    def count_users(self):
+    def users_count(self):
         """
         User counter
 
@@ -203,21 +202,6 @@ class KeycloakAdmin:
                                            data=payload, **params_query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def reset_password(self, user_id, password):
-        """
-        Set up a temporary password for the user User will have to reset the
-        temporary password next time they log in.
-
-        :param user_id: User id
-        :param password: A Temporary password
-
-        :return:
-        """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
-        data_raw = self.connection.raw_put(URL_ADMIN_RESET_PASSWORD.format(**params_path),
-                                           data=json.dumps({'pass': password}))
-        return raise_error_from_response(data_raw, KeycloakGetError)
-
     def send_verify_email(self, user_id, client_id=None, redirect_uri=None):
         """
         Send a update account email to the user An email contains a
@@ -254,8 +238,6 @@ class KeycloakAdmin:
         """
         Get themes, social providers, auth providers, and event listeners available on this server
 
-        :param user_id: User id
-
         ServerInfoRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_serverinforepresentation
 
@@ -275,5 +257,48 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENTS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_client(self, client_id):
+        """
+        Get representation of the client
+
+        ClientRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+
+        :param client_id: id of client (not client-id)
+
+        :return: ClientRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_client_role(self, client_id):
+        """
+        Get all roles for the client
+
+        RoleRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
+
+        :param client_id: id of client (not client-id)
+
+        :return: RoleRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_ROLES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_roles(self):
+        """
+        Get all roles for the realm or client
+
+        RoleRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
+
+        :return: RoleRepresentation
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_ADMIN_REALM_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
