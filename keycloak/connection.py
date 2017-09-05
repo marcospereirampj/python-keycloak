@@ -162,3 +162,22 @@ class ConnectionManager(object):
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
+
+    def raw_delete(self, path, **kwargs):
+        """ Submit delete request to the path.
+
+        :arg
+            path (str): Path for request.
+        :return
+            Response the request.
+        :exception
+            HttpError: Can't connect to server.
+        """
+        try:
+            return requests.delete(urljoin(self.base_url, path),
+                                   params=kwargs,
+                                   headers=self.headers,
+                                   timeout=self.timeout)
+        except Exception as e:
+            raise KeycloakConnectionError(
+                "Can't connect to server (%s)" % e)
