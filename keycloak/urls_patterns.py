@@ -28,3 +28,13 @@ URL_ENTITLEMENT = "realms/{realm-name}/authz/entitlement/{resource-server-id}"
 URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
 URL_ADMIN_USERS_COUNT = "admin/realms/{realm-name}/users/count"
 URL_ADMIN_USER = "admin/realms/{realm-name}/users/{id}"
+URL_ADMIN_USER_CONSENTS = "admin/realms/{realm-name}/users/{id}/consents"
+URL_ADMIN_SEND_UPDATE_ACCOUNT = "admin/realms/{realm-name}/users/{id}/execute-actions-email"
+URL_ADMIN_SEND_VERIFY_EMAIL = "admin/realms/{realm-name}/users/{id}/send-verify-email"
+URL_ADMIN_RESET_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
+URL_ADMIN_GET_SESSIONS = "admin/realms/{realm-name}/users/{id}/sessions"
+URL_ADMIN_SERVER_INFO = "admin/serverinfo"
+
+URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
+
+
