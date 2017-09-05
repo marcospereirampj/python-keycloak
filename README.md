@@ -44,49 +44,112 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 ## Usage
 
 ```python
-from keycloak import Keycloak
+from keycloak import KeycloakOpenID
 
 # Configure client
-keycloak = Keycloak(server_url="http://localhost:8080/auth/",
+keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                     client_id="example_client",
                     realm_name="example_realm",
                     client_secret_key="secret")
 
 # Get WellKnow
-config_well_know = keycloak.well_know()
+config_well_know = keycloak_openid.well_know()
 
 # Get Token
-token = keycloak.token("user", "password")
+token = keycloak_openid.token("user", "password")
 
 # Get Userinfo
-userinfo = keycloak.userinfo(token['access_token'])
+userinfo = keycloak_openid.userinfo(token['access_token'])
 
 # Logout
-keycloak.logout(token['refresh_token'])
+keycloak_openid.logout(token['refresh_token'])
 
 # Get Certs
-certs = keycloak.certs()
+certs = keycloak_openid.certs()
 
 # Get RPT (Entitlement)
-token = keycloak.token("user", "password")
-rpt = keycloak.entitlement(token['access_token'], "resource_id")
+token = keycloak_openid.token("user", "password")
+rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
 
 # Instropect RPT
-token_rpt_info = keycloak.instropect(keycloak.instropect(token['access_token'], rpt=rpt['rpt'],
+token_rpt_info = keycloak_openid.instropect(keycloak_openid.instropect(token['access_token'], rpt=rpt['rpt'],
                                      token_type_hint="requesting_party_token"))
 
 # Introspect Token
-token_info = keycloak.introspect(token['access_token']))
+token_info = keycloak_openid.introspect(token['access_token']))
 
 # Decode Token
 KEYCLOAK_PUBLIC_KEY = "secret"
 options = {"verify_signature": True, "verify_aud": True, "exp": True}
-token_info = keycloak.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
+token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
 # Get permissions by token
-token = keycloak.token("user", "password")
-keycloak.load_authorization_config("example-authz-config.json")
-policies = keycloak.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
-permissions = keycloak.get_permissions(token['access_token'], method_token_info='introspect')
+token = keycloak_openid.token("user", "password")
+keycloak_openid.load_authorization_config("example-authz-config.json")
+policies = keycloak_openid.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
+permissions = keycloak_openid.get_permissions(token['access_token'], method_token_info='introspect')
+
+# KEYCLOAK ADMIN
+
+from keycloak import KeycloakAdmin
+
+keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
+                               username='example-admin',
+                               password='secret',
+                               realm_name="example_realm")
+        
+# Add user                       
+new_user = keycloak_admin.create_user({"email": "example@example.com",
+                    "username": "example@example.com",
+                    "enabled": True,
+                    "firstName": "Example",
+                    "lastName": "Example",
+                    "realmRoles": ["user_default", ],
+                    "attributes": {"example": "1,2,3,3,"}})                         
+
+# User counter
+count_users = keycloak_admin.users_count()
+
+# Get users Returns a list of users, filtered according to query parameters
+users = keycloak_admin.get_users({})
+
+# Get User
+user = keycloak_admin.get_user("user-id-keycloak")
+
+# Update User
+response = keycloak_admin.update_user(user_id="user-id-keycloak", 
+                                      payload={'firstName': 'Example Update'})
+                                      
+# Delete User
+response = keycloak_admin.delete_user(user_id="user-id-keycloak")
+
+# Get consents granted by the user
+consents = keycloak_admin.consents_user(user_id="user-id-keycloak")
+
+# Send User Action
+response = keycloak_admin.send_update_account(user_id="user-id-keycloak", 
+                                              payload=json.dumps(['UPDATE_PASSWORD']))
+
+# Send Verify Email
+response = keycloak_admin.send_verify_email(user_id="user-id-keycloak")
+
+# Get sessions associated with the user
+sessions = keycloak_admin.get_sessions(user_id="user-id-keycloak")
+
+# Get themes, social providers, auth providers, and event listeners available on this server
+server_info = keycloak_admin.get_server_info()
+
+# Get clients belonging to the realm Returns a list of clients belonging to the realm
+clients = keycloak_admin.get_clients()
+
+# Get representation of the client - id of client (not client-id)
+client = keycloak_admin.get_client(client_id='id-client')
+
+# Get all roles for the client
+client_roles = keycloak_admin.get_client_role(client_id='id-client')
+
+
+# Get all roles for the realm or client
+realm_roles = keycloak_admin.get_roles()
 
 ```
