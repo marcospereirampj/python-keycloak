@@ -126,7 +126,8 @@ Main methods::
     keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
                                    username='example-admin',
                                    password='secret',
-                                   realm_name="example_realm")
+                                   realm_name="example_realm",
+                                    verify=True)
 
     # Add user
     new_user = keycloak_admin.create_user({"email": "example@example.com",
