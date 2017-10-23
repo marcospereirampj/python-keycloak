@@ -66,6 +66,7 @@ Contributors
 ==================
 
 * `Agriness Team <http://www.agriness.com/pt/>`_
+* `Martin Devlin <martin.devlin@pearson.com>`_
 
 Usage
 =====
