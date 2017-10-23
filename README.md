@@ -3,8 +3,6 @@
 Python Keycloak
 ====================
 
-For review- see https://bitbucket.org/agriness/python-keycloak
-
 **python-keycloak** is a Python package providing access to the Keycloak API.
 
 ## Installation
