@@ -32,20 +32,21 @@ import json
 
 class KeycloakAdmin:
 
-    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli'):
+    def __init__(self, server_url, verify, username, password, realm_name='master', client_id='admin-cli'):
         self._username = username
         self._password = password
         self._client_id = client_id
         self._realm_name = realm_name
 
         # Get token Admin
-        keycloak_openid = KeycloakOpenID(server_url, client_id, realm_name)
+        keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=realm_name, verify=verify)
         self._token = keycloak_openid.token(username, password)
 
         self._connection = ConnectionManager(base_url=server_url,
                                              headers={'Authorization': 'Bearer ' + self.token.get('access_token'),
                                                       'Content-Type': 'application/json'},
-                                             timeout=60)
+                                             timeout=60,
+                                             verify=verify)
 
     @property
     def realm_name(self):
@@ -333,6 +334,43 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def create_client(self, name, client_id, redirect_urls, protocol="openid-connect", public_client=True, direct_access_grants=True):
+        """
+        Create a client
+
+        :param name: name of client, payload (ClientRepresentation)
+
+        ClientRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+
+        """
+        data={}
+        data["name"]=name
+        data["clientId"]=client_id
+        data["redirectUris"]=redirect_urls
+        data["protocol"]=protocol
+        data["publicClient"]=public_client
+        data["directAccessGrantsEnabled"]=direct_access_grants
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(URL_ADMIN_CLIENTS.format(**params_path),
+                                            data=json.dumps(data))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+
+    def delete_client(self, client_id):
+        """
+        Get representation of the client
+
+        ClientRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+
+        :param client_id: id of client (not client-id)
+
+        :return: ClientRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_delete(URL_ADMIN_CLIENT.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
     def get_client_roles(self, client_id):
         """
         Get all roles for the client
@@ -401,6 +439,24 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(data))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+
+    def delete_client_role(self, client_id, role_name):
+        """
+        Create a client role
+
+        :param client_id: id of client (not client-id), payload (RoleRepresentation)
+
+        RoleRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
+
+        """
+        data={}
+        data["name"]=role_name
+        data["clientRole"]=True
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_delete(URL_ADMIN_CLIENT_ROLES.format(**params_path) + "/" + role_name,
+                                            data=json.dumps(data))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def assign_client_role(self, user_id, client_id, role_id, role_name):
         """

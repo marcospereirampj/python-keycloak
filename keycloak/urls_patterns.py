@@ -42,5 +42,3 @@ URL_ADMIN_CLIENT = "admin/realms/{realm-name}/clients/{id}"
 URL_ADMIN_CLIENT_ROLES = "admin/realms/{realm-name}/clients/{id}/roles"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
-
-

@@ -30,12 +30,14 @@ class ConnectionManager(object):
         base_url (str): The server URL.
         headers (dict): The header parameters of the requests to the server.
         timeout (int): Timeout to use for requests to the server.
+        verify (bool): Verify server SSL.
     """
 
-    def __init__(self, base_url, headers={}, timeout=60):
+    def __init__(self, base_url, headers={}, timeout=60, verify=True):
         self._base_url = base_url
         self._headers = headers
         self._timeout = timeout
+        self._verify = verify
 
     @property
     def base_url(self):
@@ -56,6 +58,16 @@ class ConnectionManager(object):
     def timeout(self, value):
         """ """
         self._timeout = value
+
+    @property
+    def verify(self):
+        """ Return verify in use for request to the server. """
+        return self._verify
+
+    @verify.setter
+    def verify(self, value):
+        """ """
+        self._verify = value
 
     @property
     def headers(self):
@@ -118,7 +130,8 @@ class ConnectionManager(object):
             return requests.get(urljoin(self.base_url, path),
                                 params=kwargs,
                                 headers=self.headers,
-                                timeout=self.timeout)
+                                timeout=self.timeout,
+                                verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -138,7 +151,8 @@ class ConnectionManager(object):
                                  params=kwargs,
                                  data=data,
                                  headers=self.headers,
-                                 timeout=self.timeout)
+                                 timeout=self.timeout,
+                                 verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -158,7 +172,8 @@ class ConnectionManager(object):
                                 params=kwargs,
                                 data=data,
                                 headers=self.headers,
-                                timeout=self.timeout)
+                                timeout=self.timeout,
+                                verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -177,7 +192,8 @@ class ConnectionManager(object):
             return requests.delete(urljoin(self.base_url, path),
                                    params=kwargs,
                                    headers=self.headers,
-                                   timeout=self.timeout)
+                                   timeout=self.timeout,
+                                   verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)

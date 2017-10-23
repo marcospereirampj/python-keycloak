@@ -3,6 +3,8 @@
 Python Keycloak
 ====================
 
+For review- see https://bitbucket.org/agriness/python-keycloak
+
 **python-keycloak** is a Python package providing access to the Keycloak API.
 
 ## Installation
@@ -113,6 +115,9 @@ count_users = keycloak_admin.users_count()
 # Get users Returns a list of users, filtered according to query parameters
 users = keycloak_admin.get_users({})
 
+# Get user ID from name
+user-id-keycloak = keycloak_admin.get_user_id("example@example.com")
+
 # Get User
 user = keycloak_admin.get_user("user-id-keycloak")
 
@@ -142,14 +147,24 @@ server_info = keycloak_admin.get_server_info()
 # Get clients belonging to the realm Returns a list of clients belonging to the realm
 clients = keycloak_admin.get_clients()
 
+# Get client - id (not client-id) from client by name
+client_id=keycloak_admin.get_client_id("my-client")
+
 # Get representation of the client - id of client (not client-id)
-client = keycloak_admin.get_client(client_id='id-client')
+client = keycloak_admin.get_client(client_id=client_id)
 
 # Get all roles for the client
-client_roles = keycloak_admin.get_client_role(client_id='id-client')
+client_roles = keycloak_admin.get_client_role(client_id=client_id)
 
+# Create client role
+keycloak_admin.create_client_role(client_id, "test")
+
+# Get client role id from name
+role_id = keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")
 
 # Get all roles for the realm or client
 realm_roles = keycloak_admin.get_roles()
 
+# Assign client role to user. Note that BOTH role_name and role_id appear to be required.
+keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
 ```
