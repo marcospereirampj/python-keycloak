@@ -14,9 +14,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from json.decoder import JSONDecodeError
 
 import requests
+from simplejson import JSONDecodeError
 
 
 class KeycloakError(Exception):
