@@ -68,7 +68,7 @@ class KeycloakInvalidTokenError(KeycloakOperationError):
     pass
 
 
-def raise_error_from_response(response, error, expected_code=200):
+def raise_error_from_response(response, error, expected_code=200, skip_exists=False):
 
     if expected_code == response.status_code:
         if expected_code == requests.codes.no_content:
@@ -78,6 +78,9 @@ def raise_error_from_response(response, error, expected_code=200):
             return response.json()
         except JSONDecodeError as e:
             return response.content
+
+    if skip_exists and response.status_code == 409:
+        return {"Already exists"}
 
     try:
         message = response.json()['message']

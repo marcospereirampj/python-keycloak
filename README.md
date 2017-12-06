@@ -3,6 +3,8 @@
 Python Keycloak
 ====================
 
+For review- see https://bitbucket.org/agriness/python-keycloak
+
 **python-keycloak** is a Python package providing access to the Keycloak API.
 
 ## Installation
@@ -51,8 +53,7 @@ from keycloak import KeycloakOpenID
 keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                     client_id="example_client",
                     realm_name="example_realm",
-                    client_secret_key="secret",
-                    verify=True)
+                    client_secret_key="secret")
 
 # Get WellKnow
 config_well_know = keycloak_openid.well_know()
