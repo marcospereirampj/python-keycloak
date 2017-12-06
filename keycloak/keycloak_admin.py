@@ -168,7 +168,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def update_user(self, user_id, username, email='', firstName='', lastName='', emailVerified=False, enabled=True):
+    def update_user(self, user_id, payload):
         """
         Update the user
 
@@ -177,12 +177,9 @@ class KeycloakAdmin:
 
         :return: Http response
         """
-        data = {"username": username, "email": email, "firstName": firstName, "lastName": lastName,
-                "emailVerified": emailVerified, "enabled": enabled}
-
         params_path = {"realm-name": self.realm_name, "id": user_id}
         data_raw = self.connection.raw_put(URL_ADMIN_USER.format(**params_path),
-                                           data=json.dumps(data))
+                                           data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def delete_user(self, user_id):
