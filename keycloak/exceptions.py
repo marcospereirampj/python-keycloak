@@ -22,7 +22,6 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import requests
-from simplejson import JSONDecodeError
 
 
 class KeycloakError(Exception):
@@ -82,7 +81,7 @@ def raise_error_from_response(response, error, expected_code=200, skip_exists=Fa
 
         try:
             return response.json()
-        except JSONDecodeError as e:
+        except ValueError:
             return response.content
 
     if skip_exists and response.status_code == 409:
