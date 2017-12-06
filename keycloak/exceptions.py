@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import requests
-from simplejson import JSONDecodeError
+from json import JSONDecodeError
 
 
 class KeycloakError(Exception):
