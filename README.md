@@ -40,6 +40,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 ## Contributors
 
 * [Agriness Team](http://www.agriness.com/pt/)
+* [Marcos Pereira](marcospereira.mpj@gmail.com)
 * [Martin Devlin](martin.devlin@pearson.com) 
 * [Shon T. Urbas](shon.urbas@gmail.com>)
 
