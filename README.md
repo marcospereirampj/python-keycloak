@@ -41,6 +41,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 
 * [Agriness Team](http://www.agriness.com/pt/)
 * [Martin Devlin](martin.devlin@pearson.com) 
+* [Shon T. Urbas](shon.urbas@gmail.com>)
 
 ## Usage
 
