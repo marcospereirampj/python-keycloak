@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import requests
-from simplejson import JSONDecodeError
 
 
 class KeycloakError(Exception):
@@ -73,10 +72,9 @@ def raise_error_from_response(response, error, expected_code=200):
     if expected_code == response.status_code:
         if expected_code == requests.codes.no_content:
             return {}
-
         try:
             return response.json()
-        except JSONDecodeError as e:
+        except ValueError:
             return response.content
 
     try:

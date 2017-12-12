@@ -106,7 +106,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_USERS.format(**params_path), **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def create_user(self, username, email='', firstName='', lastName='', emailVerified=False, enabled=True):
+    def create_user(self, payload):
         """
         Create a new user Username must be unique
 
@@ -115,17 +115,11 @@ class KeycloakAdmin:
 
         :param payload: UserRepresentation
 
+        :return: UserRepresentation
         """
-        data={}
-        data["username"]=username
-        data["email"]=email
-        data["firstName"]=firstName
-        data["lastName"]=lastName
-        data["emailVerified"]=emailVerified
-        data["enabled"]=enabled
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_post(URL_ADMIN_USERS.format(**params_path),
-                                            data=json.dumps(data))
+                                            data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
     def users_count(self):
@@ -137,7 +131,6 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_ADMIN_USERS_COUNT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
-
 
     def get_user_id(self, username):
         """
@@ -175,7 +168,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def update_user(self, user_id, username, email='', firstName='', lastName='', emailVerified=False, enabled=True):
+    def update_user(self, user_id, payload):
         """
         Update the user
 
@@ -184,17 +177,9 @@ class KeycloakAdmin:
 
         :return: Http response
         """
-        data={}
-        data["username"]=username
-        data["email"]=email
-        data["firstName"]=firstName
-        data["lastName"]=lastName
-        data["emailVerified"]=emailVerified
-        data["enabled"]=enabled
-        params_path = {"realm-name": self.realm_name}
         params_path = {"realm-name": self.realm_name, "id": user_id}
         data_raw = self.connection.raw_put(URL_ADMIN_USER.format(**params_path),
-                                           data=json.dumps(data))
+                                           data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def delete_user(self, user_id):
