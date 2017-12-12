@@ -43,7 +43,6 @@ python-keycloak depends on:
 * Python 3
 * `requests <http://docs.python-requests.org/en/master/>`_
 * `python-jose <http://python-jose.readthedocs.io/en/latest/>`_
-* `simplejson <https://simplejson.readthedocs.io/en/latest/>`_
 
 Tests Dependencies
 ------------------
@@ -67,6 +66,7 @@ Contributors
 
 * `Agriness Team <http://www.agriness.com/pt/>`_
 * `Martin Devlin <martin.devlin@pearson.com>`_
+* `Shon T. Urbas <shon.urbas@gmail.com>`_
 
 Usage
 =====
@@ -102,7 +102,7 @@ Main methods::
     rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
 
     # Instropect RPT
-    token_rpt_info = keycloak_openid.instropect(keycloak_openid.instropect(token['access_token'], rpt=rpt['rpt'],
+    token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
                                          token_type_hint="requesting_party_token"))
 
     # Introspect Token
@@ -127,7 +127,7 @@ Main methods::
                                    username='example-admin',
                                    password='secret',
                                    realm_name="example_realm",
-                                    verify=True)
+                                   verify=True)
 
     # Add user
     new_user = keycloak_admin.create_user({"email": "example@example.com",
