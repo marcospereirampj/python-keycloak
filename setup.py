@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='python-keycloak',
-    version='0.11.0',
+    version='0.11.1',
     url='https://bitbucket.org/agriness/python-keycloak',
     license='GNU General Public License - V3',
     author='Marcos Pereira',
@@ -12,7 +12,7 @@ setup(
     keywords='keycloak openid',
     description=u'python-keycloak is a Python package providing access to the Keycloak API.',
     packages=['keycloak', 'keycloak.authorization', 'keycloak.tests'],
-    install_requires=['requests==2.18.4', 'httmock==1.2.5', 'python-jose==1.3.2', 'simplejson'],
+    install_requires=['requests==2.18.4', 'httmock==1.2.5', 'python-jose==1.4.0'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
