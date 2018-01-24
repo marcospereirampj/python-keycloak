@@ -42,7 +42,9 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 ## Contributors
 
 * [Agriness Team](http://www.agriness.com/pt/)
+* [Marcos Pereira](marcospereira.mpj@gmail.com)
 * [Martin Devlin](martin.devlin@pearson.com) 
+* [Shon T. Urbas](shon.urbas@gmail.com>)
 
 ## Usage
 
@@ -75,7 +77,7 @@ token = keycloak_openid.token("user", "password")
 rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
 
 # Instropect RPT
-token_rpt_info = keycloak_openid.instropect(keycloak_openid.instropect(token['access_token'], rpt=rpt['rpt'],
+token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
                                      token_type_hint="requesting_party_token"))
 
 # Introspect Token
