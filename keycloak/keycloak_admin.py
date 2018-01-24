@@ -23,7 +23,7 @@ from .urls_patterns import \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
     URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
     URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
-    URL_ADMIN_USER_PASSWORD, URL_ADMIN_GROUP_PERMISSIONS
+    URL_ADMIN_GROUP_PERMISSIONS
 
 from .keycloak_openid import KeycloakOpenID
 
@@ -46,7 +46,8 @@ class KeycloakAdmin:
         self._realm_name = realm_name
 
         # Get token Admin
-        keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=realm_name, verify=verify)
+        keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=realm_name,
+                                         verify=verify)
         self._token = keycloak_openid.token(username, password)
 
         self._connection = ConnectionManager(base_url=server_url,
@@ -217,7 +218,7 @@ class KeycloakAdmin:
         """
         payload = {"type": "password", "temporary": temporary, "value": password}
         params_path = {"realm-name": self.realm_name, "id": user_id}
-        data_raw = self.connection.raw_put(URL_ADMIN_USER_PASSWORD.format(**params_path),
+        data_raw = self.connection.raw_put(URL_ADMIN_RESET_PASSWORD.format(**params_path),
                                            data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=200)
 
@@ -481,24 +482,22 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_client_id(self, client_id_name):
+    def get_client_id(self, client_name):
         """
         Get internal keycloak client id from client-id.
         This is required for further actions against this client.
 
-        :param client_id_name: name in ClientRepresentation
+        :param client_name: name in ClientRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
 
         :return: client_id (uuid as string)
         """
-        params_path = {"realm-name": self.realm_name, "clientId": client_id_name}
-        data_raw = self.connection.raw_get(URL_ADMIN_CLIENTS.format(**params_path))
-        data_content = raise_error_from_response(data_raw, KeycloakGetError)
 
-        for client in data_content:
-            client_id = json.dumps(client["clientId"]).strip('"')
-            if client_id == client_id_name:
-               return json.dumps(client["id"]).strip('"')
+        clients = self.get_clients()
+
+        for client in clients:
+            if client_name == client['name']:
+                return client["id"]
 
         return None
 
@@ -517,31 +516,20 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def create_client(self, name, client_id, redirect_uris, protocol="openid-connect", public_client=True,
-                      direct_access_grants=True):
+    def create_client(self, payload):
         """
         Create a client
 
-        :param name: name of client
-        :param client_id: (oauth client-id)
-        :param redirect_uris: Valid edirect URIs
-        :param redirect urls
-        :param protocol: openid-connect or saml
+        :param payload: ClientRepresentation
 
-        ClientRepresentation
-        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+        :return: UserRepresentation
+
+        ClientRepresentation: http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
 
         """
-        data={}
-        data["name"]=name
-        data["clientId"]=client_id
-        data["redirectUris"]=redirect_uris
-        data["protocol"]=protocol
-        data["publicClient"]=public_client
-        data["directAccessGrantsEnabled"]=direct_access_grants
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENTS.format(**params_path),
-                                            data=json.dumps(data))
+                                            data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
     def delete_client(self, client_id):
@@ -576,24 +564,22 @@ class KeycloakAdmin:
 
     def get_client_role_id(self, client_id, role_name):
         """
-        Get client role id
+        Get client role id by name
         This is required for further actions with this role.
 
-        :param client_id: id of client (not client-id), role_name: name of role
+        :param client_id: id of client (not client-id)
+        :param role_name: role’s name (not id!)
 
         RoleRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
 
         :return: role_id
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
-        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_ROLES.format(**params_path))
-        data_content = raise_error_from_response(data_raw, KeycloakGetError)
+        roles = self.get_client_roles(client_id)
 
-        for role in data_content:
-            this_role_name = json.dumps(role["name"]).strip('"')
-            if this_role_name == role_name:
-                return json.dumps(role["id"]).strip('"')
+        for role in roles:
+            if roles['name'] == role_name:
+                return role["id"]
 
         return None
 
@@ -610,54 +596,49 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_REALM_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def create_client_role(self, client_id, role_name, skip_exists=False):
+    def create_client_role(self, payload):
         """
         Create a client role
 
-        :param client_id: id of client (not client-id), role_name: name of role
+        :param payload: id of client (not client-id), role_name: name of role
 
         RoleRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
 
         """
-        data={}
-        data["name"]=role_name
-        data["clientRole"]=True
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.realm_name, "id": self.client_id}
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_ROLES.format(**params_path),
-                                            data=json.dumps(data))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
-    def delete_client_role(self, client_id, role_name):
+    def delete_client_role(self, role_name):
         """
         Create a client role
 
-        :param client_id: id of client (not client-id), role_name: name of role
+        :param role_name: role’s name (not id!)
 
         RoleRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
 
         """
-        data={}
-        data["name"]=role_name
-        data["clientRole"]=True
-        params_path = {"realm-name": self.realm_name, "id": client_id}
-        data_raw = self.connection.raw_delete(URL_ADMIN_CLIENT_ROLES.format(**params_path) + "/" + role_name,
-                                            data=json.dumps(data))
+        params_path = {"realm-name": self.realm_name, "id": self.client_id, "role-name": role_name}
+        data_raw = self.connection.raw_delete(URL_ADMIN_CLIENT_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
-    def assign_client_role(self, user_id, client_id, role_id, role_name):
+    def assign_client_role(self, user_id, client_id, roles):
         """
         Assign a client role to a user
 
-        :param client_id: id of client (not client-id), user_id: id of user, client_id: id of client containing role,
-        role_id: client role id, role_name: client role name)
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :param client_id: id of client containing role,
+        :param roles: roles list or role (use RoleRepresentation)
+
+        :return
 
         """
-        payload=[{}]
-        payload[0]["id"]=role_id
-        payload[0]["name"]=role_name
 
+        payload = roles if isinstance(roles, list) else [roles]
         params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
         data_raw = self.connection.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
