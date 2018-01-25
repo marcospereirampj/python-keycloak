@@ -39,3 +39,4 @@ entitlement, instropect)
 * Add groups functions
 * Add Admin Tasks for user and client role management
 * Function to trigger user sync from provider
+* Optional parameter: verify 

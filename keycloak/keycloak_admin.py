@@ -39,7 +39,16 @@ import json
 
 class KeycloakAdmin:
 
-    def __init__(self, server_url, verify, username, password, realm_name='master', client_id='admin-cli'):
+    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True):
+        """
+
+        :param server_url: Keycloak server url
+        :param username: admin username
+        :param password: admin password
+        :param realm_name: realm name
+        :param client_id: client id
+        :param verify: True if want check connection SSL
+        """
         self._username = username
         self._password = password
         self._client_id = client_id

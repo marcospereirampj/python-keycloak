@@ -34,7 +34,15 @@ import json
 
 class KeycloakOpenID:
 
-    def __init__(self, server_url, verify, client_id, realm_name, client_secret_key=None):
+    def __init__(self, server_url, realm_name, client_id, client_secret_key=None, verify=True):
+        """
+
+        :param server_url: Keycloak server url
+        :param client_id: client id
+        :param realm_name: realm name
+        :param client_secret_key: client secret key
+        :param verify: True if want check connection SSL
+        """
         self._client_id = client_id
         self._client_secret_key = client_secret_key
         self._realm_name = realm_name
