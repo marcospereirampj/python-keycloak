@@ -49,3 +49,5 @@ URL_ADMIN_CLIENT_ROLES = "admin/realms/{realm-name}/clients/{id}/roles"
 URL_ADMIN_CLIENT_ROLE = "admin/realms/{realm-name}/clients/{id}/roles/{role-name}"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
+
+URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"

@@ -22,8 +22,8 @@ from .urls_patterns import \
     URL_ADMIN_USERS_COUNT, URL_ADMIN_USER, URL_ADMIN_USER_CONSENTS, \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
     URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
-    URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
-    URL_ADMIN_GROUP_PERMISSIONS
+    URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
+    URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE
 
 from .keycloak_openid import KeycloakOpenID
 
@@ -627,3 +627,12 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def sync_users(self, storage_id, action):
+        data = {'action': action}
+        params_query = {"action": action}
+
+        params_path = {"realm-name": self.realm_name, "id": storage_id}
+        data_raw = self.connection.raw_post(URL_ADMIN_USER_STORAGE.format(**params_path),
+                                            data=json.dumps(data), **params_query)
+        return raise_error_from_response(data_raw, KeycloakGetError)
