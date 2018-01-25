@@ -165,6 +165,26 @@ class KeycloakOpenID:
                                             data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def refresh_token(self, refresh_token, grant_type=["refresh_token"]):
+        """
+        The token endpoint is used to obtain tokens. Tokens can either be obtained by
+        exchanging an authorization code or by supplying credentials directly depending on
+        what flow is used. The token endpoint is also used to obtain new access tokens
+        when they expire.
+
+        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+
+        :param refresh_token:
+        :param grant_type:
+        :return:
+        """
+        params_path = {"realm-name": self.realm_name}
+        payload = {"client_id": self.client_id, "grant_type": grant_type, "refresh_token": refresh_token}
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path),
+                                            data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def userinfo(self, token):
         """
         The userinfo endpoint returns standard claims about the authenticated user,
