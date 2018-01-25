@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='python-keycloak',
-    version='0.11.1',
+    version='0.12.0',
     url='https://bitbucket.org/agriness/python-keycloak',
     license='GNU General Public License - V3',
     author='Marcos Pereira',
