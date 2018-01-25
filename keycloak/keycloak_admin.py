@@ -629,6 +629,13 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def sync_users(self, storage_id, action):
+        """
+        Function to trigger user sync from provider
+
+        :param storage_id:
+        :param action:
+        :return:
+        """
         data = {'action': action}
         params_query = {"action": action}
 
