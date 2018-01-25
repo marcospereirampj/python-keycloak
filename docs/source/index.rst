@@ -65,6 +65,7 @@ Contributors
 ==================
 
 * `Agriness Team <http://www.agriness.com/pt/>`_
+* `Marcos Pereira <marcospereira.mpj@gmail.com>`_
 * `Martin Devlin <martin.devlin@pearson.com>`_
 * `Shon T. Urbas <shon.urbas@gmail.com>`_
 
