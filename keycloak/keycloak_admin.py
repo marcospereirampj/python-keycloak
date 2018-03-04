@@ -649,6 +649,22 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def delete_client_roles_of_user(self, user_id, client_id, roles):
+        """
+        Delete client roles from a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :param client_id: id of client containing role,
+        :param roles: roles list or role to delete (use RoleRepresentation)
+        :return: Keycloak server response
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        data_raw = self.connection.raw_delete(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
+                                              data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
     def sync_users(self, storage_id, action):
         """
         Function to trigger user sync from provider
