@@ -637,6 +637,18 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
+    def get_client_roles_of_user(self, user_id, client_id):
+        """
+        Get all client roles for a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def sync_users(self, storage_id, action):
         """
         Function to trigger user sync from provider
