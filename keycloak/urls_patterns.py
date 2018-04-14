@@ -47,6 +47,7 @@ URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
 URL_ADMIN_CLIENT = "admin/realms/{realm-name}/clients/{id}"
 URL_ADMIN_CLIENT_ROLES = "admin/realms/{realm-name}/clients/{id}/roles"
 URL_ADMIN_CLIENT_ROLE = "admin/realms/{realm-name}/clients/{id}/roles/{role-name}"
+URL_ADMIN_CLIENT_AUTHZ_SETTINGS = "admin/realms/{realm-name}/clients/{id}/authz/resource-server/settings"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 
