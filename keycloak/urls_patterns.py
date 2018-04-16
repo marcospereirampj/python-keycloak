@@ -48,7 +48,10 @@ URL_ADMIN_CLIENT = "admin/realms/{realm-name}/clients/{id}"
 URL_ADMIN_CLIENT_ROLES = "admin/realms/{realm-name}/clients/{id}/roles"
 URL_ADMIN_CLIENT_ROLE = "admin/realms/{realm-name}/clients/{id}/roles/{role-name}"
 URL_ADMIN_CLIENT_AUTHZ_SETTINGS = "admin/realms/{realm-name}/clients/{id}/authz/resource-server/settings"
+URL_ADMIN_CLIENT_AUTHZ_RESOURCES = "admin/realms/{realm-name}/clients/{id}/authz/resource-server/resource"
+URL_ADMIN_CLIENT_CERTS = "admin/realms/{realm-name}/clients/{id}/certificates/{attr}"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 
 URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"
+
