@@ -512,7 +512,7 @@ class KeycloakAdmin:
 
     def get_client_authz_resources(self, client_id):
         """
-        Get authorization json from client.
+        Get resources from client.
 
         :param client_id: id in ClientRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
