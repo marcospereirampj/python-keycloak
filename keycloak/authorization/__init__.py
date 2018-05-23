@@ -75,13 +75,15 @@ class Authorization:
                     self.policies[policy_name].add_permission(permission)
 
             if pol['type'] == 'resource':
+                from pprint import pprint
                 permission = Permission(name=pol['name'],
                                         type=pol['type'],
                                         logic=pol['logic'],
                                         decision_strategy=pol['decisionStrategy'])
 
-                permission.resources = ast.literal_eval(pol['config']['resources'])
+                permission.resources = ast.literal_eval(pol['config'].get('resources', "[]"))
 
                 for policy_name in ast.literal_eval(pol['config']['applyPolicies']):
-                    self.policies[policy_name].add_permission(permission)
+                    if self.policies.get(policy_name) is not None:
+                        self.policies[policy_name].add_permission(permission)
 
