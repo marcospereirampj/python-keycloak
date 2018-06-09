@@ -22,7 +22,7 @@ from .urls_patterns import \
     URL_ADMIN_USERS_COUNT, URL_ADMIN_USER, URL_ADMIN_USER_CONSENTS, \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
     URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
-    URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
+    URL_ADMIN_GROUP, URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
     URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE
 
 from .keycloak_openid import KeycloakOpenID
@@ -331,6 +331,19 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
         data_raw = self.connection.raw_get(URL_ADMIN_GROUP.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_group_members(self, group_id):
+        """
+        Get group by id. Returns full group details
+
+        GroupRepresentation
+        http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
+
+        :return: Keycloak server response (GroupRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_GROUP_MEMBERS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_group_by_name(self, name_or_path, search_in_subgroups=False):
