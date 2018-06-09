@@ -335,12 +335,12 @@ class KeycloakAdmin:
 
     def get_group_members(self, group_id):
         """
-        Get group by id. Returns full group details
+        Get members by group id. Returns group members
 
         GroupRepresentation
-        http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
+        http://www.keycloak.org/docs-api/3.2/rest-api/#_userrepresentation
 
-        :return: Keycloak server response (GroupRepresentation)
+        :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
         data_raw = self.connection.raw_get(URL_ADMIN_GROUP_MEMBERS.format(**params_path))
