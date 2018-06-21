@@ -23,7 +23,7 @@ from .urls_patterns import \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
     URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
     URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP,\
-    URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE
+    URL_ADMIN_USER_GROUPS, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE
 
 from .keycloak_openid import KeycloakOpenID
 
@@ -184,6 +184,18 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(URL_ADMIN_USER.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_user_groups(self, user_id):
+        """
+        Get user groups Returns a list of groups of which the user is a member
+
+        :param user_id: User id
+
+        :return: user groups list
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_USER_GROUPS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def update_user(self, user_id, payload):
