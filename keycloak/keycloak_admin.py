@@ -386,7 +386,7 @@ class KeycloakAdmin:
                     return self.get_subgroups(subgroup, path)
         return None
 
-    def get_group_members(self, group_id):
+    def get_group_members(self, group_id, **query):
         """
         Get members by group id. Returns group members
 
@@ -396,7 +396,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        data_raw = self.connection.raw_get(URL_ADMIN_GROUP_MEMBERS.format(**params_path))
+        data_raw = self.connection.raw_get(URL_ADMIN_GROUP_MEMBERS.format(**params_path), **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_group_by_path(self, path, search_in_subgroups=False):
