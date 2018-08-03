@@ -123,6 +123,19 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_USERS.format(**params_path), **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_idps(self):
+        """
+        Returns a list of ID Providers,
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/3.3/rest-api/index.html#_identityproviderrepresentation
+
+        :return: array IdentityProviderRepresentation
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_ADMIN_IDPS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def create_user(self, payload):
         """
         Create a new user Username must be unique
@@ -135,6 +148,12 @@ class KeycloakAdmin:
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.realm_name}
+
+        exists = self.get_user_id(username=payload['username'])
+
+        if exists is not None:
+            return str(exists)
+
         data_raw = self.connection.raw_post(URL_ADMIN_USERS.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
@@ -333,7 +352,28 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_GROUP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_group_by_name(self, name_or_path, search_in_subgroups=False):
+    def get_subgroups(self, group, path):
+        """
+        Utility function to iterate through nested group structures
+
+        GroupRepresentation
+        http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
+
+        :param name: group (GroupRepresentation)
+        :param path: group path (string)
+
+        :return: Keycloak server response (GroupRepresentation)
+        """
+
+        for subgroup in group["subGroups"]:
+            if subgroup['path'] == path:
+                return subgroup
+            elif subgroup["subGroups"]:
+                 for subgroup in group["subGroups"]:
+                    return self.get_subgroups(subgroup, path)
+        return None
+
+    def get_group_by_path(self, path, search_in_subgroups=False):
         """
         Get group id based on name or path.
         A straight name or path match with a top-level group will return first.
@@ -342,7 +382,6 @@ class KeycloakAdmin:
         GroupRepresentation
         http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
 
-        :param name: group name
         :param path: group path
         :param search_in_subgroups: True if want search in the subgroups
         :return: Keycloak server response (GroupRepresentation)
@@ -352,48 +391,48 @@ class KeycloakAdmin:
 
         # TODO: Review this code is necessary
         for group in groups:
-            if group['name'] == name_or_path or group['path'] == name_or_path:
+            if group['path'] == path:
                 return group
             elif search_in_subgroups and group["subGroups"]:
-                for subgroup in group["subGroups"]:
-                    if subgroup['name'] == name_or_path or subgroup['path'] == name_or_path:
-                        return subgroup
-
+                res = self.get_subgroups(group, path)
+                if res != None:
+                    return res
         return None
 
-    def create_group(self, name=None, client_roles={}, realm_roles=[], sub_groups=[], path=None, parent=None):
+    def create_group(self, payload, parent=None, skip_exists=False):
         """
-        Create a group in the Realm
+        Creates a group in the Realm
+
+        :param payload: GroupRepresentation
+        :param parent: parent group's id. Required to create a sub-group.
 
         GroupRepresentation
         http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
 
-        :param name: group name
-        :param client_roles: (Dict) Client roles to include in groupp # Not demonstrated to work
-        :param realm_roles: (List) Realm roles to include in group # Not demonstrated to work
-        :param sub_groups: (List) Subgroups to include in groupp # Not demonstrated to work
-        :param path: group path
-        :param parent: parent group's id. Required to create a sub-group.
-
-        :return: Keycloak server response (GroupRepresentation)
+        :return: Http response
         """
+        name = payload['name']
+        path = payload['path']
+        exists = None
 
-        data = {"name": name or path,
-                "path": path,
-                "clientRoles": client_roles,
-                "realmRoles": realm_roles,
-                "subGroups": sub_groups}
+        if name is None and path is not None:
+          path="/" + name
+
+        elif path is not None:
+            exists = self.get_group_by_path(path=path, search_in_subgroups=True)
+
+        if exists is not None:
+            return str(exists)
 
         if parent is None:
-            params_path = {"realm-name": self.realm_name}
-            data_raw = self.connection.raw_post(URL_ADMIN_GROUPS.format(**params_path),
-                                                data=json.dumps(data))
+          params_path = {"realm-name": self.realm_name}
+          data_raw = self.connection.raw_post(URL_ADMIN_GROUPS.format(**params_path),
+                                            data=json.dumps(payload))
         else:
-            params_path = {"realm-name": self.realm_name, "id": parent}
-            data_raw = self.connection.raw_post(URL_ADMIN_GROUP_CHILD.format(**params_path),
-                                                data=json.dumps(data))
-
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+          params_path = {"realm-name": self.realm_name, "id": parent,}
+          data_raw = self.connection.raw_post(URL_ADMIN_GROUP_CHILD.format(**params_path),
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
     def group_set_permissions(self, group_id, enabled=True):
         """
@@ -496,7 +535,7 @@ class KeycloakAdmin:
 
         return None
 
-    def create_client(self, payload):
+    def create_client(self, payload, skip_exists=False):
         """
         Create a client
 
@@ -509,7 +548,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENTS.format(**params_path),
                                             data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
     def delete_client(self, client_id):
         """
@@ -591,7 +630,7 @@ class KeycloakAdmin:
         role = self.get_client_role(client_id, role_name)
         return role.get("id")
 
-    def create_client_role(self, payload):
+    def create_client_role(self, payload, skip_exists=False):
         """
         Create a client role
 
@@ -605,7 +644,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": self.client_id}
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
     def delete_client_role(self, role_name):
         """

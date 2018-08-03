@@ -1,4 +1,3 @@
-
 Changelog
 ============
 
@@ -6,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.5.0] - 2017-08-21
 
-* Basic functions for Keycloak API (well_know, token, userinfo, logout, certs, 
+* Basic functions for Keycloak API (well_know, token, userinfo, logout, certs,
 entitlement, instropect)
 
 ## [0.6.0] - 2017-08-23
@@ -39,4 +38,8 @@ entitlement, instropect)
 * Add groups functions
 * Add Admin Tasks for user and client role management
 * Function to trigger user sync from provider
-* Optional parameter: verify 
+
+## [0.12.1] - 2018-08-04
+
+* Add get_idps
+* Rework group functions
