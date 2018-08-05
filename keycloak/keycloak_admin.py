@@ -181,8 +181,8 @@ class KeycloakAdmin:
 
         :return: user_id
         """
-        params_path = {"realm-name": self.realm_name, "username": username}
-        data_raw = self.connection.raw_get(URL_ADMIN_USERS.format(**params_path))
+
+        data_raw = self.get_users(query={"username": username})
         data_content = raise_error_from_response(data_raw, KeycloakGetError)
 
         for user in data_content:
