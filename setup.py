@@ -2,15 +2,20 @@
 
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='python-keycloak',
     version='0.13.0',
     url='https://bitbucket.org/agriness/python-keycloak',
-    license='GNU General Public License - V3',
+    license='The MIT License',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',
     keywords='keycloak openid',
     description=u'python-keycloak is a Python package providing access to the Keycloak API.',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=['keycloak', 'keycloak.authorization', 'keycloak.tests'],
     install_requires=['requests==2.18.4', 'httmock==1.2.5', 'python-jose==1.4.0', 'simplejson'],
     classifiers=[
