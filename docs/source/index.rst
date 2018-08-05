@@ -66,12 +66,15 @@ Contributors
 ==================
 
 * `Agriness Team <http://www.agriness.com/pt/>`_
+* `Marcos Pereira <marcospereira.mpj@gmail.com>`_
 * `Martin Devlin <martin.devlin@pearson.com>`_
 * `Shon T. Urbas <shon.urbas@gmail.com>`_
-* `Shon T. Urbas <shon.urbas@gmail.com>`_
-* `Shon T. Urbas <shon.urbas@gmail.com>`_
-* `Shon T. Urbas <shon.urbas@gmail.com>`_
-* `Shon T. Urbas <shon.urbas@gmail.com>`_
+* `Markus Spanier <https://bitbucket.org/spanierm/>`_
+* `Remco Kranenburg <https://bitbucket.org/Remco47/>`_
+* `Armin <https://bitbucket.org/arminfelder/>`_
+* `Njordr <https://bitbucket.org/njordr/>`_
+* `Josha Inglis <https://bitbucket.org/joshainglis/>`_
+* `Alex] <https://bitbucket.org/alex_zel/>`_
 
 Usage
 =====
