@@ -47,7 +47,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 * [Shon T. Urbas](shon.urbas@gmail.com>)
 * [Markus Spanier]()
 * [Remco Kranenburg]()
-* [Remco Kranenburg]()
+* [Armin]()
 
 ## Usage
 

@@ -68,6 +68,10 @@ Contributors
 * `Agriness Team <http://www.agriness.com/pt/>`_
 * `Martin Devlin <martin.devlin@pearson.com>`_
 * `Shon T. Urbas <shon.urbas@gmail.com>`_
+* `Shon T. Urbas <shon.urbas@gmail.com>`_
+* `Shon T. Urbas <shon.urbas@gmail.com>`_
+* `Shon T. Urbas <shon.urbas@gmail.com>`_
+* `Shon T. Urbas <shon.urbas@gmail.com>`_
 
 Usage
 =====

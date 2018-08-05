@@ -44,6 +44,7 @@ URL_ADMIN_GROUPS = "admin/realms/{realm-name}/groups"
 URL_ADMIN_GROUP = "admin/realms/{realm-name}/groups/{id}"
 URL_ADMIN_GROUP_CHILD = "admin/realms/{realm-name}/groups/{id}/children"
 URL_ADMIN_GROUP_PERMISSIONS = "admin/realms/{realm-name}/groups/{id}/management/permissions"
+URL_ADMIN_GROUP_MEMBERS = "admin/realms/{realm-name}/groups/{id}/members"
 
 URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
 URL_ADMIN_CLIENT = "admin/realms/{realm-name}/clients/{id}"
