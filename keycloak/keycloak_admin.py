@@ -18,14 +18,7 @@
 # Unless otherwise stated in the comments, "id", in e.g. user_id, refers to the
 # internal Keycloak server ID, usually a uuid string
 
-from keycloak.urls_patterns import URL_ADMIN_CLIENT_ROLE
-from .urls_patterns import \
-    URL_ADMIN_USERS_COUNT, URL_ADMIN_USER, URL_ADMIN_USER_CONSENTS, \
-    URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
-    URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
-    URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP, URL_ADMIN_GROUP_MEMBERS, \
-    URL_ADMIN_USER_GROUPS, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE, \
-    URL_ADMIN_CLIENT_AUTHZ_SETTINGS, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_IDPS
+from .urls_patterns import *
 
 from .keycloak_openid import KeycloakOpenID
 
@@ -728,6 +721,57 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
         data_raw = self.connection.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_client_roles_of_user(self, user_id, client_id):
+        """
+        Get all client roles for a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        return self._get_client_roles_of_user(URL_ADMIN_USER_CLIENT_ROLES, user_id, client_id)
+
+    def get_available_client_roles_of_user(self, user_id, client_id):
+        """
+        Get available client role-mappings for a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        return self._get_client_roles_of_user(URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, user_id, client_id)
+
+    def get_composite_client_roles_of_user(self, user_id, client_id):
+        """
+        Get composite client role-mappings for a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        return self._get_client_roles_of_user(URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE, user_id, client_id)
+
+    def _get_client_roles_of_user(self, client_level_role_mapping_url, user_id, client_id):
+        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        data_raw = self.connection.raw_get(client_level_role_mapping_url.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def delete_client_roles_of_user(self, user_id, client_id, roles):
+        """
+        Delete client roles from a user.
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :param client_id: id of client containing role,
+        :param roles: roles list or role to delete (use RoleRepresentation)
+        :return: Keycloak server response
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        data_raw = self.connection.raw_delete(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
+                                              data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def sync_users(self, storage_id, action):

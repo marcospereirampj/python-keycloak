@@ -197,6 +197,19 @@ keycloak_admin.create_client_role(client_id, "test")
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id="client_id", user_id="user_id", role_id="role_id", role_name="test")
 
+# Retrieve client roles of a user.
+keycloak_admin.get_client_roles_of_user(user_id="user_id", client_id="client_id")
+
+# Retrieve available client roles of a user.
+keycloak_admin.get_available_client_roles_of_user(user_id="user_id", client_id="client_id")
+
+# Retrieve composite client roles of a user.
+keycloak_admin.get_composite_client_roles_of_user(user_id="user_id", client_id="client_id")
+
+# Delete client roles of a user.
+keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles={"id": "role-id"})
+keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
+
 # Create new group
 group = keycloak_admin.create_group(name="Example Group")
 
