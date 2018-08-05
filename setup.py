@@ -15,7 +15,7 @@ setup(
     install_requires=['requests==2.18.4', 'httmock==1.2.5', 'python-jose==1.4.0', 'simplejson'],
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: The MIT License (MIT)',
+        'License :: OSI Approved :: MIT License',
         'Development Status :: 3 - Alpha',
         'Operating System :: MacOS',
         'Operating System :: Unix',
