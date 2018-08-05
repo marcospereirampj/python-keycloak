@@ -150,7 +150,7 @@ class KeycloakOpenID:
         """
         return NotImplemented
 
-    def token(self, username, password, grant_type=["password"]):
+    def token(self, username="", password="", grant_type=["password"], code="", redirect_uri=""):
         """
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -162,11 +162,14 @@ class KeycloakOpenID:
         :param username:
         :param password:
         :param grant_type:
+        :param code:
+        :param redirect_uri
         :return:
         """
         params_path = {"realm-name": self.realm_name}
         payload = {"username": username, "password": password,
-                   "client_id": self.client_id, "grant_type": grant_type}
+                   "client_id": self.client_id, "grant_type": grant_type,
+                   "code": code, "redirect_uri": redirect_uri}
 
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path),
