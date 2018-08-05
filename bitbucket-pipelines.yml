@@ -8,6 +8,7 @@ image: python:3.5.1
 pipelines:
   default:
     - step:
+        name: Tests
         caches:
           - pip
         script: # Modify the commands below to build your repository.
