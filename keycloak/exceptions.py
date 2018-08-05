@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import requests
+from simplejson import JSONDecodeError
 
 
 class KeycloakError(Exception):
@@ -67,15 +68,19 @@ class KeycloakInvalidTokenError(KeycloakOperationError):
     pass
 
 
-def raise_error_from_response(response, error, expected_code=200):
+def raise_error_from_response(response, error, expected_code=200, skip_exists=False):
 
     if expected_code == response.status_code:
         if expected_code == requests.codes.no_content:
             return {}
+
         try:
             return response.json()
-        except ValueError:
+        except JSONDecodeError as e:
             return response.content
+
+    if skip_exists and response.status_code == 409:
+        return {"Already exists"}
 
     try:
         message = response.json()['message']

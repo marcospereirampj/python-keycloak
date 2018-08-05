@@ -1,3 +1,4 @@
 requests>=2.18.4
 httmock>=1.2.5
 python-jose>=1.4.0
+simplejson
