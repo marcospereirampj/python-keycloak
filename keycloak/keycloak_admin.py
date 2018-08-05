@@ -24,7 +24,8 @@ from .urls_patterns import \
     URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_GET_SESSIONS, \
     URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENTS, URL_ADMIN_CLIENT, URL_ADMIN_CLIENT_ROLES, URL_ADMIN_REALM_ROLES, \
     URL_ADMIN_GROUP, URL_ADMIN_GROUPS, URL_ADMIN_GROUP_CHILD, URL_ADMIN_USER_GROUP, URL_ADMIN_GROUP_MEMBERS, \
-    URL_ADMIN_USER_GROUPS, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE
+    URL_ADMIN_USER_GROUPS, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_USER_CLIENT_ROLES, URL_ADMIN_USER_STORAGE, \
+    URL_ADMIN_CLIENT_AUTHZ_SETTINGS, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_IDPS
 
 from .keycloak_openid import KeycloakOpenID
 
@@ -556,10 +557,36 @@ class KeycloakAdmin:
         clients = self.get_clients()
 
         for client in clients:
-            if client_name == client['name']:
+            if client_name == client.get('name') or client_name == client.get('clientId'):
                 return client["id"]
 
         return None
+
+    def get_client_authz_settings(self, client_id):
+        """
+        Get authorization json from client.
+
+        :param client_id: id in ClientRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path))
+        return data_raw
+
+    def get_client_authz_resources(self, client_id):
+        """
+        Get resources from client.
+
+        :param client_id: id in ClientRepresentation
+        http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path))
+        return data_raw
 
     def create_client(self, payload, skip_exists=False):
         """
@@ -567,6 +594,7 @@ class KeycloakAdmin:
 
         ClientRepresentation: http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_clientrepresentation
 
+        :param skip_exists: Skip if client already exist.
         :param payload: ClientRepresentation
         :return:  Keycloak server response (UserRepresentation)
         """

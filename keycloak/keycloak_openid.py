@@ -391,3 +391,4 @@ class KeycloakOpenID:
                     permissions += policy.permissions
 
         return list(set(permissions))
+
