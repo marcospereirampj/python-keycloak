@@ -206,8 +206,21 @@ groups = keycloak_admin.get_groups()
 group = keycloak_admin.get_group(group_id='group_id')
 
 # Get group by name
-group = keycloak_admin.get_group_by_name(name_or_path='group_id', search_in_subgroups=True)
+group = keycloak_admin.get_group_by_path(path='/group/subgroup', search_in_subgroups=True)
 
 # Function to trigger user sync from provider
 sync_users(storage_id="storage_di", action="action")
+
+# Get client role id from name
+role_id = keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")
+
+# Get all roles for the realm or client
+realm_roles = keycloak_admin.get_roles()
+
+# Assign client role to user. Note that BOTH role_name and role_id appear to be required.
+keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
+
+# Get all ID Providers
+idps = keycloak_admin.get_idps()
+
 ```

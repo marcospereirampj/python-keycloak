@@ -36,6 +36,7 @@ URL_ADMIN_GET_SESSIONS = "admin/realms/{realm-name}/users/{id}/sessions"
 URL_ADMIN_USER_CLIENT_ROLES = "admin/realms/{realm-name}/users/{id}/role-mappings/clients/{client-id}"
 URL_ADMIN_USER_GROUP = "admin/realms/{realm-name}/users/{id}/groups/{group-id}"
 URL_ADMIN_USER_GROUPS = "admin/realms/{realm-name}/users/{id}/groups"
+URL_ADMIN_USER_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
 
 URL_ADMIN_SERVER_INFO = "admin/serverinfo"
 
@@ -52,3 +53,5 @@ URL_ADMIN_CLIENT_ROLE = "admin/realms/{realm-name}/clients/{id}/roles/{role-name
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 
 URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"
+
+URL_ADMIN_IDPS = "admin/realms/{realm}/identity-provider/instances"
