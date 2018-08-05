@@ -43,12 +43,14 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 
 * [Agriness Team](http://www.agriness.com/pt/)
 * [Marcos Pereira](marcospereira.mpj@gmail.com)
-* [Martin Devlin](martin.devlin@pearson.com) 
-* [Shon T. Urbas](shon.urbas@gmail.com>)
-* [Markus Spanier]()
-* [Remco Kranenburg]()
-* [Armin]()
+* [Martin Devlin](https://bitbucket.org/devlinmpearson/) 
+* [Shon T. Urbas](https://bitbucket.org/surbas/)
+* [Markus Spanier](https://bitbucket.org/spanierm/)
+* [Remco Kranenburg](https://bitbucket.org/Remco47/)
+* [Armin](https://bitbucket.org/arminfelder/)
 * [njordr](https://bitbucket.org/njordr/)
+* [Josha Inglis](https://bitbucket.org/joshainglis/)
+* [Alex](https://bitbucket.org/alex_zel/)
 
 ## Usage
 
@@ -116,20 +118,15 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "username": "example@example.com",
                     "enabled": True,
                     "firstName": "Example",
-                    "lastName": "Example",
-                    "realmRoles": ["user_default", ],
-                    "attributes": {"example": "1,2,3,3,"}})    
-                    
-                    
+                    "lastName": "Example"})    
+                                        
 # Add user and set password                    
 new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "username": "example@example.com",
                     "enabled": True,
                     "firstName": "Example",
                     "lastName": "Example",
-                    "credentials": [{"value": "secret","type": "password",}],
-                    "realmRoles": ["user_default", ],
-                    "attributes": {"example": "1,2,3,3,"}})                        
+                    "credentials": [{"value": "secret","type": "password",}]})                        
 
 # User counter
 count_users = keycloak_admin.users_count()
