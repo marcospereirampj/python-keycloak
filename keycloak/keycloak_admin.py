@@ -780,6 +780,61 @@ class KeycloakAdmin:
                                               data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
+    def get_authentication_flows(self):
+        """
+        Get authentication flows. Returns all flow details
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/4.1/rest-api/index.html#_authenticationflowrepresentation
+
+        :return: Keycloak server response (AuthenticationFlowRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_ADMIN_FLOWS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_authentication_flow(self, payload, skip_exists=False):
+        """
+        Create a new authentication flow
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/4.1/rest-api/index.html#_authenticationflowrepresentation
+
+        :param payload: AuthenticationFlowRepresentation
+        :return: Keycloak server response (RoleRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(URL_ADMIN_FLOWS.format(**params_path),
+                                            data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+
+    def get_authentication_flow_executions(self, flow_alias):
+        """
+        Get authentication flow executions. Returns all execution steps
+
+        :return: Response(json)
+        """
+        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        data_raw = self.connection.raw_get(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def update_authentication_flow_executions(self, payload, flow_alias):
+        """
+        Update an authentication flow execution
+
+        AuthenticationExecutionInfoRepresentation
+        https://www.keycloak.org/docs-api/4.1/rest-api/index.html#_authenticationexecutioninforepresentation
+
+        :param payload: AuthenticationExecutionInfoRepresentation
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        data_raw = self.connection.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
+                                            data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
     def sync_users(self, storage_id, action):
         """
         Function to trigger user sync from provider
