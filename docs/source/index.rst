@@ -43,7 +43,6 @@ python-keycloak depends on:
 * Python 3
 * `requests <http://docs.python-requests.org/en/master/>`_
 * `python-jose <http://python-jose.readthedocs.io/en/latest/>`_
-* `simplejson <https://simplejson.readthedocs.io/en/latest/>`_
 
 Tests Dependencies
 ------------------
