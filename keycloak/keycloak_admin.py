@@ -182,15 +182,8 @@ class KeycloakAdmin:
         :return: user_id
         """
 
-        data_raw = self.get_users(query={"username": username})
-        data_content = raise_error_from_response(data_raw, KeycloakGetError)
-
-        for user in data_content:
-            this_use_rname = json.dumps(user["username"]).strip('"')
-            if this_use_rname == username:
-                return json.dumps(user["id"]).strip('"')
-
-        return None
+        users = self.get_users(query={"username": username})
+        return next((user["id"] for user in users if user["username"] == username), None)
 
     def get_user(self, user_id):
         """
