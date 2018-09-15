@@ -114,6 +114,22 @@ class KeycloakAdmin:
     def token(self, value):
         self._token = value
 
+    def import_realm(self, payload):
+        """
+        Import a new realm from a RealmRepresentation. Realm name must be unique.
+
+        RealmRepresentation
+        https://www.keycloak.org/docs-api/4.4/rest-api/index.html#_realmrepresentation
+
+        :param payload: RealmRepresentation
+
+        :return: RealmRepresentation
+        """
+
+        data_raw = self.connection.raw_post(URL_ADMIN_REALM_IMPORT,
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+
     def get_users(self, query=None):
         """
         Get users Returns a list of users, filtered according to query parameters

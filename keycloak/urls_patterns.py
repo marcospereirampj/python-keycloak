@@ -64,6 +64,7 @@ URL_ADMIN_CLIENT_AUTHZ_RESOURCES = "admin/realms/{realm-name}/clients/{id}/authz
 URL_ADMIN_CLIENT_CERTS = "admin/realms/{realm-name}/clients/{id}/certificates/{attr}"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
+URL_ADMIN_REALM_IMPORT = "admin/realms"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
