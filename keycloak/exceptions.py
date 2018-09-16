@@ -74,7 +74,6 @@ class KeycloakInvalidTokenError(KeycloakOperationError):
 
 
 def raise_error_from_response(response, error, expected_code=200, skip_exists=False):
-
     if expected_code == response.status_code:
         if expected_code == requests.codes.no_content:
             return {}

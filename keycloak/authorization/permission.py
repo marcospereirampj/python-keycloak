@@ -101,4 +101,3 @@ class Permission:
     @scopes.setter
     def scopes(self, value):
         self._scopes = value
-

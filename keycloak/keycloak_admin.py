@@ -24,18 +24,15 @@
 # Unless otherwise stated in the comments, "id", in e.g. user_id, refers to the
 # internal Keycloak server ID, usually a uuid string
 
-from .urls_patterns import *
+import json
 
-from .keycloak_openid import KeycloakOpenID
-
+from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
-
+from .keycloak_openid import KeycloakOpenID
+from .urls_patterns import *
 from .urls_patterns import (
     URL_ADMIN_USERS,
 )
-
-from .connection import ConnectionManager
-import json
 
 
 class KeycloakAdmin:
@@ -391,7 +388,7 @@ class KeycloakAdmin:
             if subgroup['path'] == path:
                 return subgroup
             elif subgroup["subGroups"]:
-                 for subgroup in group["subGroups"]:
+                for subgroup in group["subGroups"]:
                     return self.get_subgroups(subgroup, path)
         return None
 
@@ -451,7 +448,7 @@ class KeycloakAdmin:
         exists = None
 
         if name is None and path is not None:
-          path="/" + name
+            path = "/" + name
 
         elif path is not None:
             exists = self.get_group_by_path(path=path, search_in_subgroups=True)
@@ -460,13 +457,13 @@ class KeycloakAdmin:
             return str(exists)
 
         if parent is None:
-          params_path = {"realm-name": self.realm_name}
-          data_raw = self.connection.raw_post(URL_ADMIN_GROUPS.format(**params_path),
-                                            data=json.dumps(payload))
+            params_path = {"realm-name": self.realm_name}
+            data_raw = self.connection.raw_post(URL_ADMIN_GROUPS.format(**params_path),
+                                                data=json.dumps(payload))
         else:
-          params_path = {"realm-name": self.realm_name, "id": parent,}
-          data_raw = self.connection.raw_post(URL_ADMIN_GROUP_CHILD.format(**params_path),
-                                            data=json.dumps(payload))
+            params_path = {"realm-name": self.realm_name, "id": parent, }
+            data_raw = self.connection.raw_post(URL_ADMIN_GROUP_CHILD.format(**params_path),
+                                                data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
     def group_set_permissions(self, group_id, enabled=True):
@@ -841,7 +838,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
-                                            data=payload)
+                                           data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def sync_users(self, storage_id, action):

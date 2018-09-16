@@ -21,7 +21,12 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import json
+
+from jose import jwt
+
 from .authorization import Authorization
+from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError, \
     KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
 from .urls_patterns import (
@@ -33,9 +38,6 @@ from .urls_patterns import (
     URL_ENTITLEMENT,
     URL_INTROSPECT
 )
-from .connection import ConnectionManager
-from jose import jwt
-import json
 
 
 class KeycloakOpenID:
@@ -397,4 +399,3 @@ class KeycloakOpenID:
                     permissions += policy.permissions
 
         return list(set(permissions))
-
