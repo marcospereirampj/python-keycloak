@@ -419,7 +419,7 @@ class KeycloakAdmin:
                     res = self.get_subgroups(group, path)
                     if res != None:
                         return res
-	return None
+        return None
 
     def create_group(self, payload, parent=None, skip_exists=False):
         """
