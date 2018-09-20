@@ -413,10 +413,13 @@ class KeycloakAdmin:
             if group['path'] == path:
                 return group
             elif search_in_subgroups and group["subGroups"]:
-                res = self.get_subgroups(group, path)
-                if res != None:
-                    return res
-        return None
+                for group in group["subGroups"]:
+                    if group['path'] == path:
+                        return group
+                    res = self.get_subgroups(group, path)
+                    if res != None:
+                        return res
+	return None
 
     def create_group(self, payload, parent=None, skip_exists=False):
         """
