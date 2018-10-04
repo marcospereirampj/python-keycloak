@@ -26,8 +26,9 @@ try:
 except ImportError:
     from urlparse import urljoin
 
-from .exceptions import *
 import requests
+
+from .exceptions import (KeycloakConnectionError)
 
 
 class ConnectionManager(object):
