@@ -73,7 +73,8 @@ Contributors
 * `Armin <https://bitbucket.org/arminfelder/>`_
 * `Njordr <https://bitbucket.org/njordr/>`_
 * `Josha Inglis <https://bitbucket.org/joshainglis/>`_
-* `Alex] <https://bitbucket.org/alex_zel/>`_
+* `Alex <https://bitbucket.org/alex_zel/>`_
+* `Ewan Jone <https://bitbucket.org/kisamoto/>`_
 
 Usage
 =====
