@@ -97,6 +97,7 @@ Main methods::
 
     # Get Token
     token = keycloak_openid.token("user", "password")
+    token = keycloak_openid.token("user", "password", totp="012345")
 
     # Get Userinfo
     userinfo = keycloak_openid.userinfo(token['access_token'])
