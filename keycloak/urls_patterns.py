@@ -29,6 +29,7 @@ URL_LOGOUT = "realms/{realm-name}/protocol/openid-connect/logout"
 URL_CERTS = "realms/{realm-name}/protocol/openid-connect/certs"
 URL_INTROSPECT = "realms/{realm-name}/protocol/openid-connect/token/introspect"
 URL_ENTITLEMENT = "realms/{realm-name}/authz/entitlement/{resource-server-id}"
+URL_AUTH = "{authorization-endpoint}?client_id={client-id}&response_type=code&redirect_uri={redirect-uri}"
 
 # ADMIN URLS
 URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
