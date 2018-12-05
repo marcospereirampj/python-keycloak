@@ -156,7 +156,9 @@ class KeycloakOpenID:
 
         :return:
         """
-        return NotImplemented
+        return (self.well_know()['authorization_endpoint'] +
+                '?client_id=' + self.client_id +
+                '&response_type=code&redirect_uri=' + redirect_uri)
 
     def token(self, username="", password="", grant_type=["password"], code="", redirect_uri=""):
         """
