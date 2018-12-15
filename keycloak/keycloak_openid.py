@@ -30,6 +30,7 @@ from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError, \
     KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
 from .urls_patterns import (
+    URL_AUTH,
     URL_TOKEN,
     URL_USERINFO,
     URL_WELL_KNOWN,
@@ -156,7 +157,10 @@ class KeycloakOpenID:
 
         :return:
         """
-        return NotImplemented
+        params_path = {"authorization-endpoint": self.well_know()['authorization_endpoint'],
+                       "client-id": self.client_id,
+                       "redirect-uri": redirect_uri}
+        return URL_AUTH.format(**params_path)
 
     def token(self, username="", password="", grant_type=["password"], code="", redirect_uri=""):
         """
