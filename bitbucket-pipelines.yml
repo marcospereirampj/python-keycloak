@@ -14,4 +14,5 @@ pipelines:
       - step:
           name: Release New Verison
           script:
+            - chmod +x ./bin/deploy.sh
             - ./bin/deploy.sh
