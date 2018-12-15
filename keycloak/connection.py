@@ -45,6 +45,7 @@ class ConnectionManager(object):
         self._headers = headers
         self._timeout = timeout
         self._verify = verify
+        self._s = requests.Session()
 
     @property
     def base_url(self):
@@ -134,11 +135,11 @@ class ConnectionManager(object):
         """
 
         try:
-            return requests.get(urljoin(self.base_url, path),
-                                params=kwargs,
-                                headers=self.headers,
-                                timeout=self.timeout,
-                                verify=self.verify)
+            return self._s.get(urljoin(self.base_url, path),
+                               params=kwargs,
+                               headers=self.headers,
+                               timeout=self.timeout,
+                               verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -154,12 +155,12 @@ class ConnectionManager(object):
             HttpError: Can't connect to server.
         """
         try:
-            return requests.post(urljoin(self.base_url, path),
-                                 params=kwargs,
-                                 data=data,
-                                 headers=self.headers,
-                                 timeout=self.timeout,
-                                 verify=self.verify)
+            return self._s.post(urljoin(self.base_url, path),
+                                params=kwargs,
+                                data=data,
+                                headers=self.headers,
+                                timeout=self.timeout,
+                                verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -175,12 +176,12 @@ class ConnectionManager(object):
             HttpError: Can't connect to server.
         """
         try:
-            return requests.put(urljoin(self.base_url, path),
-                                params=kwargs,
-                                data=data,
-                                headers=self.headers,
-                                timeout=self.timeout,
-                                verify=self.verify)
+            return self._s.put(urljoin(self.base_url, path),
+                               params=kwargs,
+                               data=data,
+                               headers=self.headers,
+                               timeout=self.timeout,
+                               verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
@@ -196,11 +197,11 @@ class ConnectionManager(object):
             HttpError: Can't connect to server.
         """
         try:
-            return requests.delete(urljoin(self.base_url, path),
-                                   params=kwargs,
-                                   headers=self.headers,
-                                   timeout=self.timeout,
-                                   verify=self.verify)
+            return self._s.delete(urljoin(self.base_url, path),
+                                  params=kwargs,
+                                  headers=self.headers,
+                                  timeout=self.timeout,
+                                  verify=self.verify)
         except Exception as e:
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
