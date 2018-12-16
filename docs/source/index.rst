@@ -224,7 +224,7 @@ Main methods::
     role_id = keycloak_admin.get_client_role_id(client_id="client_id", role_name="test")
 
     # Create client role
-    keycloak_admin.create_client_role(client_id, "test")
+    keycloak_admin.create_client_role(client_id="client_id", {'name': 'roleName', 'clientRole': True})
 
     # Get client role id from name
     role_id = keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")

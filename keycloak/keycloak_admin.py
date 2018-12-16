@@ -696,32 +696,34 @@ class KeycloakAdmin:
         role = self.get_client_role(client_id, role_name)
         return role.get("id")
 
-    def create_client_role(self, payload, skip_exists=False):
+    def create_client_role(self, client_role_id, payload, skip_exists=False):
         """
         Create a client role
 
         RoleRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
 
-        :param payload: id of client (not client-id), role_name: name of role
+        :param client_role_id: id of client (not client-id)
+        :param payload: RoleRepresentation
         :return: Keycloak server response (RoleRepresentation)
         """
 
-        params_path = {"realm-name": self.realm_name, "id": self.client_id}
+        params_path = {"realm-name": self.realm_name, "id": client_role_id}
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
-    def delete_client_role(self, role_name):
+    def delete_client_role(self, client_role_id, role_name):
         """
         Create a client role
 
         RoleRepresentation
         http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_rolerepresentation
 
+        :param client_role_id: id of client (not client-id)
         :param role_name: role’s name (not id!)
         """
-        params_path = {"realm-name": self.realm_name, "id": self.client_id, "role-name": role_name}
+        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
         data_raw = self.connection.raw_delete(URL_ADMIN_CLIENT_ROLE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
