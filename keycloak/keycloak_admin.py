@@ -41,7 +41,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
 
 class KeycloakAdmin:
 
-    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True):
+    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True, client_secret_key=None):
         """
 
         :param server_url: Keycloak server url
@@ -50,6 +50,7 @@ class KeycloakAdmin:
         :param realm_name: realm name
         :param client_id: client id
         :param verify: True if want check connection SSL
+        :param client_secret_key: client secret key
         """
         self._username = username
         self._password = password
@@ -58,9 +59,12 @@ class KeycloakAdmin:
 
         # Get token Admin
         keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=realm_name,
-                                         verify=verify)
-        self._token = keycloak_openid.token(username, password)
+                                         verify=verify, client_secret_key=client_secret_key)
 
+        grant_type = ["password"]
+        if client_secret_key:
+            grant_type = ["client_credentials"]
+        self._token = keycloak_openid.token(username, password, grant_type=grant_type)
         self._connection = ConnectionManager(base_url=server_url,
                                              headers={'Authorization': 'Bearer ' + self.token.get('access_token'),
                                                       'Content-Type': 'application/json'},
