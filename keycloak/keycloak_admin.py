@@ -36,7 +36,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_GROUPS, URL_ADMIN_CLIENTS, URL_ADMIN_FLOWS_EXECUTIONS, URL_ADMIN_GROUPS, URL_ADMIN_USER_CLIENT_ROLES, \
     URL_ADMIN_REALM_IMPORT, URL_ADMIN_USERS_COUNT, URL_ADMIN_FLOWS, URL_ADMIN_GROUP, URL_ADMIN_CLIENT_AUTHZ_SETTINGS, \
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
-    URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS
+    URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
+    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE
 
 
 class KeycloakAdmin:
@@ -865,3 +866,43 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_USER_STORAGE.format(**params_path),
                                             data=json.dumps(data), **params_query)
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_client_scopes(self):
+        """
+        Get representation of the client scopes for the realm where we are connected to
+        https://www.keycloak.org/docs-api/4.5/rest-api/index.html#_getclientscopes
+
+        :return: Keycloak server response Array of (ClientScopeRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_SCOPES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_client_scope(self, client_scope_id):
+        """
+        Get representation of the client scopes for the realm where we are connected to
+        https://www.keycloak.org/docs-api/4.5/rest-api/index.html#_getclientscopes
+
+        :return: Keycloak server response (ClientScopeRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_SCOPE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+
+    def add_mapper_to_client_scope(self, client_scope_id, payload):
+        """
+        Add a mapper to a client scope
+        https://www.keycloak.org/docs-api/4.5/rest-api/index.html#_create_mapper
+
+        :param payload: ProtocolMapperRepresentation
+        :return: Keycloak server Response
+        """
+
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+
+        data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path), data=json.dumps(payload))
+
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
