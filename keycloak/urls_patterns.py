@@ -64,6 +64,10 @@ URL_ADMIN_CLIENT_AUTHZ_SETTINGS = "admin/realms/{realm-name}/clients/{id}/authz/
 URL_ADMIN_CLIENT_AUTHZ_RESOURCES = "admin/realms/{realm-name}/clients/{id}/authz/resource-server/resource"
 URL_ADMIN_CLIENT_CERTS = "admin/realms/{realm-name}/clients/{id}/certificates/{attr}"
 
+URL_ADMIN_CLIENT_SCOPES = "admin/realms/{realm-name}/client-scopes"
+URL_ADMIN_CLIENT_SCOPE = URL_ADMIN_CLIENT_SCOPES + "/{scope-id}"
+URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER = URL_ADMIN_CLIENT_SCOPE + "/protocol-mappers/models"
+
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 URL_ADMIN_REALM_IMPORT = "admin/realms"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
