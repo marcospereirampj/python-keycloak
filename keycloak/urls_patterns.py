@@ -70,7 +70,7 @@ URL_ADMIN_CLIENT_SCOPE = URL_ADMIN_CLIENT_SCOPES + "/{scope-id}"
 URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER = URL_ADMIN_CLIENT_SCOPE + "/protocol-mappers/models"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
-URL_ADMIN_REALM_IMPORT = "admin/realms"
+URL_ADMIN_REALMS = "admin/realms"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
