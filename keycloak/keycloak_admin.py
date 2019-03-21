@@ -37,7 +37,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALM_IMPORT, URL_ADMIN_USERS_COUNT, URL_ADMIN_FLOWS, URL_ADMIN_GROUP, URL_ADMIN_CLIENT_AUTHZ_SETTINGS, \
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
-    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE
+    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS
 
 
 class KeycloakAdmin:
@@ -204,7 +204,7 @@ class KeycloakAdmin:
         :return: user_id
         """
 
-        users = self.get_users(query={"username": username})
+        users = self.get_users(query={"search": username})
         return next((user["id"] for user in users if user["username"] == username), None)
 
     def get_user(self, user_id):
@@ -910,3 +910,17 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path), data=json.dumps(payload))
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+
+    def get_client_secrets(self, client_id):
+        """
+
+        Get representation of the client secrets
+        https://www.keycloak.org/docs-api/4.5/rest-api/index.html#_getclientsecret
+
+        :param client_id:  id of client (not client-id)
+        :return: Keycloak server response (ClientRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_SECRETS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
