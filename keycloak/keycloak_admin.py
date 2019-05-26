@@ -145,6 +145,22 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_REALMS)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def create_realm(self, payload, skip_exists=False):
+        """
+        Create a client
+
+        ClientRepresentation: http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_realmrepresentation
+
+        :param skip_exists: Skip if Realm already exist.
+        :param payload: RealmRepresentation
+        :return:  Keycloak server response (UserRepresentation)
+        """
+
+        data_raw = self.connection.raw_post(URL_ADMIN_REALMS,
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+
+
     def get_users(self, query=None):
         """
         Get users Returns a list of users, filtered according to query parameters
