@@ -7,13 +7,13 @@ with open("README.md", "r") as fh:
 
 setup(
     name='python-keycloak',
-    version='0.17.0',
+    version='0.17.1',
     url='https://bitbucket.org/agriness/python-keycloak',
     license='The MIT License',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',
     keywords='keycloak openid',
-    description=u'python-keycloak is a Python package providing access to the Keycloak API.',
+    description='python-keycloak is a Python package providing access to the Keycloak API.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=['keycloak', 'keycloak.authorization', 'keycloak.tests'],
