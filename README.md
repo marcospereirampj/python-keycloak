@@ -237,6 +237,6 @@ keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=
 idps = keycloak_admin.get_idps()
 
 # Create a new Realm
-keycloak_admin.create_realm(payload={"realm": "demo", skip_exists=False)
+keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)
 
 ```
