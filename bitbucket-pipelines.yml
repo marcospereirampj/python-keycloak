@@ -14,5 +14,6 @@ pipelines:
       - step:
           name: Release New Verison
           script:
+            - pip install -r requirements.txt
             - chmod +x ./bin/deploy.sh
             - ./bin/deploy.sh
