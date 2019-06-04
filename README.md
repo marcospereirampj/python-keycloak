@@ -3,7 +3,7 @@
 Python Keycloak
 ====================
 
-For review- see https://bitbucket.org/agriness/python-keycloak
+For review- see https://github.com/marcospereirampj/python-keycloak
 
 **python-keycloak** is a Python package providing access to the Keycloak API.
 
@@ -33,7 +33,7 @@ python-keycloak depends on:
 ## Bug reports
 
 Please report bugs and feature requests at
-https://bitbucket.org/agriness/python-keycloak/issues
+https://github.com/marcospereirampj/python-keycloak/issues
 
 ## Documentation
 

@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 setup(
     name='python-keycloak',
     version='0.17.1',
-    url='https://bitbucket.org/agriness/python-keycloak',
+    url='https://github.com/marcospereirampj/python-keycloak',
     license='The MIT License',
     author='Marcos Pereira',
     author_email='marcospereira.mpj@gmail.com',

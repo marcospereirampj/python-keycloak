@@ -54,7 +54,7 @@ Bug reports
 ==================
 
 Please report bugs and feature requests at
-`https://bitbucket.org/agriness/python-keycloak/issues <https://bitbucket.org/agriness/python-keycloak/issues>`_
+`https://github.com/marcospereirampj/python-keycloak/issues <https://github.com/marcospereirampj/python-keycloak/issues>`_
 
 Documentation
 ==================
