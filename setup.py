@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='python-keycloak',
-    version='0.17.3',
+    version='0.17.4',
     url='https://github.com/marcospereirampj/python-keycloak',
     license='The MIT License',
     author='Marcos Pereira',
@@ -17,7 +17,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=['keycloak', 'keycloak.authorization', 'keycloak.tests'],
-    install_requires=['requests>=2.18.4', 'python-jose>=1.4.0'],
+    install_requires=['requests>=2.20.0', 'python-jose>=1.4.0'],
     tests_require=['httmock>=1.2.5'],
     classifiers=[
         'Programming Language :: Python :: 3',
