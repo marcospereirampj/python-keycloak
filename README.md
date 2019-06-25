@@ -1,4 +1,6 @@
+[![CircleCI](https://circleci.com/gh/marcospereirampj/python-keycloak/tree/master.svg?style=svg)](https://circleci.com/gh/marcospereirampj/python-keycloak/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/python-keycloak/badge/?version=latest)](http://python-keycloak.readthedocs.io/en/latest/?badge=latest)
+
 
 Python Keycloak
 ====================
