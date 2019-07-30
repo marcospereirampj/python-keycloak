@@ -419,8 +419,7 @@ class KeycloakAdmin:
         :return: array GroupRepresentation
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_ADMIN_GROUPS.format(**params_path))
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return self.__fetch_all(URL_ADMIN_GROUPS.format(**params_path))
 
     def get_group(self, group_id):
         """
