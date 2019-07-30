@@ -199,8 +199,7 @@ class KeycloakAdmin:
         :return: users list
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_ADMIN_USERS.format(**params_path), **query)
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return self.__fetch_all(URL_ADMIN_USERS.format(**params_path), query)
 
     def get_idps(self):
         """
