@@ -423,7 +423,10 @@ class KeycloakAdmin:
                 return subgroup
             elif subgroup["subGroups"]:
                 for subgroup in group["subGroups"]:
-                    return self.get_subgroups(subgroup, path)
+                    result = self.get_subgroups(subgroup, path)
+                    if result:
+                        return result
+        # went through the tree without hits
         return None
 
     def get_group_members(self, group_id, **query):
