@@ -534,6 +534,24 @@ class KeycloakAdmin:
                                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
+    def update_group(self, group_id, payload):
+        """
+        Update group, ignores subgroups.
+
+        :param group_id: id of group
+        :param payload: GroupRepresentation with updated information.
+
+        GroupRepresentation
+        http://www.keycloak.org/docs-api/3.2/rest-api/#_grouprepresentation
+
+        :return: Http response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.connection.raw_put(URL_ADMIN_GROUP.format(**params_path),
+                                           data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
     def group_set_permissions(self, group_id, enabled=True):
         """
         Enable/Disable permissions for a group. Cannot delete group if disabled
