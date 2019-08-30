@@ -823,6 +823,23 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
+    def assign_realm_roles(self, user_id, client_id, roles):
+        """
+        Assign realm roles to a user
+
+        :param client_id: id of client (not client-id)
+        :param user_id: id of user
+        :param client_id: id of client containing role,
+        :param roles: roles list or role (use RoleRepresentation)
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.connection.raw_post(URL_ADMIN_USER_REALM_ROLES.format(**params_path),
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
     def get_client_roles_of_user(self, user_id, client_id):
         """
         Get all client roles for a user.
