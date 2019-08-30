@@ -511,18 +511,6 @@ class KeycloakAdmin:
 
         :return: Http response
         """
-        name = payload['name']
-        path = payload['path']
-        exists = None
-
-        if name is None and path is not None:
-            path = "/" + name
-
-        elif path is not None:
-            exists = self.get_group_by_path(path=path, search_in_subgroups=True)
-
-        if exists is not None:
-            return str(exists)
 
         if parent is None:
             params_path = {"realm-name": self.realm_name}
@@ -532,6 +520,7 @@ class KeycloakAdmin:
             params_path = {"realm-name": self.realm_name, "id": parent, }
             data_raw = self.connection.raw_post(URL_ADMIN_GROUP_CHILD.format(**params_path),
                                                 data=json.dumps(payload))
+
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
     def update_group(self, group_id, payload):
