@@ -235,7 +235,9 @@ class KeycloakAdmin:
 
         data_raw = self.connection.raw_post(URL_ADMIN_USERS.format(**params_path),
                                             data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+        raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+        _last_slash_idx = data_raw.headers['Location'].rindex('/')
+        return data_raw.headers['Location'][_last_slash_idx + 1:]
 
     def users_count(self):
         """
