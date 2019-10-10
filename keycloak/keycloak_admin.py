@@ -179,13 +179,13 @@ class KeycloakAdmin:
 
     def create_realm(self, payload, skip_exists=False):
         """
-        Create a client
+        Create a realm
 
         ClientRepresentation: http://www.keycloak.org/docs-api/3.3/rest-api/index.html#_realmrepresentation
 
         :param skip_exists: Skip if Realm already exist.
         :param payload: RealmRepresentation
-        :return:  Keycloak server response (UserRepresentation)
+        :return:  Keycloak server response (RealmRepresentation)
         """
 
         data_raw = self.connection.raw_post(URL_ADMIN_REALMS,
@@ -684,6 +684,20 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_CLIENTS.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+
+    def update_client(self, client_id, payload):
+        """
+        Update a client
+
+        :param client_id: Client id
+        :param payload: ClientRepresentation
+
+        :return: Http response
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.connection.raw_put(URL_ADMIN_CLIENT.format(**params_path),
+                                           data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def delete_client(self, client_id):
         """
