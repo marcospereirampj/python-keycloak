@@ -827,6 +827,21 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
+    def create_realm_role(self, payload, skip_exists=False):
+        """
+        Create a new role for the realm or client
+
+        :param realm: realm name (not id)
+        :param rep: RoleRepresentation https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_rolerepresentation
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(URL_ADMIN_REALM_ROLES.format(**params_path),
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+
+
     def assign_realm_roles(self, user_id, client_id, roles):
         """
         Assign realm roles to a user
