@@ -27,6 +27,7 @@ except ImportError:
     from urlparse import urljoin
 
 import requests
+from requests.adapters import HTTPAdapter
 
 from .exceptions import (KeycloakConnectionError)
 
@@ -46,6 +47,10 @@ class ConnectionManager(object):
         self._timeout = timeout
         self._verify = verify
         self._s = requests.Session()
+        # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
+        # see https://github.com/marcospereirampj/python-keycloak/issues/36
+        self._s.mount('https://', HTTPAdapter(max_retries=1))
+        self._s.mount('http://', HTTPAdapter(max_retries=1))
 
     @property
     def base_url(self):
