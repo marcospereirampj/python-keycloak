@@ -14,9 +14,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from unittest import mock
 
 from httmock import urlmatch, response, HTTMock, all_requests
 
+from keycloak import KeycloakAdmin, KeycloakOpenID
 from ..connection import ConnectionManager
 
 try:
@@ -141,3 +143,47 @@ class TestConnection(unittest.TestCase):
         self._conn.add_param_headers("test", "value")
         self.assertEqual(self._conn.headers,
                          {"test": "value"})
+
+    def test_KeycloakAdmin_custom_header(self):
+
+        class FakeToken:
+            @staticmethod
+            def get(string_val):
+                return "faketoken"
+
+        fake_token = FakeToken()
+
+        with mock.patch.object(KeycloakOpenID, "__init__", return_value=None) as mock_keycloak_open_id:
+            with mock.patch("keycloak.keycloak_openid.KeycloakOpenID.token", return_value=fake_token):
+                with mock.patch("keycloak.connection.ConnectionManager.__init__", return_value=None) as mock_connection_manager:
+                    server_url = "https://localhost/auth/"
+                    username = "admin"
+                    password = "secret"
+                    realm_name = "master"
+
+                    headers = {
+                        'Custom': 'test-custom-header'
+                    }
+                    KeycloakAdmin(server_url=server_url,
+                                  username=username,
+                                  password=password,
+                                  realm_name=realm_name,
+                                  verify=False,
+                                  custom_headers=headers)
+
+                    mock_keycloak_open_id.assert_called_with(server_url=server_url,
+                                                             realm_name=realm_name,
+                                                             client_id='admin-cli',
+                                                             client_secret_key=None,
+                                                             verify=False,
+                                                             custom_headers=headers)
+
+                    expected_header = {'Authorization': 'Bearer faketoken',
+                                       'Content-Type': 'application/json',
+                                       'Custom': 'test-custom-header'
+                                       }
+
+                    mock_connection_manager.assert_called_with(base_url=server_url,
+                                                               headers=expected_header,
+                                                               timeout=60,
+                                                               verify=False)

@@ -92,6 +92,14 @@ Main methods::
                         client_secret_key="secret",
                         verify=True)
 
+    # Optionally, you can pass custom headers that will be added to all HTTP calls
+    # keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
+    #                    client_id="example_client",
+    #                    realm_name="example_realm",
+    #                    client_secret_key="secret",
+    #                    verify=True,
+    #                    custom_headers={'CustomHeader': 'value'})
+
     # Get WellKnow
     config_well_know = keycloak_openid.well_know()
 
@@ -142,6 +150,14 @@ Main methods::
                                    password='secret',
                                    realm_name="example_realm",
                                    verify=True)
+
+    # Optionally, you can pass custom headers that will be added to all HTTP calls
+    #keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
+    #                               username='example-admin',
+    #                               password='secret',
+    #                               realm_name="example_realm",
+    #                               verify=True,
+    #                               custom_headers={'CustomHeader': 'value'})
 
     # Add user
     new_user = keycloak_admin.create_user({"email": "example@example.com",
