@@ -45,7 +45,8 @@ class KeycloakAdmin:
 
     PAGE_SIZE = 100
 
-    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True, client_secret_key=None, user_realm_name=None):
+    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True,
+                 client_secret_key=None, custom_headers=None, user_realm_name=None):
         """
 
         :param server_url: Keycloak server url
@@ -55,6 +56,7 @@ class KeycloakAdmin:
         :param client_id: client id
         :param verify: True if want check connection SSL
         :param client_secret_key: client secret key
+        :param custom_headers: dict of custom header to pass to each HTML request
         """
         self._username = username
         self._password = password
@@ -63,15 +65,23 @@ class KeycloakAdmin:
 
         # Get token Admin
         keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=user_realm_name or realm_name,
-                                         verify=verify, client_secret_key=client_secret_key)
-
+                                         verify=verify, client_secret_key=client_secret_key,
+                                         custom_headers=custom_headers)
+        
         grant_type = ["password"]
         if client_secret_key:
             grant_type = ["client_credentials"]
         self._token = keycloak_openid.token(username, password, grant_type=grant_type)
+        headers = {
+            'Authorization': 'Bearer ' + self.token.get('access_token'),
+            'Content-Type': 'application/json'
+        }
+        if custom_headers is not None:
+            # merge custom headers to main headers
+            headers.update(custom_headers)
+
         self._connection = ConnectionManager(base_url=server_url,
-                                             headers={'Authorization': 'Bearer ' + self.token.get('access_token'),
-                                                      'Content-Type': 'application/json'},
+                                             headers=headers,
                                              timeout=60,
                                              verify=verify)
 
@@ -826,6 +836,21 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def create_realm_role(self, payload, skip_exists=False):
+        """
+        Create a new role for the realm or client
+
+        :param realm: realm name (not id)
+        :param rep: RoleRepresentation https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_rolerepresentation
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(URL_ADMIN_REALM_ROLES.format(**params_path),
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+
 
     def assign_realm_roles(self, user_id, client_id, roles):
         """
