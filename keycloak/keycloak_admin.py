@@ -46,7 +46,7 @@ class KeycloakAdmin:
     PAGE_SIZE = 100
 
     def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True,
-                 client_secret_key=None, custom_headers=None):
+                 client_secret_key=None, custom_headers=None, user_realm_name=None):
         """
 
         :param server_url: Keycloak server url
@@ -64,10 +64,10 @@ class KeycloakAdmin:
         self._realm_name = realm_name
 
         # Get token Admin
-        keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=realm_name,
+        keycloak_openid = KeycloakOpenID(server_url=server_url, client_id=client_id, realm_name=user_realm_name or realm_name,
                                          verify=verify, client_secret_key=client_secret_key,
                                          custom_headers=custom_headers)
-
+        
         grant_type = ["password"]
         if client_secret_key:
             grant_type = ["client_credentials"]
