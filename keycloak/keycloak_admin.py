@@ -1159,7 +1159,7 @@ class KeycloakAdmin:
     def get_token(self):
         self.keycloak_openid = KeycloakOpenID(server_url=self.server_url, client_id=self.client_id,
                                               realm_name=self.user_realm_name or self.realm_name, verify=self.verify,
-                                              client_secret_key=self.client_secret_key
+                                              client_secret_key=self.client_secret_key,
                                               custom_headers=self.custom_headers)
 
         grant_type = ["password"]
