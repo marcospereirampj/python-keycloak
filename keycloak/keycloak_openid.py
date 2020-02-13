@@ -30,6 +30,7 @@ from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError, \
     KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
 from .urls_patterns import (
+    URL_REALM,
     URL_AUTH,
     URL_TOKEN,
     URL_USERINFO,
@@ -263,8 +264,19 @@ class KeycloakOpenID:
         :return:
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
+        data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
+    
+    def public_key(self):
+        """
+        The public key is exposed by the realm page directly.
+
+        :return:
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)['public_key']
+
 
     def entitlement(self, token, resource_server_id):
         """
