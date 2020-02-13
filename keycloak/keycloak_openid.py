@@ -264,7 +264,7 @@ class KeycloakOpenID:
         :return:
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
+        data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
     
     def public_key(self):
@@ -274,7 +274,7 @@ class KeycloakOpenID:
         :return:
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
+        data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)['public_key']
 
 
