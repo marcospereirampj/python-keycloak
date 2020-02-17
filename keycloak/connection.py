@@ -47,6 +47,7 @@ class ConnectionManager(object):
         self._timeout = timeout
         self._verify = verify
         self._s = requests.Session()
+        self._s.auth = lambda x: x  # don't let requests add auth headers
 
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
