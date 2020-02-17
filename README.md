@@ -115,6 +115,7 @@ keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
                                username='example-admin',
                                password='secret',
                                realm_name="example_realm",
+                               client_secret_key="client-secret",
                                verify=True)
         
 # Add user                       
