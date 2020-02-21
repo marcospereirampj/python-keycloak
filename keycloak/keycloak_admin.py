@@ -28,6 +28,7 @@ import json
 from builtins import isinstance
 from typing import List, Iterable
 
+from keycloak.urls_patterns import URL_ADMIN_GROUPS_REALM_ROLES
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
@@ -919,7 +920,6 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
-
     def assign_realm_roles(self, user_id, client_id, roles):
         """
         Assign realm roles to a user
@@ -933,6 +933,21 @@ class KeycloakAdmin:
         payload = roles if isinstance(roles, list) else [roles]
         params_path = {"realm-name": self.realm_name, "id": user_id}
         data_raw = self.raw_post(URL_ADMIN_USER_REALM_ROLES.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def assign_group_realm_roles(self, group_id, roles):
+        """
+        Assign realm roles to a group
+
+        :param group_id: id of groupp
+        :param roles: roles list or role (use GroupRoleRepresentation)
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.raw_post(URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path),
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
