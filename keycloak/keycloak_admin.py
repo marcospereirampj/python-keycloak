@@ -60,7 +60,7 @@ class KeycloakAdmin:
     _custom_headers = None
     _user_realm_name = None
 
-    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True,
+    def __init__(self, server_url, username=None, password=None, realm_name='master', client_id='admin-cli', verify=True,
                  client_secret_key=None, custom_headers=None, user_realm_name=None, auto_refresh_token=None):
         """
 
