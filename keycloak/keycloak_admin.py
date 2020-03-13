@@ -1103,6 +1103,20 @@ class KeycloakAdmin:
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
+    def generate_client_secrets(self, client_id):
+        """
+
+        Generate a new secret for the client
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_regeneratesecret
+
+        :param client_id:  id of client (not client-id)
+        :return: Keycloak server response (ClientRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_SECRETS.format(**params_path), data=None)
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_client_secrets(self, client_id):
         """
 
