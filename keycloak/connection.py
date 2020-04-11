@@ -199,7 +199,7 @@ class ConnectionManager(object):
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
 
-    def raw_delete(self, path, data, **kwargs):
+    def raw_delete(self, path, data={}, **kwargs):
         """ Submit delete request to the path.
 
         :arg
