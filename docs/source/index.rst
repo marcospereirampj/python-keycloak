@@ -158,6 +158,14 @@ Main methods::
     #                               realm_name="example_realm",
     #                               verify=True,
     #                               custom_headers={'CustomHeader': 'value'})
+    #
+    # You can also authenticate with client_id and client_secret
+    #keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
+    #                               client_id="example_client",
+    #                               client_secret_key="secret",
+    #                               realm_name="example_realm",
+    #                               verify=True,
+    #                               custom_headers={'CustomHeader': 'value'})
 
     # Add user
     new_user = keycloak_admin.create_user({"email": "example@example.com",
