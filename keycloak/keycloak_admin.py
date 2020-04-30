@@ -41,8 +41,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALMS, URL_ADMIN_USERS_COUNT, URL_ADMIN_FLOWS, URL_ADMIN_GROUP, URL_ADMIN_CLIENT_AUTHZ_SETTINGS, \
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
-    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
-    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT
+    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, 
+    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS
 
 
 class KeycloakAdmin:
@@ -1185,7 +1185,9 @@ class KeycloakAdmin:
         :return: components list
         """
         params_path = {"realm-name": self.realm_name}
-        return self.__fetch_all(URL_ADMIN_COMPONENTS.format(**params_path), query)
+        data_raw = self.raw_get(URL_ADMIN_COMPONENTS.format(**params_path),
+                                data=None, **query)
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_component(self, payload):
         """
@@ -1202,7 +1204,7 @@ class KeycloakAdmin:
 
         data_raw = self.raw_post(URL_ADMIN_COMPONENTS.format(**params_path),
                                  data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
 
     def get_component(self, component_id):
         """
@@ -1215,7 +1217,7 @@ class KeycloakAdmin:
 
         :return: ComponentRepresentation
         """
-        params_path = {"realm-name": self.realm_name, "id": component_id}
+        params_path = {"realm-name": self.realm_name, "component-id": component_id}
         data_raw = self.raw_get(URL_ADMIN_COMPONENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1229,7 +1231,7 @@ class KeycloakAdmin:
 
         :return: Http response
         """
-        params_path = {"realm-name": self.realm_name, "id": component_id}
+        params_path = {"realm-name": self.realm_name, "component-id": component_id}
         data_raw = self.raw_put(URL_ADMIN_COMPONENT.format(**params_path),
                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
@@ -1242,9 +1244,23 @@ class KeycloakAdmin:
 
         :return: Http response
         """
-        params_path = {"realm-name": self.realm_name, "id": component_id}
+        params_path = {"realm-name": self.realm_name, "component-id": component_id}
         data_raw = self.raw_delete(URL_ADMIN_COMPONENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_keys(self):
+        """
+        Return a list of keys, filtered according to query parameters
+
+        KeysMetadataRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_key_resource
+
+        :return: keys list
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(URL_ADMIN_KEYS.format(**params_path),
+                                data=None)
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
 
     def raw_get(self, *args, **kwargs):
