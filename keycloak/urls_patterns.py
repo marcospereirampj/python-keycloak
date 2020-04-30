@@ -79,3 +79,6 @@ URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
+
+URL_ADMIN_COMPONENTS = "admin/realms/{realm-name}/components"
+URL_ADMIN_COMPONENT = "admin/realms/{realm-name}/component/{component-id}"

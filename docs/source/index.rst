@@ -276,3 +276,23 @@ Main methods::
 
     # Function to trigger user sync from provider
     sync_users(storage_id="storage_di", action="action")
+
+    # Rotate RSA realm keys
+    # List existing rsa keys
+    components = keycloak_admin.get_components(query={"parent":"example_realm", "type":"org.keycloak.keys.KeyProvider"})
+    components_rsa_generated = list(filter(lambda component: component["provider-id"] == "rsa-generated"))
+
+    # Create a new one
+    keycloak_admin.create_component({"name":"rsa-generated","providerId":"rsa-generated","providerType":"org.keycloak.keys.KeyProvider","parentId":"example_realm","config":{"priority":["100"],"enabled":["true"],"active":["true"],"algorithm":["RS256"],"keySize":["2048"]}})
+
+    for component in components_rsa_generated:
+      component_details = keycloak_admin.get_component(component['id'])
+
+      # Delete inactive keys
+      if component_details['config']['active'] == ["false"]:
+        keycloak_admin.delete_component(component['id'])
+
+      # Make previous keys inactive
+      else:
+        component_details['config']['active'] = ["false"]
+        keycloak_admin.update_component(component['id'], component_details)
