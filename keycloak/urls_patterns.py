@@ -82,4 +82,4 @@ URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{fl
 
 URL_ADMIN_COMPONENTS = "admin/realms/{realm-name}/components"
 URL_ADMIN_COMPONENT = "admin/realms/{realm-name}/components/{component-id}"
-URL_ADMIN_KEYS = "admin/realms/{realm-name}/components/keys"
+URL_ADMIN_KEYS = "admin/realms/{realm-name}/keys"
