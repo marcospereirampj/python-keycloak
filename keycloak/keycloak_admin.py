@@ -775,7 +775,7 @@ class KeycloakAdmin:
         :return: Http response
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
-        data_raw = self.connection.raw_put(URL_ADMIN_CLIENT.format(**params_path),
+        data_raw = self.raw_put(URL_ADMIN_CLIENT.format(**params_path),
                                            data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
@@ -917,7 +917,7 @@ class KeycloakAdmin:
         """
 
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_post(URL_ADMIN_REALM_ROLES.format(**params_path),
+        data_raw = self.raw_post(URL_ADMIN_REALM_ROLES.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
