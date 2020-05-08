@@ -76,6 +76,8 @@ URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER = URL_ADMIN_CLIENT_SCOPE + "/protocol-mappers
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 URL_ADMIN_REALMS = "admin/realms"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
+URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name}"
+
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
