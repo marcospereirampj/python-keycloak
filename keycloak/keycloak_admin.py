@@ -28,6 +28,8 @@ import json
 from builtins import isinstance
 from typing import List, Iterable
 
+from keycloak.urls_patterns import URL_ADMIN_GROUPS_REALM_ROLES, \
+    URL_ADMIN_GET_GROUPS_REALM_ROLES
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
@@ -60,7 +62,7 @@ class KeycloakAdmin:
     _custom_headers = None
     _user_realm_name = None
 
-    def __init__(self, server_url, username, password, realm_name='master', client_id='admin-cli', verify=True,
+    def __init__(self, server_url, username=None, password=None, realm_name='master', client_id='admin-cli', verify=True,
                  client_secret_key=None, custom_headers=None, user_realm_name=None, auto_refresh_token=None):
         """
 
@@ -936,6 +938,47 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
+    def assign_group_realm_roles(self, group_id, roles):
+        """
+        Assign realm roles to a group
+
+        :param group_id: id of groupp
+        :param roles: roles list or role (use GroupRoleRepresentation)
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.raw_post(URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def delete_group_realm_roles(self, group_id, roles):
+        """
+        Delete realm roles of a group
+
+        :param group_id: id of group
+        :param roles: roles list or role (use GroupRoleRepresentation)
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.raw_delete(URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_group_realm_roles(self, group_id):
+        """
+        Get all realm roles for a group.
+
+        :param user_id: id of the group
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": group_id}
+        data_raw = self.raw_get(URL_ADMIN_GET_GROUPS_REALM_ROLES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_client_roles_of_user(self, user_id, client_id):
         """
         Get all client roles for a user.
@@ -1102,6 +1145,20 @@ class KeycloakAdmin:
             URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path), data=json.dumps(payload))
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201)
+
+    def generate_client_secrets(self, client_id):
+        """
+
+        Generate a new secret for the client
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_regeneratesecret
+
+        :param client_id:  id of client (not client-id)
+        :return: Keycloak server response (ClientRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_SECRETS.format(**params_path), data=None)
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_client_secrets(self, client_id):
         """
