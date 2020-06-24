@@ -276,3 +276,19 @@ Main methods::
 
     # Function to trigger user sync from provider
     sync_users(storage_id="storage_di", action="action")
+
+    # List public RSA keys
+    components = keycloak_admin.keys
+
+    # List all keys
+    components = keycloak_admin.get_components(query={"parent":"example_realm", "type":"org.keycloak.keys.KeyProvider"})
+
+    # Create a new RSA key
+    component = keycloak_admin.create_component({"name":"rsa-generated","providerId":"rsa-generated","providerType":"org.keycloak.keys.KeyProvider","parentId":"example_realm","config":{"priority":["100"],"enabled":["true"],"active":["true"],"algorithm":["RS256"],"keySize":["2048"]}})
+
+    # Update the key
+    component_details['config']['active'] = ["false"]
+    keycloak_admin.update_component(component['id'])
+
+    # Delete the key
+    keycloak_admin.delete_component(component['id'])
