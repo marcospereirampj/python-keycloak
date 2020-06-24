@@ -29,7 +29,7 @@ from builtins import isinstance
 from typing import List, Iterable
 
 from keycloak.urls_patterns import URL_ADMIN_GROUPS_REALM_ROLES, \
-    URL_ADMIN_GET_GROUPS_REALM_ROLES
+    URL_ADMIN_GET_GROUPS_REALM_ROLES, URL_ADMIN_REALM_ROLES_ROLE_BY_NAME
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
@@ -951,6 +951,30 @@ class KeycloakAdmin:
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
+    def update_realm_role(self, role_name, payload):
+        """
+        Update a role for the realm by name
+        :param role_name: The name of the role to be updated
+        :param payload: The role (use RoleRepresentation)
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        data_raw = self.connection.raw_put(URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path),
+                                            data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def delete_realm_role(self, role_name):
+        """
+        Delete a role for the realm by name
+        :param payload: The role name {'role-name':'name-of-the-role'}
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        data_raw = self.connection.raw_delete(
+            URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def assign_realm_roles(self, user_id, client_id, roles):
         """
