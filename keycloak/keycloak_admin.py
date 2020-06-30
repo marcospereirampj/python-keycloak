@@ -293,7 +293,6 @@ class KeycloakAdmin:
         data_raw = self.raw_delete(URL_ADMIN_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
-
     def get_users(self, query=None):
         """
         Return a list of users, filtered according to query parameters
@@ -1182,7 +1181,6 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """
         Add a mapper to a client scope
@@ -1315,7 +1313,6 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_KEYS.format(**params_path),
                                 data=None)
         return raise_error_from_response(data_raw, KeycloakGetError)
-
 
     def raw_get(self, *args, **kwargs):
         """
