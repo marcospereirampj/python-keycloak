@@ -1403,7 +1403,7 @@ class KeycloakAdmin:
                 b'Token is not active',
                 b'Session not active',
             ]
-            if e.response_code == 400 and any(err in list_errors for err in list_errors):
+            if e.response_code == 400 and any(err in e.response_body for err in list_errors):
                 self.get_token()
             else:
                 raise
