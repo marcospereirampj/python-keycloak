@@ -150,7 +150,7 @@ response = keycloak_admin.update_user(user_id="user-id-keycloak",
                                       payload={'firstName': 'Example Update'})
 
 # Update User Password
-response = set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
+response = keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
                                       
 # Delete User
 response = keycloak_admin.delete_user(user_id="user-id-keycloak")
