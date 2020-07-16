@@ -1070,7 +1070,7 @@ class KeycloakAdmin:
         :param group_id: id of group
         :param client_id: id of client (not client-id)
         :param roles: roles list or role (use GroupRoleRepresentation)
-        :return Keycloak server response
+        :return Keycloak server response (array RoleRepresentation)
         """
 
         payload = roles if isinstance(roles, list) else [roles]
