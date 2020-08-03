@@ -470,8 +470,9 @@ class KeycloakAdmin:
         """
         Add a federated identity / social login provider to the user
         :param user_id: User id
-        :param provider: Social login provider id
-        :param realm: realm name 
+        :param provider_id: Social login provider id
+        :param provider_userid: userid specified by the provider
+        :param provider_username: username specified by the provider
         :return:
         """
         payload = {"identityProvider": provider_id, "userId": provider_userid, "userName": provider_username}
