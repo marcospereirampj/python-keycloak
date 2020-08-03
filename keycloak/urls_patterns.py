@@ -86,3 +86,6 @@ URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{fl
 URL_ADMIN_COMPONENTS = "admin/realms/{realm-name}/components"
 URL_ADMIN_COMPONENT = "admin/realms/{realm-name}/components/{component-id}"
 URL_ADMIN_KEYS = "admin/realms/{realm-name}/keys"
+
+URL_ADMIN_USER_FEDERATED_IDENTITIES = "admin/realms/{realm-name}/users/{id}/federated-identity"
+URL_ADMIN_USER_FEDERATED_IDENTITY = "admin/realms/{realm-name}/users/{id}/federated-identity/{provider}"
