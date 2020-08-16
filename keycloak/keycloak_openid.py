@@ -251,7 +251,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_LOGOUT.format(**params_path),
                                             data=payload)
 
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def certs(self):
         """
