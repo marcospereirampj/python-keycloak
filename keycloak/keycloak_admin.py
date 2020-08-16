@@ -1469,7 +1469,8 @@ class KeycloakAdmin:
         try:
             self.token = self.keycloak_openid.refresh_token(refresh_token)
         except KeycloakGetError as e:
-            if e.response_code == 400 and b'Refresh token expired' in e.response_body:
+            if e.response_code == 400 and (b'Refresh token expired' in e.response_body or
+                                           b'Token is not active' in e.response_body):
                 self.get_token()
             else:
                 raise
