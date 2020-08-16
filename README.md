@@ -24,7 +24,7 @@ For review- see https://github.com/marcospereirampj/python-keycloak
 python-keycloak depends on:
 
 * Python 3
-* [requests](http://docs.python-requests.org/en/master/)
+* [requests](https://requests.readthedocs.io)
 * [python-jose](http://python-jose.readthedocs.io/en/latest/)
 
 ### Tests Dependencies
