@@ -42,7 +42,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
-    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS 
+    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
+    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES
 
 
 class KeycloakAdmin:
@@ -454,6 +455,30 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_USER_CONSENTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_user_social_logins(self, user_id):
+        """
+        Returns a list of federated identities/social logins of which the user has been associated with
+        :param user_id: User id
+        :return: federated identities list
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_get(URL_ADMIN_USER_FEDERATED_IDENTITIES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_user_social_login(self, user_id, provider_id, provider_userid, provider_username):
+
+        """
+        Add a federated identity / social login provider to the user
+        :param user_id: User id
+        :param provider_id: Social login provider id
+        :param provider_userid: userid specified by the provider
+        :param provider_username: username specified by the provider
+        :return:
+        """
+        payload = {"identityProvider": provider_id, "userId": provider_userid, "userName": provider_username}
+        params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
+        data_raw = self.raw_post(URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path), data=json.dumps(payload))
+    
     def send_update_account(self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None):
         """
         Send an update account email to the user. An email contains a
