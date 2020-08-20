@@ -1266,7 +1266,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPES.format(**params_path),
                                  data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """
