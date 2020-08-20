@@ -43,7 +43,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
-    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES
+    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER
 
 
 class KeycloakAdmin:
@@ -801,6 +801,19 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path))
         return data_raw
+
+    def get_client_service_account_user(self, client_id):
+        """
+        Get service account user from client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :return: UserRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_client(self, payload, skip_exists=False):
         """
