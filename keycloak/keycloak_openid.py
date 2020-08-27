@@ -28,7 +28,8 @@ from jose import jwt
 from .authorization import Authorization
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError, \
-    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError
+    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError,
+    KeycloakDeprecationError
 from .urls_patterns import (
     URL_REALM,
     URL_AUTH,
@@ -291,6 +292,9 @@ class KeycloakOpenID:
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
         data_raw = self.connection.raw_get(URL_ENTITLEMENT.format(**params_path))
+        
+        if data_raw.status_code == 404: 
+            return raise_error_from_response(data_raw, KeycloakDeprecationError)
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
