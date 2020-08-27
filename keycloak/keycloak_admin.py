@@ -43,7 +43,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
-    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES
+    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_CLIENT_ROLE_MEMBERS, \
+    URL_ADMIN_REALM_ROLES_MEMBERS
 
 
 class KeycloakAdmin:
@@ -861,6 +862,16 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_REALM_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_realm_role_members(self, role_name, **query):
+        """
+        Get role members of realm by role name.
+        :param role_name: Name of the role.
+        :param query: Additional Query parameters (see https://www.keycloak.org/docs-api/11.0/rest-api/index.html#_roles_resource)
+        :return: Keycloak Server Response (UserRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "role-name":role_name}
+        return self.__fetch_all(URL_ADMIN_REALM_ROLES_MEMBERS.format(**params_path), query)
+
     def get_client_roles(self, client_id):
         """
         Get all roles for the client
@@ -959,6 +970,18 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def get_client_role_members(self, client_id, role_name, **query):
+        """
+        Get members by client role .
+        :param client_id: The client id
+        :param role_name: the name of role to be queried.
+        :param query: Additional query parameters ( see https://www.keycloak.org/docs-api/11.0/rest-api/index.html#_clients_resource)
+        :return: Keycloak server response (UserRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id":client_id, "role-name":role_name}
+        return self.__fetch_all(URL_ADMIN_CLIENT_ROLE_MEMBERS.format(**params_path) , query)
+
 
     def create_realm_role(self, payload, skip_exists=False):
         """
