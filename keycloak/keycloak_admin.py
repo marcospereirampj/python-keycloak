@@ -40,7 +40,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_GROUPS, URL_ADMIN_CLIENTS, URL_ADMIN_FLOWS_EXECUTIONS, URL_ADMIN_GROUPS, URL_ADMIN_USER_CLIENT_ROLES, \
     URL_ADMIN_REALMS, URL_ADMIN_USERS_COUNT, URL_ADMIN_FLOWS, URL_ADMIN_GROUP, URL_ADMIN_CLIENT_AUTHZ_SETTINGS, \
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
-    URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
+    URL_ADMIN_IDP_MAPPERS, URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES
@@ -305,6 +305,35 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name}
         return self.__fetch_all(URL_ADMIN_USERS.format(**params_path), query)
+
+    def create_idp(self, payload):
+        """
+        Create an ID Provider,
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_identityproviderrepresentation
+
+        :param: payload: IdentityProviderRepresentation
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_post(URL_ADMIN_IDPS.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+
+    def add_mapper_to_idp(self, idp_alias, payload):
+        """
+        Create an ID Provider,
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_identityprovidermapperrepresentation
+
+        :param: idp_alias: alias for Idp to add mapper in
+        :param: payload: IdentityProviderMapperRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
+        data_raw = self.raw_post(URL_ADMIN_IDP_MAPPERS.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
 
     def get_idps(self):
         """
