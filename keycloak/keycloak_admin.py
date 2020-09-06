@@ -909,13 +909,11 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=201, skip_exists=skip_exists)
 
 
-    def assign_realm_roles(self, user_id, client_id, roles):
+    def assign_realm_roles(self, user_id, roles):
         """
         Assign realm roles to a user
 
-        :param client_id: id of client (not client-id)
         :param user_id: id of user
-        :param client_id: id of client containing role,
         :param roles: roles list or role (use RoleRepresentation)
         :return Keycloak server response
         """
