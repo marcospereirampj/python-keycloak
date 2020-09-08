@@ -79,6 +79,7 @@ URL_ADMIN_REALMS = "admin/realms"
 URL_ADMIN_REALM = "admin/realms/{realm-name}"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 URL_ADMIN_IDP_MAPPERS = "admin/realms/{realm-name}/identity-provider/instances/{idp-alias}/mappers"
+URL_ADMIN_IDP = "admin/realms//{realm-name}/identity-provider/instances/{alias}"
 URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name}"
 
 
