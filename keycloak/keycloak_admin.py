@@ -1015,6 +1015,11 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
+    def get_realm_roles_of_user(self, user_id):
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_get(URL_ADMIN_USER_REALM_ROLES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def assign_group_realm_roles(self, group_id, roles):
         """
         Assign realm roles to a group
