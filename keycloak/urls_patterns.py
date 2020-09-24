@@ -69,10 +69,12 @@ URL_ADMIN_CLIENT_ROLE = URL_ADMIN_CLIENT + "/roles/{role-name}"
 URL_ADMIN_CLIENT_AUTHZ_SETTINGS = URL_ADMIN_CLIENT + "/authz/resource-server/settings"
 URL_ADMIN_CLIENT_AUTHZ_RESOURCES = URL_ADMIN_CLIENT + "/authz/resource-server/resource"
 URL_ADMIN_CLIENT_CERTS = URL_ADMIN_CLIENT + "/certificates/{attr}"
+URL_ADMIN_CLIENT_PROTOCOL_MAPPER = URL_ADMIN_CLIENT + "/protocol-mappers/models"
 
 URL_ADMIN_CLIENT_SCOPES = "admin/realms/{realm-name}/client-scopes"
 URL_ADMIN_CLIENT_SCOPE = URL_ADMIN_CLIENT_SCOPES + "/{scope-id}"
 URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER = URL_ADMIN_CLIENT_SCOPE + "/protocol-mappers/models"
+URL_ADMIN_CLIENT_SCOPES_MAPPERS = URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER + "/{protocol-mapper-id}"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 URL_ADMIN_REALMS = "admin/realms"
