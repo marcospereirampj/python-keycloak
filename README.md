@@ -140,7 +140,7 @@ count_users = keycloak_admin.users_count()
 users = keycloak_admin.get_users({})
 
 # Get user ID from name
-user-id-keycloak = keycloak_admin.get_user_id("example@example.com")
+user_id_keycloak = keycloak_admin.get_user_id("example@example.com")
 
 # Get User
 user = keycloak_admin.get_user("user-id-keycloak")
@@ -175,7 +175,7 @@ server_info = keycloak_admin.get_server_info()
 clients = keycloak_admin.get_clients()
 
 # Get client - id (not client-id) from client by name
-client_id=keycloak_admin.get_client_id("my-client")
+client_id = keycloak_admin.get_client_id("my-client")
 
 # Get representation of the client - id of client (not client-id)
 client = keycloak_admin.get_client(client_id="client_id")
