@@ -98,7 +98,7 @@ token_info = keycloak_openid.introspect(token['access_token']))
 
 # Decode Token
 KEYCLOAK_PUBLIC_KEY = keycloak_openid.public_key()
-options = {"verify_signature": True, "verify_aud": True, "exp": True}
+options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
 token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
 # Get permissions by token
