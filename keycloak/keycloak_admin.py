@@ -222,6 +222,13 @@ class KeycloakAdmin:
             page += 1
         return results
 
+    def __fetch_paginated(self, url, query=None):
+        query = query or {}
+
+        return raise_error_from_response(
+            self.raw_get(url, **query),
+            KeycloakGetError)
+
     def import_realm(self, payload):
         """
         Import a new realm from a RealmRepresentation. Realm name must be unique.
@@ -303,8 +310,14 @@ class KeycloakAdmin:
         :param query: Query parameters (optional)
         :return: users list
         """
+        query = query or {}
         params_path = {"realm-name": self.realm_name}
-        return self.__fetch_all(URL_ADMIN_USERS.format(**params_path), query)
+        url = URL_ADMIN_USERS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def get_idps(self):
         """
@@ -541,7 +554,7 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_SERVER_INFO)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_groups(self):
+    def get_groups(self, query=None):
         """
         Returns a list of groups belonging to the realm
 
@@ -550,8 +563,14 @@ class KeycloakAdmin:
 
         :return: array GroupRepresentation
         """
+        query = query or {}
         params_path = {"realm-name": self.realm_name}
-        return self.__fetch_all(URL_ADMIN_GROUPS.format(**params_path))
+        url = URL_ADMIN_USERS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def get_group(self, group_id):
         """
@@ -603,7 +622,12 @@ class KeycloakAdmin:
         :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        return self.__fetch_all(URL_ADMIN_GROUP_MEMBERS.format(**params_path), query)
+        url = URL_ADMIN_USERS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def get_group_by_path(self, path, search_in_subgroups=False):
         """
