@@ -43,7 +43,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
-    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_FLOWS_SUBFLOWS
+    URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, \
+    URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW
 
 
 class KeycloakAdmin:
@@ -1210,6 +1211,23 @@ class KeycloakAdmin:
         data_raw = self.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
                                 data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+    
+    def create_authentication_flow_execution(self, payload, flow_alias):
+        """
+        Create an authentication flow execution
+
+        AuthenticationExecutionInfoRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticationexecutioninforepresentation
+
+        :param payload: AuthenticationExecutionInfoRepresentation
+        :param flow_alias: The flow alias
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION.format(**params_path),
+                                data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
 
     def create_authentication_flow_subflow(self, payload, flow_alias, skip_exists=False):
         """
@@ -1225,7 +1243,7 @@ class KeycloakAdmin:
         """
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
-        data_raw = self.raw_post(URL_ADMIN_FLOWS_SUBFLOWS.format(**params_path),
+        data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_FLOW.format(**params_path),
                                  data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 

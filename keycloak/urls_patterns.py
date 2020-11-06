@@ -82,7 +82,8 @@ URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
-URL_ADMIN_FLOWS_SUBFLOWS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/flow"
+URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
+URL_ADMIN_FLOWS_EXECUTIONS_FLOW = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/flow"
 
 URL_ADMIN_COMPONENTS = "admin/realms/{realm-name}/components"
 URL_ADMIN_COMPONENT = "admin/realms/{realm-name}/components/{component-id}"
