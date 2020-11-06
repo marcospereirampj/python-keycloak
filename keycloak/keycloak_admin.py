@@ -44,7 +44,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, \
-    URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW
+    URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY
 
 
 class KeycloakAdmin:
@@ -1183,6 +1183,21 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_FLOWS.format(**params_path),
                                  data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def copy_authentication_flow(self, payload, flow_alias):
+        """
+        Copy existing authentication flow under a new name. The new name is given as 'newName' attribute of the passed payload.
+
+        :param payload: JSON containing 'newName' attribute
+        :param flow_alias: the flow alias
+        :return: Keycloak server response (RoleRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        data_raw = self.raw_post(URL_ADMIN_FLOWS_COPY.format(**params_path),
+                                 data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+
 
     def get_authentication_flow_executions(self, flow_alias):
         """
