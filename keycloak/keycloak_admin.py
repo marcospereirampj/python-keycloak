@@ -44,7 +44,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, \
-    URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY
+    URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
+    URL_ADMIN_FLOWS_ALIAS
 
 
 class KeycloakAdmin:
@@ -1166,6 +1167,20 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(URL_ADMIN_FLOWS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
+    
+    def get_authentication_flow_for_id(self, flow_id):
+        """
+        Get one authentication flow by it's id/alias. Returns all flow details
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticationflowrepresentation
+        
+        :param flow_id: the id of a flow NOT it's alias
+        :return: Keycloak server response (AuthenticationFlowRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "flow-id": flow_id}
+        data_raw = self.raw_get(URL_ADMIN_FLOWS_ALIAS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_authentication_flow(self, payload, skip_exists=False):
         """
@@ -1197,7 +1212,6 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_FLOWS_COPY.format(**params_path),
                                  data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
-
 
     def get_authentication_flow_executions(self, flow_alias):
         """

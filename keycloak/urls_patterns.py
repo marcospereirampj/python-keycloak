@@ -81,6 +81,7 @@ URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name}"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
+URL_ADMIN_FLOWS_ALIAS = "admin/realms/{realm-name}/authentication/flows/{flow-id}"
 URL_ADMIN_FLOWS_COPY = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/copy"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
 URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
