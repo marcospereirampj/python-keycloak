@@ -49,7 +49,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_CLIENT_ROLE_MEMBERS, \
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
-    URL_ADMIN_FLOWS_ALIAS
+    URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER
 
 
 class KeycloakAdmin:
@@ -847,6 +847,19 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path))
         return data_raw
 
+    def get_client_service_account_user(self, client_id):
+        """
+        Get service account user from client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :return: UserRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def create_client(self, payload, skip_exists=False):
         """
         Create a client
@@ -1469,6 +1482,22 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
         data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_client_scope(self, payload, skip_exists=False):
+        """
+        Create a client scope
+
+        ClientScopeRepresentation: https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_getclientscopes
+
+        :param payload: ClientScopeRepresentation
+        :param skip_exists: If true then do not raise an error if client scope already exists
+        :return:  Keycloak server response (ClientScopeRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPES.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """
