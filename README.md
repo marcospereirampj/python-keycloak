@@ -235,6 +235,10 @@ realm_roles = keycloak_admin.get_roles()
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
 
+# Assign realm roles to user
+keycloak_admin.assign_realm_roles(user_id=user_id, roles=realm_roles)
+
+
 # Get all ID Providers
 idps = keycloak_admin.get_idps()
 
