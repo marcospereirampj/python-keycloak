@@ -44,7 +44,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALMS, URL_ADMIN_USERS_COUNT, URL_ADMIN_FLOWS, URL_ADMIN_GROUP, URL_ADMIN_CLIENT_AUTHZ_SETTINGS, \
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, URL_ADMIN_IDP, \
     URL_ADMIN_IDP_MAPPERS, URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
-    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
+    URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, \
     URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
@@ -891,6 +891,24 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.raw_delete(URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def get_client_installation_provider(self, client_id, provider_id):
+        """
+        Get content for given installation provider
+
+        Related documentation:
+        https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_clients_resource
+
+        Possible provider_id list available in the ServerInfoRepresentation#clientInstallations
+        https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_serverinforepresentation
+
+        :param client_id: Client id
+        :param provider_id: provider id to specify response format
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id, "provider-id": provider_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_INSTALLATION_PROVIDER.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     def get_realm_roles(self):
         """
