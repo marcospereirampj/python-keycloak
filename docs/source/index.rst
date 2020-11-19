@@ -132,7 +132,7 @@ Main methods::
 
     # Decode Token
     KEYCLOAK_PUBLIC_KEY = "secret"
-    options = {"verify_signature": True, "verify_aud": True, "exp": True}
+    options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
     token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
     # Get permissions by token
@@ -155,6 +155,14 @@ Main methods::
     #keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
     #                               username='example-admin',
     #                               password='secret',
+    #                               realm_name="example_realm",
+    #                               verify=True,
+    #                               custom_headers={'CustomHeader': 'value'})
+    #
+    # You can also authenticate with client_id and client_secret
+    #keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
+    #                               client_id="example_client",
+    #                               client_secret_key="secret",
     #                               realm_name="example_realm",
     #                               verify=True,
     #                               custom_headers={'CustomHeader': 'value'})
@@ -268,3 +276,19 @@ Main methods::
 
     # Function to trigger user sync from provider
     sync_users(storage_id="storage_di", action="action")
+
+    # List public RSA keys
+    components = keycloak_admin.keys
+
+    # List all keys
+    components = keycloak_admin.get_components(query={"parent":"example_realm", "type":"org.keycloak.keys.KeyProvider"})
+
+    # Create a new RSA key
+    component = keycloak_admin.create_component({"name":"rsa-generated","providerId":"rsa-generated","providerType":"org.keycloak.keys.KeyProvider","parentId":"example_realm","config":{"priority":["100"],"enabled":["true"],"active":["true"],"algorithm":["RS256"],"keySize":["2048"]}})
+
+    # Update the key
+    component_details['config']['active'] = ["false"]
+    keycloak_admin.update_component(component['id'])
+
+    # Delete the key
+    keycloak_admin.delete_component(component['id'])

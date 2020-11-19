@@ -24,7 +24,7 @@ For review- see https://github.com/marcospereirampj/python-keycloak
 python-keycloak depends on:
 
 * Python 3
-* [requests](http://docs.python-requests.org/en/master/)
+* [requests](https://requests.readthedocs.io)
 * [python-jose](http://python-jose.readthedocs.io/en/latest/)
 
 ### Tests Dependencies
@@ -94,11 +94,11 @@ token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['ac
                                      token_type_hint="requesting_party_token"))
 
 # Introspect Token
-token_info = keycloak_openid.introspect(token['access_token']))
+token_info = keycloak_openid.introspect(token['access_token'])
 
 # Decode Token
-KEYCLOAK_PUBLIC_KEY = "secret"
-options = {"verify_signature": True, "verify_aud": True, "exp": True}
+KEYCLOAK_PUBLIC_KEY = keycloak_openid.public_key()
+options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
 token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
 # Get permissions by token
@@ -114,7 +114,9 @@ from keycloak import KeycloakAdmin
 keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
                                username='example-admin',
                                password='secret',
-                               realm_name="example_realm",
+                               realm_name="master",
+                               user_realm_name="only_if_other_realm_than_master",
+                               client_secret_key="client-secret",
                                verify=True)
         
 # Add user                       
@@ -139,7 +141,7 @@ count_users = keycloak_admin.users_count()
 users = keycloak_admin.get_users({})
 
 # Get user ID from name
-user-id-keycloak = keycloak_admin.get_user_id("example@example.com")
+user_id_keycloak = keycloak_admin.get_user_id("example@example.com")
 
 # Get User
 user = keycloak_admin.get_user("user-id-keycloak")
@@ -149,7 +151,7 @@ response = keycloak_admin.update_user(user_id="user-id-keycloak",
                                       payload={'firstName': 'Example Update'})
 
 # Update User Password
-response = set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
+response = keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
                                       
 # Delete User
 response = keycloak_admin.delete_user(user_id="user-id-keycloak")
@@ -174,7 +176,7 @@ server_info = keycloak_admin.get_server_info()
 clients = keycloak_admin.get_clients()
 
 # Get client - id (not client-id) from client by name
-client_id=keycloak_admin.get_client_id("my-client")
+client_id = keycloak_admin.get_client_id("my-client")
 
 # Get representation of the client - id of client (not client-id)
 client = keycloak_admin.get_client(client_id="client_id")

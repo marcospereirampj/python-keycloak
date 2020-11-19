@@ -53,6 +53,9 @@ class KeycloakOperationError(KeycloakError):
     pass
 
 
+class KeycloakDeprecationError(KeycloakError):
+    pass
+
 class KeycloakGetError(KeycloakOperationError):
     pass
 
@@ -73,9 +76,12 @@ class KeycloakInvalidTokenError(KeycloakOperationError):
     pass
 
 
-def raise_error_from_response(response, error, expected_code=200, skip_exists=False):
-    if expected_code == response.status_code:
-        if expected_code == requests.codes.no_content:
+def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
+    if expected_codes is None:
+        expected_codes = [200, 201, 204]
+
+    if response.status_code in expected_codes:
+        if response.status_code == requests.codes.no_content:
             return {}
 
         try:

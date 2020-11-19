@@ -47,6 +47,7 @@ class ConnectionManager(object):
         self._timeout = timeout
         self._verify = verify
         self._s = requests.Session()
+        self._s.auth = lambda x: x  # don't let requests add auth headers
 
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
@@ -198,11 +199,12 @@ class ConnectionManager(object):
             raise KeycloakConnectionError(
                 "Can't connect to server (%s)" % e)
 
-    def raw_delete(self, path, **kwargs):
+    def raw_delete(self, path, data={}, **kwargs):
         """ Submit delete request to the path.
 
         :arg
             path (str): Path for request.
+            data (dict): Payload for request.
         :return
             Response the request.
         :exception
@@ -211,6 +213,7 @@ class ConnectionManager(object):
         try:
             return self._s.delete(urljoin(self.base_url, path),
                                   params=kwargs,
+                                  data=data,
                                   headers=self.headers,
                                   timeout=self.timeout,
                                   verify=self.verify)
