@@ -94,7 +94,7 @@ token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['ac
                                      token_type_hint="requesting_party_token"))
 
 # Introspect Token
-token_info = keycloak_openid.introspect(token['access_token']))
+token_info = keycloak_openid.introspect(token['access_token'])
 
 # Decode Token
 KEYCLOAK_PUBLIC_KEY = keycloak_openid.public_key()
