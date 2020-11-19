@@ -47,6 +47,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
     URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, \
+    URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS
 
@@ -1392,6 +1393,41 @@ class KeycloakAdmin:
 
         data_raw = self.raw_post(
             URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path), data=json.dumps(payload))
+
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+
+    def delete_mapper_from_client_scope(self, client_scope_id, protocol_mppaer_id):
+        """
+        Delete a mapper from a client scope
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_delete_mapper
+
+        :param client_scope_id: The id of the client scope
+        :param payload: ProtocolMapperRepresentation
+        :return: Keycloak server Response
+        """
+
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id,
+                       "protocol-mapper-id": protocol_mppaer_id}
+
+        data_raw = self.raw_delete(
+            URL_ADMIN_CLIENT_SCOPES_MAPPERS.format(**params_path))
+
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def add_mapper_to_client(self, client_id, payload):
+        """
+        Add a mapper to a client
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_create_mapper
+
+        :param client_id: The id of the client
+        :param payload: ProtocolMapperRepresentation
+        :return: Keycloak server Response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+
+        data_raw = self.raw_post(
+            URL_ADMIN_CLIENT_PROTOCOL_MAPPER.format(**params_path), data=json.dumps(payload))
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
 
