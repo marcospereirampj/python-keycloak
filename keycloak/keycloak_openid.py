@@ -28,8 +28,7 @@ from jose import jwt
 from .authorization import Authorization
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError, \
-    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError,
-    KeycloakDeprecationError
+    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError, KeycloakDeprecationError
 from .urls_patterns import (
     URL_REALM,
     URL_AUTH,
