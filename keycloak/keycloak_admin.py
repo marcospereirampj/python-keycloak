@@ -1137,24 +1137,22 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
-    def delete_group_client_roles(self, group_id, client_id, roles):
+    def get_group_client_roles(self, group_id, client_id):
         """
-        Delete client roles of a group
+        Get client roles of a group
 
         :param group_id: id of group
         :param client_id: id of client (not client-id)
-        :param roles: roles list or role (use GroupRoleRepresentation)
         :return Keycloak server response
         """
 
-        payload = roles if isinstance(roles, list) else [roles]
         params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
         data_raw = self.raw_get(URL_ADMIN_GROUPS_CLIENT_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_group_client_roles(self, group_id, client_id, roles):
+    def delete_group_client_roles(self, group_id, client_id, roles):
         """
-        Get client roles of a group
+        Delete client roles of a group
 
         :param group_id: id of group
         :param client_id: id of client (not client-id)
