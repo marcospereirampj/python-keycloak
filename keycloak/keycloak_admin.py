@@ -52,7 +52,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
 class KeycloakAdmin:
 
     PAGE_SIZE = 100
-    
+
     _server_url = None
     _username = None
     _password = None
@@ -519,7 +519,7 @@ class KeycloakAdmin:
         payload = {"identityProvider": provider_id, "userId": provider_userid, "userName": provider_username}
         params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
         data_raw = self.raw_post(URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path), data=json.dumps(payload))
-    
+
     def send_update_account(self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None):
         """
         Send an update account email to the user. An email contains a
@@ -1330,14 +1330,14 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(URL_ADMIN_FLOWS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
-    
+
     def get_authentication_flow_for_id(self, flow_id):
         """
         Get one authentication flow by it's id/alias. Returns all flow details
 
         AuthenticationFlowRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticationflowrepresentation
-        
+
         :param flow_id: the id of a flow NOT it's alias
         :return: Keycloak server response (AuthenticationFlowRepresentation)
         """
@@ -1403,7 +1403,7 @@ class KeycloakAdmin:
         data_raw = self.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
                                 data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
-    
+
     def create_authentication_flow_execution(self, payload, flow_alias):
         """
         Create an authentication flow execution
@@ -1495,6 +1495,22 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPES.format(**params_path),
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def update_client_scope(self, client_scope_id, payload):
+        """
+        Update a client scope
+
+        ClientScopeRepresentation: https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_client_scopes_resource
+
+        :param client_scope_id: The id of the client scope
+        :param payload: ClientScopeRepresentation
+        :return:  Keycloak server response (ClientScopeRepresentation)
+        """
+
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        data_raw = self.raw_put(URL_ADMIN_CLIENT_SCOPE.format(**params_path),
+                                data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """
@@ -1725,18 +1741,18 @@ class KeycloakAdmin:
         grant_type = ["password"]
         if self.client_secret_key:
             grant_type = ["client_credentials"]
-            
+
         self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
 
         headers = {
             'Authorization': 'Bearer ' + self.token.get('access_token'),
             'Content-Type': 'application/json'
         }
-        
+
         if self.custom_headers is not None:
             # merge custom headers to main headers
             headers.update(self.custom_headers)
-            
+
         self._connection = ConnectionManager(base_url=self.server_url,
                                              headers=headers,
                                              timeout=60,
