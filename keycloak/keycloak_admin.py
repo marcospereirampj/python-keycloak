@@ -46,7 +46,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_CLIENT_ROLE_MEMBERS, \
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
-    URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER
+    URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG
 
 
 class KeycloakAdmin:
@@ -1438,6 +1438,47 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_FLOW.format(**params_path),
                                  data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def get_authenticator_config(self, config_id):
+        """
+        Get authenticator configuration. Returns all configuration details.
+
+        :param config_id: Authenticator config id
+        :return: Response(json)
+        """
+        params_path = {"realm-name": self.realm_name, "id": config_id}
+        data_raw = self.raw_get(URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def update_authenticator_config(self, payload, config_id):
+        """
+        Update an authenticator configuration.
+
+        AuthenticatorConfigRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticatorconfigrepresentation
+
+        :param payload: AuthenticatorConfigRepresentation
+        :param config_id: Authenticator config id
+        :return: Response(json)
+        """
+        params_path = {"realm-name": self.realm_name, "id": config_id}
+        data_raw = self.raw_put(URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path),
+                                data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def delete_authenticator_config(self, config_id):
+        """
+        Delete a authenticator configuration.
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authentication_management_resource
+
+        :param config_id: Authenticator config id
+        :return: Keycloak server Response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": config_id}
+        data_raw = self.raw_delete(URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path))
+
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def sync_users(self, storage_id, action):
         """
