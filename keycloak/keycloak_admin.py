@@ -1588,6 +1588,26 @@ class KeycloakAdmin:
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
+    def update_mapper_in_client_scope(self, client_scope_id, protocol_mapper_id, payload):
+        """
+        Update an existing protocol mapper in a client scope
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_protocol_mappers_resource
+
+        :param client_scope_id: The id of the client scope
+        :param protocol_mapper_id: The id of the protocol mapper which exists in the client scope
+               and should to be updated
+        :param payload: ProtocolMapperRepresentation
+        :return: Keycloak server Response
+        """
+
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id,
+                       "protocol-mapper-id": protocol_mapper_id}
+
+        data_raw = self.raw_put(
+            URL_ADMIN_CLIENT_SCOPES_MAPPERS.format(**params_path), data=json.dumps(payload))
+
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def add_mapper_to_client(self, client_id, payload):
         """
         Add a mapper to a client
