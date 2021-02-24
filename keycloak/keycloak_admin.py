@@ -536,7 +536,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": user_id}
         params_query = {"client_id": client_id, "lifespan": lifespan, "redirect_uri": redirect_uri}
         data_raw = self.raw_put(URL_ADMIN_SEND_UPDATE_ACCOUNT.format(**params_path),
-                                data=payload, **params_query)
+                                data=json.dumps(payload), **params_query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def send_verify_email(self, user_id, client_id=None, redirect_uri=None):
@@ -1359,7 +1359,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_post(URL_ADMIN_FLOWS.format(**params_path),
-                                 data=payload)
+                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
     def copy_authentication_flow(self, payload, flow_alias):
@@ -1373,7 +1373,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.raw_post(URL_ADMIN_FLOWS_COPY.format(**params_path),
-                                 data=payload)
+                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
 
     def get_authentication_flow_executions(self, flow_alias):
@@ -1401,7 +1401,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
-                                data=payload)
+                                data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def create_authentication_flow_execution(self, payload, flow_alias):
@@ -1418,7 +1418,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION.format(**params_path),
-                                data=payload)
+                                data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
 
     def create_authentication_flow_subflow(self, payload, flow_alias, skip_exists=False):
@@ -1436,7 +1436,7 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_FLOW.format(**params_path),
-                                 data=payload)
+                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
     def get_authenticator_config(self, config_id):
