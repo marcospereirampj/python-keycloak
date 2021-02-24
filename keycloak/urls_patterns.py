@@ -63,6 +63,7 @@ URL_ADMIN_GROUP_MEMBERS = "admin/realms/{realm-name}/groups/{id}/members"
 
 URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
 URL_ADMIN_CLIENT = URL_ADMIN_CLIENTS + "/{id}"
+URL_ADMIN_CLIENT_ALL_SESSIONS = URL_ADMIN_CLIENT + "/user-sessions"
 URL_ADMIN_CLIENT_SECRETS = URL_ADMIN_CLIENT + "/client-secret"
 URL_ADMIN_CLIENT_ROLES = URL_ADMIN_CLIENT + "/roles"
 URL_ADMIN_CLIENT_ROLE = URL_ADMIN_CLIENT + "/roles/{role-name}"

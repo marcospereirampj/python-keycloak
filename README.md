@@ -54,6 +54,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 * [Josha Inglis](https://bitbucket.org/joshainglis/)
 * [Alex](https://bitbucket.org/alex_zel/)
 * [Ewan Jone](https://bitbucket.org/kisamoto/)
+* [Lukas Martini](https://github.com/lutoma)
 
 ## Usage
 
@@ -125,6 +126,15 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "enabled": True,
                     "firstName": "Example",
                     "lastName": "Example"})    
+
+# Add user and raise exception if username already exists
+# exist_ok currently defaults to True for backwards compatibility reasons
+new_user = keycloak_admin.create_user({"email": "example@example.com",
+                    "username": "example@example.com",
+                    "enabled": True,
+                    "firstName": "Example",
+                    "lastName": "Example"},
+                    exist_ok=False)
                                         
 # Add user and set password                    
 new_user = keycloak_admin.create_user({"email": "example@example.com",
