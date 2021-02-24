@@ -60,6 +60,9 @@ class ConnectionManager(object):
 
             self._s.mount(protocol, adapter)
 
+    def __del__(self):
+        self._s.close()
+
     @property
     def base_url(self):
         """ Return base url in use for requests to the server. """
