@@ -47,7 +47,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
-    URL_ADMIN_CLIENT_ALL_SESSIONS
+    URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS
 
 
 class KeycloakAdmin:
@@ -1015,6 +1015,22 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_CLIENT_ROLES.format(**params_path),
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def add_composite_client_roles_to_role(self, client_role_id, role_name, roles):
+        """
+        Add composite roles to client role
+
+        :param client_role_id: id of client (not client-id)
+        :param role_name: The name of the role
+        :param roles: roles list or role (use RoleRepresentation) to be updated
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
+                                 data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def delete_client_role(self, client_role_id, role_name):
         """
