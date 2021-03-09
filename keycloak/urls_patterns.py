@@ -105,3 +105,5 @@ URL_ADMIN_KEYS = "admin/realms/{realm-name}/keys"
 
 URL_ADMIN_USER_FEDERATED_IDENTITIES = "admin/realms/{realm-name}/users/{id}/federated-identity"
 URL_ADMIN_USER_FEDERATED_IDENTITY = "admin/realms/{realm-name}/users/{id}/federated-identity/{provider}"
+
+URL_ADMIN_EVENTS = 'admin/realms/{realm-name}/events'
