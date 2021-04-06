@@ -34,7 +34,7 @@ from .keycloak_openid import KeycloakOpenID
 from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
     URL_ADMIN_GET_SESSIONS, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_GROUPS_REALM_ROLES, \
     URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
-    URL_ADMIN_REALM_ROLES_ROLE_BY_NAME, URL_ADMIN_GET_GROUPS_REALM_ROLES, URL_ADMIN_GROUPS_CLIENT_ROLES, \
+    URL_ADMIN_REALM_ROLES_ROLE_BY_NAME, URL_ADMIN_GROUPS_CLIENT_ROLES, \
     URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE, URL_ADMIN_USER_GROUP, URL_ADMIN_REALM_ROLES, URL_ADMIN_GROUP_CHILD, \
     URL_ADMIN_USER_CONSENTS, URL_ADMIN_SEND_VERIFY_EMAIL, URL_ADMIN_CLIENT, URL_ADMIN_USER, URL_ADMIN_CLIENT_ROLE, \
     URL_ADMIN_USER_GROUPS, URL_ADMIN_CLIENTS, URL_ADMIN_FLOWS_EXECUTIONS, URL_ADMIN_GROUPS, URL_ADMIN_USER_CLIENT_ROLES, \
@@ -1239,7 +1239,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        data_raw = self.raw_get(URL_ADMIN_GET_GROUPS_REALM_ROLES.format(**params_path))
+        data_raw = self.raw_get(URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def assign_group_client_roles(self, group_id, client_id, roles):
