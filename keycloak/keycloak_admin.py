@@ -410,9 +410,9 @@ class KeycloakAdmin:
 
         :return: user_id
         """
-
-        users = self.get_users(query={"search": username})
-        return next((user["id"] for user in users if user["username"] == username), None)
+        lower_user_name = username.lower()
+        users = self.get_users(query={"search": lower_user_name})
+        return next((user["id"] for user in users if user["username"] == lower_user_name), None)
 
     def get_user(self, user_id):
         """
