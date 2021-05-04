@@ -23,3 +23,4 @@
 
 from .keycloak_admin import *
 from .keycloak_openid import *
+from .keycloak_admin_token import *
