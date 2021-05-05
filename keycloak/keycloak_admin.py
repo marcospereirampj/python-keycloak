@@ -1875,6 +1875,6 @@ class KeycloakAdmin:
 
         :return: UserSessionRepresentation
         """
-        params_path = {"realm-name": self.realm_name, "client-id": client_id}
+        params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
