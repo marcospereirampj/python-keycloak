@@ -47,7 +47,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
-    URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS
+    URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS
 
 
 class KeycloakAdmin:
@@ -1758,6 +1758,20 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(URL_ADMIN_KEYS.format(**params_path),
                                 data=None)
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_events(self, query=None):
+        """
+        Return a list of events, filtered according to query parameters
+
+        EventRepresentation array
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_eventrepresentation
+
+        :return: events list
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(URL_ADMIN_EVENTS.format(**params_path),
+                                data=None, **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def raw_get(self, *args, **kwargs):
