@@ -77,7 +77,7 @@ class KeycloakAdmin:
         :param realm_name: realm name
         :param client_id: client id
         :param verify: True if want check connection SSL
-        :param client_secret_key: client secret key
+        :param client_secret_key: client secret key (optional, required only for access type confidential)
         :param custom_headers: dict of custom header to pass to each HTML request
         :param user_realm_name: The realm name of the user, if different from realm_name
         :param auto_refresh_token: list of methods that allows automatic token refresh. ex: ['get', 'put', 'post', 'delete']
