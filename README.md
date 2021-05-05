@@ -142,7 +142,17 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "enabled": True,
                     "firstName": "Example",
                     "lastName": "Example",
-                    "credentials": [{"value": "secret","type": "password",}]})                        
+                    "credentials": [{"value": "secret","type": "password",}]})
+
+# Add user and specify a locale                       
+new_user = keycloak_admin.create_user({"email": "example@example.fr",
+                    "username": "example@example.fr",
+                    "enabled": True,
+                    "firstName": "Example",
+                    "lastName": "Example",
+                    "attributes": {
+                      "locale": ["fr"]
+                    })    
 
 # User counter
 count_users = keycloak_admin.users_count()
