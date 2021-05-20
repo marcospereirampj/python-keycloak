@@ -54,8 +54,6 @@ class KeycloakAdminToken(KeycloakAdmin):
     PAGE_SIZE = 100
 
     _server_url = None
-    _username = None
-    _password = None
     _realm_name = None
     _client_id = None
     _verify = None
@@ -66,12 +64,11 @@ class KeycloakAdminToken(KeycloakAdmin):
     _custom_headers = None
     _user_realm_name = None
 
-    def __init__(self, server_url, username=None, realm_name='master', client_id='admin-cli', verify=True,
+    def __init__(self, server_url, realm_name='master', client_id='admin-cli', verify=True,
                  client_secret_key=None, custom_headers=None, user_realm_name=None, auto_refresh_token=None, token= None):
         """
 
         :param server_url: Keycloak server url
-        :param username: admin username
         :param realm_name: realm name
         :param client_id: client id
         :param verify: True if want check connection SSL
@@ -139,13 +136,6 @@ class KeycloakAdminToken(KeycloakAdmin):
     def verify(self, value):
         self._verify = value
 
-    @property
-    def username(self):
-        return self._username
-
-    @username.setter
-    def username(self, value):
-        self._username = value
 
     @property
     def token(self):
