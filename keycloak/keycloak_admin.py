@@ -1173,7 +1173,7 @@ class KeycloakAdmin:
             URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def assign_realm_roles(self, user_id, client_id, roles):
+    def assign_realm_roles(self, user_id, roles):
         """
         Assign realm roles to a user
 
