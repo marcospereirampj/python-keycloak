@@ -262,6 +262,9 @@ Main methods::
     # Assign realm roles to user. Note that BOTH role_name and role_id appear to be required.
     keycloak_admin.assign_realm_roles(client_id="client_id", user_id="user_id", roles=[{"roles_representation"}])
 
+    # Delete realm roles of user. Note that BOTH role_name and role_id appear to be required.
+    keycloak_admin.deletes_realm_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"roles_representation"}])
+
     # Create new group
     group = keycloak_admin.create_group(name="Example Group")
 
