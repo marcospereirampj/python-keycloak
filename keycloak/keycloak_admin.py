@@ -1189,12 +1189,11 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
-    def delete_realm_roles_of_user(self, user_id, client_id, roles):
+    def delete_realm_roles_of_user(self, user_id, roles):
         """
         Deletes realm roles of a user
 
         :param user_id: id of user
-        :param client_id: id of client containing role (not client-id)
         :param roles: roles list or role (use RoleRepresentation)
         :return Keycloak server response
         """
