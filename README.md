@@ -98,7 +98,7 @@ token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['ac
 token_info = keycloak_openid.introspect(token['access_token'])
 
 # Decode Token
-KEYCLOAK_PUBLIC_KEY = keycloak_openid.public_key()
+KEYCLOAK_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" + keycloak_openid.public_key() + "\n-----END PUBLIC KEY-----"
 options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
 token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
