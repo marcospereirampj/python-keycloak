@@ -1890,4 +1890,4 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": str(user_id) }
         data_raw = self.connection.raw_delete(URL_ADMIN_DELETE_USER_ROLE.format(**params_path),
                                               data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
