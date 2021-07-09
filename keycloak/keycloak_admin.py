@@ -247,6 +247,12 @@ class KeycloakAdmin:
         """
         Export the realm configurations in the json format
 
+        RealmRepresentation
+        https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_partialexport
+
+        :param export-clients: Skip if not want to export realm clients
+        :param export-groups-and-roles: Skip if not want to export realm groups and roles
+        
         :return: realm configurations JSON
         """
         params_path = {"realm-name": self.realm_name, "export-clients": export_clients, "export-groups-and-roles": export_groups_and_role }
