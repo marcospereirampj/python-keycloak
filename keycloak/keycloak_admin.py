@@ -1774,6 +1774,20 @@ class KeycloakAdmin:
                                 data=None, **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def set_events(self, payload):
+        """
+        Set realm events configuration
+
+        RealmEventsConfigRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_realmeventsconfigrepresentation
+
+        :return: Http response
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_put(URL_ADMIN_EVENTS.format(**params_path),
+                                data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def raw_get(self, *args, **kwargs):
         """
         Calls connection.raw_get.
