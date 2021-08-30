@@ -1841,14 +1841,17 @@ class KeycloakAdmin:
         return r
 
     def get_token(self):
+        token_realm_name = 'master' if self.client_secret_key else self.user_realm_name or self.realm_name
         self.keycloak_openid = KeycloakOpenID(server_url=self.server_url, client_id=self.client_id,
-                                              realm_name=self.user_realm_name or self.realm_name, verify=self.verify,
+                                              realm_name=token_realm_name, verify=self.verify,
                                               client_secret_key=self.client_secret_key,
                                               custom_headers=self.custom_headers)
 
         grant_type = ["password"]
         if self.client_secret_key:
             grant_type = ["client_credentials"]
+            if self.user_realm_name:
+                self.realm_name = self.user_realm_name
 
         self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
 
