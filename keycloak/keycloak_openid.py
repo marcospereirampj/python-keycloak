@@ -189,7 +189,7 @@ class KeycloakOpenID:
         payload = {"username": username, "password": password,
                    "client_id": self.client_id, "grant_type": grant_type,
                    "code": code, "redirect_uri": redirect_uri}
-        if payload:
+        if extra:
             payload.update(extra)
 
         if totp:

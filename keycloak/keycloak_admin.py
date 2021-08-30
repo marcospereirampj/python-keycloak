@@ -47,8 +47,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
-    URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS,\
-    URL_ADMIN_DELETE_USER_ROLE
+    URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS, \
+    URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE
 
 
 class KeycloakAdmin:
@@ -224,6 +224,8 @@ class KeycloakAdmin:
             if not partial_results:
                 break
             results.extend(partial_results)
+            if len(partial_results) < query['max']:
+                break
             page += 1
         return results
 
@@ -242,6 +244,22 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_REALMS,
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+
+    def export_realm(self, export_clients=False, export_groups_and_role=False):
+        """
+        Export the realm configurations in the json format
+
+        RealmRepresentation
+        https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_partialexport
+
+        :param export-clients: Skip if not want to export realm clients
+        :param export-groups-and-roles: Skip if not want to export realm groups and roles
+        
+        :return: realm configurations JSON
+        """
+        params_path = {"realm-name": self.realm_name, "export-clients": export_clients, "export-groups-and-roles": export_groups_and_role }
+        data_raw = self.raw_post(URL_ADMIN_REALM_EXPORT.format(**params_path), data="")
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realms(self):
         """
@@ -1775,6 +1793,20 @@ class KeycloakAdmin:
                                 data=None, **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def set_events(self, payload):
+        """
+        Set realm events configuration
+
+        RealmEventsConfigRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_realmeventsconfigrepresentation
+
+        :return: Http response
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_put(URL_ADMIN_EVENTS.format(**params_path),
+                                data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def raw_get(self, *args, **kwargs):
         """
         Calls connection.raw_get.
@@ -1828,14 +1860,17 @@ class KeycloakAdmin:
         return r
 
     def get_token(self):
+        token_realm_name = 'master' if self.client_secret_key else self.user_realm_name or self.realm_name
         self.keycloak_openid = KeycloakOpenID(server_url=self.server_url, client_id=self.client_id,
-                                              realm_name=self.user_realm_name or self.realm_name, verify=self.verify,
+                                              realm_name=token_realm_name, verify=self.verify,
                                               client_secret_key=self.client_secret_key,
                                               custom_headers=self.custom_headers)
 
         grant_type = ["password"]
         if self.client_secret_key:
             grant_type = ["client_credentials"]
+            if self.user_realm_name:
+                self.realm_name = self.user_realm_name
 
         self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
 
