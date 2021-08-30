@@ -98,7 +98,7 @@ token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['ac
 token_info = keycloak_openid.introspect(token['access_token'])
 
 # Decode Token
-KEYCLOAK_PUBLIC_KEY = keycloak_openid.public_key()
+KEYCLOAK_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" + keycloak_openid.public_key() + "\n-----END PUBLIC KEY-----"
 options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
 token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
@@ -215,7 +215,7 @@ role = keycloak_admin.get_client_role(client_id="client_id", role_name="role_nam
 role_id = keycloak_admin.get_client_role_id(client_id="client_id", role_name="test")
 
 # Create client role
-keycloak_admin.create_client_role(client_id='client_id', {'name': 'roleName', 'clientRole': True})
+keycloak_admin.create_client_role(client_role_id='client_id', {'name': 'roleName', 'clientRole': True})
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id="client_id", user_id="user_id", role_id="role_id", role_name="test")
