@@ -223,6 +223,8 @@ class KeycloakAdmin:
             if not partial_results:
                 break
             results.extend(partial_results)
+            if len(partial_results) < query['max']:
+                break
             page += 1
         return results
 
