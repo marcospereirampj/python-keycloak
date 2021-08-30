@@ -50,6 +50,7 @@ URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE = "admin/realms/{realm-name}/users/{id}/ro
 URL_ADMIN_USER_GROUP = "admin/realms/{realm-name}/users/{id}/groups/{group-id}"
 URL_ADMIN_USER_GROUPS = "admin/realms/{realm-name}/users/{id}/groups"
 URL_ADMIN_USER_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
+URL_ADMIN_USER_LOGOUT = "admin/realms/{realm-name}/users/{id}/logout"
 URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"
 
 URL_ADMIN_SERVER_INFO = "admin/serverinfo"
