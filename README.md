@@ -172,6 +172,15 @@ response = keycloak_admin.update_user(user_id="user-id-keycloak",
 
 # Update User Password
 response = keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
+
+# Get User Credentials
+credentials = keycloak_admin.get_credentials(user_id='user_id')
+
+# Get User Credential by ID
+credential = keycloak_admin.get_credential(user_id='user_id', credential_id='credential_id')
+
+# Delete User Credential
+response = keycloak_admin.delete_credential(user_id='user_id', credential_id='credential_id')
                                       
 # Delete User
 response = keycloak_admin.delete_user(user_id="user-id-keycloak")
