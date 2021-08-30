@@ -89,6 +89,7 @@ URL_ADMIN_IDP_MAPPERS = "admin/realms/{realm-name}/identity-provider/instances/{
 URL_ADMIN_IDP = "admin/realms//{realm-name}/identity-provider/instances/{alias}"
 URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name}"
 URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE = "admin/realms/{realm-name}/roles/{role-name}/composites"
+URL_ADMIN_REALM_EXPORT = "admin/realms/{realm-name}/partial-export?exportClients={export-clients}&exportGroupsAndRoles={export-groups-and-roles}"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
 URL_ADMIN_FLOWS_ALIAS = "admin/realms/{realm-name}/authentication/flows/{flow-id}"
