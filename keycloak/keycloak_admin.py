@@ -1672,10 +1672,50 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": client_id}
 
         data_raw = self.raw_post(
-            URL_ADMIN_CLIENT_PROTOCOL_MAPPER.format(**params_path), data=json.dumps(payload))
+            URL_ADMIN_CLIENT_PROTOCOL_MAPPERS.format(**params_path), data=json.dumps(payload))
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+    
+    def update_client_mapper(self, client_id, mapper_id, payload):
+        """
+        Update client mapper
+        :param client_id: The id of the client
+        :param client_mapper_id: The id of the mapper to be deleted
+        :param payload: ProtocolMapperRepresentation
+        :return: Keycloak server response 
+        """
 
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": self.client_id, 
+            "protocol-mapper-id": mapper_id,
+        }
+
+        data_raw = self.raw_put(
+           URL_ADMIN_CLIENT_PROTOCOL_MAPPER.format(**params_path), data=json.dumps(payload)) 
+        
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def remove_client_mapper(self, client_id, client_mapper_id):
+        """
+        Removes a mapper from the client
+        https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_protocol_mappers_resource
+        :param client_id: The id of the client
+        :param client_mapper_id: The id of the mapper to be deleted
+        :return: Keycloak server response
+        """
+
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": client_id,
+            "protocol-mapper-id": mapper_id
+        }
+
+        data_raw = self.raw_delete(
+            URL_ADMIN_CLIENT_PROTOCOL_MAPPER.format(**params_path))
+        
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+        
     def generate_client_secrets(self, client_id):
         """
 
