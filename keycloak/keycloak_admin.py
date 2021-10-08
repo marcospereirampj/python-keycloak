@@ -555,6 +555,18 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
         data_raw = self.raw_post(URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path), data=json.dumps(payload))
 
+    def delete_user_social_login(self, user_id, provider_id):
+
+        """
+        Delete a federated identity / social login provider from the user
+        :param user_id: User id
+        :param provider_id: Social login provider id
+        :return:
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
+        data_raw = self.raw_delete(URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def send_update_account(self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None):
         """
         Send an update account email to the user. An email contains a
