@@ -62,7 +62,7 @@ class ConnectionManager(object):
             self._s.mount(protocol, adapter)
         
         if proxies:
-            self._s.proxies = proxies
+            self._s.proxies.update(proxies)
 
     def __del__(self):
         self._s.close()
