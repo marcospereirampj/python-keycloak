@@ -39,9 +39,10 @@ class ConnectionManager(object):
         headers (dict): The header parameters of the requests to the server.
         timeout (int): Timeout to use for requests to the server.
         verify (bool): Verify server SSL.
+        proxies (dict): The proxies servers requests is sent by.
     """
 
-    def __init__(self, base_url, headers={}, timeout=60, verify=True):
+    def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None):
         self._base_url = base_url
         self._headers = headers
         self._timeout = timeout
@@ -59,6 +60,9 @@ class ConnectionManager(object):
             adapter.max_retries.allowed_methods = frozenset(allowed_methods)
 
             self._s.mount(protocol, adapter)
+        
+        if proxies:
+            self._s.proxies = proxies
 
     def __del__(self):
         self._s.close()
