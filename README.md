@@ -234,7 +234,7 @@ keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
 
 # Create new group
-group = keycloak_admin.create_group(name="Example Group")
+group = keycloak_admin.create_group({"name": "Example Group"})
 
 # Get all groups
 groups = keycloak_admin.get_groups()
