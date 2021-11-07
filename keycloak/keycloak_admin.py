@@ -32,7 +32,7 @@ from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
 from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
-    URL_ADMIN_CLIENT_AUTHZ_POLICIES, URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_PERMISSION, \
+    URL_ADMIN_CLIENT_AUTHZ_POLICIES, URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION, \
     URL_ADMIN_GET_SESSIONS, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_GROUPS_REALM_ROLES, \
     URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
     URL_ADMIN_REALM_ROLES_ROLE_BY_NAME, URL_ADMIN_GROUPS_CLIENT_ROLES, \
@@ -929,9 +929,9 @@ class KeycloakAdmin:
                                         data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
-    def create_client_authz_role_based_permission(self, client_id, payload, skip_exists=False):
+    def create_client_authz_resource_based_permission(self, client_id, payload, skip_exists=False):
         """
-        Create role-based permission of client.
+        Create resource-based permission of client.
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
@@ -956,7 +956,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name,
                     "id": client_id}
 
-        data_raw = self.raw_post(URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_PERMISSION.format(**params_path),
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
                                         data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
