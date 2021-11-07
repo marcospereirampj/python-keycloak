@@ -873,6 +873,9 @@ class KeycloakAdmin:
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: ResourceRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_resourcerepresentation
+
         :return: Keycloak server response
         """
 
@@ -902,6 +905,9 @@ class KeycloakAdmin:
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: PolicyRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_policyrepresentation
+
         :return: Keycloak server response
         """
 
@@ -918,6 +924,20 @@ class KeycloakAdmin:
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: No Document
+        payload example:
+        payload={
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "name": "Permission-Name",
+            "resources": [
+                resource_id
+            ],
+            "policies": [
+                policy_id
+            ]
+
         :return: Keycloak server response
         """
 
@@ -934,6 +954,9 @@ class KeycloakAdmin:
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: PolicyRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_policyrepresentation
+
         :return: Keycloak server response
         """
         
