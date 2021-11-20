@@ -48,7 +48,9 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
     URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS, \
-    URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT
+    URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT, \
+    URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE, \
+    URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES, URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE
 
 
 class KeycloakAdmin:
@@ -1658,6 +1660,78 @@ class KeycloakAdmin:
             URL_ADMIN_CLIENT_SCOPES_MAPPERS.format(**params_path), data=json.dumps(payload))
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def get_default_default_client_scopes(self):
+        """
+        Return list of default default client scopes
+
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+
+    def delete_default_default_client_scope(self, scope_id):
+        """
+        Delete default default client scope
+
+        :param scope_id: default default client scope id
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        data_raw = self.raw_delete(URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+
+    def add_default_default_client_scope(self, scope_id):
+        """
+        Add default default client scope
+
+        :param scope_id: default default client scope id
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        payload = {"realm": self.realm_name, "clientScopeId": scope_id}
+        data_raw = self.raw_put(URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE.format(**params_path), data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+
+    def get_default_optional_client_scopes(self):
+        """
+        Return list of default optional client scopes
+
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+
+    def delete_default_optional_client_scope(self, scope_id):
+        """
+        Delete default optional client scope
+
+        :param scope_id: default optional client scope id
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        data_raw = self.raw_delete(URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+
+    def add_default_optional_client_scope(self, scope_id):
+        """
+        Add default optional client scope
+
+        :param scope_id: default optional client scope id
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        payload = {"realm": self.realm_name, "clientScopeId": scope_id}
+        data_raw = self.raw_put(URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE.format(**params_path), data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
 
     def add_mapper_to_client(self, client_id, payload):
         """
