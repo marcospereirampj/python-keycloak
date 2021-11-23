@@ -93,6 +93,7 @@ URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE = "admin/realms/{realm-name}/roles/{r
 URL_ADMIN_REALM_EXPORT = "admin/realms/{realm-name}/partial-export?exportClients={export-clients}&exportGroupsAndRoles={export-groups-and-roles}"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
+URL_ADMIN_FLOW = URL_ADMIN_FLOWS + "/{id}"
 URL_ADMIN_FLOWS_ALIAS = "admin/realms/{realm-name}/authentication/flows/{flow-id}"
 URL_ADMIN_FLOWS_COPY = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/copy"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
