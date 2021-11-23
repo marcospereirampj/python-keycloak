@@ -48,8 +48,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
     URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS, \
-    URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT
-
+    URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT, URL_ADMIN_FLOWS_EXECUTION
 
 class KeycloakAdmin:
 
@@ -1455,6 +1454,20 @@ class KeycloakAdmin:
                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
+    def get_authentication_flow_execution(self, execution_id):
+        """
+        Get authentication flow execution.
+
+        AuthenticationExecutionInfoRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticationexecutioninforepresentation
+
+        :param execution_id: the execution ID
+        :return: Response(json)
+        """
+        params_path = {"realm-name": self.realm_name, "id": execution_id}
+        data_raw = self.raw_get(URL_ADMIN_FLOWS_EXECUTION.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def create_authentication_flow_execution(self, payload, flow_alias):
         """
         Create an authentication flow execution
@@ -1471,6 +1484,20 @@ class KeycloakAdmin:
         data_raw = self.raw_post(URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION.format(**params_path),
                                 data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201])
+
+    def delete_authentication_flow_execution(self, execution_id):
+        """
+        Delete authentication flow execution
+
+        AuthenticationExecutionInfoRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authenticationexecutioninforepresentation
+
+        :param execution_id: keycloak client id (not oauth client-id)
+        :return: Keycloak server response (json)
+        """
+        params_path = {"realm-name": self.realm_name, "id": execution_id}
+        data_raw = self.raw_delete(URL_ADMIN_FLOWS_EXECUTION.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
     def create_authentication_flow_subflow(self, payload, flow_alias, skip_exists=False):
         """
