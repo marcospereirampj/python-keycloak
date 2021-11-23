@@ -98,7 +98,7 @@ URL_ADMIN_FLOWS_ALIAS = "admin/realms/{realm-name}/authentication/flows/{flow-id
 URL_ADMIN_FLOWS_COPY = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/copy"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
 URL_ADMIN_FLOWS_EXECUTION = "admin/realms/{realm-name}/authentication/executions/{id}"
-URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
+URL_ADMIN_FLOWS_EXECUTIONS_EXECUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
 URL_ADMIN_FLOWS_EXECUTIONS_FLOW = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/flow"
 URL_ADMIN_AUTHENTICATOR_CONFIG = "admin/realms/{realm-name}/authentication/config/{id}"
 
