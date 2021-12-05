@@ -9,5 +9,5 @@ username=${PYPI_USERNAME}
 password=${PYPI_PASSWORD}
 EOF
 
-python setup.py sdist
+python setup.py sdist bdist_wheel --universal
 twine upload dist/*
