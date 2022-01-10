@@ -1928,7 +1928,6 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-
     def delete_user_realm_role(self, user_id, payload):
         """
         Delete realm-level role mappings
@@ -1939,3 +1938,18 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_delete(URL_ADMIN_DELETE_USER_ROLE.format(**params_path),
                                               data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
+    def get_client_sessions_stats(self):
+        """
+        Get current session count for all clients with active sessions
+
+        https://www.keycloak.org/docs-api/16.1/rest-api/index.html#_getclientsessionstats
+
+        :return: Dict of clients and session count
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(
+            self.URL_ADMIN_CLIENT_SESSION_STATS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
