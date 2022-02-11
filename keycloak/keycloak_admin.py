@@ -42,7 +42,8 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, URL_ADMIN_IDP, \
     URL_ADMIN_IDP_MAPPERS, URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
-    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
+    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_USER_REALM_ROLES_AVAILABLE, URL_ADMIN_USER_REALM_ROLES_COMPOSITE, \
+    URL_ADMIN_REALM, URL_ADMIN_COMPONENTS, URL_ADMIN_COMPONENT, URL_ADMIN_KEYS, \
     URL_ADMIN_USER_FEDERATED_IDENTITY, URL_ADMIN_USER_FEDERATED_IDENTITIES, URL_ADMIN_CLIENT_ROLE_MEMBERS, \
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
@@ -1231,6 +1232,26 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "id": user_id}
         data_raw = self.raw_get(URL_ADMIN_USER_REALM_ROLES.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_available_realm_roles_of_user(self, user_id):
+        """
+        Get all available (i.e. unassigned) realm roles for a user.
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_get(URL_ADMIN_USER_REALM_ROLES_AVAILABLE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_composite_realm_roles_of_user(self, user_id):
+        """
+        Get all composite (i.e. implicit) realm roles for a user.
+        :param user_id: id of user
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_get(URL_ADMIN_USER_REALM_ROLES_COMPOSITE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def assign_group_realm_roles(self, group_id, roles):
