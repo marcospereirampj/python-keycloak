@@ -26,7 +26,6 @@
 
 import json
 from builtins import isinstance
-from copy import deepcopy
 from typing import Iterable
 
 from .connection import ConnectionManager
