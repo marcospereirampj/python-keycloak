@@ -1234,7 +1234,6 @@ class KeycloakAdmin:
         Assign realm roles to a user
 
         :param user_id: id of user
-        :param client_id: id of client containing role (not client-id)
         :param roles: roles list or role (use RoleRepresentation)
         :return Keycloak server response
         """
