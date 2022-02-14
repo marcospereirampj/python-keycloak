@@ -1244,6 +1244,21 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
+    def delete_realm_roles_of_user(self, user_id, roles):
+        """
+        Deletes realm roles of a user
+
+        :param user_id: id of user
+        :param roles: roles list or role (use RoleRepresentation)
+        :return Keycloak server response
+        """
+
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_delete(URL_ADMIN_USER_REALM_ROLES.format(**params_path),
+                                   data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def get_realm_roles_of_user(self, user_id):
         """
         Get all realm roles for a user.
