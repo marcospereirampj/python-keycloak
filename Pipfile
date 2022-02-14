@@ -7,6 +7,7 @@ name = "pypi"
 requests = ">=2.20.0"
 httmock = ">=1.2.5"
 python-jose = ">=1.4.0"
+urllib3 = ">=1.26.5"
 
 [dev-packages]
 
