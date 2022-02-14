@@ -1920,8 +1920,10 @@ class KeycloakAdmin:
             # merge custom headers to main headers
             headers.update(self.custom_headers)
 
-        self._connection = deepcopy(self.keycloak_openid.connection())
-        self._connection._headers.update(headers)
+        self._connection = ConnectionManager(base_url=self.server_url,
+                                             headers=headers,
+                                             timeout=60,
+                                             verify=self.verify)
 
     def refresh_token(self):
         refresh_token = self.token.get('refresh_token')
