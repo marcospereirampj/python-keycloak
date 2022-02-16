@@ -304,3 +304,4 @@ Main methods::
 
     # Delete the key
     keycloak_admin.delete_component(component['id'])
+
