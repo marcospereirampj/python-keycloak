@@ -1956,7 +1956,7 @@ class KeycloakAdmin:
         return r
 
     def get_token(self):
-        token_realm_name = 'master' if self.client_secret_key else self.user_realm_name or self.realm_name
+        token_realm_name = self.user_realm_name or self.realm_name
         self.keycloak_openid = KeycloakOpenID(server_url=self.server_url, client_id=self.client_id,
                                               realm_name=token_realm_name, verify=self.verify,
                                               client_secret_key=self.client_secret_key,
