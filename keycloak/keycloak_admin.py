@@ -2106,7 +2106,13 @@ class KeycloakAdmin:
         return r
 
     def get_token(self):
-        token_realm_name = self.user_realm_name or self.realm_name
+        if self.user_realm_name:
+            token_realm_name = self.user_realm_name
+        elif self.realm_name:
+            token_realm_name = self.realm_name
+        else:
+            token_realm_name = "master"
+            
         self.keycloak_openid = KeycloakOpenID(server_url=self.server_url, client_id=self.client_id,
                                               realm_name=token_realm_name, verify=self.verify,
                                               client_secret_key=self.client_secret_key,
@@ -2139,19 +2145,23 @@ class KeycloakAdmin:
                                              verify=self.verify)
 
     def refresh_token(self):
-        refresh_token = self.token.get('refresh_token')
-        try:
-            self.token = self.keycloak_openid.refresh_token(refresh_token)
-        except KeycloakGetError as e:
-            list_errors = [
-                b'Refresh token expired',
-                b'Token is not active',
-                b'Session not active'
-            ]
-            if e.response_code == 400 and any(err in e.response_body for err in list_errors):
-                self.get_token()
-            else:
-                raise
+        refresh_token = self.token.get('refresh_token', None)
+        if refresh_token is None:
+            self.get_token()
+        else:
+            try:
+                self.token = self.keycloak_openid.refresh_token(refresh_token)
+            except KeycloakGetError as e:
+                list_errors = [
+                    b'Refresh token expired',
+                    b'Token is not active',
+                    b'Session not active'
+                ]
+                if e.response_code == 400 and any(err in e.response_body for err in list_errors):
+                    self.get_token()            
+                else:
+                    raise
+                    
         self.connection.add_param_headers('Authorization', 'Bearer ' + self.token.get('access_token'))
 
     def get_client_all_sessions(self, client_id):
