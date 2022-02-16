@@ -100,6 +100,15 @@ Main methods::
     #                    verify=True,
     #                    custom_headers={'CustomHeader': 'value'})
 
+    # Optionally, you can pass proxies as well that will be used in all HTTP calls. See requests documentation for more details_
+    # `requests-proxies <https://2.python-requests.org/en/master/user/advanced/#id10>`_.
+    # keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
+    #                    client_id="example_client",
+    #                    realm_name="example_realm",
+    #                    client_secret_key="secret",
+    #                    verify=True,
+    #                    proxies={'http': 'http://10.10.1.10:3128', 'https': 'http://10.10.1.10:1080'})
+
     # Get WellKnow
     config_well_know = keycloak_openid.well_know()
 
@@ -261,6 +270,9 @@ Main methods::
 
     # Assign realm roles to user. Note that BOTH role_name and role_id appear to be required.
     keycloak_admin.assign_realm_roles(client_id="client_id", user_id="user_id", roles=[{"roles_representation"}])
+
+    # Delete realm roles of user. Note that BOTH role_name and role_id appear to be required.
+    keycloak_admin.deletes_realm_roles_of_user(user_id="user_id", roles=[{"roles_representation"}])
 
     # Create new group
     group = keycloak_admin.create_group(name="Example Group")
