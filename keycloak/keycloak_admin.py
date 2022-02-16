@@ -31,8 +31,10 @@ from typing import Iterable
 from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
-from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
-    URL_ADMIN_CLIENT_AUTHZ_POLICIES, URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION, \
+
+from .urls_patterns import URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS, URL_ADMIN_CLIENT_AUTHZ_POLICIES, \
+    URL_ADMIN_CLIENT_AUTHZ_SCOPES, URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
+    URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION, \
     URL_ADMIN_GET_SESSIONS, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_GROUPS_REALM_ROLES, \
     URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
     URL_ADMIN_REALM_ROLES_ROLE_BY_NAME, URL_ADMIN_GROUPS_CLIENT_ROLES, \
@@ -52,7 +54,7 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT, URL_ADMIN_FLOWS_EXECUTION, \
     URL_ADMIN_FLOW, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE, \
     URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES, URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE, \
-    URL_ADMIN_USER_CREDENTIALS, URL_ADMIN_USER_CREDENTIAL
+    URL_ADMIN_USER_CREDENTIALS, URL_ADMIN_USER_CREDENTIAL, URL_ADMIN_CLIENT_PROTOCOL_MAPPERS
 
 
 class KeycloakAdmin:
@@ -1043,22 +1045,44 @@ class KeycloakAdmin:
                                         data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
 
+    def get_client_authz_scopes(self, client_id):
+        """
+        Get scopes from client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path))
+        return data_raw
+
+    def get_client_authz_permissions(self, client_id):
+        """
+        Get permissions from client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path))
+        return data_raw
+
     def get_client_authz_policies(self, client_id):
         """
         Get policies from client.
 
         :param client_id: id in ClientRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
-        :param payload: PolicyRepresentation
-        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_policyrepresentation
-
         :return: Keycloak server response
         """
-        
+
         params_path = {"realm-name": self.realm_name, "id": client_id}
-        params_query = {"first": 0, "max": 20, "permission": False}
-        data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path), **params_query)
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path))
+        return data_raw
 
     def get_client_service_account_user(self, client_id):
         """
@@ -2017,7 +2041,7 @@ class KeycloakAdmin:
         params_path = {
             "realm-name": self.realm_name,
             "id": client_id,
-            "protocol-mapper-id": mapper_id
+            "protocol-mapper-id": client_mapper_id
         }
 
         data_raw = self.raw_delete(
