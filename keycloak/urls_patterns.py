@@ -129,8 +129,5 @@ URL_ADMIN_USER_FEDERATED_IDENTITY = "admin/realms/{realm-name}/users/{id}/federa
 URL_ADMIN_EVENTS = 'admin/realms/{realm-name}/events'
 
 URL_ADMIN_DELETE_USER_ROLE = "admin/realms/{realm-name}/users/{id}/role-mappings/realm"
-<<<<<<< HEAD
-=======
-
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
->>>>>>> 28f67a0d1c47a9fed090157ea7e519e35fa20b56
+
