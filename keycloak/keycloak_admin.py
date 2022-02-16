@@ -32,6 +32,7 @@ from .connection import ConnectionManager
 from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
 from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
+    URL_ADMIN_CLIENT_AUTHZ_POLICIES, URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION, \
     URL_ADMIN_GET_SESSIONS, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_GROUPS_REALM_ROLES, \
     URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
     URL_ADMIN_REALM_ROLES_ROLE_BY_NAME, URL_ADMIN_GROUPS_CLIENT_ROLES, \
@@ -947,6 +948,25 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path))
         return data_raw
 
+    def create_client_authz_resource(self, client_id, payload, skip_exists=False):
+        """
+        Create resources of client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: ResourceRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_resourcerepresentation
+
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name,
+                    "id": client_id}
+
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path),
+                                        data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
     def get_client_authz_resources(self, client_id):
         """
         Get resources from client.
@@ -958,7 +978,85 @@ class KeycloakAdmin:
 
         params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path))
-        return data_raw
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_client_authz_role_based_policy(self, client_id, payload, skip_exists=False):
+        """
+        Create role-based policy of client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: No Document
+        payload example:
+        payload={
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "name": "Policy-1",
+            "roles": [
+                {
+                "id": id
+                }
+            ]
+        }
+
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name,
+                    "id": client_id}
+
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY.format(**params_path),
+                                        data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def create_client_authz_resource_based_permission(self, client_id, payload, skip_exists=False):
+        """
+        Create resource-based permission of client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: PolicyRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_policyrepresentation
+        payload example:
+        payload={
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "name": "Permission-Name",
+            "resources": [
+                resource_id
+            ],
+            "policies": [
+                policy_id
+            ]
+
+        :return: Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name,
+                    "id": client_id}
+
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
+                                        data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[201], skip_exists=skip_exists)
+
+    def get_client_authz_policies(self, client_id):
+        """
+        Get policies from client.
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_clientrepresentation
+        :param payload: PolicyRepresentation
+        https://www.keycloak.org/docs-api/12.0/rest-api/index.html#_policyrepresentation
+
+        :return: Keycloak server response
+        """
+        
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_query = {"first": 0, "max": 20, "permission": False}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path), **params_query)
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_client_service_account_user(self, client_id):
         """
