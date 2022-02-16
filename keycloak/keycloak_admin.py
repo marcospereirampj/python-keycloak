@@ -263,7 +263,7 @@ class KeycloakAdmin:
 
         :param export-clients: Skip if not want to export realm clients
         :param export-groups-and-roles: Skip if not want to export realm groups and roles
-        
+
         :return: realm configurations JSON
         """
         params_path = {"realm-name": self.realm_name, "export-clients": export_clients, "export-groups-and-roles": export_groups_and_role }
@@ -2118,12 +2118,16 @@ class KeycloakAdmin:
             if self.user_realm_name:
                 self.realm_name = self.user_realm_name
 
-        self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
+        if self.username and self.password:
+            self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
 
-        headers = {
-            'Authorization': 'Bearer ' + self.token.get('access_token'),
-            'Content-Type': 'application/json'
-        }
+            headers = {
+                'Authorization': 'Bearer ' + self.token.get('access_token'),
+                'Content-Type': 'application/json'
+            }
+        else:
+            self._token = None
+            headers = {}
 
         if self.custom_headers is not None:
             # merge custom headers to main headers
