@@ -105,10 +105,12 @@ URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES = URL_ADMIN_REALM + "/default-optional-
 URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE = URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES + "/{id}"
 
 URL_ADMIN_FLOWS = "admin/realms/{realm-name}/authentication/flows"
+URL_ADMIN_FLOW = URL_ADMIN_FLOWS + "/{id}"
 URL_ADMIN_FLOWS_ALIAS = "admin/realms/{realm-name}/authentication/flows/{flow-id}"
 URL_ADMIN_FLOWS_COPY = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/copy"
 URL_ADMIN_FLOWS_EXECUTIONS = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions"
-URL_ADMIN_FLOWS_EXECUTIONS_EXEUCUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
+URL_ADMIN_FLOWS_EXECUTION = "admin/realms/{realm-name}/authentication/executions/{id}"
+URL_ADMIN_FLOWS_EXECUTIONS_EXECUTION = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/execution"
 URL_ADMIN_FLOWS_EXECUTIONS_FLOW = "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/flow"
 URL_ADMIN_AUTHENTICATOR_CONFIG = "admin/realms/{realm-name}/authentication/config/{id}"
 
