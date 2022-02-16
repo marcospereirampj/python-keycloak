@@ -172,6 +172,15 @@ response = keycloak_admin.update_user(user_id="user-id-keycloak",
 
 # Update User Password
 response = keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
+
+# Get User Credentials
+credentials = keycloak_admin.get_credentials(user_id='user_id')
+
+# Get User Credential by ID
+credential = keycloak_admin.get_credential(user_id='user_id', credential_id='credential_id')
+
+# Delete User Credential
+response = keycloak_admin.delete_credential(user_id='user_id', credential_id='credential_id')
                                       
 # Delete User
 response = keycloak_admin.delete_user(user_id="user-id-keycloak")
@@ -234,7 +243,7 @@ keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
 
 # Create new group
-group = keycloak_admin.create_group(name="Example Group")
+group = keycloak_admin.create_group({"name": "Example Group"})
 
 # Get all groups
 groups = keycloak_admin.get_groups()
@@ -256,6 +265,10 @@ realm_roles = keycloak_admin.get_roles()
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
+
+# Assign realm roles to user
+keycloak_admin.assign_realm_roles(user_id=user_id, roles=realm_roles)
+
 
 # Get all ID Providers
 idps = keycloak_admin.get_idps()

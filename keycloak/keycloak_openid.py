@@ -44,7 +44,7 @@ from .urls_patterns import (
 
 class KeycloakOpenID:
 
-    def __init__(self, server_url, realm_name, client_id, client_secret_key=None, verify=True, custom_headers=None):
+    def __init__(self, server_url, realm_name, client_id, client_secret_key=None, verify=True, custom_headers=None, proxies=None):
         """
 
         :param server_url: Keycloak server url
@@ -53,6 +53,7 @@ class KeycloakOpenID:
         :param client_secret_key: client secret key
         :param verify: True if want check connection SSL
         :param custom_headers: dict of custom header to pass to each HTML request
+        :param proxies: dict of proxies to sent the request by.
         """
         self._client_id = client_id
         self._client_secret_key = client_secret_key
@@ -64,7 +65,8 @@ class KeycloakOpenID:
         self._connection = ConnectionManager(base_url=server_url,
                                              headers=headers,
                                              timeout=60,
-                                             verify=verify)
+                                             verify=verify,
+                                             proxies=proxies)
 
         self._authorization = Authorization()
 
