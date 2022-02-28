@@ -242,6 +242,9 @@ keycloak_admin.get_composite_client_roles_of_user(user_id="user_id", client_id="
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles={"id": "role-id"})
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
 
+# Get the client authorization settings
+client_authz_settings = get_client_authz_settings(client_id="client_id")
+
 # Get all client authorization resources
 client_resources = get_client_authz_resources(client_id="client_id")
 
