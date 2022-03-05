@@ -242,6 +242,9 @@ keycloak_admin.get_composite_client_roles_of_user(user_id="user_id", client_id="
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles={"id": "role-id"})
 keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
 
+# Get the client authorization settings
+client_authz_settings = get_client_authz_settings(client_id="client_id")
+
 # Get all client authorization resources
 client_resources = get_client_authz_resources(client_id="client_id")
 
@@ -271,9 +274,6 @@ sync_users(storage_id="storage_di", action="action")
 
 # Get client role id from name
 role_id = keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")
-
-# Get all roles for the realm or client
-realm_roles = keycloak_admin.get_roles()
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
