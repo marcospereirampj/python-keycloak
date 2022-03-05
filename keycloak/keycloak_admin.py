@@ -33,7 +33,7 @@ from .exceptions import raise_error_from_response, KeycloakGetError
 from .keycloak_openid import KeycloakOpenID
 
 from .urls_patterns import URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS, URL_ADMIN_CLIENT_AUTHZ_POLICIES, \
-    URL_ADMIN_CLIENT_AUTHZ_SCOPES, URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
+    URL_ADMIN_CLIENT_AUTHZ_SCOPES, URL_ADMIN_REALM_ROLES_SEARCH, URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURCES, URL_ADMIN_CLIENT_ROLES, \
     URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY, URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION, \
     URL_ADMIN_GET_SESSIONS, URL_ADMIN_RESET_PASSWORD, URL_ADMIN_SEND_UPDATE_ACCOUNT, URL_ADMIN_GROUPS_REALM_ROLES, \
     URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE, URL_ADMIN_CLIENT_INSTALLATION_PROVIDER, \
@@ -1161,18 +1161,25 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_CLIENT_INSTALLATION_PROVIDER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
-    def get_realm_roles(self):
+    def get_realm_roles(self, search_text=None):
         """
         Get all roles for the realm or client
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_rolerepresentation
-
+        
+        :param search_text: optional search text to limit the returned result.
         :return: Keycloak server response (RoleRepresentation)
         """
+        if search_text:
+            URL = URL_ADMIN_REALM_ROLES_SEARCH
+            params_path = {"realm-name": self.realm_name, "search-text": search_text}
+        else:
+            URL = URL_ADMIN_REALM_ROLES
+            params_path = {"realm-name": self.realm_name}
 
-        params_path = {"realm-name": self.realm_name}
-        data_raw = self.raw_get(URL_ADMIN_REALM_ROLES.format(**params_path))
+
+        data_raw = self.raw_get(URL.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realm_role_members(self, role_name, **query):
