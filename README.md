@@ -55,6 +55,7 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 * [Alex](https://bitbucket.org/alex_zel/)
 * [Ewan Jone](https://bitbucket.org/kisamoto/)
 * [Lukas Martini](https://github.com/lutoma)
+* [Dusan Andrc](https://github.com/andricDu)
 
 ## Usage
 

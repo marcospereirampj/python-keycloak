@@ -2279,19 +2279,20 @@ class KeycloakAdmin:
                                               client_secret_key=self.client_secret_key,
                                               custom_headers=self.custom_headers)
 
-        grant_type = ["password"]
-        if self.client_secret_key:
-            grant_type = ["client_credentials"]
-            if self.user_realm_name:
-                self.realm_name = self.user_realm_name
 
-        if self.username and self.password:
-            self._token = self.keycloak_openid.token(self.username, self.password, grant_type=grant_type)
-
-            headers = {
+        def set_token_get_header(identifier, secret, grant):
+            self._token = self.keycloak_openid.token(identifier, secret, grant_type=grant)
+            return {
                 'Authorization': 'Bearer ' + self.token.get('access_token'),
                 'Content-Type': 'application/json'
             }
+
+        if self.client_secret_key:
+            headers = set_token_get_header(self.client_id, self.client_secret_key, ["client_credentials"])
+            if self.user_realm_name:
+                self.realm_name = self.user_realm_name
+        elif self.username and self.password:
+            headers = set_token_get_header(self.username, self.password, ["password"])
         else:
             self._token = None
             headers = {}
