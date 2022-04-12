@@ -27,8 +27,8 @@ from jose import jwt
 
 from .authorization import Authorization
 from .connection import ConnectionManager
-from .exceptions import raise_error_from_response, KeycloakGetError, \
-    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError, KeycloakDeprecationError
+from .exceptions import KeycloakPermissionFormatError, raise_error_from_response, KeycloakGetError, \
+    KeycloakRPTNotFound, KeycloakAuthorizationConfigError, KeycloakInvalidTokenError, KeycloakDeprecationError, KeycloakAuthenticationError
 from .urls_patterns import (
     URL_REALM,
     URL_AUTH,
@@ -40,6 +40,24 @@ from .urls_patterns import (
     URL_ENTITLEMENT,
     URL_INTROSPECT
 )
+
+SAME_AS_CLIENT = object()
+
+
+class AuthStatus:
+    """A class that represents the authorization/login status of a user associated with a token.
+    This has to evaluate to True if and only if the user is properly authorized for the requested resource."""
+
+    def __init__(self, is_logged_in, is_authorized, missing_permissions):
+        self.is_logged_in = is_logged_in
+        self.is_authorized = is_authorized
+        self.missing_permissions = missing_permissions
+
+    def __bool__(self):
+        return self.is_authorized
+
+    def __repr__(self):
+        return f"AuthStatus(is_authorized={self.is_authorized}, is_logged_in={self.is_logged_in}, missing_permissions={self.missing_permissions})"
 
 
 class KeycloakOpenID:
@@ -431,3 +449,103 @@ class KeycloakOpenID:
                     permissions += policy.permissions
 
         return list(set(permissions))
+
+    def UMA_permissions(self, token, permissions, audience=SAME_AS_CLIENT, response_mode="permissions"):
+        """
+        The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
+        invoked by confidential clients.
+
+        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+
+
+        :param token: user token
+        :param permissions:
+        :return: permissions list
+        """
+
+        if audience is SAME_AS_CLIENT:
+            audience = self.client_id
+
+        permission = build_permission_param(permissions)
+
+        params_path = {"realm-name": self.realm_name}
+        payload = {"grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket", "permission": permission,
+                   "response_mode": response_mode, "audience": audience, "Authorization": "Bearer "+token}
+
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        try:
+            data_raw = self.connection.raw_post(
+                URL_TOKEN.format(**params_path), data=payload)
+        finally:
+            self.connection.del_param_headers("Authorization")
+
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def has_UMA_access(self, token, permissions):
+        """
+        Get permission by user token
+
+        :param token: user token
+        :param permissions: dict(resource:scope)
+        :return: result bool
+        """
+        needed = build_permission_param(permissions)
+        try:
+            granted = self.UMA_permissions(token, permissions)
+        except (KeycloakGetError, KeycloakAuthenticationError) as e:
+            if e.response_code == 403:
+                return AuthStatus(is_logged_in=True, is_authorized=False, missing_permissions=needed)
+            elif e.response_code == 401:
+                return AuthStatus(is_logged_in=False, is_authorized=False, missing_permissions=needed)
+            raise
+
+        for resource_struct in granted:
+            resource = resource_struct["rsname"]
+            scopes = resource_struct.get("scopes", None)
+            if not scopes:
+                needed.discard(resource)
+                continue
+            for scope in scopes:
+                needed.discard("{}#{}".format(resource, scope))
+
+        return AuthStatus(is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed)
+
+
+def build_permission_param(permissions):
+    """
+    Transform permissions to a set, so they are usable for requests
+
+    :param permissions: either str (resource#scope),
+        iterable[str] (resource#scope),
+        dict[str,str] (resource: scope),
+        dict[str,iterable[str]] (resource: scopes) 
+    :return: result bool
+    """
+    if permissions is None or permissions == "":
+        return set()
+    if isinstance(permissions, str):
+        return set((permissions,))
+
+    try:  # treat as dictionary of permissions
+        result = set()
+        for resource, scopes in permissions.items():
+            if scopes is None:
+                result.add(resource)
+            elif isinstance(scopes, str):
+                result.add("{}#{}".format(resource, scopes))
+            else:
+                for scope in scopes:
+                    if not isinstance(scope, str):
+                        raise KeycloakPermissionFormatError(
+                            'misbuilt permission {}'.format(permissions))
+                    result.add("{}#{}".format(resource, scope))
+        return result
+    except AttributeError:
+        pass
+
+    try:  # treat as any other iterable of permissions
+        return set(permissions)
+    except TypeError:
+        pass
+    raise KeycloakPermissionFormatError(
+        'misbuilt permission {}'.format(permissions))

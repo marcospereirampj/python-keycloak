@@ -56,6 +56,7 @@ class KeycloakOperationError(KeycloakError):
 class KeycloakDeprecationError(KeycloakError):
     pass
 
+
 class KeycloakGetError(KeycloakOperationError):
     pass
 
@@ -73,6 +74,10 @@ class KeycloakAuthorizationConfigError(KeycloakOperationError):
 
 
 class KeycloakInvalidTokenError(KeycloakOperationError):
+    pass
+
+
+class KeycloakPermissionFormatError(KeycloakOperationError):
     pass
 
 
