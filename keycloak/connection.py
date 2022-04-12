@@ -60,7 +60,7 @@ class ConnectionManager(object):
             adapter.max_retries.allowed_methods = frozenset(allowed_methods)
 
             self._s.mount(protocol, adapter)
-        
+
         if proxies:
             self._s.proxies.update(proxies)
 

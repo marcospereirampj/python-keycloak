@@ -268,7 +268,7 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
-    
+
     def public_key(self):
         """
         The public key is exposed by the realm page directly.
@@ -278,7 +278,6 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)['public_key']
-
 
     def entitlement(self, token, resource_server_id):
         """
@@ -293,8 +292,8 @@ class KeycloakOpenID:
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
         data_raw = self.connection.raw_get(URL_ENTITLEMENT.format(**params_path))
-        
-        if data_raw.status_code == 404: 
+
+        if data_raw.status_code == 404:
             return raise_error_from_response(data_raw, KeycloakDeprecationError)
 
         return raise_error_from_response(data_raw, KeycloakGetError)

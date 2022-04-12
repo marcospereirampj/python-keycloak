@@ -56,6 +56,7 @@ class KeycloakOperationError(KeycloakError):
 class KeycloakDeprecationError(KeycloakError):
     pass
 
+
 class KeycloakGetError(KeycloakOperationError):
     pass
 

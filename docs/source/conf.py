@@ -182,6 +182,3 @@ texinfo_documents = [
      author, 'python-keycloak', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
