@@ -25,6 +25,7 @@ import json
 
 from jose import jwt
 
+from .uma_permissions import UMA_Permission
 from .authorization import Authorization
 from .connection import ConnectionManager
 from .exceptions import KeycloakPermissionFormatError, raise_error_from_response, KeycloakGetError, \
@@ -297,7 +298,6 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)['public_key']
 
-
     def entitlement(self, token, resource_server_id):
         """
         Client applications can use a specific endpoint to obtain a special security token
@@ -523,7 +523,7 @@ def build_permission_param(permissions):
     """
     if permissions is None or permissions == "":
         return set()
-    if isinstance(permissions, str):
+    if isinstance(permissions, (str, UMA_Permission)):
         return set((permissions,))
 
     try:  # treat as dictionary of permissions
@@ -531,11 +531,11 @@ def build_permission_param(permissions):
         for resource, scopes in permissions.items():
             if scopes is None:
                 result.add(resource)
-            elif isinstance(scopes, str):
+            elif isinstance(scopes, (str, UMA_Permission)):
                 result.add("{}#{}".format(resource, scopes))
             else:
                 for scope in scopes:
-                    if not isinstance(scope, str):
+                    if not isinstance(scope, (str, UMA_Permission)):
                         raise KeycloakPermissionFormatError(
                             'misbuilt permission {}'.format(permissions))
                     result.add("{}#{}".format(resource, scope))

@@ -81,6 +81,10 @@ class KeycloakPermissionFormatError(KeycloakOperationError):
     pass
 
 
+class PermissionDefinitionError(Exception):
+    pass
+
+
 def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
     if expected_codes is None:
         expected_codes = [200, 201, 204]
