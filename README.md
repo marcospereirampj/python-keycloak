@@ -108,6 +108,15 @@ keycloak_openid.load_authorization_config("example-authz-config.json")
 policies = keycloak_openid.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
 permissions = keycloak_openid.get_permissions(token['access_token'], method_token_info='introspect')
 
+# Get UMA-permissions by token
+token = keycloak_openid.token("user", "password")
+permissions = keycloak_openid.UMA_permissions(token['access_token'])
+
+# Get auth status for a specific resource and scope by token
+token = keycloak_openid.token("user", "password")
+auth_status = keycloak_openid.has_UMA_access(token['access_token'], "Resource#Scope")
+
+
 # KEYCLOAK ADMIN
 
 from keycloak import KeycloakAdmin
