@@ -55,7 +55,8 @@ from .urls_patterns import URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS, URL_ADMIN_CLIENT_
     URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT, URL_ADMIN_FLOWS_EXECUTION, \
     URL_ADMIN_FLOW, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE, \
     URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES, URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE, \
-    URL_ADMIN_USER_CREDENTIALS, URL_ADMIN_USER_CREDENTIAL, URL_ADMIN_CLIENT_PROTOCOL_MAPPERS
+    URL_ADMIN_USER_CREDENTIALS, URL_ADMIN_USER_CREDENTIAL, URL_ADMIN_CLIENT_PROTOCOL_MAPPERS, \
+    URL_ADMIN_CLIENT_ROLE_GROUPS
 
 
 class KeycloakAdmin:
@@ -705,7 +706,7 @@ class KeycloakAdmin:
         """
         query = query or {}
         params_path = {"realm-name": self.realm_name}
-        url = URL_ADMIN_USERS.format(**params_path)
+        url = URL_ADMIN_GROUPS.format(**params_path)
 
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
@@ -762,7 +763,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        url = URL_ADMIN_USERS.format(**params_path)
+        url = URL_ADMIN_GROUP_MEMBERS.format(**params_path)
 
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
@@ -1308,9 +1309,19 @@ class KeycloakAdmin:
         :param query: Additional query parameters ( see https://www.keycloak.org/docs-api/11.0/rest-api/index.html#_clients_resource)
         :return: Keycloak server response (UserRepresentation)
         """
-        params_path = {"realm-name": self.realm_name, "id":client_id, "role-name":role_name}
-        return self.__fetch_all(URL_ADMIN_CLIENT_ROLE_MEMBERS.format(**params_path) , query)
+        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        return self.__fetch_all(URL_ADMIN_CLIENT_ROLE_MEMBERS.format(**params_path), query)
 
+    def get_client_role_groups(self, client_id, role_name, **query):
+        """
+        Get group members by client role .
+        :param client_id: The client id
+        :param role_name: the name of role to be queried.
+        :param query: Additional query parameters (see https://www.keycloak.org/docs-api/11.0/rest-api/index.html#_clients_resource)
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        return self.__fetch_all(URL_ADMIN_CLIENT_ROLE_GROUPS.format(**params_path), query)
 
     def create_realm_role(self, payload, skip_exists=False):
         """
