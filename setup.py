@@ -17,7 +17,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=['keycloak', 'keycloak.authorization', 'keycloak.tests'],
-    install_requires=['requests>=2.20.0', 'python-jose>=1.4.0'],
+    install_requires=['requests>=2.20.0', 'python-jose>=1.4.0', 'urllib>=1.26.0'],
     tests_require=['httmock>=1.2.5'],
     classifiers=[
         'Programming Language :: Python :: 3',
