@@ -26,7 +26,8 @@ class Permission:
     """
     Consider this simple and very common permission:
 
-    A permission associates the object being protected with the policies that must be evaluated to determine whether access is granted.
+    A permission associates the object being protected with the policies that must be evaluated to
+    determine whether access is granted.
 
     X CAN DO Y ON RESOURCE Z
 
