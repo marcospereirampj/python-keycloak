@@ -5,3 +5,5 @@ twine==1.13.0
 jose~=1.0.0
 setuptools~=54.2.0
 urllib3>=1.26.5
+pytest>=7.1.2
+pytest-cov>=3.0.0

@@ -105,3 +105,5 @@ main.py
 main2.py
 s3air-authz-config.json
 .vscode
+.docker
+.pytest_cache
