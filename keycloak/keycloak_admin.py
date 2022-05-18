@@ -1707,7 +1707,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
         data_raw = self.raw_put(URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
                                 data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[202,204])
 
     def get_authentication_flow_execution(self, execution_id):
         """
