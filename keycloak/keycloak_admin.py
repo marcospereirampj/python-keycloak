@@ -1348,7 +1348,7 @@ class KeycloakAdmin:
         """
 
         params_path = {"realm-name": self.realm_name, "role-name": role_name}
-        data_raw = self.connection.raw_put(URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path),
+        data_raw = self.raw_put(URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path),
                                             data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
@@ -1360,7 +1360,7 @@ class KeycloakAdmin:
         """
 
         params_path = {"realm-name": self.realm_name, "role-name": role_name}
-        data_raw = self.connection.raw_delete(
+        data_raw = self.raw_delete(
             URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
@@ -2337,7 +2337,7 @@ class KeycloakAdmin:
         :return: UserSessionRepresentation
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
-        data_raw = self.connection.raw_get(URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path))
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def delete_user_realm_role(self, user_id, payload):
@@ -2347,7 +2347,7 @@ class KeycloakAdmin:
 
         """
         params_path = {"realm-name": self.realm_name, "id": str(user_id) }
-        data_raw = self.connection.raw_delete(URL_ADMIN_DELETE_USER_ROLE.format(**params_path),
+        data_raw = self.raw_delete(URL_ADMIN_DELETE_USER_ROLE.format(**params_path),
                                               data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
