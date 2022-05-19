@@ -21,7 +21,7 @@ jobs:
     - name: Apply the tag version
       run: |
         version=${{ github.ref_name }}
-        sed -i 's/__version__ = .*/__version__ = "'${version:1}'"/' keycloak/_version.py
+        sed -i 's/__version__ = .*/__version__ = "'${version:1}'"/' src/keycloak/_version.py
     - name: Run build
       run: |
         tox -e build
