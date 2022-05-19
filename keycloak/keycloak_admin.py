@@ -762,7 +762,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        url = URL_ADMIN_USERS.format(**params_path)
+        url = URL_ADMIN_GROUP_MEMBERS.format(**params_path)
 
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
