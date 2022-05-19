@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
-from setuptools import setup
+
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -15,7 +16,7 @@ with open("docs-requirements.txt", "r") as fh:
     docs_reqs = fh.read().split("\n")
 
 
-VERSIONFILE = "keycloak/_version.py"
+VERSIONFILE = "src/keycloak/_version.py"
 verstrline = open(VERSIONFILE, "rt").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)
@@ -35,7 +36,8 @@ setup(
     description="python-keycloak is a Python package providing access to the Keycloak API.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=["keycloak", "keycloak.authorization"],
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     install_requires=reqs,
     tests_require=dev_reqs,
     extras_require={"docs": docs_reqs},
