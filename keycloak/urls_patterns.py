@@ -148,6 +148,12 @@ URL_ADMIN_FLOWS_EXECUTIONS_EXECUTION = (
 URL_ADMIN_FLOWS_EXECUTIONS_FLOW = (
     "admin/realms/{realm-name}/authentication/flows/{flow-alias}/executions/flow"
 )
+URL_ADMIN_AUTHENTICATOR_PROVIDERS = (
+    "admin/realms/{realm-name}/authentication/authenticator-providers"
+)
+URL_ADMIN_AUTHENTICATOR_CONFIG_DESCRIPTION = (
+    "admin/realms/{realm-name}/authentication/config-description/{provider-id}"
+)
 URL_ADMIN_AUTHENTICATOR_CONFIG = "admin/realms/{realm-name}/authentication/config/{id}"
 
 URL_ADMIN_COMPONENTS = "admin/realms/{realm-name}/components"

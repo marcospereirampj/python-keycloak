@@ -1199,3 +1199,43 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_authentication_flow(flow_id=flow_id)
     assert err.match('404: b\'{"error":"Could not find flow with id"}\'')
+
+
+def test_authentication_configs(admin: KeycloakAdmin, realm: str):
+    admin.realm_name = realm
+
+    # Test list of auth providers
+    res = admin.get_authenticator_providers()
+    assert len(res) == 39
+
+    res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
+    assert res == {
+        "helpText": "Validates the SSO cookie set by the auth server.",
+        "name": "Cookie",
+        "properties": [],
+        "providerId": "auth-cookie",
+    }
+
+    # Test authenticator config
+    # Currently unable to find a sustainable way to fetch the config id,
+    # therefore testing only failures
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_authenticator_config(config_id="bad")
+    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_authenticator_config(payload=dict(), config_id="bad")
+    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_authenticator_config(config_id="bad")
+    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+
+
+def test_sync_users(admin: KeycloakAdmin, realm: str):
+    admin.realm_name = realm
+
+    # Only testing the error message
+    with pytest.raises(KeycloakPostError) as err:
+        admin.sync_users(storage_id="does-not-exist", action="triggerFullSync")
+    assert err.match('404: b\'{"error":"Could not find component"}\'')
