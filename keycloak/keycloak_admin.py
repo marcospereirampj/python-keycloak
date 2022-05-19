@@ -1280,6 +1280,24 @@ class KeycloakAdmin:
                                  data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
+    def update_client_role(self, client_role_id, role_name, payload):
+        """
+        Update a client role
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_rolerepresentation
+
+        :param client_role_id: id of client (not client-id)
+        :param role_name: role's name (not id!)
+        :param payload: RoleRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
+        data_raw = self.raw_put(
+            URL_ADMIN_CLIENT_ROLE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
+
     def delete_client_role(self, client_role_id, role_name):
         """
         Delete a client role
