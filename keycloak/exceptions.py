@@ -25,8 +25,7 @@ import requests
 
 
 class KeycloakError(Exception):
-    def __init__(self, error_message="", response_code=None,
-                 response_body=None):
+    def __init__(self, error_message="", response_code=None, response_body=None):
 
         Exception.__init__(self, error_message)
 
@@ -56,7 +55,20 @@ class KeycloakOperationError(KeycloakError):
 class KeycloakDeprecationError(KeycloakError):
     pass
 
+
 class KeycloakGetError(KeycloakOperationError):
+    pass
+
+
+class KeycloakPostError(KeycloakOperationError):
+    pass
+
+
+class KeycloakPutError(KeycloakOperationError):
+    pass
+
+
+class KeycloakDeleteError(KeycloakOperationError):
     pass
 
 
@@ -90,10 +102,10 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
             return response.content
 
     if skip_exists and response.status_code == 409:
-        return {"Already exists"}
+        return {"msg": "Already exists"}
 
     try:
-        message = response.json()['message']
+        message = response.json()["message"]
     except (KeyError, ValueError):
         message = response.content
 
@@ -103,6 +115,6 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
         if response.status_code == 401:
             error = KeycloakAuthenticationError
 
-    raise error(error_message=message,
-                response_code=response.status_code,
-                response_body=response.content)
+    raise error(
+        error_message=message, response_code=response.status_code, response_body=response.content
+    )

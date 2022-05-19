@@ -38,7 +38,7 @@ class Authorization:
     """
 
     def __init__(self):
-        self._policies = {}
+        self.policies = {}
 
     @property
     def policies(self):
@@ -53,41 +53,46 @@ class Authorization:
         Load policies, roles and permissions (scope/resources).
 
         :param data: keycloak authorization data (dict)
-        :return:
+        :returns: None
         """
-        for pol in data['policies']:
-            if pol['type'] == 'role':
-                policy = Policy(name=pol['name'],
-                                type=pol['type'],
-                                logic=pol['logic'],
-                                decision_strategy=pol['decisionStrategy'])
+        for pol in data["policies"]:
+            if pol["type"] == "role":
+                policy = Policy(
+                    name=pol["name"],
+                    type=pol["type"],
+                    logic=pol["logic"],
+                    decision_strategy=pol["decisionStrategy"],
+                )
 
-                config_roles = json.loads(pol['config']['roles'])
+                config_roles = json.loads(pol["config"]["roles"])
                 for role in config_roles:
-                    policy.add_role(Role(name=role['id'],
-                                         required=role['required']))
+                    policy.add_role(Role(name=role["id"], required=role["required"]))
 
                 self.policies[policy.name] = policy
 
-            if pol['type'] == 'scope':
-                permission = Permission(name=pol['name'],
-                                        type=pol['type'],
-                                        logic=pol['logic'],
-                                        decision_strategy=pol['decisionStrategy'])
+            if pol["type"] == "scope":
+                permission = Permission(
+                    name=pol["name"],
+                    type=pol["type"],
+                    logic=pol["logic"],
+                    decision_strategy=pol["decisionStrategy"],
+                )
 
-                permission.scopes = ast.literal_eval(pol['config']['scopes'])
+                permission.scopes = ast.literal_eval(pol["config"]["scopes"])
 
-                for policy_name in ast.literal_eval(pol['config']['applyPolicies']):
+                for policy_name in ast.literal_eval(pol["config"]["applyPolicies"]):
                     self.policies[policy_name].add_permission(permission)
 
-            if pol['type'] == 'resource':
-                permission = Permission(name=pol['name'],
-                                        type=pol['type'],
-                                        logic=pol['logic'],
-                                        decision_strategy=pol['decisionStrategy'])
+            if pol["type"] == "resource":
+                permission = Permission(
+                    name=pol["name"],
+                    type=pol["type"],
+                    logic=pol["logic"],
+                    decision_strategy=pol["decisionStrategy"],
+                )
 
-                permission.resources = ast.literal_eval(pol['config'].get('resources', "[]"))
+                permission.resources = ast.literal_eval(pol["config"].get("resources", "[]"))
 
-                for policy_name in ast.literal_eval(pol['config']['applyPolicies']):
+                for policy_name in ast.literal_eval(pol["config"]["applyPolicies"]):
                     if self.policies.get(policy_name) is not None:
                         self.policies[policy_name].add_permission(permission)

@@ -29,9 +29,10 @@ class Policy:
     A policy defines the conditions that must be satisfied to grant access to an object.
     Unlike permissions, you do not specify the object being protected but rather the conditions
     that must be satisfied for access to a given object (for example, resource, scope, or both).
-    Policies are strongly related to the different access control mechanisms (ACMs) that you can use to
-    protect your resources. With policies, you can implement strategies for attribute-based access control
-    (ABAC), role-based access control (RBAC), context-based access control, or any combination of these.
+    Policies are strongly related to the different access control mechanisms (ACMs) that you can
+    use to protect your resources. With policies, you can implement strategies for attribute-based
+    access control (ABAC), role-based access control (RBAC), context-based access control, or any
+    combination of these.
 
     https://keycloak.gitbooks.io/documentation/authorization_services/topics/policy/overview.html
 
@@ -98,9 +99,10 @@ class Policy:
         :param role: keycloak role.
         :return:
         """
-        if self.type != 'role':
+        if self.type != "role":
             raise KeycloakAuthorizationConfigError(
-                "Can't add role. Policy type is different of role")
+                "Can't add role. Policy type is different of role"
+            )
         self._roles.append(role)
 
     def add_permission(self, permission):

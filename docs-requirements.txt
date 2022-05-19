@@ -1,0 +1,9 @@
+mock
+alabaster
+commonmark
+recommonmark
+sphinx
+sphinx-rtd-theme
+readthedocs-sphinx-ext
+m2r2
+sphinx-autoapi

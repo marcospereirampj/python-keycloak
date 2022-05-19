@@ -1,9 +1,7 @@
-[![CircleCI](https://circleci.com/gh/marcospereirampj/python-keycloak/tree/master.svg?style=svg)](https://circleci.com/gh/marcospereirampj/python-keycloak/tree/master)
+[![CircleCI](https://github.com/marcospereirampj/python-keycloak/actions/workflows/daily.yaml/badge.svg)](https://github.com/marcospereirampj/python-keycloak/)
 [![Documentation Status](https://readthedocs.org/projects/python-keycloak/badge/?version=latest)](http://python-keycloak.readthedocs.io/en/latest/?badge=latest)
 
-
-Python Keycloak
-====================
+# Python Keycloak
 
 For review- see https://github.com/marcospereirampj/python-keycloak
 
@@ -13,24 +11,27 @@ For review- see https://github.com/marcospereirampj/python-keycloak
 
 ### Via Pypi Package:
 
-``` $ pip install python-keycloak ```
+`$ pip install python-keycloak`
 
 ### Manually
 
-``` $ python setup.py install ```
+`$ python setup.py install`
 
 ## Dependencies
 
 python-keycloak depends on:
 
-* Python 3
-* [requests](https://requests.readthedocs.io)
-* [python-jose](http://python-jose.readthedocs.io/en/latest/)
+- Python 3
+- [requests](https://requests.readthedocs.io)
+- [python-jose](http://python-jose.readthedocs.io/en/latest/)
+- [urllib3](https://urllib3.readthedocs.io/en/stable/)
 
 ### Tests Dependencies
 
-* unittest
-* [httmock](https://github.com/patrys/httmock)
+- [tox](https://tox.readthedocs.io/)
+- [pytest](https://docs.pytest.org/en/latest/)
+- [pytest-cov](https://github.com/pytest-dev/pytest-cov)
+- [wheel](https://github.com/pypa/wheel)
 
 ## Bug reports
 
@@ -43,18 +44,19 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 
 ## Contributors
 
-* [Agriness Team](http://www.agriness.com/pt/)
-* [Marcos Pereira](marcospereira.mpj@gmail.com)
-* [Martin Devlin](https://bitbucket.org/devlinmpearson/) 
-* [Shon T. Urbas](https://bitbucket.org/surbas/)
-* [Markus Spanier](https://bitbucket.org/spanierm/)
-* [Remco Kranenburg](https://bitbucket.org/Remco47/)
-* [Armin](https://bitbucket.org/arminfelder/)
-* [njordr](https://bitbucket.org/njordr/)
-* [Josha Inglis](https://bitbucket.org/joshainglis/)
-* [Alex](https://bitbucket.org/alex_zel/)
-* [Ewan Jone](https://bitbucket.org/kisamoto/)
-* [Lukas Martini](https://github.com/lutoma)
+- [Agriness Team](http://www.agriness.com/pt/)
+- [Marcos Pereira](marcospereira.mpj@gmail.com)
+- [Martin Devlin](https://bitbucket.org/devlinmpearson/)
+- [Shon T. Urbas](https://bitbucket.org/surbas/)
+- [Markus Spanier](https://bitbucket.org/spanierm/)
+- [Remco Kranenburg](https://bitbucket.org/Remco47/)
+- [Armin](https://bitbucket.org/arminfelder/)
+- [njordr](https://bitbucket.org/njordr/)
+- [Josha Inglis](https://bitbucket.org/joshainglis/)
+- [Alex](https://bitbucket.org/alex_zel/)
+- [Ewan Jone](https://bitbucket.org/kisamoto/)
+- [Lukas Martini](https://github.com/lutoma)
+- [Adamatics](https://www.adamatics.com)
 
 ## Usage
 
@@ -119,13 +121,13 @@ keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
                                user_realm_name="only_if_other_realm_than_master",
                                client_secret_key="client-secret",
                                verify=True)
-        
-# Add user                       
+
+# Add user
 new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "username": "example@example.com",
                     "enabled": True,
                     "firstName": "Example",
-                    "lastName": "Example"})    
+                    "lastName": "Example"})
 
 # Add user and raise exception if username already exists
 # exist_ok currently defaults to True for backwards compatibility reasons
@@ -135,8 +137,8 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "firstName": "Example",
                     "lastName": "Example"},
                     exist_ok=False)
-                                        
-# Add user and set password                    
+
+# Add user and set password
 new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "username": "example@example.com",
                     "enabled": True,
@@ -144,7 +146,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "lastName": "Example",
                     "credentials": [{"value": "secret","type": "password",}]})
 
-# Add user and specify a locale                       
+# Add user and specify a locale
 new_user = keycloak_admin.create_user({"email": "example@example.fr",
                     "username": "example@example.fr",
                     "enabled": True,
@@ -152,7 +154,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.fr",
                     "lastName": "Example",
                     "attributes": {
                       "locale": ["fr"]
-                    })    
+                    })
 
 # User counter
 count_users = keycloak_admin.users_count()
@@ -167,7 +169,7 @@ user_id_keycloak = keycloak_admin.get_user_id("example@example.com")
 user = keycloak_admin.get_user("user-id-keycloak")
 
 # Update User
-response = keycloak_admin.update_user(user_id="user-id-keycloak", 
+response = keycloak_admin.update_user(user_id="user-id-keycloak",
                                       payload={'firstName': 'Example Update'})
 
 # Update User Password
@@ -181,7 +183,7 @@ credential = keycloak_admin.get_credential(user_id='user_id', credential_id='cre
 
 # Delete User Credential
 response = keycloak_admin.delete_credential(user_id='user_id', credential_id='credential_id')
-                                      
+
 # Delete User
 response = keycloak_admin.delete_user(user_id="user-id-keycloak")
 
@@ -189,7 +191,7 @@ response = keycloak_admin.delete_user(user_id="user-id-keycloak")
 consents = keycloak_admin.consents_user(user_id="user-id-keycloak")
 
 # Send User Action
-response = keycloak_admin.send_update_account(user_id="user-id-keycloak", 
+response = keycloak_admin.send_update_account(user_id="user-id-keycloak",
                                               payload=json.dumps(['UPDATE_PASSWORD']))
 
 # Send Verify Email
@@ -260,7 +262,7 @@ group = keycloak_admin.create_group({"name": "Example Group"})
 # Get all groups
 groups = keycloak_admin.get_groups()
 
-# Get group 
+# Get group
 group = keycloak_admin.get_group(group_id='group_id')
 
 # Get group by name
