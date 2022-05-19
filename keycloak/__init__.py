@@ -21,5 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from .keycloak_admin import *
-from .keycloak_openid import *
+from ._version import __version__
+from .keycloak_admin import KeycloakAdmin
+from .keycloak_openid import KeycloakOpenID
+
+__all__ = ["KeycloakAdmin", "KeycloakOpenID", "__version__"]
