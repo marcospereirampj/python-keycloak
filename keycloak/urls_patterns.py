@@ -65,7 +65,6 @@ URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE = (
 )
 URL_ADMIN_USER_GROUP = "admin/realms/{realm-name}/users/{id}/groups/{group-id}"
 URL_ADMIN_USER_GROUPS = "admin/realms/{realm-name}/users/{id}/groups"
-URL_ADMIN_USER_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
 URL_ADMIN_USER_CREDENTIALS = "admin/realms/{realm-name}/users/{id}/credentials"
 URL_ADMIN_USER_CREDENTIAL = "admin/realms/{realm-name}/users/{id}/credentials/{credential_id}"
 URL_ADMIN_USER_LOGOUT = "admin/realms/{realm-name}/users/{id}/logout"
@@ -87,12 +86,15 @@ URL_ADMIN_CLIENT_ROLES = URL_ADMIN_CLIENT + "/roles"
 URL_ADMIN_CLIENT_ROLE = URL_ADMIN_CLIENT + "/roles/{role-name}"
 URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE = URL_ADMIN_CLIENT_ROLE + "/composites"
 URL_ADMIN_CLIENT_ROLE_MEMBERS = URL_ADMIN_CLIENT + "/roles/{role-name}/users"
+URL_ADMIN_CLIENT_ROLE_GROUPS = URL_ADMIN_CLIENT + "/roles/{role-name}/groups"
 
 URL_ADMIN_CLIENT_AUTHZ_SETTINGS = URL_ADMIN_CLIENT + "/authz/resource-server/settings"
 URL_ADMIN_CLIENT_AUTHZ_RESOURCES = URL_ADMIN_CLIENT + "/authz/resource-server/resource?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_SCOPES = URL_ADMIN_CLIENT + "/authz/resource-server/scope?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS = URL_ADMIN_CLIENT + "/authz/resource-server/permission?max=-1"
-URL_ADMIN_CLIENT_AUTHZ_POLICIES = URL_ADMIN_CLIENT + "/authz/resource-server/policy?max=-1"
+URL_ADMIN_CLIENT_AUTHZ_POLICIES = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/policy?max=-1&permission=false"
+)
 URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = (
     URL_ADMIN_CLIENT + "/authz/resource-server/policy/role?max=-1"
 )
@@ -155,6 +157,4 @@ URL_ADMIN_USER_FEDERATED_IDENTITY = (
 )
 
 URL_ADMIN_EVENTS = "admin/realms/{realm-name}/events"
-
-URL_ADMIN_DELETE_USER_ROLE = "admin/realms/{realm-name}/users/{id}/role-mappings/realm"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
