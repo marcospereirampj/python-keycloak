@@ -51,6 +51,7 @@ from .urls_patterns import URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS, URL_ADMIN_CLIENT_
     URL_ADMIN_REALM_ROLES_MEMBERS, URL_ADMIN_CLIENT_PROTOCOL_MAPPER, URL_ADMIN_CLIENT_SCOPES_MAPPERS, \
     URL_ADMIN_FLOWS_EXECUTIONS_EXECUTION, URL_ADMIN_FLOWS_EXECUTIONS_FLOW, URL_ADMIN_FLOWS_COPY, \
     URL_ADMIN_FLOWS_ALIAS, URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER, URL_ADMIN_AUTHENTICATOR_CONFIG, \
+    URL_ADMIN_CLIENT_ROLE_GROUPS, \
     URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE, URL_ADMIN_CLIENT_ALL_SESSIONS, URL_ADMIN_EVENTS, \
     URL_ADMIN_REALM_EXPORT, URL_ADMIN_DELETE_USER_ROLE, URL_ADMIN_USER_LOGOUT, URL_ADMIN_FLOWS_EXECUTION, \
     URL_ADMIN_FLOW, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES, URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE, \
@@ -1339,6 +1340,19 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id":client_id, "role-name":role_name}
         return self.__fetch_all(URL_ADMIN_CLIENT_ROLE_MEMBERS.format(**params_path) , query)
 
+    def get_client_role_groups(self, client_id, role_name, **query):
+        """
+        Get group members by client role .
+        :param client_id: The client id
+        :param role_name: the name of role to be queried.
+        :param query: Additional query parameters
+        (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
+        :return: Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        return self.__fetch_all(
+            URL_ADMIN_CLIENT_ROLE_GROUPS.format(**params_path), query
+        )
 
     def create_realm_role(self, payload, skip_exists=False):
         """
