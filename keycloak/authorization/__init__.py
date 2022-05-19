@@ -38,7 +38,7 @@ class Authorization:
     """
 
     def __init__(self):
-        self._policies = {}
+        self.policies = {}
 
     @property
     def policies(self):
@@ -53,7 +53,7 @@ class Authorization:
         Load policies, roles and permissions (scope/resources).
 
         :param data: keycloak authorization data (dict)
-        :return:
+        :returns: None
         """
         for pol in data["policies"]:
             if pol["type"] == "role":

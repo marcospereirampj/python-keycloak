@@ -49,6 +49,18 @@ from .urls_patterns import (
 
 
 class KeycloakOpenID:
+    """
+    Keycloak OpenID client.
+
+    :param server_url: Keycloak server url
+    :param client_id: client id
+    :param realm_name: realm name
+    :param client_secret_key: client secret key
+    :param verify: True if want check connection SSL
+    :param custom_headers: dict of custom header to pass to each HTML request
+    :param proxies: dict of proxies to sent the request by.
+    """
+
     def __init__(
         self,
         server_url,
@@ -59,28 +71,15 @@ class KeycloakOpenID:
         custom_headers=None,
         proxies=None,
     ):
-        """
-
-        :param server_url: Keycloak server url
-        :param client_id: client id
-        :param realm_name: realm name
-        :param client_secret_key: client secret key
-        :param verify: True if want check connection SSL
-        :param custom_headers: dict of custom header to pass to each HTML request
-        :param proxies: dict of proxies to sent the request by.
-        """
-        self._client_id = client_id
-        self._client_secret_key = client_secret_key
-        self._realm_name = realm_name
-        headers = dict()
-        if custom_headers is not None:
-            # merge custom headers to main headers
-            headers.update(custom_headers)
-        self._connection = ConnectionManager(
+        self.client_id = client_id
+        self.client_secret_key = client_secret_key
+        self.realm_name = realm_name
+        headers = custom_headers if custom_headers is not None else dict()
+        self.connection = ConnectionManager(
             base_url=server_url, headers=headers, timeout=60, verify=verify, proxies=proxies
         )
 
-        self._authorization = Authorization()
+        self.authorization = Authorization()
 
     @property
     def client_id(self):
@@ -206,8 +205,8 @@ class KeycloakOpenID:
         :param password:
         :param grant_type:
         :param code:
-        :param redirect_uri
-        :param totp
+        :param redirect_uri:
+        :param totp:
         :return:
         """
         params_path = {"realm-name": self.realm_name}
@@ -312,9 +311,9 @@ class KeycloakOpenID:
         """
         Client applications can use a specific endpoint to obtain a special security token
         called a requesting party token (RPT). This token consists of all the entitlements
-        (or permissions) for a user as a result of the evaluation of the permissions and authorization
-        policies associated with the resources being requested. With an RPT, client applications can
-        gain access to protected resources at the resource server.
+        (or permissions) for a user as a result of the evaluation of the permissions and
+        authorization policies associated with the resources being requested. With an RPT,
+        client applications can gain access to protected resources at the resource server.
 
         :return:
         """
@@ -329,8 +328,8 @@ class KeycloakOpenID:
 
     def introspect(self, token, rpt=None, token_type_hint=None):
         """
-        The introspection endpoint is used to retrieve the active state of a token. It is can only be
-        invoked by confidential clients.
+        The introspection endpoint is used to retrieve the active state of a token.
+        It is can only be invoked by confidential clients.
 
         https://tools.ietf.org/html/rfc7662
 
