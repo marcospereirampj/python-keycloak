@@ -1,0 +1,8 @@
+{
+  "plugins": ["@semantic-release/commit-analyzer"],
+  "verifyConditions": false,
+  "npmPublish": false,
+  "publish": false,
+  "fail": false,
+  "success": false
+}

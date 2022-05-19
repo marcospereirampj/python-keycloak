@@ -98,9 +98,10 @@ class Policy:
         :param role: keycloak role.
         :return:
         """
-        if self.type != 'role':
+        if self.type != "role":
             raise KeycloakAuthorizationConfigError(
-                "Can't add role. Policy type is different of role")
+                "Can't add role. Policy type is different of role"
+            )
         self._roles.append(role)
 
     def add_permission(self, permission):
