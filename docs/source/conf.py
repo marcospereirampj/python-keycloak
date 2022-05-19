@@ -21,6 +21,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_rtd_theme
+
 from keycloak import __version__
 
 # -- General configuration ------------------------------------------------
@@ -169,7 +170,7 @@ latex_documents = [
         "python-keycloak Documentation",
         "Marcos Pereira",
         "manual",
-    ),
+    )
 ]
 
 
@@ -194,5 +195,5 @@ texinfo_documents = [
         "python-keycloak",
         "One line description of project.",
         "Miscellaneous",
-    ),
+    )
 ]
