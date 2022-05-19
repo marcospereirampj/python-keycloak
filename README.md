@@ -154,7 +154,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.fr",
                     "lastName": "Example",
                     "attributes": {
                       "locale": ["fr"]
-                    })
+                    }})
 
 # User counter
 count_users = keycloak_admin.users_count()
@@ -226,7 +226,7 @@ role = keycloak_admin.get_client_role(client_id="client_id", role_name="role_nam
 role_id = keycloak_admin.get_client_role_id(client_id="client_id", role_name="test")
 
 # Create client role
-keycloak_admin.create_client_role(client_role_id='client_id', {'name': 'roleName', 'clientRole': True})
+keycloak_admin.create_client_role(client_role_id='client_id', payload={'name': 'roleName', 'clientRole': True})
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
 keycloak_admin.assign_client_role(client_id="client_id", user_id="user_id", role_id="role_id", role_name="test")
