@@ -1983,6 +1983,34 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def get_authenticator_providers(self):
+        """
+        Get authenticator providers list.
+
+        :return: Response(json)
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_AUTHENTICATOR_PROVIDERS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_authenticator_provider_config_description(self, provider_id):
+        """
+        Get authenticator's provider configuration description.
+
+        AuthenticatorConfigInfoRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticatorconfiginforepresentation
+
+        :param provider_id: Provider Id
+        :return: AuthenticatorConfigInfoRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "provider-id": provider_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG_DESCRIPTION.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_authenticator_config(self, config_id):
         """
         Get authenticator configuration. Returns all configuration details.
