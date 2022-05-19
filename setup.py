@@ -30,7 +30,7 @@ setup(
     url="https://github.com/marcospereirampj/python-keycloak",
     license="The MIT License",
     author="Marcos Pereira, Richard Nemeth",
-    author_email="marcospereira.mpj@gmail.com; ryshoooo@gmail.com",
+    author_email="marcospereira.mpj@gmail.com, ryshoooo@gmail.com",
     keywords="keycloak openid oidc",
     description="python-keycloak is a Python package providing access to the Keycloak API.",
     long_description=long_description,
