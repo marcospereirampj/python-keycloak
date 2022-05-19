@@ -284,6 +284,16 @@ class KeycloakAdmin:
         data_raw = self.raw_get(URL_ADMIN_REALMS)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_realm(self, realm_name):
+        """
+        Get a specific realm.
+
+        :param realm_name: Realm name (not the realm id)
+        """
+        params_path = {"realm-name": realm_name}
+        data_raw = self.raw_get(URL_ADMIN_REALM.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
     def create_realm(self, payload, skip_exists=False):
         """
         Create a realm
