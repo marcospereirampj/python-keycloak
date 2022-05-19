@@ -718,7 +718,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert members == list(), members
 
     # Test create realm role
-    role_id = admin.create_realm_role(payload={"name": "test-realm-role"})
+    role_id = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
     assert role_id, role_id
     with pytest.raises(KeycloakPostError) as err:
         admin.create_realm_role(payload={"name": "test-realm-role"})
@@ -865,7 +865,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
 
     # Test create client role
     client_role_id = admin.create_client_role(
-        client_role_id=client, payload={"name": "client-role-test"}
+        client_role_id=client, payload={"name": "client-role-test"}, skip_exists=True
     )
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_role(client_role_id=client, payload={"name": "client-role-test"})
