@@ -1361,9 +1361,11 @@ class KeycloakAdmin:
         """
 
         if skip_exists:
-            res = self.get_client_role(client_id=client_role_id, role_name=payload["name"])
-            if res:
+            try:
+                res = self.get_client_role(client_id=client_role_id, role_name=payload["name"])
                 return res["name"]
+            except KeycloakGetError:
+                pass
 
         params_path = {"realm-name": self.realm_name, "id": client_role_id}
         data_raw = self.raw_post(
@@ -1480,9 +1482,11 @@ class KeycloakAdmin:
         """
 
         if skip_exists:
-            role = self.get_realm_role(role_name=payload["name"])
-            if role is not None:
+            try:
+                role = self.get_realm_role(role_name=payload["name"])
                 return role["name"]
+            except KeycloakGetError:
+                pass
 
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_post(
