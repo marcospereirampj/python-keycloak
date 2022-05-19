@@ -41,7 +41,7 @@ extensions = [
 ]
 
 autoapi_type = "python"
-autoapi_dirs = ["../../keycloak"]
+autoapi_dirs = ["../../src/keycloak"]
 autoapi_root = "reference"
 autoapi_keep_files = False
 autoapi_add_toctree_entry = False
