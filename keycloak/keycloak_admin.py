@@ -1361,9 +1361,13 @@ class KeycloakAdmin:
         """
 
         if skip_exists:
-            res = self.get_client_role(client_id=client_role_id, role_name=payload["name"])
-            if res:
-                return res["name"]
+            try:
+                res = self.get_client_role(client_id=client_role_id, role_name=payload["name"])
+            except:
+                pass
+            else:
+                if res:
+                    return res['name']
 
         params_path = {"realm-name": self.realm_name, "id": client_role_id}
         data_raw = self.raw_post(
