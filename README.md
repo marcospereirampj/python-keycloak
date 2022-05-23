@@ -114,6 +114,10 @@ permissions = keycloak_openid.get_permissions(token['access_token'], method_toke
 token = keycloak_openid.token("user", "password")
 permissions = keycloak_openid.uma_permissions(token['access_token'])
 
+# Get UMA-permissions by token with specific resource and scope requested
+token = keycloak_openid.token("user", "password")
+permissions = keycloak_openid.uma_permissions(token['access_token'], permissions="Resource#Scope")
+
 # Get auth status for a specific resource and scope by token
 token = keycloak_openid.token("user", "password")
 auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Scope")

@@ -14,11 +14,12 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import pytest
 import re
-from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
-from keycloak.uma_permissions import build_permission_param, Resource, Scope
 
+import pytest
+
+from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
+from keycloak.uma_permissions import Resource, Scope, build_permission_param
 
 
 def test_resource_with_scope_obj():
@@ -45,24 +46,12 @@ def test_scope_resource_str():
     assert s(resource=r) == "Resource1#Scope1"
 
 
-def test_resource_scope_dict():
-    r = Resource("Resource1")
-    s = {"scope": "Scope1"}
-    assert r(**s) == "Resource1#Scope1"
-
-
-def test_scope_resource_dict():
-    r = {"resource": "Resource1"}
-    s = Scope("Scope1")
-    assert s(**r) == "Resource1#Scope1"
-
-
 def test_resource_scope_list():
     r = Resource("Resource1")
     s = ["Scope1"]
     with pytest.raises(PermissionDefinitionError) as err:
-        r(*s)
-    assert err.match("can't determine if 'Scope1' is a resource or scope")
+        r(s)
+    assert err.match(re.escape("can't determine if '['Scope1']' is a resource or scope"))
 
 
 def test_build_permission_none():
@@ -119,6 +108,16 @@ def test_build_permission_tuple_dict_str_list_str2():
     ) == {"res1#scope1", "res1#scope2", "res2#scope2", "res2#scope3"}
 
 
+def test_build_permission_uma():
+    assert build_permission_param(Resource("res1")(Scope("scope1"))) == {"res1#scope1"}
+
+
+def test_build_permission_uma_list():
+    assert build_permission_param(
+        [Resource("res1")(Scope("scope1")), Resource("res1")(Scope("scope2"))]
+    ) == {"res1#scope1", "res1#scope2"}
+
+
 def test_build_permission_misbuilt_dict_str_list_list_str():
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param({"res1": [["scope1", "scope2"]]})
@@ -127,17 +126,23 @@ def test_build_permission_misbuilt_dict_str_list_list_str():
 
 def test_build_permission_misbuilt_list_list_str():
     with pytest.raises(KeycloakPermissionFormatError) as err:
-        build_permission_param([["scope1", "scope2"]])
+        print(build_permission_param([["scope1", "scope2"]]))
     assert err.match(re.escape("misbuilt permission [['scope1', 'scope2']]"))
 
 
 def test_build_permission_misbuilt_list_set_str():
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param([{"scope1", "scope2"}])
-    assert err.match(re.escape("misbuilt permission [{'scope1', 'scope2'}]"))
+    assert err.match("misbuilt permission.*")
 
 
 def test_build_permission_misbuilt_set_set_str():
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param([{"scope1"}])
     assert err.match(re.escape("misbuilt permission [{'scope1'}]"))
+
+
+def test_build_permission_misbuilt_dict_non_iterable():
+    with pytest.raises(KeycloakPermissionFormatError) as err:
+        build_permission_param({"res1": 5})
+    assert err.match(re.escape("misbuilt permission {'res1': 5}"))

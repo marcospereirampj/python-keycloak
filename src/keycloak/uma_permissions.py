@@ -38,9 +38,19 @@ class UMAPermission:
 
     """
 
-    def __init__(self, *, resource="", scope=""):
+    def __init__(self, permission=None, resource="", scope=""):
         self.resource = resource
         self.scope = scope
+
+        if permission:
+            if not isinstance(permission, UMAPermission):
+                raise PermissionDefinitionError(
+                    "can't determine if '{}' is a resource or scope".format(permission)
+                )
+            if permission.resource:
+                self.resource = str(permission.resource)
+            if permission.scope:
+                self.scope = str(permission.scope)
 
     def __str__(self):
         scope = self.scope
@@ -57,41 +67,50 @@ class UMAPermission:
     def __hash__(self) -> int:
         return hash(str(self))
 
-    def __call__(self, *args, resource="", scope="") -> object:
+    def __call__(self, permission=None, resource="", scope="") -> object:
         result_resource = self.resource
         result_scope = self.scope
-
-        for arg in args:
-            if not isinstance(arg, UMAPermission):
-                raise PermissionDefinitionError(
-                    "can't determine if '{}' is a resource or scope".format(arg)
-                )
-            if arg.resource:
-                result_resource = str(arg.resource)
-            if arg.scope:
-                result_scope = str(arg.scope)
 
         if resource:
             result_resource = str(resource)
         if scope:
             result_scope = str(scope)
 
+        if permission:
+            if not isinstance(permission, UMAPermission):
+                raise PermissionDefinitionError(
+                    "can't determine if '{}' is a resource or scope".format(permission)
+                )
+            if permission.resource:
+                result_resource = str(permission.resource)
+            if permission.scope:
+                result_scope = str(permission.scope)
+
         return UMAPermission(resource=result_resource, scope=result_scope)
 
 
 class Resource(UMAPermission):
+    """An UMAPermission Resource class to conveniently assembly permissions.
+    The class itself is callable, and will return the assembled permission.
+    """
+
     def __init__(self, resource):
         super().__init__(resource=resource)
 
 
 class Scope(UMAPermission):
+    """An UMAPermission Scope class to conveniently assembly permissions.
+    The class itself is callable, and will return the assembled permission.
+    """
+
     def __init__(self, scope):
         super().__init__(scope=scope)
 
 
 class AuthStatus:
     """A class that represents the authorization/login status of a user associated with a token.
-    This has to evaluate to True if and only if the user is properly authorized for the requested resource."""
+    This has to evaluate to True if and only if the user is properly authorized
+    for the requested resource."""
 
     def __init__(self, is_logged_in, is_authorized, missing_permissions):
         self.is_logged_in = is_logged_in
@@ -102,7 +121,12 @@ class AuthStatus:
         return self.is_authorized
 
     def __repr__(self):
-        return f"AuthStatus(is_authorized={self.is_authorized}, is_logged_in={self.is_logged_in}, missing_permissions={self.missing_permissions})"
+        return (
+            f"AuthStatus("
+            f"is_authorized={self.is_authorized}, "
+            f"is_logged_in={self.is_logged_in}, "
+            f"missing_permissions={self.missing_permissions})"
+        )
 
 
 def build_permission_param(permissions):
@@ -117,29 +141,42 @@ def build_permission_param(permissions):
     """
     if permissions is None or permissions == "":
         return set()
-    if isinstance(permissions, (str, UMAPermission)):
+    if isinstance(permissions, str):
         return set((permissions,))
+    if isinstance(permissions, UMAPermission):
+        return set((str(permissions),))
 
     try:  # treat as dictionary of permissions
         result = set()
         for resource, scopes in permissions.items():
+            print(f"resource={resource}scopes={scopes}")
             if scopes is None:
                 result.add(resource)
-            elif isinstance(scopes, (str, UMAPermission)):
+            elif isinstance(scopes, str):
                 result.add("{}#{}".format(resource, scopes))
             else:
-                for scope in scopes:
-                    if not isinstance(scope, (str, UMAPermission)):
-                        raise KeycloakPermissionFormatError(
-                            "misbuilt permission {}".format(permissions)
-                        )
-                    result.add("{}#{}".format(resource, scope))
+                try:
+                    for scope in scopes:
+                        if not isinstance(scope, str):
+                            raise KeycloakPermissionFormatError(
+                                "misbuilt permission {}".format(permissions)
+                            )
+                        result.add("{}#{}".format(resource, scope))
+                except TypeError:
+                    raise KeycloakPermissionFormatError(
+                        "misbuilt permission {}".format(permissions)
+                    )
         return result
     except AttributeError:
         pass
 
     try:  # treat as any other iterable of permissions
-        return set(permissions)
+        result = set()
+        for permission in permissions:
+            if not isinstance(permission, (str, UMAPermission)):
+                raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
+            result.add(str(permission))
+        return result
     except TypeError:
         pass
     raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
