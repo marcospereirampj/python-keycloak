@@ -22,7 +22,41 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from ._version import __version__
+from .connection import ConnectionManager
+from .exceptions import (
+    KeycloakAuthenticationError,
+    KeycloakAuthorizationConfigError,
+    KeycloakConnectionError,
+    KeycloakDeleteError,
+    KeycloakDeprecationError,
+    KeycloakError,
+    KeycloakGetError,
+    KeycloakInvalidTokenError,
+    KeycloakOperationError,
+    KeycloakPostError,
+    KeycloakPutError,
+    KeycloakRPTNotFound,
+    KeycloakSecretNotFound,
+)
 from .keycloak_admin import KeycloakAdmin
 from .keycloak_openid import KeycloakOpenID
 
-__all__ = ["KeycloakAdmin", "KeycloakOpenID", "__version__"]
+__all__ = [
+    "__version__",
+    "ConnectionManager",
+    "KeycloakAuthenticationError",
+    "KeycloakAuthorizationConfigError",
+    "KeycloakConnectionError",
+    "KeycloakDeleteError",
+    "KeycloakDeprecationError",
+    "KeycloakError",
+    "KeycloakGetError",
+    "KeycloakInvalidTokenError",
+    "KeycloakOperationError",
+    "KeycloakPostError",
+    "KeycloakPutError",
+    "KeycloakRPTNotFound",
+    "KeycloakSecretNotFound",
+    "KeycloakAdmin",
+    "KeycloakOpenID",
+]
