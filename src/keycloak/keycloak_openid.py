@@ -28,13 +28,16 @@ from jose import jwt
 from .authorization import Authorization
 from .connection import ConnectionManager
 from .exceptions import (
+    KeycloakAuthenticationError,
     KeycloakAuthorizationConfigError,
     KeycloakDeprecationError,
     KeycloakGetError,
     KeycloakInvalidTokenError,
+    KeycloakPostError,
     KeycloakRPTNotFound,
     raise_error_from_response,
 )
+from .uma_permissions import AuthStatus, build_permission_param
 from .urls_patterns import (
     URL_AUTH,
     URL_CERTS,
@@ -452,3 +455,67 @@ class KeycloakOpenID:
                     permissions += policy.permissions
 
         return list(set(permissions))
+
+    def uma_permissions(self, token, permissions=""):
+        """
+        Get UMA permissions by user token with requested permissions
+
+        The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
+        invoked by confidential clients.
+
+        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+
+        :param token: user token
+        :param permissions: list of uma permissions list(resource:scope) requested by the user
+        :return: permissions list
+        """
+
+        permission = build_permission_param(permissions)
+
+        params_path = {"realm-name": self.realm_name}
+        payload = {
+            "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
+            "permission": permission,
+            "response_mode": "permissions",
+            "audience": self.client_id,
+        }
+
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    def has_uma_access(self, token, permissions):
+        """
+        Determine whether user has uma permissions with specified user token
+
+        :param token: user token
+        :param permissions: list of uma permissions (resource:scope)
+        :return: auth status
+        """
+        needed = build_permission_param(permissions)
+        try:
+            granted = self.uma_permissions(token, permissions)
+        except (KeycloakPostError, KeycloakAuthenticationError) as e:
+            if e.response_code == 403:
+                return AuthStatus(
+                    is_logged_in=True, is_authorized=False, missing_permissions=needed
+                )
+            elif e.response_code == 401:
+                return AuthStatus(
+                    is_logged_in=False, is_authorized=False, missing_permissions=needed
+                )
+            raise
+
+        for resource_struct in granted:
+            resource = resource_struct["rsname"]
+            scopes = resource_struct.get("scopes", None)
+            if not scopes:
+                needed.discard(resource)
+                continue
+            for scope in scopes:
+                needed.discard("{}#{}".format(resource, scope))
+
+        return AuthStatus(
+            is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
+        )
