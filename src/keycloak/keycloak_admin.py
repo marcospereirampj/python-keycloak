@@ -2566,13 +2566,15 @@ class KeycloakAdmin:
             custom_headers=self.custom_headers,
         )
 
-        grant_type = ["password"]
+        grant_type = []
         if self.client_secret_key:
-            grant_type = ["client_credentials"]
             if self.user_realm_name:
                 self.realm_name = self.user_realm_name
+            grant_type.append("client_credentials")
+        elif self.username and self.password:
+            grant_type.append("password")
 
-        if self.username and self.password:
+        if grant_type:
             self.token = self.keycloak_openid.token(
                 self.username, self.password, grant_type=grant_type, totp=self.totp
             )
