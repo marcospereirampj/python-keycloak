@@ -159,7 +159,7 @@ class KeycloakOpenID:
 
         return token_info
 
-    def well_know(self):
+    def well_known(self):
         """The most important endpoint to understand is the well-known configuration
         endpoint. It lists endpoints and other configuration options relevant to
         the OpenID Connect implementation in Keycloak.
@@ -180,7 +180,7 @@ class KeycloakOpenID:
         :return:
         """
         params_path = {
-            "authorization-endpoint": self.well_know()["authorization_endpoint"],
+            "authorization-endpoint": self.well_known()["authorization_endpoint"],
             "client-id": self.client_id,
             "redirect-uri": redirect_uri,
         }

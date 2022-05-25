@@ -42,3 +42,7 @@ All notable changes to this project will be documented in this file.
 
 - Add get_idps
 - Rework group functions
+
+ ## [master]
+
+ * Renamed `KeycloakOpenID.well_know` to `KeycloakOpenID.well_known`
