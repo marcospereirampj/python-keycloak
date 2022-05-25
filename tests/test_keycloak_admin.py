@@ -184,6 +184,10 @@ def test_users(admin: KeycloakAdmin, realm: str):
     count = admin.users_count()
     assert count == 1, count
 
+    # Test users count with query
+    count = admin.users_count(query={"username": "notpresent"})
+    assert count == 0
+
     # Test user groups
     groups = admin.get_user_groups(user_id=user["id"])
     assert len(groups) == 0

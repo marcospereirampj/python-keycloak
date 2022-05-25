@@ -464,14 +464,19 @@ class KeycloakAdmin:
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
-    def users_count(self):
+    def users_count(self, query=None):
         """
         User counter
 
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_users_resource
+
+        :param query: (dict) Query parameters for users count
+
         :return: counter
         """
+        query = query or dict()
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_USERS_COUNT.format(**params_path))
+        data_raw = self.raw_get(urls_patterns.URL_ADMIN_USERS_COUNT.format(**params_path), **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_user_id(self, username):
