@@ -70,7 +70,7 @@ keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                     client_secret_key="secret")
 
 # Get WellKnow
-config_well_know = keycloak_openid.well_know()
+config_well_known = keycloak_openid.well_known()
 
 # Get Token
 token = keycloak_openid.token("user", "password")
