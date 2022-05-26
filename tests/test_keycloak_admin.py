@@ -1243,3 +1243,142 @@ def test_sync_users(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakPostError) as err:
         admin.sync_users(storage_id="does-not-exist", action="triggerFullSync")
     assert err.match('404: b\'{"error":"Could not find component"}\'')
+
+
+def test_client_scopes(admin: KeycloakAdmin, realm: str):
+    admin.realm_name = realm
+
+    # Test get client scopes
+    res = admin.get_client_scopes()
+    scope_names = {x["name"] for x in res}
+    assert len(res) == 10
+    assert "email" in scope_names
+    assert "profile" in scope_names
+    assert "offline_access" in scope_names
+
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_client_scope(client_scope_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+
+    scope = admin.get_client_scope(client_scope_id=res[0]["id"])
+    assert res[0] == scope
+
+    scope = admin.get_client_scope_by_name(client_scope_name=res[0]["name"])
+    assert res[0] == scope
+
+    # Test create client scope
+    res = admin.create_client_scope(payload={"name": "test-scope"}, skip_exists=True)
+    assert res
+    res2 = admin.create_client_scope(payload={"name": "test-scope"}, skip_exists=True)
+    assert res == res2
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_client_scope(payload={"name": "test-scope"}, skip_exists=False)
+    assert err.match('409: b\'{"errorMessage":"Client Scope test-scope already exists"}\'')
+
+    # Test update client scope
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_client_scope(client_scope_id="does-not-exist", payload=dict())
+    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+
+    res_update = admin.update_client_scope(
+        client_scope_id=res, payload={"name": "test-scope-update"}
+    )
+    assert res_update == dict()
+    admin.get_client_scope(client_scope_id=res)["name"] == "test-scope-update"
+
+    # Test get mappers
+    mappers = admin.get_mappers_from_client_scope(client_scope_id=res)
+    assert mappers == list()
+
+    # Test add mapper
+    with pytest.raises(KeycloakPostError) as err:
+        admin.add_mapper_to_client_scope(client_scope_id=res, payload=dict())
+    assert err.match('404: b\'{"error":"ProtocolMapper provider not found"}\'')
+
+    res_add = admin.add_mapper_to_client_scope(
+        client_scope_id=res,
+        payload={
+            "name": "test-mapper",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+        },
+    )
+    assert res_add == b""
+    assert len(admin.get_mappers_from_client_scope(client_scope_id=res)) == 1
+
+    # Test update mapper
+    test_mapper = admin.get_mappers_from_client_scope(client_scope_id=res)[0]
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_mapper_in_client_scope(
+            client_scope_id="does-not-exist", protocol_mapper_id=test_mapper["id"], payload=dict()
+        )
+    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+    test_mapper["config"]["user.attribute"] = "test"
+    res_update = admin.update_mapper_in_client_scope(
+        client_scope_id=res,
+        protocol_mapper_id=test_mapper["id"],
+        payload=test_mapper,
+    )
+    assert res_update == dict()
+    assert (
+        admin.get_mappers_from_client_scope(client_scope_id=res)[0]["config"]["user.attribute"]
+        == "test"
+    )
+
+    # Test delete mapper
+    res_del = admin.delete_mapper_from_client_scope(
+        client_scope_id=res, protocol_mapper_id=test_mapper["id"]
+    )
+    assert res_del == dict()
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_mapper_from_client_scope(
+            client_scope_id=res, protocol_mapper_id=test_mapper["id"]
+        )
+    assert err.match('404: b\'{"error":"Model not found"}\'')
+
+    # Test default default scopes
+    res_defaults = admin.get_default_default_client_scopes()
+    assert len(res_defaults) == 6
+
+    with pytest.raises(KeycloakPutError) as err:
+        admin.add_default_default_client_scope(scope_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+
+    res_add = admin.add_default_default_client_scope(scope_id=res)
+    assert res_add == dict()
+    assert len(admin.get_default_default_client_scopes()) == 7
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_default_default_client_scope(scope_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+
+    res_del = admin.delete_default_default_client_scope(scope_id=res)
+    assert res_del == dict()
+    assert len(admin.get_default_default_client_scopes()) == 6
+
+    # Test default optional scopes
+    res_defaults = admin.get_default_optional_client_scopes()
+    assert len(res_defaults) == 4
+
+    with pytest.raises(KeycloakPutError) as err:
+        admin.add_default_optional_client_scope(scope_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+
+    res_add = admin.add_default_optional_client_scope(scope_id=res)
+    assert res_add == dict()
+    assert len(admin.get_default_optional_client_scopes()) == 5
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_default_optional_client_scope(scope_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+
+    res_del = admin.delete_default_optional_client_scope(scope_id=res)
+    assert res_del == dict()
+    assert len(admin.get_default_optional_client_scopes()) == 4
+
+    # Test client scope delete
+    res_del = admin.delete_client_scope(client_scope_id=res)
+    assert res_del == dict()
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_client_scope(client_scope_id=res)
+    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
