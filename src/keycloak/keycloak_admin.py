@@ -2108,6 +2108,22 @@ class KeycloakAdmin:
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_client_scope_by_name(self, client_scope_name):
+        """
+        Get representation of the client scope identified by the client scope name.
+
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientscopes
+        :param client_scope_name: (str) Name of the client scope
+        :returns: ClientScopeRepresentation or None
+        """
+
+        client_scopes = self.get_client_scopes()
+        for client_scope in client_scopes:
+            if client_scope["name"] == client_scope_name:
+                return client_scope
+
+        return None
+
     def create_client_scope(self, payload, skip_exists=False):
         """
         Create a client scope
@@ -2117,16 +2133,24 @@ class KeycloakAdmin:
 
         :param payload: ClientScopeRepresentation
         :param skip_exists: If true then do not raise an error if client scope already exists
-        :return:  Keycloak server response (ClientScopeRepresentation)
+        :return: Client scope id
         """
+
+        if skip_exists:
+            exists = self.get_client_scope_by_name(client_scope_name=payload["name"])
+
+            if exists is not None:
+                return exists["id"]
 
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_SCOPES.format(**params_path), data=json.dumps(payload)
         )
-        return raise_error_from_response(
+        raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
+        _last_slash_idx = data_raw.headers["Location"].rindex("/")
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def update_client_scope(self, client_scope_id, payload):
         """
@@ -2145,6 +2169,34 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path), data=json.dumps(payload)
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    def delete_client_scope(self, client_scope_id):
+        """
+        Delete existing client scope.
+
+        ClientScopeRepresentation:
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_client_scopes_resource
+
+        :param client_scope_id: The id of the client scope
+        :return:  Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        data_raw = self.raw_delete(urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_mappers_from_client_scope(self, client_scope_id):
+        """
+        Get a list of all mappers connected to the client scope
+
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_protocol_mappers_resource
+        :param client_scope_id: Client scope id
+        :returns: Keycloak server response (ProtocolMapperRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """
@@ -2165,20 +2217,20 @@ class KeycloakAdmin:
 
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
-    def delete_mapper_from_client_scope(self, client_scope_id, protocol_mppaer_id):
+    def delete_mapper_from_client_scope(self, client_scope_id, protocol_mapper_id):
         """
         Delete a mapper from a client scope
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_delete_mapper
 
         :param client_scope_id: The id of the client scope
-        :param payload: ProtocolMapperRepresentation
+        :param protocol_mapper_id: Protocol mapper id
         :return: Keycloak server Response
         """
 
         params_path = {
             "realm-name": self.realm_name,
             "scope-id": client_scope_id,
-            "protocol-mapper-id": protocol_mppaer_id,
+            "protocol-mapper-id": protocol_mapper_id,
         }
 
         data_raw = self.raw_delete(
