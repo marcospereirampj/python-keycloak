@@ -2461,6 +2461,7 @@ class KeycloakAdmin:
         :param query: Query parameters (optional)
         :return: components list
         """
+        query = query or dict()
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=None, **query
@@ -2475,15 +2476,15 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
 
         :param payload: ComponentRepresentation
-
-        :return: UserRepresentation
+        :return: Component id
         """
         params_path = {"realm-name": self.realm_name}
-
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=json.dumps(payload)
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        _last_slash_idx = data_raw.headers["Location"].rindex("/")
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_component(self, component_id):
         """
