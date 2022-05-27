@@ -1451,3 +1451,53 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client_scope(client_scope_id=res)
     assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+
+
+def test_components(admin: KeycloakAdmin, realm: str):
+    admin.realm_name = realm
+
+    # Test get components
+    res = admin.get_components()
+    assert len(res) == 12
+
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_component(component_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Could not find component"}\'')
+
+    res_get = admin.get_component(component_id=res[0]["id"])
+    assert res_get == res[0]
+
+    # Test create component
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_component(payload={"bad": "dict"})
+    assert err.match('400: b\'{"error":"Unrecognized field')
+
+    res = admin.create_component(
+        payload={
+            "name": "Test Component",
+            "providerId": "max-clients",
+            "providerType": "org.keycloak.services.clientregistration."
+            + "policy.ClientRegistrationPolicy",
+            "config": {"max-clients": ["1000"]},
+        }
+    )
+    assert res
+    assert admin.get_component(component_id=res)["name"] == "Test Component"
+
+    # Test update component
+    component = admin.get_component(component_id=res)
+    component["name"] = "Test Component Update"
+
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_component(component_id="does-not-exist", payload=dict())
+    assert err.match('404: b\'{"error":"Could not find component"}\'')
+    res_upd = admin.update_component(component_id=res, payload=component)
+    assert res_upd == dict()
+    assert admin.get_component(component_id=res)["name"] == "Test Component Update"
+
+    # Test delete component
+    res_del = admin.delete_component(component_id=res)
+    assert res_del == dict()
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_component(component_id=res)
+    assert err.match('404: b\'{"error":"Could not find component"}\'')
