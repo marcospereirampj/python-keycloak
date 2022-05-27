@@ -2343,6 +2343,23 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
+    def get_mappers_from_client(self, client_id):
+        """
+        List of all client mappers.
+
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_protocolmapperrepresentation
+
+        :param client_id: Client id
+        :returns: KeycloakServerResponse (list of ProtocolMapperRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_PROTOCOL_MAPPERS.format(**params_path)
+        )
+
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[200])
+
     def add_mapper_to_client(self, client_id, payload):
         """
         Add a mapper to a client
@@ -2373,7 +2390,7 @@ class KeycloakAdmin:
 
         params_path = {
             "realm-name": self.realm_name,
-            "id": self.client_id,
+            "id": client_id,
             "protocol-mapper-id": mapper_id,
         }
 
@@ -2444,6 +2461,7 @@ class KeycloakAdmin:
         :param query: Query parameters (optional)
         :return: components list
         """
+        query = query or dict()
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=None, **query
@@ -2458,15 +2476,15 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
 
         :param payload: ComponentRepresentation
-
-        :return: UserRepresentation
+        :return: Component id
         """
         params_path = {"realm-name": self.realm_name}
-
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=json.dumps(payload)
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        _last_slash_idx = data_raw.headers["Location"].rindex("/")
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_component(self, component_id):
         """
@@ -2533,6 +2551,7 @@ class KeycloakAdmin:
 
         :return: events list
         """
+        query = query or dict()
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(
             urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=None, **query
@@ -2550,7 +2569,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_put(
-            urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=json.dumps(payload)
+            urls_patterns.URL_ADMIN_EVENTS_CONFIG.format(**params_path), data=json.dumps(payload)
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
