@@ -573,6 +573,39 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         admin.update_client(client_id="does-not-exist", payload={"name": "test-client-change"})
     assert err.match('404: b\'{"error":"Could not find client"}\'')
 
+    # Test client mappers
+    res = admin.get_mappers_from_client(client_id=client_id)
+    assert len(res) == 0
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.add_mapper_to_client(client_id="does-not-exist", payload=dict())
+    assert err.match('404: b\'{"error":"Could not find client"}\'')
+
+    res = admin.add_mapper_to_client(
+        client_id=client_id,
+        payload={
+            "name": "test-mapper",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+        },
+    )
+    assert res == b""
+    assert len(admin.get_mappers_from_client(client_id=client_id)) == 1
+
+    mapper = admin.get_mappers_from_client(client_id=client_id)[0]
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_client_mapper(client_id=client_id, mapper_id="does-not-exist", payload=dict())
+    assert err.match('404: b\'{"error":"Model not found"}\'')
+    mapper["config"]["user.attribute"] = "test"
+    res = admin.update_client_mapper(client_id=client_id, mapper_id=mapper["id"], payload=mapper)
+    assert res == dict()
+
+    res = admin.remove_client_mapper(client_id=client_id, client_mapper_id=mapper["id"])
+    assert res == dict()
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.remove_client_mapper(client_id=client_id, client_mapper_id=mapper["id"])
+    assert err.match('404: b\'{"error":"Model not found"}\'')
+
     # Test authz
     auth_client_id = admin.create_client(
         payload={
@@ -702,6 +735,42 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client(client_id=auth_client_id)
     assert err.match('404: b\'{"error":"Could not find client"}\'')
+
+    # Test client credentials
+    admin.create_client(
+        payload={
+            "name": "test-confidential",
+            "enabled": True,
+            "protocol": "openid-connect",
+            "publicClient": False,
+            "redirectUris": ["http://localhost/*"],
+            "webOrigins": ["+"],
+            "clientId": "test-confidential",
+            "secret": "test-secret",
+            "clientAuthenticatorType": "client-secret",
+        }
+    )
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_client_secrets(client_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Could not find client"}\'')
+
+    secrets = admin.get_client_secrets(
+        client_id=admin.get_client_id(client_name="test-confidential")
+    )
+    assert secrets == {"type": "secret", "value": "test-secret"}
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.generate_client_secrets(client_id="does-not-exist")
+    assert err.match('404: b\'{"error":"Could not find client"}\'')
+
+    res = admin.generate_client_secrets(
+        client_id=admin.get_client_id(client_name="test-confidential")
+    )
+    assert res
+    assert (
+        admin.get_client_secrets(client_id=admin.get_client_id(client_name="test-confidential"))
+        == res
+    )
 
 
 def test_realm_roles(admin: KeycloakAdmin, realm: str):
