@@ -2551,6 +2551,7 @@ class KeycloakAdmin:
 
         :return: events list
         """
+        query = query or dict()
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(
             urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=None, **query
@@ -2568,7 +2569,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_put(
-            urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=json.dumps(payload)
+            urls_patterns.URL_ADMIN_EVENTS_CONFIG.format(**params_path), data=json.dumps(payload)
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 

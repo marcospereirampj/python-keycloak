@@ -166,4 +166,5 @@ URL_ADMIN_USER_FEDERATED_IDENTITY = (
 )
 
 URL_ADMIN_EVENTS = "admin/realms/{realm-name}/events"
+URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_EVENTS + "/config"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
