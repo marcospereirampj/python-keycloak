@@ -413,6 +413,20 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
+    def get_idp_mappers(self, idp_alias):
+        """
+        Returns a list of ID Providers mappers
+
+        IdentityProviderMapperRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getmappers
+
+        :param: idp_alias: alias for Idp to fetch mappers
+        :return: array IdentityProviderMapperRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
+        data_raw = self.raw_get(urls_patterns.URL_ADMIN_IDP_MAPPERS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_idps(self):
         """
         Returns a list of ID Providers,
