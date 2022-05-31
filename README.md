@@ -76,6 +76,9 @@ config_well_known = keycloak_openid.well_known()
 token = keycloak_openid.token("user", "password")
 token = keycloak_openid.token("user", "password", totp="012345")
 
+# Get token using Token Exchange
+token = keycloak_openid.exchange_token(token['access_token'], "my_client", "other_client", "some_user")
+
 # Get Userinfo
 userinfo = keycloak_openid.userinfo(token['access_token'])
 
