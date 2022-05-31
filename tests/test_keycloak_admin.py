@@ -336,6 +336,12 @@ def test_idps(admin: KeycloakAdmin, realm: str):
         admin.add_mapper_to_idp(idp_alias="does-no-texist", payload=dict())
     assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
+    # Test IdP mappers listing
+    idp_mappers = admin.get_idp_mappers(
+        idp_alias="github",
+    )
+    assert len(idp_mappers) == 1
+
     # Test delete
     res = admin.delete_idp(idp_alias="github")
     assert res == dict(), res
