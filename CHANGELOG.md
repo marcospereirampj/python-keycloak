@@ -46,3 +46,4 @@ All notable changes to this project will be documented in this file.
  ## [master]
 
  * Renamed `KeycloakOpenID.well_know` to `KeycloakOpenID.well_known`
+ * Add `KeycloakOpenID.token_exchange` to support Token Exchange
