@@ -254,6 +254,30 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def exchange_token(self, token: str, client_id: str, audience: str, subject: str) -> dict:
+        """
+        Use a token to obtain an entirely different token. See
+        https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-exchange
+
+        :param token:
+        :param client_id:
+        :param audience:
+        :param subject:
+        :return:
+        """
+        params_path = {"realm-name": self.realm_name}
+        payload = {
+            "grant_type": ["urn:ietf:params:oauth:grant-type:token-exchange"],
+            "client_id": client_id,
+            "subject_token": token,
+            "requested_token_type": "urn:ietf:params:oauth:token-type:refresh_token",
+            "audience": audience,
+            "requested_subject": subject,
+        }
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def userinfo(self, token):
         """
         The userinfo endpoint returns standard claims about the authenticated user,
