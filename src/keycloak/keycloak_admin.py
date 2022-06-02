@@ -413,6 +413,31 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
+    def update_mapper_in_idp(self, idp_alias, mapper_id, payload):
+        """
+        Update an IdP mapper
+
+        IdentityProviderMapperRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_update
+
+        :param: idp_alias: alias for Idp to fetch mappers
+        :param: mapper_id: Mapper Id to update
+        :param: payload: IdentityProviderMapperRepresentation
+        :return: Http response
+        """
+        params_path = {
+            "realm-name": self.realm_name,
+            "idp-alias": idp_alias,
+            "mapper-id": mapper_id,
+        }
+
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_IDP_MAPPER_UPDATE.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
     def get_idp_mappers(self, idp_alias):
         """
         Returns a list of ID Providers mappers
@@ -2208,7 +2233,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
         data_raw = self.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path),
+            urls_patterns.URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
