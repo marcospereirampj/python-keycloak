@@ -337,10 +337,23 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
     # Test IdP mappers listing
-    idp_mappers = admin.get_idp_mappers(
-        idp_alias="github",
-    )
+    idp_mappers = admin.get_idp_mappers(idp_alias="github")
     assert len(idp_mappers) == 1
+
+    # Test IdP mapper update
+    res = admin.update_mapper_in_idp(
+        idp_alias="github",
+        mapper_id=idp_mappers[0]["id"],
+        # For an obscure reason, keycloak expect all fields
+        payload={
+            "id": idp_mappers[0]["id"],
+            "identityProviderAlias": "github-alias",
+            "identityProviderMapper": "github-user-attribute-mapper",
+            "name": "test",
+            "config": idp_mappers[0]["config"],
+        },
+    )
+    assert res == dict(), res
 
     # Test delete
     res = admin.delete_idp(idp_alias="github")
@@ -1452,9 +1465,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find client scope"}\'')
     test_mapper["config"]["user.attribute"] = "test"
     res_update = admin.update_mapper_in_client_scope(
-        client_scope_id=res,
-        protocol_mapper_id=test_mapper["id"],
-        payload=test_mapper,
+        client_scope_id=res, protocol_mapper_id=test_mapper["id"], payload=test_mapper
     )
     assert res_update == dict()
     assert (
