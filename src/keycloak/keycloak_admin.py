@@ -397,6 +397,22 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
+    def update_idp(self, idp_alias, payload):
+        """
+        Update an ID Provider
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource
+
+        :param: alias: alias for IdP to update
+        :param: payload: The IdentityProviderRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "alias": idp_alias}
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_IDP.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
     def add_mapper_to_idp(self, idp_alias, payload):
         """
         Create an ID Provider,
