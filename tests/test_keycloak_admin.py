@@ -320,6 +320,11 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     assert len(idps) == 1
     assert "github" == idps[0]["alias"]
 
+    # Test IdP update
+    res = admin.update_idp(idp_alias="github", payload=idps[0])
+
+    assert res == {}, res
+
     # Test adding a mapper
     res = admin.add_mapper_to_idp(
         idp_alias="github",
