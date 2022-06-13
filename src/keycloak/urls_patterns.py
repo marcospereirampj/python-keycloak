@@ -87,6 +87,7 @@ URL_ADMIN_CLIENT_ROLE = URL_ADMIN_CLIENT + "/roles/{role-name}"
 URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE = URL_ADMIN_CLIENT_ROLE + "/composites"
 URL_ADMIN_CLIENT_ROLE_MEMBERS = URL_ADMIN_CLIENT + "/roles/{role-name}/users"
 URL_ADMIN_CLIENT_ROLE_GROUPS = URL_ADMIN_CLIENT + "/roles/{role-name}/groups"
+URL_ADMIN_CLIENT_MANAGEMENT_PERMISSIONS = URL_ADMIN_CLIENT + "/management/permissions"
 
 URL_ADMIN_CLIENT_AUTHZ_SETTINGS = URL_ADMIN_CLIENT + "/authz/resource-server/settings"
 URL_ADMIN_CLIENT_AUTHZ_RESOURCES = URL_ADMIN_CLIENT + "/authz/resource-server/resource?max=-1"
@@ -101,6 +102,16 @@ URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = (
 URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION = (
     URL_ADMIN_CLIENT + "/authz/resource-server/permission/resource?max=-1"
 )
+URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/policy/{policy-id}/scopes"
+)
+URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/policy/{policy-id}/resources"
+)
+URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope/{scope-id}"
+)
+URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY = URL_ADMIN_CLIENT + "/authz/resource-server/policy/client"
 
 URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER = URL_ADMIN_CLIENT + "/service-account-user"
 URL_ADMIN_CLIENT_CERTS = URL_ADMIN_CLIENT + "/certificates/{attr}"
