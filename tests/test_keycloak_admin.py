@@ -1176,6 +1176,86 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
 
+def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
+    # Test enabling token exchange between two confidential clients
+    admin.realm_name = realm
+
+    # Create test clients
+    source_client_id = admin.create_client(
+        payload={"name": "Source Client", "clientId": "source-client"}
+    )
+    target_client_id = admin.create_client(
+        payload={"name": "Target Client", "clientId": "target-client"}
+    )
+    for c in admin.get_clients():
+        if c["clientId"] == "realm-management":
+            realm_management_id = c["id"]
+            break
+    else:
+        raise AssertionError("Missing realm management client")
+
+    # Enable permissions on the Superset client
+    admin.update_client_management_permissions(
+        payload={"enabled": True}, client_id=target_client_id
+    )
+
+    # Fetch various IDs and strings needed when creating the permission
+    token_exchange_permission_id = admin.get_client_management_permissions(
+        client_id=target_client_id
+    )["scopePermissions"]["token-exchange"]
+    scopes = admin.get_client_authz_policy_scopes(
+        client_id=realm_management_id, policy_id=token_exchange_permission_id
+    )
+
+    for s in scopes:
+        if s["name"] == "token-exchange":
+            token_exchange_scope_id = s["id"]
+            break
+    else:
+        raise AssertionError("Missing token-exchange scope")
+
+    resources = admin.get_client_authz_policy_resources(
+        client_id=realm_management_id, policy_id=token_exchange_permission_id
+    )
+    for r in resources:
+        if r["name"] == f"client.resource.{target_client_id}":
+            token_exchange_resource_id = r["_id"]
+            break
+    else:
+        raise AssertionError("Missing client resource")
+
+    # Create a client policy for source client
+    client_policy_id = admin.create_client_authz_client_policy(
+        payload={
+            "type": "client",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "name": "Exchange source client token with target client token",
+            "clients": [source_client_id],
+        },
+        client_id=realm_management_id,
+    )["id"]
+
+    # Update permissions on the target client to reference this policy
+    permission_name = admin.get_client_authz_scope_permission(
+        client_id=realm_management_id, scope_id=token_exchange_permission_id
+    )["name"]
+    admin.update_client_authz_scope_permission(
+        payload={
+            "id": token_exchange_permission_id,
+            "name": permission_name,
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [token_exchange_resource_id],
+            "scopes": [token_exchange_scope_id],
+            "policies": [client_policy_id],
+        },
+        client_id=realm_management_id,
+        scope_id=token_exchange_permission_id,
+    )
+
+
 def test_email(admin: KeycloakAdmin, user: str):
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
