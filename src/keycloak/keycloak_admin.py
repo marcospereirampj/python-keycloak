@@ -2891,6 +2891,20 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
 
+    def get_client_authz_client_policies(self, client_id):
+        """
+        Get policies for a given client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :return: Keycloak server response (RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
     def create_client_authz_client_policy(self, payload, client_id):
         """
         Create a new policy for a given client.

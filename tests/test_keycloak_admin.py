@@ -1225,16 +1225,24 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
         raise AssertionError("Missing client resource")
 
     # Create a client policy for source client
+    policy_name = "Exchange source client token with target client token"
     client_policy_id = admin.create_client_authz_client_policy(
         payload={
             "type": "client",
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
-            "name": "Exchange source client token with target client token",
+            "name": policy_name,
             "clients": [source_client_id],
         },
         client_id=realm_management_id,
     )["id"]
+    policies = admin.get_client_authz_client_policies(client_id=realm_management_id)
+    for policy in policies:
+        if policy["name"] == policy_name:
+            assert policy["clients"] == [source_client_id]
+            break
+    else:
+        raise AssertionError("Missing client policy")
 
     # Update permissions on the target client to reference this policy
     permission_name = admin.get_client_authz_scope_permission(
