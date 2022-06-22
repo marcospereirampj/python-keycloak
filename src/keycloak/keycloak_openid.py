@@ -73,13 +73,14 @@ class KeycloakOpenID:
         verify=True,
         custom_headers=None,
         proxies=None,
+        timeout=60,
     ):
         self.client_id = client_id
         self.client_secret_key = client_secret_key
         self.realm_name = realm_name
         headers = custom_headers if custom_headers is not None else dict()
         self.connection = ConnectionManager(
-            base_url=server_url, headers=headers, timeout=60, verify=verify, proxies=proxies
+            base_url=server_url, headers=headers, timeout=timeout, verify=verify, proxies=proxies
         )
 
         self.authorization = Authorization()
