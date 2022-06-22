@@ -88,6 +88,7 @@ class KeycloakAdmin:
         custom_headers=None,
         user_realm_name=None,
         auto_refresh_token=None,
+        timeout=60,
     ):
         self.server_url = server_url
         self.username = username
@@ -100,6 +101,7 @@ class KeycloakAdmin:
         self.auto_refresh_token = auto_refresh_token or []
         self.user_realm_name = user_realm_name
         self.custom_headers = custom_headers
+        self.timeout = timeout
 
         # Get token Admin
         self.get_token()
@@ -2695,6 +2697,7 @@ class KeycloakAdmin:
             verify=self.verify,
             client_secret_key=self.client_secret_key,
             custom_headers=self.custom_headers,
+            timeout=self.timeout,
         )
 
         grant_type = []
