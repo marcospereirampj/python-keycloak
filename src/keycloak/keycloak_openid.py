@@ -23,6 +23,8 @@
 
 import json
 
+from typing import TYPE_CHECKING, Any, TypeVar, Union, Dict, Optional, List, Iterable
+
 from jose import jwt
 
 from .authorization import Authorization
@@ -49,6 +51,15 @@ from .urls_patterns import (
     URL_USERINFO,
     URL_WELL_KNOWN,
 )
+from keycloak.uma_permissions import AuthStatus
+
+
+_T0 = TypeVar('_T0', bound=Dict)
+R = Union[bytes, dict]
+
+
+if TYPE_CHECKING:
+    from keycloak.uma_permissions import UMAPermission
 
 
 class KeycloakOpenID:
@@ -66,14 +77,14 @@ class KeycloakOpenID:
 
     def __init__(
         self,
-        server_url,
-        realm_name,
-        client_id,
-        client_secret_key=None,
-        verify=True,
-        custom_headers=None,
-        proxies=None,
-        timeout=60,
+        server_url: str,
+        realm_name: str,
+        client_id: str,
+        client_secret_key: Optional[str] = None,
+        verify: Optional[bool] = True,
+        custom_headers: Optional[Dict[str, str]] = None,
+        proxies:  Optional[Dict[str, str]] = None,
+        timeout: Optional[int] = 60,
     ):
         self.client_id = client_id
         self.client_secret_key = client_secret_key
@@ -125,7 +136,7 @@ class KeycloakOpenID:
     def authorization(self, value):
         self._authorization = value
 
-    def _add_secret_key(self, payload):
+    def _add_secret_key(self, payload: _T0) -> _T0:
         """
         Add secret key if exist.
 
@@ -137,7 +148,7 @@ class KeycloakOpenID:
 
         return payload
 
-    def _build_name_role(self, role):
+    def _build_name_role(self, role: str) -> str:
         """
 
         :param role:
@@ -145,7 +156,7 @@ class KeycloakOpenID:
         """
         return self.client_id + "/" + role
 
-    def _token_info(self, token, method_token_info, **kwargs):
+    def _token_info(self, token: str, method_token_info: str, **kwargs) -> Any:
         """
 
         :param token:
@@ -160,7 +171,7 @@ class KeycloakOpenID:
 
         return token_info
 
-    def well_known(self):
+    def well_known(self) -> Union[bytes, dict]:
         """The most important endpoint to understand is the well-known configuration
         endpoint. It lists endpoints and other configuration options relevant to
         the OpenID Connect implementation in Keycloak.
@@ -173,7 +184,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def auth_url(self, redirect_uri):
+    def auth_url(self, redirect_uri) -> str:
         """
 
         http://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint
@@ -189,14 +200,14 @@ class KeycloakOpenID:
 
     def token(
         self,
-        username="",
-        password="",
-        grant_type=["password"],
-        code="",
-        redirect_uri="",
-        totp=None,
+        username: Optional[str] = "",
+        password: Optional[str] = "",
+        grant_type: Optional[List[str]] = None,
+        code: Optional[str] = "",
+        redirect_uri: Optional[str] = "",
+        totp: Optional[str] = None,
         **extra
-    ):
+    ) -> Union[bytes, dict]:
         """
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -213,6 +224,7 @@ class KeycloakOpenID:
         :param totp:
         :return:
         """
+        grant_type = grant_type or ["password"]
         params_path = {"realm-name": self.realm_name}
         payload = {
             "username": username,
@@ -232,7 +244,11 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def refresh_token(self, refresh_token, grant_type=["refresh_token"]):
+    def refresh_token(
+            self,
+            refresh_token: str,
+            grant_type: Optional[List[str]] = None
+    ) -> Union[bytes, dict]:
         """
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -245,6 +261,7 @@ class KeycloakOpenID:
         :param grant_type:
         :return:
         """
+        grant_type = grant_type or ["refresh_token"]
         params_path = {"realm-name": self.realm_name}
         payload = {
             "client_id": self.client_id,
@@ -255,7 +272,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def exchange_token(self, token: str, client_id: str, audience: str, subject: str) -> dict:
+    def exchange_token(self, token: str, client_id: str, audience: str, subject: str) -> Union[bytes, dict]:
         """
         Use a token to obtain an entirely different token. See
         https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-exchange
@@ -279,7 +296,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def userinfo(self, token):
+    def userinfo(self, token: str) -> Union[bytes, dict]:
         """
         The userinfo endpoint returns standard claims about the authenticated user,
         and is protected by a bearer token.
@@ -297,7 +314,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def logout(self, refresh_token):
+    def logout(self, refresh_token: str) -> Union[bytes, dict]:
         """
         The logout endpoint logs out the authenticated user.
         :param refresh_token:
@@ -311,7 +328,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[204])
 
-    def certs(self):
+    def certs(self) -> Union[bytes, dict]:
         """
         The certificate endpoint returns the public keys enabled by the realm, encoded as a
         JSON Web Key (JWK). Depending on the realm settings there can be one or more keys enabled
@@ -325,7 +342,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def public_key(self):
+    def public_key(self) -> Union[bytes, dict]:
         """
         The public key is exposed by the realm page directly.
 
@@ -335,7 +352,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)["public_key"]
 
-    def entitlement(self, token, resource_server_id):
+    def entitlement(self, token: str, resource_server_id: str) -> Union[bytes, dict]:
         """
         Client applications can use a specific endpoint to obtain a special security token
         called a requesting party token (RPT). This token consists of all the entitlements
@@ -354,7 +371,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def introspect(self, token, rpt=None, token_type_hint=None):
+    def introspect(self, token: str, rpt: Optional[str] = None, token_type_hint: Optional[str] = None) -> Union[bytes, dict]:
         """
         The introspection endpoint is used to retrieve the active state of a token.
         It is can only be invoked by confidential clients.
@@ -384,7 +401,11 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def decode_token(self, token, key, algorithms=["RS256"], **kwargs):
+    def decode_token(
+            self,
+            token: str,
+            key: str,
+            algorithms: Optional[Union[str, list]] = None, **kwargs) -> dict:
         """
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data
         structure that represents a cryptographic key.  This specification
@@ -400,10 +421,10 @@ class KeycloakOpenID:
         :param algorithms:
         :return:
         """
-
+        algorithms = algorithms or ["RS256"]
         return jwt.decode(token, key, algorithms=algorithms, audience=self.client_id, **kwargs)
 
-    def load_authorization_config(self, path):
+    def load_authorization_config(self, path: str) -> None:
         """
         Load Keycloak settings (authorization)
 
@@ -415,11 +436,12 @@ class KeycloakOpenID:
         self.authorization.load_config(authorization_json)
         authorization_file.close()
 
-    def get_policies(self, token, method_token_info="introspect", **kwargs):
+    def get_policies(self, token: str, method_token_info: Optional[str] = "introspect", **kwargs) -> Optional[list]:
         """
         Get policies by user token
 
         :param token: user token
+        :param method_token_info: method token info
         :return: policies list
         """
 
@@ -447,7 +469,7 @@ class KeycloakOpenID:
 
         return list(set(policies))
 
-    def get_permissions(self, token, method_token_info="introspect", **kwargs):
+    def get_permissions(self, token: str, method_token_info: Optional[str] = "introspect", **kwargs) -> Optional[list]:
         """
         Get permission by user token
 
@@ -481,7 +503,7 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    def uma_permissions(self, token, permissions=""):
+    def uma_permissions(self, token: str, permissions: Optional[str] = "") -> Union[bytes, dict]:
         """
         Get UMA permissions by user token with requested permissions
 
@@ -510,7 +532,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def has_uma_access(self, token, permissions):
+    def has_uma_access(self, token: str, permissions: Union["UMAPermission", str, dict, Iterable[str]]) -> AuthStatus:
         """
         Determine whether user has uma permissions with specified user token
 
@@ -532,14 +554,15 @@ class KeycloakOpenID:
                 )
             raise
 
-        for resource_struct in granted:
-            resource = resource_struct["rsname"]
-            scopes = resource_struct.get("scopes", None)
-            if not scopes:
-                needed.discard(resource)
-                continue
-            for scope in scopes:
-                needed.discard("{}#{}".format(resource, scope))
+        if isinstance(granted, dict):
+            for _, resource_struct in granted.items():
+                resource = resource_struct["rsname"]
+                scopes = resource_struct.get("scopes", None)
+                if not scopes:
+                    needed.discard(resource)
+                    continue
+                for scope in scopes:
+                    needed.discard("{}#{}".format(resource, scope))
 
         return AuthStatus(
             is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed

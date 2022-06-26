@@ -20,6 +20,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+from typing import Type, Union, Optional, Set, Tuple, Iterable
 
 from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
 
@@ -38,7 +39,12 @@ class UMAPermission:
 
     """
 
-    def __init__(self, permission=None, resource="", scope=""):
+    def __init__(
+            self,
+            permission: Optional[Type["UMAPermission"]] = None,
+            resource: Optional[str] = "",
+            scope: Optional[str] = ""
+    ) -> None:
         self.resource = resource
         self.scope = scope
 
@@ -52,7 +58,7 @@ class UMAPermission:
             if permission.scope:
                 self.scope = str(permission.scope)
 
-    def __str__(self):
+    def __str__(self) -> str:
         scope = self.scope
         if scope:
             scope = "#" + scope
@@ -67,7 +73,12 @@ class UMAPermission:
     def __hash__(self) -> int:
         return hash(str(self))
 
-    def __call__(self, permission=None, resource="", scope="") -> object:
+    def __call__(
+            self,
+            permission: Union["UMAPermission", str, dict, Iterable[str]] = None,
+            resource: Optional[str] = "",
+            scope: Optional[str] = ""
+    ) -> object:
         result_resource = self.resource
         result_scope = self.scope
 
@@ -94,7 +105,7 @@ class Resource(UMAPermission):
     The class itself is callable, and will return the assembled permission.
     """
 
-    def __init__(self, resource):
+    def __init__(self, resource: str) -> None:
         super().__init__(resource=resource)
 
 
@@ -103,7 +114,7 @@ class Scope(UMAPermission):
     The class itself is callable, and will return the assembled permission.
     """
 
-    def __init__(self, scope):
+    def __init__(self, scope: str) -> None:
         super().__init__(scope=scope)
 
 
@@ -112,15 +123,15 @@ class AuthStatus:
     This has to evaluate to True if and only if the user is properly authorized
     for the requested resource."""
 
-    def __init__(self, is_logged_in, is_authorized, missing_permissions):
+    def __init__(self, is_logged_in: bool, is_authorized: bool, missing_permissions: Iterable) -> None:
         self.is_logged_in = is_logged_in
         self.is_authorized = is_authorized
         self.missing_permissions = missing_permissions
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.is_authorized
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"AuthStatus("
             f"is_authorized={self.is_authorized}, "
@@ -129,7 +140,9 @@ class AuthStatus:
         )
 
 
-def build_permission_param(permissions):
+def build_permission_param(
+        permissions: Union["UMAPermission", str, dict, Iterable[str]]
+) -> Union[Set[str], Set[Tuple[str]]]:
     """
     Transform permissions to a set, so they are usable for requests
 
@@ -142,13 +155,13 @@ def build_permission_param(permissions):
     if permissions is None or permissions == "":
         return set()
     if isinstance(permissions, str):
-        return set((permissions,))
+        return {permissions}
     if isinstance(permissions, UMAPermission):
-        return set((str(permissions),))
+        return {str(permissions)}
 
     try:  # treat as dictionary of permissions
         result = set()
-        for resource, scopes in permissions.items():
+        for resource, scopes in permissions.items():  # pytype: disable=attribute-error
             print(f"resource={resource}scopes={scopes}")
             if scopes is None:
                 result.add(resource)

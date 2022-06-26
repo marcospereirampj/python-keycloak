@@ -21,11 +21,26 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from typing import TYPE_CHECKING, Type, Union, Dict, Optional
+
 import requests
+
+if TYPE_CHECKING:
+    from requests import Response
+    from keycloak.keycloak_models import KeycloakModel
+
+KeycloakErrorType = Type["KeycloakError"]
+KeycloakModelType = Type["KeycloakModel"]
+RequestResponseType = Union[Dict, bytes]
 
 
 class KeycloakError(Exception):
-    def __init__(self, error_message="", response_code=None, response_body=None):
+    def __init__(
+            self,
+            error_message: Optional[str] = "",
+            response_code: Optional[int] = None,
+            response_body: Optional[RequestResponseType] = None
+    ) -> None:
 
         Exception.__init__(self, error_message)
 
@@ -33,7 +48,7 @@ class KeycloakError(Exception):
         self.response_body = response_body
         self.error_message = error_message
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.response_code is not None:
             return "{0}: {1}".format(self.response_code, self.error_message)
         else:
@@ -96,7 +111,11 @@ class PermissionDefinitionError(Exception):
     pass
 
 
-def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
+def raise_error_from_response(
+        response: "Response",
+        error: Union[KeycloakErrorType, Exception, Dict],
+        expected_codes=None,
+        skip_exists=False) -> RequestResponseType:
     if expected_codes is None:
         expected_codes = [200, 201, 204]
 
