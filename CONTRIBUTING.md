@@ -17,7 +17,7 @@ python -m pip install --upgrade pip poetry
 python -m poetry env use <PATH_TO_PYTHON_VERSION>
 
 # install package dependencies including dev dependencies
-python -m poetry install --dev
+python -m poetry install
 
 # Activate virtualenv
 python -m poetry shell

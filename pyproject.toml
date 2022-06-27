@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-keycloak"
-version = "1.9.0"
+version = "0.0.0"
 description = "python-keycloak is a Python package providing access to the Keycloak API."
 license = "MIT"
 readme = "README.md"
