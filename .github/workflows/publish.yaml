@@ -21,7 +21,7 @@ jobs:
     - name: Apply the tag version
       run: |
         version=${{ github.ref_name }}
-        sed -i 's/__version__ = .*/__version__ = "'${version:1}'"/' src/keycloak/_version.py
+        sed -Ei '/^version = /s|= "[0-9.]+"$|= "'${version:-1}'"|' pyproject.toml
     - name: Run build
       run: |
         tox -e build
