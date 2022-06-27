@@ -1,5 +1,0 @@
-tox
-pytest
-pytest-cov
-wheel
-pre-commit

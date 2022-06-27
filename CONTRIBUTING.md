@@ -10,11 +10,17 @@ The development environment is mainly up to the developer. Our recommendations a
 virtual environment and install the necessary requirements. Example
 
 ```sh
-python -m venv venv
-source venv/bin/activate
-python -m pip install -U pip
-python -m pip install -r requirements.txt
-python -m pip install -r dev-requirements.txt
+# Install and upgrade pip & poetry
+python -m pip install --upgrade pip poetry
+
+# Create virtualenv
+python -m poetry env use <PATH_TO_PYTHON_VERSION>
+
+# install package dependencies including dev dependencies
+python -m poetry install --dev
+
+# Activate virtualenv
+python -m poetry shell
 ```
 
 ## Running checks and tests
@@ -67,9 +73,12 @@ After cloning this repository, you must install the pre-commit hook for
 conventional commits (this is included in the `dev-requirements.txt`)
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install pre-commit
+# Create virtualenv
+python -m poetry env use <PATH_TO_PYTHON_VERSION>
+
+# Activate virtualenv
+python -m poetry shell
+
 pre-commit install --install-hooks -t pre-commit -t pre-push -t commit-msg
 ```
 

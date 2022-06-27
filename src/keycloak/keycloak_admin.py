@@ -2904,7 +2904,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path),
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 

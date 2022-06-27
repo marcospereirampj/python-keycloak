@@ -1,3 +1,0 @@
-requests>=2.20.0
-python-jose>=1.4.0
-urllib3>=1.26.0
