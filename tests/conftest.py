@@ -3,27 +3,84 @@ import uuid
 
 import pytest
 
-from keycloak import KeycloakAdmin
+from keycloak import KeycloakAdmin, KeycloakOpenID
+
+
+class KeycloakTestEnv(object):
+    def __init__(
+        self,
+        host: str = os.environ["KEYCLOAK_HOST"],
+        port: str = os.environ["KEYCLOAK_PORT"],
+        username: str = os.environ["KEYCLOAK_ADMIN"],
+        password: str = os.environ["KEYCLOAK_ADMIN_PASSWORD"],
+    ):
+        self.KEYCLOAK_HOST = host
+        self.KEYCLOAK_PORT = port
+        self.KEYCLOAK_ADMIN = username
+        self.KEYCLOAK_ADMIN_PASSWORD = password
+
+    @property
+    def KEYCLOAK_HOST(self):
+        return self._KEYCLOAK_HOST
+
+    @KEYCLOAK_HOST.setter
+    def KEYCLOAK_HOST(self, value: str):
+        self._KEYCLOAK_HOST = value
+
+    @property
+    def KEYCLOAK_PORT(self):
+        return self._KEYCLOAK_PORT
+
+    @KEYCLOAK_PORT.setter
+    def KEYCLOAK_PORT(self, value: str):
+        self._KEYCLOAK_PORT = value
+
+    @property
+    def KEYCLOAK_ADMIN(self):
+        return self._KEYCLOAK_ADMIN
+
+    @KEYCLOAK_ADMIN.setter
+    def KEYCLOAK_ADMIN(self, value: str):
+        self._KEYCLOAK_ADMIN = value
+
+    @property
+    def KEYCLOAK_ADMIN_PASSWORD(self):
+        return self._KEYCLOAK_ADMIN_PASSWORD
+
+    @KEYCLOAK_ADMIN_PASSWORD.setter
+    def KEYCLOAK_ADMIN_PASSWORD(self, value: str):
+        self._KEYCLOAK_ADMIN_PASSWORD = value
 
 
 @pytest.fixture
 def env():
-    class KeycloakTestEnv(object):
-        KEYCLOAK_HOST = os.environ["KEYCLOAK_HOST"]
-        KEYCLOAK_PORT = os.environ["KEYCLOAK_PORT"]
-        KEYCLOAK_ADMIN = os.environ["KEYCLOAK_ADMIN"]
-        KEYCLOAK_ADMIN_PASSWORD = os.environ["KEYCLOAK_ADMIN_PASSWORD"]
-
     return KeycloakTestEnv()
 
 
 @pytest.fixture
-def admin(env):
+def admin(env: KeycloakTestEnv):
     return KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
         password=env.KEYCLOAK_ADMIN_PASSWORD,
     )
+
+
+@pytest.fixture
+def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
+    # Set the realm
+    admin.realm_name = realm
+    # Create client
+    client = str(uuid.uuid4())
+    client_id = admin.create_client(payload={"name": client, "clientId": client})
+    # Return OID
+    yield KeycloakOpenID(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        realm_name=realm,
+        client_id=client,
+    )
+    # Cleanup
+    admin.delete_client(client_id=client_id)
 
 
 @pytest.fixture
