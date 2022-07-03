@@ -170,7 +170,6 @@ class KeycloakOpenID:
 
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_WELL_KNOWN.format(**params_path))
-
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def auth_url(self, redirect_uri):
