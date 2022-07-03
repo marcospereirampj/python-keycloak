@@ -1,6 +1,6 @@
-from keycloak.keycloak_openid import KeycloakOpenID
-from keycloak.connection import ConnectionManager
 from keycloak.authorization import Authorization
+from keycloak.connection import ConnectionManager
+from keycloak.keycloak_openid import KeycloakOpenID
 
 
 def test_keycloak_openid_init(env):
