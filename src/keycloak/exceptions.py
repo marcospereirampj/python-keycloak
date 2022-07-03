@@ -21,12 +21,22 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Keycloak custom exeptions module."""
+
 import requests
 
 
 class KeycloakError(Exception):
-    def __init__(self, error_message="", response_code=None, response_body=None):
+    """Base class for custom Keycloak errors.
 
+    :param error_message: The error message
+    :type error_message: str
+    :param response_code: The response status code
+    :type response_code: int
+    """
+
+    def __init__(self, error_message="", response_code=None, response_body=None):
+        """Init method."""
         Exception.__init__(self, error_message)
 
         self.response_code = response_code
@@ -34,6 +44,7 @@ class KeycloakError(Exception):
         self.error_message = error_message
 
     def __str__(self):
+        """Str method."""
         if self.response_code is not None:
             return "{0}: {1}".format(self.response_code, self.error_message)
         else:
@@ -41,62 +52,91 @@ class KeycloakError(Exception):
 
 
 class KeycloakAuthenticationError(KeycloakError):
+    """Keycloak authentication error exception."""
+
     pass
 
 
 class KeycloakConnectionError(KeycloakError):
+    """Keycloak connection error exception."""
+
     pass
 
 
 class KeycloakOperationError(KeycloakError):
+    """Keycloak operation error exception."""
+
     pass
 
 
 class KeycloakDeprecationError(KeycloakError):
+    """Keycloak deprecation error exception."""
+
     pass
 
 
 class KeycloakGetError(KeycloakOperationError):
+    """Keycloak request get error exception."""
+
     pass
 
 
 class KeycloakPostError(KeycloakOperationError):
+    """Keycloak request post error exception."""
+
     pass
 
 
 class KeycloakPutError(KeycloakOperationError):
+    """Keycloak request put error exception."""
+
     pass
 
 
 class KeycloakDeleteError(KeycloakOperationError):
+    """Keycloak request delete error exception."""
+
     pass
 
 
 class KeycloakSecretNotFound(KeycloakOperationError):
+    """Keycloak secret not found exception."""
+
     pass
 
 
 class KeycloakRPTNotFound(KeycloakOperationError):
+    """Keycloak RPT not found exception."""
+
     pass
 
 
 class KeycloakAuthorizationConfigError(KeycloakOperationError):
+    """Keycloak authorization config exception."""
+
     pass
 
 
 class KeycloakInvalidTokenError(KeycloakOperationError):
+    """Keycloak invalid token exception."""
+
     pass
 
 
 class KeycloakPermissionFormatError(KeycloakOperationError):
+    """Keycloak permission format exception."""
+
     pass
 
 
 class PermissionDefinitionError(Exception):
+    """Keycloak permission definition exception."""
+
     pass
 
 
 def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
+    """Raise an exception for the response."""
     if expected_codes is None:
         expected_codes = [200, 201, 204]
 
