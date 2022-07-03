@@ -1,9 +1,13 @@
+"""Test module for KeycloakOpenID."""
+from unittest import mock
+
 from keycloak.authorization import Authorization
 from keycloak.connection import ConnectionManager
 from keycloak.keycloak_openid import KeycloakOpenID
 
 
 def test_keycloak_openid_init(env):
+    """Test KeycloakOpenId's init method."""
     oid = KeycloakOpenID(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         realm_name="master",
@@ -18,6 +22,7 @@ def test_keycloak_openid_init(env):
 
 
 def test_well_known(oid: KeycloakOpenID):
+    """Test the well_known method."""
     res = oid.well_known()
     assert res is not None
     assert res != dict()
@@ -77,3 +82,56 @@ def test_well_known(oid: KeycloakOpenID):
         "userinfo_signing_alg_values_supported",
     ]:
         assert key in res
+
+
+def test_auth_url(env, oid: KeycloakOpenID):
+    """Test the auth_url method."""
+    res = oid.auth_url(redirect_uri="http://test.test/*")
+    assert (
+        res
+        == f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}/realms/{oid.realm_name}"
+        + f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
+        + "&redirect_uri=http://test.test/*"
+    )
+
+
+def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
+    """Test the token method."""
+    oid, username, password = oid_with_credentials
+    token = oid.token(username=username, password=password)
+    assert token == {
+        "access_token": mock.ANY,
+        "expires_in": 300,
+        "not-before-policy": 0,
+        "refresh_expires_in": 1800,
+        "refresh_token": mock.ANY,
+        "scope": "profile email",
+        "session_state": mock.ANY,
+        "token_type": "Bearer",
+    }
+
+    # Test with dummy totp
+    token = oid.token(username=username, password=password, totp="123456")
+    assert token == {
+        "access_token": mock.ANY,
+        "expires_in": 300,
+        "not-before-policy": 0,
+        "refresh_expires_in": 1800,
+        "refresh_token": mock.ANY,
+        "scope": "profile email",
+        "session_state": mock.ANY,
+        "token_type": "Bearer",
+    }
+
+    # Test with extra param
+    token = oid.token(username=username, password=password, extra_param="foo")
+    assert token == {
+        "access_token": mock.ANY,
+        "expires_in": 300,
+        "not-before-policy": 0,
+        "refresh_expires_in": 1800,
+        "refresh_token": mock.ANY,
+        "scope": "profile email",
+        "session_state": mock.ANY,
+        "token_type": "Bearer",
+    }
