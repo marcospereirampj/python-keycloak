@@ -51,6 +51,8 @@ pre-commit = "^2.19.0"
 isort = "^5.10.1"
 black = "^22.3.0"
 flake8 = "^3.5.0"
+flake8-docstrings = "^1.6.0"
+commitizen = "^2.28.0"
 
 [tool.poetry.extras]
 docs = [
