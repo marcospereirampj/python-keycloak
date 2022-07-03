@@ -71,6 +71,9 @@ jobs:
     - name: Run tests
       run: |
         tox -e tests
+    - name: Keycloak logs
+      run: |
+        cat keycloak_test_logs.txt
 
   build:
     runs-on: ubuntu-latest
