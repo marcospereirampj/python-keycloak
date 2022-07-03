@@ -1731,7 +1731,7 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
         verify=admin.verify,
     )
     admin.token["refresh_token"] = "bad"
-    with pytest.raises(KeycloakGetError) as err:
+    with pytest.raises(KeycloakPostError) as err:
         admin.get_realm(realm_name="test-refresh")
     assert err.match(
         '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''

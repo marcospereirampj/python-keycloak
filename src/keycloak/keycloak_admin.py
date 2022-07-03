@@ -2736,7 +2736,7 @@ class KeycloakAdmin:
         else:
             try:
                 self.token = self.keycloak_openid.refresh_token(refresh_token)
-            except KeycloakGetError as e:
+            except KeycloakPostError as e:
                 list_errors = [
                     b"Refresh token expired",
                     b"Token is not active",
