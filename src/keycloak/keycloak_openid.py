@@ -62,6 +62,7 @@ class KeycloakOpenID:
     :param verify: True if want check connection SSL
     :param custom_headers: dict of custom header to pass to each HTML request
     :param proxies: dict of proxies to sent the request by.
+    :param timeout: connection timeout in seconds
     """
 
     def __init__(
