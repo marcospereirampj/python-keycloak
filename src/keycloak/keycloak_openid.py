@@ -346,7 +346,7 @@ class KeycloakOpenID:
         if data_raw.status_code == 404:
             return raise_error_from_response(data_raw, KeycloakDeprecationError)
 
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return raise_error_from_response(data_raw, KeycloakGetError)  # pragma: no cover
 
     def introspect(self, token, rpt=None, token_type_hint=None):
         """

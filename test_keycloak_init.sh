@@ -10,7 +10,7 @@ function keycloak_stop() {
 
 function keycloak_start() {
     echo "Starting keycloak docker container"
-    docker run -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" "${KEYCLOAK_DOCKER_IMAGE}" start-dev
+    docker run -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -e KC_FEATURES="token-exchange" -p "${KEYCLOAK_PORT}:8080" "${KEYCLOAK_DOCKER_IMAGE}" start-dev
     SECONDS=0
     until curl --silent --output /dev/null localhost:$KEYCLOAK_PORT; do
       sleep 5;
@@ -28,7 +28,7 @@ keycloak_stop # In case it did not shut down correctly last time.
 keycloak_start
 
 eval ${CMD_ARGS}
-docker logs unittest_keycloak > keycloak_test_logs.txt
 RETURN_VALUE=$?
+docker logs unittest_keycloak > keycloak_test_logs.txt
 
 exit ${RETURN_VALUE}
