@@ -185,6 +185,14 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
             "serviceAccountsEnabled": True,
         }
     )
+    admin.create_client_authz_role_based_policy(
+        client_id=client_id,
+        payload={
+            "name": "test-authz-rb-policy",
+            "roles": [{"id": admin.get_realm_role(role_name="offline_access")["id"]}],
+        },
+    )
+    admin.create_client_authz_resource
     # Create user
     username = str(uuid.uuid4())
     password = str(uuid.uuid4())

@@ -43,12 +43,12 @@ class Policy:
 
     def __init__(self, name, type, logic, decision_strategy):
         """Init method."""
-        self._name = name
-        self._type = type
-        self._logic = logic
-        self._decision_strategy = decision_strategy
-        self._roles = []
-        self._permissions = []
+        self.name = name
+        self.type = type
+        self.logic = logic
+        self.decision_strategy = decision_strategy
+        self.roles = []
+        self.permissions = []
 
     def __repr__(self):
         """Repr method."""
@@ -99,10 +99,18 @@ class Policy:
         """Get roles."""
         return self._roles
 
+    @roles.setter
+    def roles(self, value):
+        self._roles = value
+
     @property
     def permissions(self):
         """Get permissions."""
         return self._permissions
+
+    @permissions.setter
+    def permissions(self, value):
+        self._permissions = value
 
     def add_role(self, role):
         """Add keycloak role in policy.

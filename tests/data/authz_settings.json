@@ -1,0 +1,45 @@
+{
+    "allowRemoteResourceManagement": true,
+    "policyEnforcementMode": "ENFORCING",
+    "policies": [
+        {
+            "name": "Default Policy",
+            "type": "js",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+                "code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
+            }
+        },
+        {
+            "name": "test-authz-rb-policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+                "roles": "[{\"id\":\"offline_access\",\"required\":false}]"
+            }
+        },
+        {
+            "name": "Default Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+                "applyPolicies": "[\"test-authz-rb-policy\"]"
+            }
+        },
+        {
+            "name": "Test scope",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+                "scopes": "[]",
+                "applyPolicies": "[\"test-authz-rb-policy\"]"
+            }
+        }
+    ],
+    "scopes": [],
+    "decisionStrategy": "UNANIMOUS"
+}

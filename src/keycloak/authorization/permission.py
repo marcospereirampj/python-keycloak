@@ -49,12 +49,12 @@ class Permission:
 
     def __init__(self, name, type, logic, decision_strategy):
         """Init method."""
-        self._name = name
-        self._type = type
-        self._logic = logic
-        self._decision_strategy = decision_strategy
-        self._resources = []
-        self._scopes = []
+        self.name = name
+        self.type = type
+        self.logic = logic
+        self.decision_strategy = decision_strategy
+        self.resources = []
+        self.scopes = []
 
     def __repr__(self):
         """Repr method."""

@@ -4,8 +4,15 @@ from unittest import mock
 import pytest
 
 from keycloak.authorization import Authorization
+from keycloak.authorization.permission import Permission
+from keycloak.authorization.policy import Policy
+from keycloak.authorization.role import Role
 from keycloak.connection import ConnectionManager
-from keycloak.exceptions import KeycloakDeprecationError, KeycloakRPTNotFound
+from keycloak.exceptions import (
+    KeycloakAuthenticationError,
+    KeycloakDeprecationError,
+    KeycloakRPTNotFound,
+)
 from keycloak.keycloak_admin import KeycloakAdmin
 from keycloak.keycloak_openid import KeycloakOpenID
 
@@ -185,6 +192,18 @@ def test_exchange_token(
     assert token != new_token
 
 
+def test_logout(oid_with_credentials):
+    """Test logout."""
+    oid, username, password = oid_with_credentials
+
+    token = oid.token(username=username, password=password)
+    assert oid.userinfo(token=token["access_token"]) != dict()
+    assert oid.logout(refresh_token=token["refresh_token"]) == dict()
+
+    with pytest.raises(KeycloakAuthenticationError):
+        oid.userinfo(token=token["access_token"])
+
+
 def test_certs(oid: KeycloakOpenID):
     """Test certificates."""
     assert len(oid.certs()["keys"]) == 2
@@ -235,4 +254,21 @@ def test_decode_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
             options={"verify_aud": False},
         )["preferred_username"]
         == username
+    )
+
+
+def test_load_authorization_config(
+    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+):
+    """Test load authorization config."""
+    oid, username, password = oid_with_credentials_authz
+
+    oid.load_authorization_config(path="tests/data/authz_settings.json")
+    assert "test-authz-rb-policy" in oid.authorization.policies
+    assert isinstance(oid.authorization.policies["test-authz-rb-policy"], Policy)
+    assert len(oid.authorization.policies["test-authz-rb-policy"].roles) == 1
+    assert isinstance(oid.authorization.policies["test-authz-rb-policy"].roles[0], Role)
+    assert len(oid.authorization.policies["test-authz-rb-policy"].permissions) == 2
+    assert isinstance(
+        oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission
     )
