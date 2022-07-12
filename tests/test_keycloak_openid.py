@@ -10,7 +10,9 @@ from keycloak.authorization.role import Role
 from keycloak.connection import ConnectionManager
 from keycloak.exceptions import (
     KeycloakAuthenticationError,
+    KeycloakAuthorizationConfigError,
     KeycloakDeprecationError,
+    KeycloakInvalidTokenError,
     KeycloakRPTNotFound,
 )
 from keycloak.keycloak_admin import KeycloakAdmin
@@ -257,9 +259,7 @@ def test_decode_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
     )
 
 
-def test_load_authorization_config(
-    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
-):
+def test_load_authorization_config(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
     """Test load authorization config."""
     oid, username, password = oid_with_credentials_authz
 
@@ -272,3 +272,80 @@ def test_load_authorization_config(
     assert isinstance(
         oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission
     )
+
+
+def test_get_policies(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+    """Test get policies."""
+    oid, username, password = oid_with_credentials_authz
+    token = oid.token(username=username, password=password)
+
+    with pytest.raises(KeycloakAuthorizationConfigError):
+        oid.get_policies(token=token["access_token"])
+
+    oid.load_authorization_config(path="tests/data/authz_settings.json")
+    assert oid.get_policies(token=token["access_token"]) is None
+
+    key = "-----BEGIN PUBLIC KEY-----\n" + oid.public_key() + "\n-----END PUBLIC KEY-----"
+    orig_client_id = oid.client_id
+    oid.client_id = "account"
+    assert oid.get_policies(token=token["access_token"], method_token_info="decode", key=key) == []
+    policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
+    policy.add_role(role="account/view-profile")
+    oid.authorization.policies["test"] = policy
+    assert [
+        str(x)
+        for x in oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+    ] == ["Policy: test (role)"]
+    assert [
+        repr(x)
+        for x in oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+    ] == ["<Policy: test (role)>"]
+    oid.client_id = orig_client_id
+
+    oid.logout(refresh_token=token["refresh_token"])
+    with pytest.raises(KeycloakInvalidTokenError):
+        oid.get_policies(token=token["access_token"])
+
+
+def test_get_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+    """Test get policies."""
+    oid, username, password = oid_with_credentials_authz
+    token = oid.token(username=username, password=password)
+
+    with pytest.raises(KeycloakAuthorizationConfigError):
+        oid.get_permissions(token=token["access_token"])
+
+    oid.load_authorization_config(path="tests/data/authz_settings.json")
+    assert oid.get_permissions(token=token["access_token"]) is None
+
+    key = "-----BEGIN PUBLIC KEY-----\n" + oid.public_key() + "\n-----END PUBLIC KEY-----"
+    orig_client_id = oid.client_id
+    oid.client_id = "account"
+    assert (
+        oid.get_permissions(token=token["access_token"], method_token_info="decode", key=key) == []
+    )
+    policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
+    policy.add_role(role="account/view-profile")
+    policy.add_permission(
+        permission=Permission(
+            name="test-perm", type="resource", logic="POSITIVE", decision_strategy="UNANIMOUS"
+        )
+    )
+    oid.authorization.policies["test"] = policy
+    assert [
+        str(x)
+        for x in oid.get_permissions(
+            token=token["access_token"], method_token_info="decode", key=key
+        )
+    ] == ["Permission: test-perm (resource)"]
+    assert [
+        repr(x)
+        for x in oid.get_permissions(
+            token=token["access_token"], method_token_info="decode", key=key
+        )
+    ] == ["<Permission: test-perm (resource)>"]
+    oid.client_id = orig_client_id
+
+    oid.logout(refresh_token=token["refresh_token"])
+    with pytest.raises(KeycloakInvalidTokenError):
+        oid.get_permissions(token=token["access_token"])

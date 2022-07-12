@@ -511,7 +511,6 @@ class KeycloakOpenID:
 
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def has_uma_access(self, token, permissions):
