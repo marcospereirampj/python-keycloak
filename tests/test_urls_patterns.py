@@ -1,9 +1,10 @@
+"""Test URL patterns."""
+
 from keycloak import urls_patterns
 
 
 def test_correctness_of_patterns():
     """Test that there are no duplicate url patterns."""
-
     # Test that the patterns are present
     urls = [x for x in dir(urls_patterns) if not x.startswith("__")]
     assert len(urls) >= 0

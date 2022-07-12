@@ -21,9 +21,12 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Keycloak authorization Permission module."""
+
 
 class Permission:
-    """
+    """Base permission class.
+
     Consider this simple and very common permission:
 
     A permission associates the object being protected with the policies that must be evaluated to
@@ -45,6 +48,7 @@ class Permission:
     """
 
     def __init__(self, name, type, logic, decision_strategy):
+        """Init method."""
         self._name = name
         self._type = type
         self._logic = logic
@@ -53,13 +57,16 @@ class Permission:
         self._scopes = []
 
     def __repr__(self):
+        """Repr method."""
         return "<Permission: %s (%s)>" % (self.name, self.type)
 
     def __str__(self):
+        """Str method."""
         return "Permission: %s (%s)" % (self.name, self.type)
 
     @property
     def name(self):
+        """Get name."""
         return self._name
 
     @name.setter
@@ -68,6 +75,7 @@ class Permission:
 
     @property
     def type(self):
+        """Get type."""
         return self._type
 
     @type.setter
@@ -76,6 +84,7 @@ class Permission:
 
     @property
     def logic(self):
+        """Get logic."""
         return self._logic
 
     @logic.setter
@@ -84,6 +93,7 @@ class Permission:
 
     @property
     def decision_strategy(self):
+        """Get decision strategy."""
         return self._decision_strategy
 
     @decision_strategy.setter
@@ -92,6 +102,7 @@ class Permission:
 
     @property
     def resources(self):
+        """Get resources."""
         return self._resources
 
     @resources.setter
@@ -100,6 +111,7 @@ class Permission:
 
     @property
     def scopes(self):
+        """Get scopes."""
         return self._scopes
 
     @scopes.setter

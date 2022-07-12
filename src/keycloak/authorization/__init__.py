@@ -21,6 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Authorization module."""
+
 import ast
 import json
 
@@ -30,18 +32,19 @@ from .role import Role
 
 
 class Authorization:
-    """
-    Keycloak Authorization (policies, roles, scopes and resources).
+    """Keycloak Authorization (policies, roles, scopes and resources).
 
     https://keycloak.gitbooks.io/documentation/authorization_services/index.html
 
     """
 
     def __init__(self):
+        """Init method."""
         self.policies = {}
 
     @property
     def policies(self):
+        """Get policies."""
         return self._policies
 
     @policies.setter
@@ -49,8 +52,7 @@ class Authorization:
         self._policies = value
 
     def load_config(self, data):
-        """
-        Load policies, roles and permissions (scope/resources).
+        """Load policies, roles and permissions (scope/resources).
 
         :param data: keycloak authorization data (dict)
         :returns: None

@@ -21,25 +21,30 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""The authorization Role module."""
+
 
 class Role:
-    """
+    """Authorization Role base class.
+
     Roles identify a type or category of user. Admin, user,
     manager, and employee are all typical roles that may exist in an organization.
 
     https://keycloak.gitbooks.io/documentation/server_admin/topics/roles.html
-
     """
 
     def __init__(self, name, required=False):
+        """Init method."""
         self.name = name
         self.required = required
 
     @property
     def get_name(self):
+        """Get name."""
         return self.name
 
     def __eq__(self, other):
+        """Eq method."""
         if isinstance(other, str):
             return self.name == other
         return NotImplemented
