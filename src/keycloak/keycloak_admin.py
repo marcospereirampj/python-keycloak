@@ -1313,7 +1313,7 @@ class KeycloakAdmin:
 
         :param role_name: Name of the role.
         :param query: Additional Query parameters
-        (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_roles_resource)
+            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_roles_resource)
         :return: Keycloak Server Response (UserRepresentation)
         """
         query = query or dict()
@@ -1464,7 +1464,7 @@ class KeycloakAdmin:
         :param client_id: The client id
         :param role_name: the name of role to be queried.
         :param query: Additional query parameters
-        (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
+            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
         :return: Keycloak server response (UserRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
@@ -1478,7 +1478,7 @@ class KeycloakAdmin:
         :param client_id: The client id
         :param role_name: the name of role to be queried.
         :param query: Additional query parameters
-        (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
+            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
         :return: Keycloak server response
         """
         params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
@@ -1530,7 +1530,7 @@ class KeycloakAdmin:
 
         :param role_name: The name of the role to be updated
         :param payload: The role (use RoleRepresentation)
-        :return Keycloak server response
+        :return: Keycloak server response
         """
         params_path = {"realm-name": self.realm_name, "role-name": role_name}
         data_raw = self.raw_put(
@@ -1543,7 +1543,7 @@ class KeycloakAdmin:
         """Delete a role for the realm by name.
 
         :param payload: The role name {'role-name':'name-of-the-role'}
-        :return Keycloak server response
+        :return: Keycloak server response
         """
         params_path = {"realm-name": self.realm_name, "role-name": role_name}
         data_raw = self.raw_delete(
