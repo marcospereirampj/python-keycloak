@@ -174,7 +174,7 @@ class KeycloakOpenID:
 
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def auth_url(self, redirect_uri):
+    def auth_url(self, redirect_uri, scope="email", state=""):
         """
 
         http://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint
@@ -185,6 +185,8 @@ class KeycloakOpenID:
             "authorization-endpoint": self.well_known()["authorization_endpoint"],
             "client-id": self.client_id,
             "redirect-uri": redirect_uri,
+            "scope": scope,
+            "state": state,
         }
         return URL_AUTH.format(**params_path)
 
