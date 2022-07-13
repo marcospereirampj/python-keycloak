@@ -524,7 +524,7 @@ class KeycloakOpenID:
         try:
             granted = self.uma_permissions(token, permissions)
         except (KeycloakPostError, KeycloakAuthenticationError) as e:
-            if e.response_code == 403:
+            if e.response_code == 403:  # pragma: no cover
                 return AuthStatus(
                     is_logged_in=True, is_authorized=False, missing_permissions=needed
                 )
@@ -540,7 +540,7 @@ class KeycloakOpenID:
             if not scopes:
                 needed.discard(resource)
                 continue
-            for scope in scopes:
+            for scope in scopes:  # pragma: no cover
                 needed.discard("{}#{}".format(resource, scope))
 
         return AuthStatus(

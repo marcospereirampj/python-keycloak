@@ -13,6 +13,7 @@ from keycloak.exceptions import (
     KeycloakAuthorizationConfigError,
     KeycloakDeprecationError,
     KeycloakInvalidTokenError,
+    KeycloakPostError,
     KeycloakRPTNotFound,
 )
 from keycloak.keycloak_admin import KeycloakAdmin
@@ -349,3 +350,43 @@ def test_get_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, 
     oid.logout(refresh_token=token["refresh_token"])
     with pytest.raises(KeycloakInvalidTokenError):
         oid.get_permissions(token=token["access_token"])
+
+
+def test_uma_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+    """Test UMA permissions."""
+    oid, username, password = oid_with_credentials_authz
+    token = oid.token(username=username, password=password)
+
+    assert len(oid.uma_permissions(token=token["access_token"])) == 1
+    assert oid.uma_permissions(token=token["access_token"])[0]["rsname"] == "Default Resource"
+
+
+def test_has_uma_access(
+    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+):
+    """Test has UMA access."""
+    oid, username, password = oid_with_credentials_authz
+    token = oid.token(username=username, password=password)
+
+    assert (
+        str(oid.has_uma_access(token=token["access_token"], permissions=""))
+        == "AuthStatus(is_authorized=True, is_logged_in=True, missing_permissions=set())"
+    )
+    assert (
+        str(oid.has_uma_access(token=token["access_token"], permissions="Default Resource"))
+        == "AuthStatus(is_authorized=True, is_logged_in=True, missing_permissions=set())"
+    )
+
+    with pytest.raises(KeycloakPostError):
+        oid.has_uma_access(token=token["access_token"], permissions="Does not exist")
+
+    oid.logout(refresh_token=token["refresh_token"])
+    assert (
+        str(oid.has_uma_access(token=token["access_token"], permissions=""))
+        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
+    )
+    assert (
+        str(oid.has_uma_access(token=admin.token["access_token"], permissions="Default Resource"))
+        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
+        + "{'Default Resource'})"
+    )
