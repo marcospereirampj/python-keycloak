@@ -22,7 +22,32 @@ import re
 import pytest
 
 from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
-from keycloak.uma_permissions import Resource, Scope, build_permission_param
+from keycloak.uma_permissions import (
+    AuthStatus,
+    Resource,
+    Scope,
+    UMAPermission,
+    build_permission_param,
+)
+
+
+def test_uma_permission_obj():
+    """Test generic UMA permission."""
+    with pytest.raises(PermissionDefinitionError):
+        UMAPermission(permission="bad")
+
+    p1 = UMAPermission(permission=Resource("Resource"))
+    assert p1.resource == "Resource"
+    assert p1.scope == ""
+    assert repr(p1) == "Resource"
+    assert str(p1) == "Resource"
+
+    p2 = UMAPermission(permission=Scope("Scope"))
+    assert p2.resource == ""
+    assert p2.scope == "Scope"
+    assert repr(p2) == "#Scope"
+    assert str(p2) == "#Scope"
+    assert {p1, p1} != {p2, p2}
 
 
 def test_resource_with_scope_obj():
@@ -174,3 +199,14 @@ def test_build_permission_misbuilt_dict_non_iterable():
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param({"res1": 5})
     assert err.match(re.escape("misbuilt permission {'res1': 5}"))
+
+
+def test_auth_status_bool():
+    """Test bool method of AuthStatus."""
+    assert not bool(AuthStatus(is_logged_in=True, is_authorized=False, missing_permissions=""))
+    assert bool(AuthStatus(is_logged_in=True, is_authorized=True, missing_permissions=""))
+
+
+def test_build_permission_without_scopes():
+    """Test build permission param with scopes."""
+    assert build_permission_param(permissions={"Resource": None}) == {"Resource"}
