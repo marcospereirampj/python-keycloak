@@ -1,4 +1,5 @@
 """Test module for KeycloakOpenID."""
+from typing import Tuple
 from unittest import mock
 
 import pytest
@@ -105,11 +106,11 @@ def test_auth_url(env, oid: KeycloakOpenID):
         res
         == f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}/realms/{oid.realm_name}"
         + f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
-        + "&redirect_uri=http://test.test/*"
+        + "&redirect_uri=http://test.test/*&scope=email&state= "
     )
 
 
-def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
+def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     """Test the token method."""
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
@@ -152,7 +153,7 @@ def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
 
 
 def test_exchange_token(
-    oid_with_credentials: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
     """Test the exchange token method."""
     # Verify existing user
@@ -218,7 +219,7 @@ def test_public_key(oid: KeycloakOpenID):
 
 
 def test_entitlement(
-    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
     """Test entitlement."""
     oid, username, password = oid_with_credentials_authz
@@ -231,7 +232,7 @@ def test_entitlement(
         oid.entitlement(token=token["access_token"], resource_server_id=resource_server_id)
 
 
-def test_introspect(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
+def test_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     """Test introspect."""
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
@@ -245,7 +246,7 @@ def test_introspect(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
         oid.introspect(token=token["access_token"], token_type_hint="requesting_party_token")
 
 
-def test_decode_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
+def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     """Test decode token."""
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
@@ -260,7 +261,7 @@ def test_decode_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]):
     )
 
 
-def test_load_authorization_config(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Test load authorization config."""
     oid, username, password = oid_with_credentials_authz
 
@@ -275,7 +276,7 @@ def test_load_authorization_config(oid_with_credentials_authz: tuple[KeycloakOpe
     )
 
 
-def test_get_policies(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+def test_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Test get policies."""
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
@@ -308,7 +309,7 @@ def test_get_policies(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str
         oid.get_policies(token=token["access_token"])
 
 
-def test_get_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Test get policies."""
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
@@ -352,7 +353,7 @@ def test_get_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, 
         oid.get_permissions(token=token["access_token"])
 
 
-def test_uma_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str]):
+def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Test UMA permissions."""
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
@@ -362,7 +363,7 @@ def test_uma_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, 
 
 
 def test_has_uma_access(
-    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
     """Test has UMA access."""
     oid, username, password = oid_with_credentials_authz
