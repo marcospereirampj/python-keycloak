@@ -176,10 +176,16 @@ class KeycloakOpenID:
 
     def auth_url(self, redirect_uri, scope="email", state=""):
         """
+        Get authorization URL endpoint.
 
-        http://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint
-
-        :return:
+        :param redirect_uri: Redirect url to receive oauth code
+        :type redirect_uri: str
+        :param scope: Scope of authorization request, split with the blank space
+        :type: scope: str
+        :param state: State will be returned to the redirect_uri
+        :type: str
+        :returns: Authorization URL Full Build
+        :rtype: str
         """
         params_path = {
             "authorization-endpoint": self.well_known()["authorization_endpoint"],
