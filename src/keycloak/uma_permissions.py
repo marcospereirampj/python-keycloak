@@ -206,13 +206,9 @@ def build_permission_param(permissions):
     except AttributeError:
         pass
 
-    try:  # treat as any other iterable of permissions
-        result = set()
-        for permission in permissions:
-            if not isinstance(permission, (str, UMAPermission)):
-                raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
-            result.add(str(permission))
-        return result
-    except TypeError:
-        pass
-    raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
+    result = set()
+    for permission in permissions:
+        if not isinstance(permission, (str, UMAPermission)):
+            raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
+        result.add(str(permission))
+    return result
