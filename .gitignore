@@ -45,6 +45,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+keycloak_test_logs.txt
 
 # Translations
 *.mo

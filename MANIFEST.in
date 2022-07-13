@@ -1,4 +1,0 @@
-include LICENSE
-include requirements.txt
-include dev-requirements.txt
-include docs-requirements.txt

@@ -21,6 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Connection manager module."""
+
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -33,8 +35,7 @@ from .exceptions import KeycloakConnectionError
 
 
 class ConnectionManager(object):
-    """
-    Represents a simple server connection.
+    """Represents a simple server connection.
 
     :param base_url: (str) The server URL.
     :param headers: (dict) The header parameters of the requests to the server.
@@ -44,6 +45,7 @@ class ConnectionManager(object):
     """
 
     def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None):
+        """Init method."""
         self._base_url = base_url
         self._headers = headers
         self._timeout = timeout
@@ -66,6 +68,7 @@ class ConnectionManager(object):
             self._s.proxies.update(proxies)
 
     def __del__(self):
+        """Del method."""
         self._s.close()
 
     @property
@@ -75,7 +78,6 @@ class ConnectionManager(object):
 
     @base_url.setter
     def base_url(self, value):
-        """ """
         self._base_url = value
 
     @property
@@ -85,7 +87,6 @@ class ConnectionManager(object):
 
     @timeout.setter
     def timeout(self, value):
-        """ """
         self._timeout = value
 
     @property
@@ -95,7 +96,6 @@ class ConnectionManager(object):
 
     @verify.setter
     def verify(self, value):
-        """ """
         self._verify = value
 
     @property
@@ -105,12 +105,10 @@ class ConnectionManager(object):
 
     @headers.setter
     def headers(self, value):
-        """ """
         self._headers = value
 
     def param_headers(self, key):
-        """
-        Return a specific header parameter.
+        """Return a specific header parameter.
 
         :param key: (str) Header parameters key.
         :returns: If the header parameters exist, return its value.
@@ -151,7 +149,6 @@ class ConnectionManager(object):
         :returns: Response the request.
         :raises: HttpError Can't connect to server.
         """
-
         try:
             return self._s.get(
                 urljoin(self.base_url, path),

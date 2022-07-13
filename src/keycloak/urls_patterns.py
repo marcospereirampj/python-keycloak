@@ -21,6 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Keycloak URL patterns."""
+
 # OPENID URLS
 URL_REALM = "realms/{realm-name}"
 URL_WELL_KNOWN = "realms/{realm-name}/.well-known/openid-configuration"

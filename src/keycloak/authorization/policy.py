@@ -21,11 +21,14 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Keycloak authorization Policy module."""
+
 from ..exceptions import KeycloakAuthorizationConfigError
 
 
 class Policy:
-    """
+    """Base policy class.
+
     A policy defines the conditions that must be satisfied to grant access to an object.
     Unlike permissions, you do not specify the object being protected but rather the conditions
     that must be satisfied for access to a given object (for example, resource, scope, or both).
@@ -39,21 +42,25 @@ class Policy:
     """
 
     def __init__(self, name, type, logic, decision_strategy):
-        self._name = name
-        self._type = type
-        self._logic = logic
-        self._decision_strategy = decision_strategy
-        self._roles = []
-        self._permissions = []
+        """Init method."""
+        self.name = name
+        self.type = type
+        self.logic = logic
+        self.decision_strategy = decision_strategy
+        self.roles = []
+        self.permissions = []
 
     def __repr__(self):
+        """Repr method."""
         return "<Policy: %s (%s)>" % (self.name, self.type)
 
     def __str__(self):
+        """Str method."""
         return "Policy: %s (%s)" % (self.name, self.type)
 
     @property
     def name(self):
+        """Get name."""
         return self._name
 
     @name.setter
@@ -62,6 +69,7 @@ class Policy:
 
     @property
     def type(self):
+        """Get type."""
         return self._type
 
     @type.setter
@@ -70,6 +78,7 @@ class Policy:
 
     @property
     def logic(self):
+        """Get logic."""
         return self._logic
 
     @logic.setter
@@ -78,6 +87,7 @@ class Policy:
 
     @property
     def decision_strategy(self):
+        """Get decision strategy."""
         return self._decision_strategy
 
     @decision_strategy.setter
@@ -86,15 +96,24 @@ class Policy:
 
     @property
     def roles(self):
+        """Get roles."""
         return self._roles
+
+    @roles.setter
+    def roles(self, value):
+        self._roles = value
 
     @property
     def permissions(self):
+        """Get permissions."""
         return self._permissions
 
+    @permissions.setter
+    def permissions(self, value):
+        self._permissions = value
+
     def add_role(self, role):
-        """
-        Add keycloak role in policy.
+        """Add keycloak role in policy.
 
         :param role: keycloak role.
         :return:
@@ -106,8 +125,7 @@ class Policy:
         self._roles.append(role)
 
     def add_permission(self, permission):
-        """
-        Add keycloak permission in policy.
+        """Add keycloak permission in policy.
 
         :param permission: keycloak permission.
         :return:

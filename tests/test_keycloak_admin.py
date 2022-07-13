@@ -1,3 +1,5 @@
+"""Test the keycloak admin object."""
+
 import pytest
 
 import keycloak
@@ -13,10 +15,12 @@ from keycloak.exceptions import (
 
 
 def test_keycloak_version():
+    """Test version."""
     assert keycloak.__version__, keycloak.__version__
 
 
 def test_keycloak_admin_bad_init(env):
+    """Test keycloak admin bad init."""
     with pytest.raises(TypeError) as err:
         KeycloakAdmin(
             server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
@@ -37,6 +41,7 @@ def test_keycloak_admin_bad_init(env):
 
 
 def test_keycloak_admin_init(env):
+    """Test keycloak admin init."""
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
@@ -111,6 +116,7 @@ def test_keycloak_admin_init(env):
 
 
 def test_realms(admin: KeycloakAdmin):
+    """Test realms."""
     # Get realms
     realms = admin.get_realms()
     assert len(realms) == 1, realms
@@ -175,6 +181,7 @@ def test_realms(admin: KeycloakAdmin):
 
 
 def test_import_export_realms(admin: KeycloakAdmin, realm: str):
+    """Test import and export of realms."""
     admin.realm_name = realm
 
     realm_export = admin.export_realm(export_clients=True, export_groups_and_role=True)
@@ -192,6 +199,7 @@ def test_import_export_realms(admin: KeycloakAdmin, realm: str):
 
 
 def test_users(admin: KeycloakAdmin, realm: str):
+    """Test users."""
     admin.realm_name = realm
 
     # Check no users present
@@ -283,6 +291,7 @@ def test_users(admin: KeycloakAdmin, realm: str):
 
 
 def test_users_pagination(admin: KeycloakAdmin, realm: str):
+    """Test user pagination."""
     admin.realm_name = realm
 
     for ind in range(admin.PAGE_SIZE + 50):
@@ -300,6 +309,7 @@ def test_users_pagination(admin: KeycloakAdmin, realm: str):
 
 
 def test_idps(admin: KeycloakAdmin, realm: str):
+    """Test IDPs."""
     admin.realm_name = realm
 
     # Create IDP
@@ -371,6 +381,7 @@ def test_idps(admin: KeycloakAdmin, realm: str):
 
 
 def test_user_credentials(admin: KeycloakAdmin, user: str):
+    """Test user credentials."""
     res = admin.set_user_password(user_id=user, password="booya", temporary=True)
     assert res == dict(), res
 
@@ -398,6 +409,7 @@ def test_user_credentials(admin: KeycloakAdmin, user: str):
 
 
 def test_social_logins(admin: KeycloakAdmin, user: str):
+    """Test social logins."""
     res = admin.add_user_social_login(
         user_id=user, provider_id="gitlab", provider_userid="test", provider_username="test"
     )
@@ -437,6 +449,7 @@ def test_social_logins(admin: KeycloakAdmin, user: str):
 
 
 def test_server_info(admin: KeycloakAdmin):
+    """Test server info."""
     info = admin.get_server_info()
     assert set(info.keys()) == {
         "systemInfo",
@@ -456,6 +469,7 @@ def test_server_info(admin: KeycloakAdmin):
 
 
 def test_groups(admin: KeycloakAdmin, user: str):
+    """Test groups."""
     # Test get groups
     groups = admin.get_groups()
     assert len(groups) == 0
@@ -599,6 +613,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
 
 def test_clients(admin: KeycloakAdmin, realm: str):
+    """Test clients."""
     admin.realm_name = realm
 
     # Test get clients
@@ -860,6 +875,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
 
 def test_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test realm roles."""
     admin.realm_name = realm
 
     # Test get realm roles
@@ -1015,6 +1031,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
 
 
 def test_client_roles(admin: KeycloakAdmin, client: str):
+    """Test client roles."""
     # Test get client roles
     res = admin.get_client_roles(client_id=client)
     assert len(res) == 0
@@ -1177,6 +1194,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
 
 
 def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
+    """Test enable token exchange."""
     # Test enabling token exchange between two confidential clients
     admin.realm_name = realm
 
@@ -1265,6 +1283,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
 
 
 def test_email(admin: KeycloakAdmin, user: str):
+    """Test email."""
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
         admin.send_update_account(user_id=user, payload=dict())
@@ -1277,6 +1296,7 @@ def test_email(admin: KeycloakAdmin, user: str):
 
 
 def test_get_sessions(admin: KeycloakAdmin):
+    """Test get sessions."""
     sessions = admin.get_sessions(user_id=admin.get_user_id(username=admin.username))
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
@@ -1285,6 +1305,7 @@ def test_get_sessions(admin: KeycloakAdmin):
 
 
 def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
+    """Test get client installation provider."""
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_installation_provider(client_id=client, provider_id="bad")
     assert err.match('404: b\'{"error":"Unknown Provider"}\'')
@@ -1303,6 +1324,7 @@ def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
 
 
 def test_auth_flows(admin: KeycloakAdmin, realm: str):
+    """Test auth flows."""
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
@@ -1449,6 +1471,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
 
 def test_authentication_configs(admin: KeycloakAdmin, realm: str):
+    """Test authentication configs."""
     admin.realm_name = realm
 
     # Test list of auth providers
@@ -1480,6 +1503,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
 
 def test_sync_users(admin: KeycloakAdmin, realm: str):
+    """Test sync users."""
     admin.realm_name = realm
 
     # Only testing the error message
@@ -1489,6 +1513,7 @@ def test_sync_users(admin: KeycloakAdmin, realm: str):
 
 
 def test_client_scopes(admin: KeycloakAdmin, realm: str):
+    """Test client scopes."""
     admin.realm_name = realm
 
     # Test get client scopes
@@ -1626,6 +1651,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
 
 def test_components(admin: KeycloakAdmin, realm: str):
+    """Test components."""
     admin.realm_name = realm
 
     # Test get components
@@ -1676,6 +1702,7 @@ def test_components(admin: KeycloakAdmin, realm: str):
 
 
 def test_keys(admin: KeycloakAdmin, realm: str):
+    """Test keys."""
     admin.realm_name = realm
     assert set(admin.get_keys()["active"].keys()) == {"AES", "HS256", "RS256", "RSA-OAEP"}
     assert {k["algorithm"] for k in admin.get_keys()["keys"]} == {
@@ -1687,6 +1714,7 @@ def test_keys(admin: KeycloakAdmin, realm: str):
 
 
 def test_events(admin: KeycloakAdmin, realm: str):
+    """Test events."""
     admin.realm_name = realm
 
     events = admin.get_events()
@@ -1706,6 +1734,7 @@ def test_events(admin: KeycloakAdmin, realm: str):
 
 
 def test_auto_refresh(admin: KeycloakAdmin, realm: str):
+    """Test auto refresh token."""
     # Test get refresh
     admin.auto_refresh_token = list()
     admin.connection = ConnectionManager(
@@ -1731,7 +1760,7 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
         verify=admin.verify,
     )
     admin.token["refresh_token"] = "bad"
-    with pytest.raises(KeycloakGetError) as err:
+    with pytest.raises(KeycloakPostError) as err:
         admin.get_realm(realm_name="test-refresh")
     assert err.match(
         '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''

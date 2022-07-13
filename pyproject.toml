@@ -22,6 +22,7 @@ packages = [
     { include = "keycloak", from = "src/" },
     { include = "keycloak/**/*.py", from = "src/" },
 ]
+include = ["LICENSE", "CHANGELOG.md", "CODEOWNERS", "CONTRIBUTING.md"]
 
 [tool.poetry.urls]
 Documentation = "https://python-keycloak.readthedocs.io/en/latest/"
@@ -51,6 +52,8 @@ pre-commit = "^2.19.0"
 isort = "^5.10.1"
 black = "^22.3.0"
 flake8 = "^3.5.0"
+flake8-docstrings = "^1.6.0"
+commitizen = "^2.28.0"
 
 [tool.poetry.extras]
 docs = [

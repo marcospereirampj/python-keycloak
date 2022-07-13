@@ -21,11 +21,14 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""User-managed access permissions module."""
+
 from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
 
 
 class UMAPermission:
     """A class to conveniently assembly permissions.
+
     The class itself is callable, and will return the assembled permission.
 
     Usage example:
@@ -36,9 +39,16 @@ class UMAPermission:
     >>> print(permission)
         'Users#delete'
 
+    :param permission: Permission
+    :type permission: UMAPermission
+    :param resource: Resource
+    :type resource: str
+    :param scope: Scope
+    :type scope: str
     """
 
     def __init__(self, permission=None, resource="", scope=""):
+        """Init method."""
         self.resource = resource
         self.scope = scope
 
@@ -53,21 +63,26 @@ class UMAPermission:
                 self.scope = str(permission.scope)
 
     def __str__(self):
+        """Str method."""
         scope = self.scope
         if scope:
             scope = "#" + scope
         return "{}{}".format(self.resource, scope)
 
     def __eq__(self, __o: object) -> bool:
+        """Eq method."""
         return str(self) == str(__o)
 
     def __repr__(self) -> str:
+        """Repr method."""
         return self.__str__()
 
     def __hash__(self) -> int:
+        """Hash method."""
         return hash(str(self))
 
     def __call__(self, permission=None, resource="", scope="") -> object:
+        """Call method."""
         result_resource = self.resource
         result_scope = self.scope
 
@@ -91,36 +106,58 @@ class UMAPermission:
 
 class Resource(UMAPermission):
     """An UMAPermission Resource class to conveniently assembly permissions.
+
     The class itself is callable, and will return the assembled permission.
+
+    :param resource: Resource
+    :type resource: str
     """
 
     def __init__(self, resource):
+        """Init method."""
         super().__init__(resource=resource)
 
 
 class Scope(UMAPermission):
     """An UMAPermission Scope class to conveniently assembly permissions.
+
     The class itself is callable, and will return the assembled permission.
+
+    :param scope: Scope
+    :type scope: str
     """
 
     def __init__(self, scope):
+        """Init method."""
         super().__init__(scope=scope)
 
 
 class AuthStatus:
     """A class that represents the authorization/login status of a user associated with a token.
+
     This has to evaluate to True if and only if the user is properly authorized
-    for the requested resource."""
+    for the requested resource.
+
+    :param is_logged_in: Is logged in indicator
+    :type is_logged_in: bool
+    :param is_authorized: Is authorized indicator
+    :type is_authorized: bool
+    :param missing_permissions: Missing permissions
+    :type missing_permissions: set
+    """
 
     def __init__(self, is_logged_in, is_authorized, missing_permissions):
+        """Init method."""
         self.is_logged_in = is_logged_in
         self.is_authorized = is_authorized
         self.missing_permissions = missing_permissions
 
     def __bool__(self):
+        """Bool method."""
         return self.is_authorized
 
     def __repr__(self):
+        """Repr method."""
         return (
             f"AuthStatus("
             f"is_authorized={self.is_authorized}, "
@@ -130,8 +167,7 @@ class AuthStatus:
 
 
 def build_permission_param(permissions):
-    """
-    Transform permissions to a set, so they are usable for requests
+    """Transform permissions to a set, so they are usable for requests.
 
     :param permissions: either str (resource#scope),
         iterable[str] (resource#scope),

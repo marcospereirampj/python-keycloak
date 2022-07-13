@@ -20,6 +20,9 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+
+"""Sphinx documentation configuration."""
+
 import sphinx_rtd_theme
 
 # -- General configuration ------------------------------------------------
