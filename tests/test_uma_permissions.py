@@ -23,11 +23,11 @@ import pytest
 
 from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
 from keycloak.uma_permissions import (
+    AuthStatus,
     Resource,
     Scope,
-    build_permission_param,
     UMAPermission,
-    AuthStatus,
+    build_permission_param,
 )
 
 
