@@ -58,6 +58,7 @@ class KeycloakAdmin:
     :param user_realm_name: The realm name of the user, if different from realm_name
     :param auto_refresh_token: list of methods that allows automatic token refresh.
         Ex: ['get', 'put', 'post', 'delete']
+    :param timeout: connection timeout in seconds
     """
 
     PAGE_SIZE = 100
