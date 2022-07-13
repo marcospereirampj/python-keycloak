@@ -25,7 +25,7 @@
 
 try:
     from urllib.parse import urljoin
-except ImportError:
+except ImportError:  # pragma: no cover
     from urlparse import urljoin
 
 import requests
@@ -46,10 +46,10 @@ class ConnectionManager(object):
 
     def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None):
         """Init method."""
-        self._base_url = base_url
-        self._headers = headers
-        self._timeout = timeout
-        self._verify = verify
+        self.base_url = base_url
+        self.headers = headers
+        self.timeout = timeout
+        self.verify = verify
         self._s = requests.Session()
         self._s.auth = lambda x: x  # don't let requests add auth headers
 

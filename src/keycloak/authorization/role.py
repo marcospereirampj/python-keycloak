@@ -38,7 +38,6 @@ class Role:
         self.name = name
         self.required = required
 
-    @property
     def get_name(self):
         """Get name."""
         return self.name
