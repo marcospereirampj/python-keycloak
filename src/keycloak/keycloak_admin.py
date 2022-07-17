@@ -1046,19 +1046,19 @@ class KeycloakAdmin:
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_client_id(self, client_name):
+    def get_client_id(self, client_id):
         """Get internal keycloak client id from client-id.
 
         This is required for further actions against this client.
 
-        :param client_name: name in ClientRepresentation
+        :param client_id: clientId in ClientRepresentation
             https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
         :return: client_id (uuid as string)
         """
         clients = self.get_clients()
 
         for client in clients:
-            if client_name == client.get("name") or client_name == client.get("clientId"):
+            if client_id == client.get("clientId"):
                 return client["id"]
 
         return None
@@ -1237,7 +1237,7 @@ class KeycloakAdmin:
         :return: Client ID
         """
         if skip_exists:
-            client_id = self.get_client_id(client_name=payload["name"])
+            client_id = self.get_client_id(client_id=payload["clientId"])
 
             if client_id is not None:
                 return client_id
