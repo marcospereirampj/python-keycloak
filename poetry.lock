@@ -688,6 +688,14 @@ category = "main"
 optional = false
 python-versions = ">=3.6,<4"
 
+[[package]]
+name = "requests-toolbelt"
+version = "0.9.1"
+description = "A utility belt for advanced users of python-requests"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4"
+
 [package.dependencies]
 pyasn1 = ">=0.1.3"
 
