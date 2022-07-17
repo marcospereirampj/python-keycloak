@@ -163,10 +163,10 @@ def test_exchange_token(
     admin.realm_name = oid.realm_name
     admin.assign_client_role(
         user_id=admin.get_user_id(username=username),
-        client_id=admin.get_client_id(client_name="realm-management"),
+        client_id=admin.get_client_id(client_id="realm-management"),
         roles=[
             admin.get_client_role(
-                client_id=admin.get_client_id(client_name="realm-management"),
+                client_id=admin.get_client_id(client_id="realm-management"),
                 role_name="impersonation",
             )
         ],

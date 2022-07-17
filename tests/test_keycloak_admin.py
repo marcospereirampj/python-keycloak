@@ -655,8 +655,8 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert len(admin.get_clients()) == 7
 
     # Test get client id
-    assert admin.get_client_id(client_name="test-client") == client_id
-    assert admin.get_client_id(client_name="does-not-exist") is None
+    assert admin.get_client_id(client_id="test-client") == client_id
+    assert admin.get_client_id(client_id="does-not-exist") is None
 
     # Test update client
     res = admin.update_client(client_id=client_id, payload={"name": "test-client-change"})
@@ -856,7 +856,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find client"}\'')
 
     secrets = admin.get_client_secrets(
-        client_id=admin.get_client_id(client_name="test-confidential")
+        client_id=admin.get_client_id(client_id="test-confidential")
     )
     assert secrets == {"type": "secret", "value": "test-secret"}
 
@@ -865,11 +865,11 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find client"}\'')
 
     res = admin.generate_client_secrets(
-        client_id=admin.get_client_id(client_name="test-confidential")
+        client_id=admin.get_client_id(client_id="test-confidential")
     )
     assert res
     assert (
-        admin.get_client_secrets(client_id=admin.get_client_id(client_name="test-confidential"))
+        admin.get_client_secrets(client_id=admin.get_client_id(client_id="test-confidential"))
         == res
     )
 
