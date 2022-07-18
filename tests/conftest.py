@@ -2,7 +2,14 @@
 
 import os
 import uuid
+import ipaddress
+from datetime import datetime, timedelta
 
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
 import pytest
 
 from keycloak import KeycloakAdmin, KeycloakOpenID
@@ -284,15 +291,6 @@ def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_
 @pytest.fixture
 def selfsigned_cert():
     """Generate self signed certificate for a hostname, and optional IP addresses."""
-    import ipaddress
-    from datetime import datetime, timedelta
-
-    from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import rsa
-    from cryptography.x509.oid import NameOID
-
     hostname = "testcert"
     ip_addresses = None
     key = None
