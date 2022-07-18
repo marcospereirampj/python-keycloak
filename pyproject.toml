@@ -43,6 +43,7 @@ readthedocs-sphinx-ext = {version = "^2.1.8", optional = true}
 m2r2 = {version = "^0.3.2", optional = true}
 sphinx-autoapi = {version = "^1.8.4", optional = true}
 requests-toolbelt = "^0.9.1"
+cryptography = "^37.0.4"
 
 [tool.poetry.dev-dependencies]
 tox = "^3.25.0"

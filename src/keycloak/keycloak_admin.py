@@ -26,10 +26,11 @@
 
 """The keycloak admin module."""
 
+import copy
 import json
 from builtins import isinstance
 from typing import Iterable
-import copy
+
 from requests_toolbelt import MultipartEncoder
 
 from . import urls_patterns
@@ -2824,7 +2825,9 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE.format(**params_path))
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_role_client_level_children(self, client_id, role_id):
@@ -2864,17 +2867,15 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "id": client_id, "attr": "jwt.credential"}
-        m = MultipartEncoder(
-            fields={
-                "keystoreFormat": "Certificate PEM",
-                "file": certcont
-            }
-        )
+        m = MultipartEncoder(fields={"keystoreFormat": "Certificate PEM", "file": certcont})
         new_headers = copy.deepcopy(self.connection.headers)
         new_headers["Content-Type"] = m.content_type
         self.connection.headers = new_headers
-        data_raw = self.raw_post(urls_patterns.URL_ADMIN_CLIENT_CERT_UPLOAD.format(**params_path),
-                                 data=m, headers=new_headers)
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_CERT_UPLOAD.format(**params_path),
+            data=m,
+            headers=new_headers,
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def get_required_action_by_alias(self, action_alias):
@@ -2887,7 +2888,7 @@ class KeycloakAdmin:
         """
         actions = self.get_required_actions()
         for a in actions:
-            if a['alias'] == action_alias:
+            if a["alias"] == action_alias:
                 break
         return a
 
@@ -2914,5 +2915,7 @@ class KeycloakAdmin:
         if not isinstance(payload, str):
             payload = json.dumps(payload)
         params_path = {"realm-name": self.realm_name, "action-alias": action_alias}
-        data_raw = self.raw_put(urls_patterns.URL_ADMIN_REQUIRED_ACTIONS_ALIAS.format(**params_path), data=payload)
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_REQUIRED_ACTIONS_ALIAS.format(**params_path), data=payload
+        )
         return raise_error_from_response(data_raw, KeycloakPutError)
