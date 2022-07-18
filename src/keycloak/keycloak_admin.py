@@ -2815,13 +2815,13 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
     def get_composite_client_roles_of_group(self, client_id, group_id):
-        """Get the composite client roles of the given group for the given client
+        """Get the composite client roles of the given group for the given client.
 
-        :param client_id: id of the client
+        :param client_id: id of the client.
         :type client_id: str
-        :param group_id: id of the group
+        :param group_id: id of the group.
         :type group_id: str
-        :return: the composite client roles of the group (list of RoleRepresentation)
+        :return: the composite client roles of the group (list of RoleRepresentation).
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
@@ -2831,13 +2831,13 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_role_client_level_children(self, client_id, role_id):
-        """Get the child roles of which the given composite client role is composed of
+        """Get the child roles of which the given composite client role is composed of.
 
-        :param client_id: id of the client
+        :param client_id: id of the client.
         :type client_id: str
-        :param role_id: id of the role
+        :param role_id: id of the role.
         :type role_id: str
-        :return: the child roles (list of RoleRepresentation)
+        :return: the child roles (list of RoleRepresentation).
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "role-id": role_id, "client-id": client_id}
@@ -2845,11 +2845,11 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_user_credentials(self, user_id):
-        """Get the credentials of the given user
+        """Get the credentials of the given user.
 
-        :param user_id: id of the user
+        :param user_id: id of the user.
         :type user_id: str
-        :return: the user credentials (list of CredentialsRepresentation)
+        :return: the user credentials (list of CredentialsRepresentation).
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "id": user_id}
@@ -2857,13 +2857,14 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def upload_certificate(self, client_id, certcont):
-        """Upload a new certificate for the client
+        """Upload a new certificate for the client.
 
-        :param client_id: id of the client
+        :param client_id: id of the client.
         :type client_id: str
-        :param certcont: the content of the certificate
+        :param certcont: the content of the certificate.
         :type certcont: str
-        :return: dictionary {"certificate": "<certcont>"}, where <certcont> is the content of the uploaded certificate
+        :return: dictionary {"certificate": "<certcont>"},
+                 where <certcont> is the content of the uploaded certificate.
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "id": client_id, "attr": "jwt.credential"}
@@ -2879,11 +2880,11 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def get_required_action_by_alias(self, action_alias):
-        """Get a required action by its alias
+        """Get a required action by its alias.
 
-        :param action_alias: the alias of the requried action
+        :param action_alias: the alias of the requried action.
         :type action_alias: str
-        :return: the required action (RequiredActionProviderRepresentation)
+        :return: the required action (RequiredActionProviderRepresentation).
         :rtype: dict
         """
         actions = self.get_required_actions()
@@ -2893,9 +2894,9 @@ class KeycloakAdmin:
         return a
 
     def get_required_actions(self):
-        """Get the required actions for the realms
+        """Get the required actions for the realms.
 
-        :return: the required actions (list of RequiredActionProviderRepresentation)
+        :return: the required actions (list of RequiredActionProviderRepresentation).
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name}
@@ -2903,13 +2904,13 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def update_required_action(self, action_alias, payload):
-        """Update a required action
+        """Update a required action.
 
-        :param action_alias: the action alias
+        :param action_alias: the action alias.
         :type action_alias: str
-        :param payload: the new required action (RequiredActionProviderRepresentation)
+        :param payload: the new required action (RequiredActionProviderRepresentation).
         :type payload: dict
-        :return: empty dictionary
+        :return: empty dictionary.
         :rtype: dict
         """
         if not isinstance(payload, str):

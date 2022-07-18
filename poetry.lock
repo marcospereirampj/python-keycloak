@@ -102,7 +102,7 @@ python-versions = ">=3.6"
 name = "cffi"
 version = "1.15.1"
 description = "Foreign Function Interface for Python calling C code."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -197,7 +197,7 @@ toml = ["tomli"]
 name = "cryptography"
 version = "37.0.4"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -544,7 +544,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -1039,7 +1039,7 @@ docs = ["mock", "alabaster", "commonmark", "recommonmark", "Sphinx", "sphinx-rtd
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "add6d6f1a2e9ec5cf7aae027fd49d5fcafd212963daa3257d363909aedb380be"
+content-hash = "b6851001fb6b3e331a39e6bab1fa2ed99fdc555e9683137c20c9c593c0e1c040"
 
 [metadata.files]
 alabaster = [

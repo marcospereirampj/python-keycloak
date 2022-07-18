@@ -1820,6 +1820,7 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str):
+    """Test requried actions."""
     admin.realm_name = realm
     ractions = admin.get_required_actions()
     assert isinstance(ractions, list)
@@ -1837,6 +1838,7 @@ def test_get_required_actions(admin: KeycloakAdmin, realm: str):
 
 
 def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
+    """Test get required action by alias."""
     admin.realm_name = realm
     ractions = admin.get_required_actions()
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
@@ -1845,6 +1847,7 @@ def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
 
 
 def test_update_required_action(admin: KeycloakAdmin, realm: str):
+    """Test update required action."""
     admin.realm_name = realm
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
     old = copy.deepcopy(ra)
@@ -1858,6 +1861,7 @@ def test_update_required_action(admin: KeycloakAdmin, realm: str):
 def test_get_composite_client_roles_of_group(
     admin: KeycloakAdmin, realm: str, client: str, group: str, composite_client_role: str
 ):
+    """Test get composite client roles of group."""
     admin.realm_name = realm
     role = admin.get_client_role(client, composite_client_role)
     admin.assign_group_client_roles(group_id=group, client_id=client, roles=[role])
@@ -1868,6 +1872,7 @@ def test_get_composite_client_roles_of_group(
 def test_get_role_client_level_children(
     admin: KeycloakAdmin, realm: str, client: str, composite_client_role: str, client_role: str
 ):
+    """Test get children of composite client role."""
     admin.realm_name = realm
     child = admin.get_client_role(client, client_role)
     parent = admin.get_client_role(client, composite_client_role)
@@ -1876,6 +1881,7 @@ def test_get_role_client_level_children(
 
 
 def test_get_user_credentials(admin: KeycloakAdmin, realm: str, user: str):
+    """Test get user credentials."""
     admin.realm_name = realm
     admin.set_user_password(user, "pwd", temporary=False)
     res = admin.get_user_credentials(user)
@@ -1885,6 +1891,7 @@ def test_get_user_credentials(admin: KeycloakAdmin, realm: str, user: str):
 
 
 def test_upload_certificate(admin: KeycloakAdmin, realm: str, client: str, selfsigned_cert: tuple):
+    """Test upload certificate."""
     admin.realm_name = realm
     cert, _ = selfsigned_cert
     cert = cert.decode("utf-8").strip()

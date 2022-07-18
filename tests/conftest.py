@@ -283,7 +283,7 @@ def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_
 
 @pytest.fixture
 def selfsigned_cert():
-    """Generates self signed certificate for a hostname, and optional IP addresses."""
+    """Generate self signed certificate for a hostname, and optional IP addresses."""
     import ipaddress
     from datetime import datetime, timedelta
 
@@ -303,8 +303,6 @@ def selfsigned_cert():
         )
 
     name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, hostname)])
-
-    # best practice seem to be to include the hostname in the SAN, which *SHOULD* mean COMMON_NAME is ignored.
     alt_names = [x509.DNSName(hostname)]
 
     # allow addressing by IP, for when you don't have real DNS (common in most testing scenarios
