@@ -184,12 +184,10 @@ URL_ADMIN_EVENTS = "admin/realms/{realm-name}/events"
 URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_EVENTS + "/config"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
 
-URL_ADMIN_REALM = "admin/realms/{realm-name}"
 URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE = URL_ADMIN_GROUPS_CLIENT_ROLES + "/composite"
 URL_ADMIN_CLIENT_ROLE_CHILDREN = (
     "admin/realms/{realm-name}/roles-by-id/{role-id}/composites/clients/{client-id}"
 )
-URL_ADMIN_USER_CREDENTIALS = URL_ADMIN_USERS + "/{id}/credentials"
 URL_ADMIN_CLIENT_CERT_UPLOAD = URL_ADMIN_CLIENT_CERTS + "/upload-certificate"
 URL_ADMIN_REQUIRED_ACTIONS = URL_ADMIN_REALM + "/authentication/required-actions"
 URL_ADMIN_REQUIRED_ACTIONS_ALIAS = URL_ADMIN_REQUIRED_ACTIONS + "/{action-alias}"
