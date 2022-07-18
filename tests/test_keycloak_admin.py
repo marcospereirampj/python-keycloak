@@ -1,5 +1,7 @@
 """Test the keycloak admin object."""
 
+import copy
+
 import pytest
 
 import keycloak
@@ -1815,3 +1817,74 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
 
     admin.auto_refresh_token = ["get", "post", "put", "delete"]
     assert admin.delete_realm(realm_name="test-refresh") == dict()
+
+
+def test_get_required_actions(admin: KeycloakAdmin, realm: str):
+    """Test requried actions."""
+    admin.realm_name = realm
+    ractions = admin.get_required_actions()
+    assert isinstance(ractions, list)
+    for ra in ractions:
+        for key in [
+            "alias",
+            "name",
+            "providerId",
+            "enabled",
+            "defaultAction",
+            "priority",
+            "config",
+        ]:
+            assert key in ra
+
+
+def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
+    """Test get required action by alias."""
+    admin.realm_name = realm
+    ractions = admin.get_required_actions()
+    ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    assert ra in ractions
+    assert ra["alias"] == "UPDATE_PASSWORD"
+
+
+def test_update_required_action(admin: KeycloakAdmin, realm: str):
+    """Test update required action."""
+    admin.realm_name = realm
+    ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    old = copy.deepcopy(ra)
+    ra["enabled"] = False
+    admin.update_required_action("UPDATE_PASSWORD", ra)
+    newra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    assert old != newra
+    assert newra["enabled"] is False
+
+
+def test_get_composite_client_roles_of_group(
+    admin: KeycloakAdmin, realm: str, client: str, group: str, composite_client_role: str
+):
+    """Test get composite client roles of group."""
+    admin.realm_name = realm
+    role = admin.get_client_role(client, composite_client_role)
+    admin.assign_group_client_roles(group_id=group, client_id=client, roles=[role])
+    result = admin.get_composite_client_roles_of_group(client, group)
+    assert role["id"] in [x["id"] for x in result]
+
+
+def test_get_role_client_level_children(
+    admin: KeycloakAdmin, realm: str, client: str, composite_client_role: str, client_role: str
+):
+    """Test get children of composite client role."""
+    admin.realm_name = realm
+    child = admin.get_client_role(client, client_role)
+    parent = admin.get_client_role(client, composite_client_role)
+    res = admin.get_role_client_level_children(client, parent["id"])
+    assert child["id"] in [x["id"] for x in res]
+
+
+def test_upload_certificate(admin: KeycloakAdmin, realm: str, client: str, selfsigned_cert: tuple):
+    """Test upload certificate."""
+    admin.realm_name = realm
+    cert, _ = selfsigned_cert
+    cert = cert.decode("utf-8").strip()
+    admin.upload_certificate(client, cert)
+    cl = admin.get_client(client)
+    assert cl["attributes"]["jwt.credential.certificate"] == "".join(cert.splitlines()[1:-1])
