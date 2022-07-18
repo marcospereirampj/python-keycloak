@@ -2844,18 +2844,6 @@ class KeycloakAdmin:
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_ROLE_CHILDREN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_user_credentials(self, user_id):
-        """Get the credentials of the given user.
-
-        :param user_id: id of the user.
-        :type user_id: str
-        :return: the user credentials (list of CredentialsRepresentation).
-        :rtype: list
-        """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_USER_CREDENTIALS.format(**params_path))
-        return raise_error_from_response(data_raw, KeycloakGetError)
-
     def upload_certificate(self, client_id, certcont):
         """Upload a new certificate for the client.
 

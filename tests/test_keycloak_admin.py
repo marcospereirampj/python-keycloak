@@ -1880,16 +1880,6 @@ def test_get_role_client_level_children(
     assert child["id"] in [x["id"] for x in res]
 
 
-def test_get_user_credentials(admin: KeycloakAdmin, realm: str, user: str):
-    """Test get user credentials."""
-    admin.realm_name = realm
-    admin.set_user_password(user, "pwd", temporary=False)
-    res = admin.get_user_credentials(user)
-    assert isinstance(res, list)
-    assert len(res) == 1
-    assert res[0]["type"] == "password"
-
-
 def test_upload_certificate(admin: KeycloakAdmin, realm: str, client: str, selfsigned_cert: tuple):
     """Test upload certificate."""
     admin.realm_name = realm
