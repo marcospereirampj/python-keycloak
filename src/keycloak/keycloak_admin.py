@@ -2878,8 +2878,8 @@ class KeycloakAdmin:
         actions = self.get_required_actions()
         for a in actions:
             if a["alias"] == action_alias:
-                break
-        return a
+                return a
+        return None
 
     def get_required_actions(self):
         """Get the required actions for the realms.
