@@ -1,5 +1,6 @@
 """Test URL patterns."""
 import inspect
+
 from keycloak import urls_patterns
 
 
