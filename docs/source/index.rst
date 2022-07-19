@@ -11,4 +11,5 @@
    :caption: Contents:
 
    readme
+   changelog
    reference/keycloak/index
