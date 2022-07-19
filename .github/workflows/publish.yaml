@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -31,3 +33,11 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
       run: |
         twine upload -u $TWINE_USERNAME -p $TWINE_PASSWORD dist/*
+    - name: Run changelog
+      run: |
+        tox -e changelog
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "docs: changelog update"
+        branch: master
+        file_pattern: CHANGELOG.md
