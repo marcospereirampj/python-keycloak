@@ -1844,6 +1844,7 @@ def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
     assert ra in ractions
     assert ra["alias"] == "UPDATE_PASSWORD"
+    assert admin.get_required_action_by_alias("does-not-exist") is None
 
 
 def test_update_required_action(admin: KeycloakAdmin, realm: str):

@@ -1,4 +1,5 @@
 """Test URL patterns."""
+import inspect
 
 from keycloak import urls_patterns
 
@@ -15,7 +16,12 @@ def test_correctness_of_patterns():
 
     # Test that the patterns have unique names
     seen_urls = list()
-    for url in urls:
+    urls_from_src = [
+        x.split("=")[0].strip()
+        for x in inspect.getsource(urls_patterns).splitlines()
+        if x.startswith("URL_")
+    ]
+    for url in urls_from_src:
         assert url not in seen_urls, f"The url pattern {url} is present twice."
         seen_urls.append(url)
 
@@ -24,4 +30,7 @@ def test_correctness_of_patterns():
     for url in urls:
         url_value = urls_patterns.__dict__[url]
         assert url_value not in seen_url_values, f"The url {url} has a duplicate value {url_value}"
+        assert (
+            url_value == url_value.strip()
+        ), f"The url {url} with value '{url_value}' has whitespace values"
         seen_url_values.append(url_value)

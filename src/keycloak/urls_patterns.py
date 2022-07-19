@@ -34,7 +34,7 @@ URL_INTROSPECT = "realms/{realm-name}/protocol/openid-connect/token/introspect"
 URL_ENTITLEMENT = "realms/{realm-name}/authz/entitlement/{resource-server-id}"
 URL_AUTH = (
     "{authorization-endpoint}?client_id={client-id}&response_type=code&redirect_uri={redirect-uri}"
-    "&scope={scope}&state={state} "
+    "&scope={scope}&state={state}"
 )
 
 # ADMIN URLS

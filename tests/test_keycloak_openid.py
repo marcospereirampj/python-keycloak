@@ -106,7 +106,7 @@ def test_auth_url(env, oid: KeycloakOpenID):
         res
         == f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}/realms/{oid.realm_name}"
         + f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
-        + "&redirect_uri=http://test.test/*&scope=email&state= "
+        + "&redirect_uri=http://test.test/*&scope=email&state="
     )
 
 
