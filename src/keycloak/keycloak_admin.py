@@ -49,19 +49,31 @@ class KeycloakAdmin:
     """Keycloak Admin client.
 
     :param server_url: Keycloak server url
+    :type server_url: str
     :param username: admin username
+    :type username: str
     :param password: admin password
+    :type password: str
     :param totp: Time based OTP
+    :type totp: str
     :param realm_name: realm name
+    :type realm_name: str
     :param client_id: client id
+    :type client_id: str
     :param verify: True if want check connection SSL
+    :type verify: bool
     :param client_secret_key: client secret key
         (optional, required only for access type confidential)
+    :type client_secret_key: str
     :param custom_headers: dict of custom header to pass to each HTML request
+    :type custom_headers: dict
     :param user_realm_name: The realm name of the user, if different from realm_name
+    :type user_realm_name: str
     :param auto_refresh_token: list of methods that allows automatic token refresh.
         Ex: ['get', 'put', 'post', 'delete']
+    :type auto_refresh_token: list
     :param timeout: connection timeout in seconds
+    :type timeout: int
     """
 
     PAGE_SIZE = 100
@@ -95,7 +107,35 @@ class KeycloakAdmin:
         auto_refresh_token=None,
         timeout=60,
     ):
-        """Init method."""
+        """Init method.
+
+        :param server_url: Keycloak server url
+        :type server_url: str
+        :param username: admin username
+        :type username: str
+        :param password: admin password
+        :type password: str
+        :param totp: Time based OTP
+        :type totp: str
+        :param realm_name: realm name
+        :type realm_name: str
+        :param client_id: client id
+        :type client_id: str
+        :param verify: True if want check connection SSL
+        :type verify: bool
+        :param client_secret_key: client secret key
+            (optional, required only for access type confidential)
+        :type client_secret_key: str
+        :param custom_headers: dict of custom header to pass to each HTML request
+        :type custom_headers: dict
+        :param user_realm_name: The realm name of the user, if different from realm_name
+        :type user_realm_name: str
+        :param auto_refresh_token: list of methods that allows automatic token refresh.
+            Ex: ['get', 'put', 'post', 'delete']
+        :type auto_refresh_token: list
+        :param timeout: connection timeout in seconds
+        :type timeout: int
+        """
         self.server_url = server_url
         self.username = username
         self.password = password
@@ -114,7 +154,11 @@ class KeycloakAdmin:
 
     @property
     def server_url(self):
-        """Get server url."""
+        """Get server url.
+
+        :returns: Keycloak server url
+        :rtype: str
+        """
         return self._server_url
 
     @server_url.setter
@@ -123,7 +167,11 @@ class KeycloakAdmin:
 
     @property
     def realm_name(self):
-        """Get realm name."""
+        """Get realm name.
+
+        :returns: Realm name
+        :rtype: str
+        """
         return self._realm_name
 
     @realm_name.setter
@@ -132,7 +180,11 @@ class KeycloakAdmin:
 
     @property
     def connection(self):
-        """Get connection."""
+        """Get connection.
+
+        :returns: Connection manager
+        :rtype: ConnectionManager
+        """
         return self._connection
 
     @connection.setter
@@ -141,7 +193,11 @@ class KeycloakAdmin:
 
     @property
     def client_id(self):
-        """Get client id."""
+        """Get client id.
+
+        :returns: Client id
+        :rtype: str
+        """
         return self._client_id
 
     @client_id.setter
@@ -150,7 +206,11 @@ class KeycloakAdmin:
 
     @property
     def client_secret_key(self):
-        """Get client secret key."""
+        """Get client secret key.
+
+        :returns: Client secret key
+        :rtype: str
+        """
         return self._client_secret_key
 
     @client_secret_key.setter
@@ -159,7 +219,11 @@ class KeycloakAdmin:
 
     @property
     def verify(self):
-        """Get verify."""
+        """Get verify.
+
+        :returns: Verify indicator
+        :rtype: bool
+        """
         return self._verify
 
     @verify.setter
@@ -168,7 +232,11 @@ class KeycloakAdmin:
 
     @property
     def username(self):
-        """Get username."""
+        """Get username.
+
+        :returns: Admin username
+        :rtype: str
+        """
         return self._username
 
     @username.setter
@@ -177,7 +245,11 @@ class KeycloakAdmin:
 
     @property
     def password(self):
-        """Get password."""
+        """Get password.
+
+        :returns: Admin password
+        :rtype: str
+        """
         return self._password
 
     @password.setter
@@ -186,7 +258,11 @@ class KeycloakAdmin:
 
     @property
     def totp(self):
-        """Get totp."""
+        """Get totp.
+
+        :returns: TOTP
+        :rtype: str
+        """
         return self._totp
 
     @totp.setter
@@ -195,7 +271,11 @@ class KeycloakAdmin:
 
     @property
     def token(self):
-        """Get token."""
+        """Get token.
+
+        :returns: Access and refresh token
+        :rtype: dict
+        """
         return self._token
 
     @token.setter
@@ -204,12 +284,20 @@ class KeycloakAdmin:
 
     @property
     def auto_refresh_token(self):
-        """Get auto refresh token."""
+        """Get auto refresh token.
+
+        :returns: List of methods for automatic token refresh
+        :rtype: list
+        """
         return self._auto_refresh_token
 
     @property
     def user_realm_name(self):
-        """Get user realm name."""
+        """Get user realm name.
+
+        :returns: User realm name
+        :rtype: str
+        """
         return self._user_realm_name
 
     @user_realm_name.setter
@@ -218,7 +306,11 @@ class KeycloakAdmin:
 
     @property
     def custom_headers(self):
-        """Get custom headers."""
+        """Get custom headers.
+
+        :returns: Custom headers
+        :rtype: dict
+        """
         return self._custom_headers
 
     @custom_headers.setter
@@ -247,13 +339,16 @@ class KeycloakAdmin:
         Wrapper function to paginate GET requests.
 
         :param url: The url on which the query is executed
+        :type url: str
         :param query: Existing query parameters (optional)
+        :type query: dict
 
         :return: Combined results of paginated queries
+        :rtype: list
         """
         results = []
 
-        # initalize query if it was called with None
+        # initialize query if it was called with None
         if not query:
             query = {}
         page = 0
@@ -274,8 +369,16 @@ class KeycloakAdmin:
         return results
 
     def __fetch_paginated(self, url, query=None):
-        query = query or {}
+        """Make a specific paginated request.
 
+        :param url: The url on which the query is executed
+        :type url: str
+        :param query: Pagination settings
+        :type query: dict
+        :returns: Response
+        :rtype: dict
+        """
+        query = query or {}
         return raise_error_from_response(self.raw_get(url, **query), KeycloakGetError)
 
     def import_realm(self, payload):
@@ -287,8 +390,9 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
 
         :param payload: RealmRepresentation
-
+        :type payload: dict
         :return: RealmRepresentation
+        :rtype: dict
         """
         data_raw = self.raw_post(urls_patterns.URL_ADMIN_REALMS, data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
@@ -299,10 +403,13 @@ class KeycloakAdmin:
         RealmRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_partialexport
 
-        :param export-clients: Skip if not want to export realm clients
-        :param export-groups-and-roles: Skip if not want to export realm groups and roles
+        :param export_clients: Skip if not want to export realm clients
+        :type export_clients: bool
+        :param export_groups_and_role: Skip if not want to export realm groups and roles
+        :type export_groups_and_role: bool
 
         :return: realm configurations JSON
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.realm_name,
@@ -318,6 +425,7 @@ class KeycloakAdmin:
         """List all realms in Keycloak deployment.
 
         :return: realms list
+        :rtype: list
         """
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_REALMS)
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -329,7 +437,9 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_realmrepresentation
 
         :param realm_name: Realm name (not the realm id)
+        :type realm_name: str
         :return: RealmRepresentation
+        :rtype: dict
         """
         params_path = {"realm-name": realm_name}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_REALM.format(**params_path))
@@ -342,8 +452,11 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
 
         :param payload: RealmRepresentation
+        :type payload: dict
         :param skip_exists: Skip if Realm already exist.
-        :return:  Keycloak server response (RealmRepresentation)
+        :type skip_exists: bool
+        :return: Keycloak server response (RealmRepresentation)
+        :rtype: dict
         """
         data_raw = self.raw_post(urls_patterns.URL_ADMIN_REALMS, data=json.dumps(payload))
         return raise_error_from_response(
@@ -353,15 +466,18 @@ class KeycloakAdmin:
     def update_realm(self, realm_name, payload):
         """Update a realm.
 
-        This wil only update top level attributes and will ignore any user,
+        This will only update top level attributes and will ignore any user,
         role, or client information in the payload.
 
         RealmRepresentation:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
 
         :param realm_name: Realm name (not the realm id)
+        :type realm_name: str
         :param payload: RealmRepresentation
+        :type payload: dict
         :return: Http response
+        :rtype: dict
         """
         params_path = {"realm-name": realm_name}
         data_raw = self.raw_put(
@@ -373,7 +489,9 @@ class KeycloakAdmin:
         """Delete a realm.
 
         :param realm_name: Realm name (not the realm id)
+        :type realm_name: str
         :return: Http response
+        :rtype: dict
         """
         params_path = {"realm-name": realm_name}
         data_raw = self.raw_delete(urls_patterns.URL_ADMIN_REALM.format(**params_path))
@@ -388,7 +506,9 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
 
         :param query: Query parameters (optional)
+        :type query: dict
         :return: users list
+        :rtype: list
         """
         query = query or {}
         params_path = {"realm-name": self.realm_name}
@@ -406,6 +526,9 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
 
         :param: payload: IdentityProviderRepresentation
+        :type payload: dict
+        :returns: Keycloak server response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_post(
@@ -419,8 +542,12 @@ class KeycloakAdmin:
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource
 
-        :param: alias: alias for IdP to update
+        :param: idp_alias: alias for IdP to update
+        :type idp_alias: str
         :param: payload: The IdentityProviderRepresentation
+        :type payload: dict
+        :returns: Keycloak server response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "alias": idp_alias}
         data_raw = self.raw_put(
@@ -435,7 +562,11 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityprovidermapperrepresentation
 
         :param: idp_alias: alias for Idp to add mapper in
+        :type idp_alias: str
         :param: payload: IdentityProviderMapperRepresentation
+        :type payload: dict
+        :returns: Keycloak server response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
         data_raw = self.raw_post(
@@ -450,9 +581,13 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_update
 
         :param: idp_alias: alias for Idp to fetch mappers
+        :type idp_alias: str
         :param: mapper_id: Mapper Id to update
+        :type mapper_id: str
         :param: payload: IdentityProviderMapperRepresentation
+        :type payload: dict
         :return: Http response
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.realm_name,
@@ -476,7 +611,9 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getmappers
 
         :param: idp_alias: alias for Idp to fetch mappers
+        :type idp_alias: str
         :return: array IdentityProviderMapperRepresentation
+        :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_IDP_MAPPERS.format(**params_path))
@@ -491,6 +628,7 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
 
         :return: array IdentityProviderRepresentation
+        :rtype: list
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_IDPS.format(**params_path))
@@ -500,6 +638,9 @@ class KeycloakAdmin:
         """Delete an ID Provider.
 
         :param: idp_alias: idp alias name
+        :type idp_alias: str
+        :returns: Keycloak server response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "alias": idp_alias}
         data_raw = self.raw_delete(urls_patterns.URL_ADMIN_IDP.format(**params_path))
@@ -514,10 +655,13 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
 
         :param payload: UserRepresentation
+        :type payload: dict
         :param exist_ok: If False, raise KeycloakGetError if username already exists.
             Otherwise, return existing user ID.
+        :type exist_ok: bool
 
         :return: UserRepresentation
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
 
@@ -540,8 +684,10 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_users_resource
 
         :param query: (dict) Query parameters for users count
+        :type query: dict
 
         :return: counter
+        :rtype: int
         """
         query = query or dict()
         params_path = {"realm-name": self.realm_name}
@@ -557,8 +703,10 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
 
         :param username: id in UserRepresentation
+        :type username: str
 
         :return: user_id
+        :rtype: str
         """
         lower_user_name = username.lower()
         users = self.get_users(query={"search": lower_user_name})
@@ -2870,7 +3018,7 @@ class KeycloakAdmin:
     def get_required_action_by_alias(self, action_alias):
         """Get a required action by its alias.
 
-        :param action_alias: the alias of the requried action.
+        :param action_alias: the alias of the required action.
         :type action_alias: str
         :return: the required action (RequiredActionProviderRepresentation).
         :rtype: dict

@@ -39,10 +39,29 @@ class Policy:
 
     https://keycloak.gitbooks.io/documentation/authorization_services/topics/policy/overview.html
 
+    :param name: Name
+    :type name: str
+    :param type: Type
+    :type type: str
+    :param logic: Logic
+    :type logic: str
+    :param decision_strategy: Decision strategy
+    :type decision_strategy: str
+
     """
 
     def __init__(self, name, type, logic, decision_strategy):
-        """Init method."""
+        """Init method.
+
+        :param name: Name
+        :type name: str
+        :param type: Type
+        :type type: str
+        :param logic: Logic
+        :type logic: str
+        :param decision_strategy: Decision strategy
+        :type decision_strategy: str
+        """
         self.name = name
         self.type = type
         self.logic = logic
@@ -51,16 +70,28 @@ class Policy:
         self.permissions = []
 
     def __repr__(self):
-        """Repr method."""
+        """Repr method.
+
+        :returns: Class representation
+        :rtype: str
+        """
         return "<Policy: %s (%s)>" % (self.name, self.type)
 
     def __str__(self):
-        """Str method."""
+        """Str method.
+
+        :returns: Class string representation
+        :rtype: str
+        """
         return "Policy: %s (%s)" % (self.name, self.type)
 
     @property
     def name(self):
-        """Get name."""
+        """Get name.
+
+        :returns: Name
+        :rtype: str
+        """
         return self._name
 
     @name.setter
@@ -69,7 +100,11 @@ class Policy:
 
     @property
     def type(self):
-        """Get type."""
+        """Get type.
+
+        :returns: Type
+        :rtype: str
+        """
         return self._type
 
     @type.setter
@@ -78,7 +113,11 @@ class Policy:
 
     @property
     def logic(self):
-        """Get logic."""
+        """Get logic.
+
+        :returns: Logic
+        :rtype: str
+        """
         return self._logic
 
     @logic.setter
@@ -87,7 +126,11 @@ class Policy:
 
     @property
     def decision_strategy(self):
-        """Get decision strategy."""
+        """Get decision strategy.
+
+        :returns: Decision strategy
+        :rtype: str
+        """
         return self._decision_strategy
 
     @decision_strategy.setter
@@ -96,7 +139,11 @@ class Policy:
 
     @property
     def roles(self):
-        """Get roles."""
+        """Get roles.
+
+        :returns: Roles
+        :rtype: list
+        """
         return self._roles
 
     @roles.setter
@@ -105,7 +152,11 @@ class Policy:
 
     @property
     def permissions(self):
-        """Get permissions."""
+        """Get permissions.
+
+        :returns: Permissions
+        :rtype: list
+        """
         return self._permissions
 
     @permissions.setter
@@ -115,8 +166,9 @@ class Policy:
     def add_role(self, role):
         """Add keycloak role in policy.
 
-        :param role: keycloak role.
-        :return:
+        :param role: Keycloak role
+        :type role: keycloak.authorization.Role
+        :raises KeycloakAuthorizationConfigError: In case of misconfigured policy type
         """
         if self.type != "role":
             raise KeycloakAuthorizationConfigError(
@@ -127,7 +179,7 @@ class Policy:
     def add_permission(self, permission):
         """Add keycloak permission in policy.
 
-        :param permission: keycloak permission.
-        :return:
+        :param permission: Keycloak permission
+        :type permission: keycloak.authorization.Permission
         """
         self._permissions.append(permission)

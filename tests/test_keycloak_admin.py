@@ -1820,7 +1820,7 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str):
-    """Test requried actions."""
+    """Test required actions."""
     admin.realm_name = realm
     ractions = admin.get_required_actions()
     assert isinstance(ractions, list)
