@@ -759,7 +759,6 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     res = admin.get_client_authz_policies(client_id=auth_client_id)
     assert len(res) == 1, res
     assert res[0]["name"] == "Default Policy"
-    assert len(admin.get_client_authz_policies(client_id=client_id)) == 1
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_policies(client_id="does-not-exist")
@@ -789,7 +788,6 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     res = admin.get_client_authz_permissions(client_id=auth_client_id)
     assert len(res) == 1, res
     assert res[0]["name"] == "Default Permission"
-    assert len(admin.get_client_authz_permissions(client_id=client_id)) == 1
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_permissions(client_id="does-not-exist")
@@ -1478,7 +1476,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) == 39
+    assert len(res) == 38
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {

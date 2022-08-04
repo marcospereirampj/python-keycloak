@@ -4,8 +4,11 @@ CMD_ARGS=$1
 KEYCLOAK_DOCKER_IMAGE="quay.io/keycloak/keycloak:latest"
 
 function keycloak_stop() {
-    docker stop unittest_keycloak &> /dev/null
-    docker rm unittest_keycloak &> /dev/null
+    if [ "$(docker ps -q -f name=unittest_keycloak)" ]; then
+      docker logs unittest_keycloak > keycloak_test_logs.txt
+      docker stop unittest_keycloak &> /dev/null
+      docker rm unittest_keycloak &> /dev/null
+    fi
 }
 
 function keycloak_start() {
@@ -29,6 +32,5 @@ keycloak_start
 
 eval ${CMD_ARGS}
 RETURN_VALUE=$?
-docker logs unittest_keycloak > keycloak_test_logs.txt
 
 exit ${RETURN_VALUE}
