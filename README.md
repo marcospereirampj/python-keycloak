@@ -65,9 +65,9 @@ from keycloak import KeycloakOpenID
 
 # Configure client
 keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
-                    client_id="example_client",
-                    realm_name="example_realm",
-                    client_secret_key="secret")
+                                 client_id="example_client",
+                                 realm_name="example_realm",
+                                 client_secret_key="secret")
 
 # Get WellKnow
 config_well_known = keycloak_openid.well_known()
@@ -110,7 +110,7 @@ rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
 
 # Instropect RPT
 token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
-                                     token_type_hint="requesting_party_token"))
+                                                                       token_type_hint="requesting_party_token"))
 
 # Introspect Token
 token_info = keycloak_openid.introspect(token['access_token'])
@@ -153,37 +153,37 @@ keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
 
 # Add user
 new_user = keycloak_admin.create_user({"email": "example@example.com",
-                    "username": "example@example.com",
-                    "enabled": True,
-                    "firstName": "Example",
-                    "lastName": "Example"})
+                                       "username": "example@example.com",
+                                       "enabled": True,
+                                       "firstName": "Example",
+                                       "lastName": "Example"})
 
 # Add user and raise exception if username already exists
 # exist_ok currently defaults to True for backwards compatibility reasons
 new_user = keycloak_admin.create_user({"email": "example@example.com",
-                    "username": "example@example.com",
-                    "enabled": True,
-                    "firstName": "Example",
-                    "lastName": "Example"},
-                    exist_ok=False)
+                                       "username": "example@example.com",
+                                       "enabled": True,
+                                       "firstName": "Example",
+                                       "lastName": "Example"},
+                                      exist_ok=False)
 
 # Add user and set password
 new_user = keycloak_admin.create_user({"email": "example@example.com",
-                    "username": "example@example.com",
-                    "enabled": True,
-                    "firstName": "Example",
-                    "lastName": "Example",
+                                       "username": "example@example.com",
+                                       "enabled": True,
+                                       "firstName": "Example",
+                                       "lastName": "Example",
                     "credentials": [{"value": "secret","type": "password",}]})
 
 # Add user and specify a locale
 new_user = keycloak_admin.create_user({"email": "example@example.fr",
-                    "username": "example@example.fr",
-                    "enabled": True,
-                    "firstName": "Example",
-                    "lastName": "Example",
-                    "attributes": {
-                      "locale": ["fr"]
-                    }})
+                                       "username": "example@example.fr",
+                                       "enabled": True,
+                                       "firstName": "Example",
+                                       "lastName": "Example",
+                                       "attributes": {
+                                           "locale": ["fr"]
+                                       }})
 
 # User counter
 count_users = keycloak_admin.users_count()
@@ -312,6 +312,14 @@ keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=
 # Assign realm roles to user
 keycloak_admin.assign_realm_roles(user_id=user_id, roles=realm_roles)
 
+# Assign realm roles to client's scope
+keycloak_admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=realm_roles)
+
+# Get realm roles assigned to client's scope
+keycloak_admin.get_realm_roles_of_client_scope(client_id=client_id)
+
+# Remove realm roles assigned to client's scope
+keycloak_admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=realm_roles)
 
 # Get all ID Providers
 idps = keycloak_admin.get_idps()

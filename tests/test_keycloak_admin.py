@@ -1030,6 +1030,64 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
 
+def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test client realm roles."""
+    admin.realm_name = realm
+
+    # Test get realm roles
+    roles = admin.get_realm_roles()
+    assert len(roles) == 3, roles
+    role_names = [x["name"] for x in roles]
+    assert "uma_authorization" in role_names, role_names
+    assert "offline_access" in role_names, role_names
+
+    # create realm role for test
+    role_id = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id, role_id
+
+    # Test realm role client assignment
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_realm_roles_to_client_scope(
+        client_id=client_id,
+        roles=[
+            admin.get_realm_role(role_name="offline_access"),
+            admin.get_realm_role(role_name="test-realm-role"),
+        ],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 2
+    client_role_names = [x["name"] for x in roles]
+    assert "offline_access" in client_role_names, client_role_names
+    assert "test-realm-role" in client_role_names, client_role_names
+    assert "uma_authorization" not in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 1
+    assert "test-realm-role" in [x["name"] for x in roles]
+
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="test-realm-role")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 0
+
+
 def test_client_roles(admin: KeycloakAdmin, client: str):
     """Test client roles."""
     # Test get client roles

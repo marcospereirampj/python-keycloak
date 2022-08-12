@@ -1597,6 +1597,48 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def assign_realm_roles_to_client_scope(self, client_id, roles):
+        """Assign realm roles to a client's scope.
+
+        :param client_id: id of client (not client-id)
+        :param roles: roles list or role (use RoleRepresentation)
+        :return: Keycloak server response
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    def delete_realm_roles_of_client_scope(self, client_id, roles):
+        """Delete realm roles of a client's scope.
+
+        :param client_id: id of client (not client-id)
+        :param roles: roles list or role (use RoleRepresentation)
+        :return: Keycloak server response
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_realm_roles_of_client_scope(self, client_id):
+        """Get all realm roles for a client's scope.
+
+        :param client_id: id of client (not client-id)
+        :return: Keycloak server response (array RoleRepresentation)
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def assign_realm_roles(self, user_id, roles):
         """Assign realm roles to a user.
 
