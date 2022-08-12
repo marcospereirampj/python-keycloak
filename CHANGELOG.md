@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.0 (2022-08-12)
+
+### Feat
+
+- add client scope-mappings realm roles operations
+
 ## v2.1.1 (2022-07-19)
 
 ### Refactor
