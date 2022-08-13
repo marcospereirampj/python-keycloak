@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.3.0 (2022-08-13)
+
+### Feat
+
+- Add token_type/scope to token exchange api
+
 ## v2.2.0 (2022-08-12)
 
 ### Feat
