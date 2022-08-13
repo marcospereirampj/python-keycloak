@@ -275,7 +275,15 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def exchange_token(self, token: str, client_id: str, audience: str, subject: str) -> dict:
+    def exchange_token(
+        self,
+        token: str,
+        client_id: str,
+        audience: str,
+        subject: str,
+        requested_token_type: str = "urn:ietf:params:oauth:token-type:refresh_token",
+        scope: str = "",
+    ) -> dict:
         """Exchange user token.
 
         Use a token to obtain an entirely different token. See
@@ -285,6 +293,8 @@ class KeycloakOpenID:
         :param client_id:
         :param audience:
         :param subject:
+        :param requested_token_type:
+        :param scope:
         :return:
         """
         params_path = {"realm-name": self.realm_name}
@@ -292,9 +302,10 @@ class KeycloakOpenID:
             "grant_type": ["urn:ietf:params:oauth:grant-type:token-exchange"],
             "client_id": client_id,
             "subject_token": token,
-            "requested_token_type": "urn:ietf:params:oauth:token-type:refresh_token",
+            "requested_token_type": requested_token_type,
             "audience": audience,
             "requested_subject": subject,
+            "scope": scope,
         }
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
