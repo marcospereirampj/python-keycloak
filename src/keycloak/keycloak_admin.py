@@ -578,17 +578,21 @@ class KeycloakAdmin:
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_user_groups(self, user_id):
+    def get_user_groups(self, user_id, brief_representation=True):
         """Get user groups.
 
         Returns a list of groups of which the user is a member
 
         :param user_id: User id
+        :param brief_representation: whether to omit attributes in the response
 
         :return: user groups list
         """
+        params = {"briefRepresentation": brief_representation}
         params_path = {"realm-name": self.realm_name, "id": user_id}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_USER_GROUPS.format(**params_path))
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_USER_GROUPS.format(**params_path), **params
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def update_user(self, user_id, payload):
@@ -1300,16 +1304,20 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
-    def get_realm_roles(self):
+    def get_realm_roles(self, brief_representation=True):
         """Get all roles for the realm or client.
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
+        :param brief_representation: whether to omit role attributes in the response
         :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path))
+        params = {"briefRepresentation": brief_representation}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), **params
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realm_role_members(self, role_name, query=None):
@@ -1326,17 +1334,21 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_REALM_ROLES_MEMBERS.format(**params_path), query
         )
 
-    def get_client_roles(self, client_id):
+    def get_client_roles(self, client_id, brief_representation=True):
         """Get all roles for the client.
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
+        :param brief_representation: whether to omit role attributes in the response
         :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_ROLES.format(**params_path))
+        params = {"briefRepresentation": brief_representation}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_ROLES.format(**params_path), **params
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_client_role(self, client_id, role_name):
@@ -1689,15 +1701,17 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_composite_realm_roles_of_user(self, user_id):
+    def get_composite_realm_roles_of_user(self, user_id, brief_representation=True):
         """Get all composite (i.e. implicit) realm roles for a user.
 
         :param user_id: id of user
+        :param brief_representation: whether to omit role attributes in the response
         :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": user_id}
+        params = {"briefRepresentation": brief_representation}
         data_raw = self.raw_get(
-            urls_patterns.URL_ADMIN_USER_REALM_ROLES_COMPOSITE.format(**params_path)
+            urls_patterns.URL_ADMIN_USER_REALM_ROLES_COMPOSITE.format(**params_path), **params
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1731,14 +1745,18 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
-    def get_group_realm_roles(self, group_id):
+    def get_group_realm_roles(self, group_id, brief_representation=True):
         """Get all realm roles for a group.
 
         :param user_id: id of the group
+        :param brief_representation: whether to omit role attributes in the response
         :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": group_id}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path))
+        params = {"briefRepresentation": brief_representation}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path), **params
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def assign_group_client_roles(self, group_id, client_id, roles):
@@ -1806,20 +1824,24 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, user_id, client_id
         )
 
-    def get_composite_client_roles_of_user(self, user_id, client_id):
+    def get_composite_client_roles_of_user(self, user_id, client_id, brief_representation=False):
         """Get composite client role-mappings for a user.
 
         :param user_id: id of user
         :param client_id: id of client (not client-id)
+        :param brief_representation: whether to omit attributes in the response
         :return: Keycloak server response (array RoleRepresentation)
         """
+        params = {"briefRepresentation": brief_representation}
         return self._get_client_roles_of_user(
-            urls_patterns.URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE, user_id, client_id
+            urls_patterns.URL_ADMIN_USER_CLIENT_ROLES_COMPOSITE, user_id, client_id, **params
         )
 
-    def _get_client_roles_of_user(self, client_level_role_mapping_url, user_id, client_id):
+    def _get_client_roles_of_user(
+        self, client_level_role_mapping_url, user_id, client_id, **params
+    ):
         params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
-        data_raw = self.raw_get(client_level_role_mapping_url.format(**params_path))
+        data_raw = self.raw_get(client_level_role_mapping_url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def delete_client_roles_of_user(self, user_id, client_id, roles):
@@ -2854,19 +2876,22 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
-    def get_composite_client_roles_of_group(self, client_id, group_id):
+    def get_composite_client_roles_of_group(self, client_id, group_id, brief_representation=True):
         """Get the composite client roles of the given group for the given client.
 
         :param client_id: id of the client.
         :type client_id: str
         :param group_id: id of the group.
         :type group_id: str
+        :param brief_representation: whether to omit attributes in the response
+        :type brief_representation: bool
         :return: the composite client roles of the group (list of RoleRepresentation).
         :rtype: list
         """
         params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
+        params = {"briefRepresentation": brief_representation}
         data_raw = self.raw_get(
-            urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE.format(**params_path)
+            urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE.format(**params_path), **params
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
