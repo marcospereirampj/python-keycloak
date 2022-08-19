@@ -1030,6 +1030,63 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
 
+@pytest.mark.parametrize(
+    "testcase, arg_brief_repr, includes_attributes",
+    [
+        ("brief True", {"brief_representation": True}, False),
+        ("brief False", {"brief_representation": False}, True),
+        ("default", {}, False),
+    ],
+)
+def test_role_attributes(
+    admin: KeycloakAdmin,
+    realm: str,
+    client: str,
+    arg_brief_repr: dict,
+    includes_attributes: bool,
+    testcase: str,
+):
+    """Test getting role attributes for bulk calls."""
+    # setup
+    attribute_role = "test-realm-role-w-attr"
+    test_attrs = {"attr1": ["val1"], "attr2": ["val2-1", "val2-2"]}
+    role_id = admin.create_realm_role(
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert role_id, role_id
+
+    cli_role_id = admin.create_client_role(
+        client,
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert cli_role_id, cli_role_id
+
+    if not includes_attributes:
+        test_attrs = None
+
+    # tests
+    roles = admin.get_realm_roles(**arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    roles = admin.get_client_roles(client, **arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == cli_role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    # cleanup
+    res = admin.delete_realm_role(role_name=attribute_role)
+    assert res == dict(), res
+
+    res = admin.delete_client_role(client, role_name=attribute_role)
+    assert res == dict(), res
+
+
 def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
     """Test client realm roles."""
     admin.realm_name = realm
