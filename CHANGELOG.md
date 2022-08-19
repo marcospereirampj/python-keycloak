@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.5.0 (2022-08-19)
+
+### Feat
+
+- added missing functionality to include attributes when returning realm roles according to specifications
+
 ## v2.4.0 (2022-08-19)
 
 ### Feat
