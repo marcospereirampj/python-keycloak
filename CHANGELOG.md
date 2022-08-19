@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.4.0 (2022-08-19)
+
+### Feat
+
+- add client scope-mappings client roles operations
+
 ## v2.3.0 (2022-08-13)
 
 ### Feat
