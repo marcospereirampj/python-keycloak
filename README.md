@@ -321,6 +321,17 @@ keycloak_admin.get_realm_roles_of_client_scope(client_id=client_id)
 # Remove realm roles assigned to client's scope
 keycloak_admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=realm_roles)
 
+another_client_id = keycloak_admin.get_client_id("my-client-2")
+
+# Assign client roles to client's scope
+keycloak_admin.assign_client_roles_to_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
+
+# Get client roles assigned to client's scope
+keycloak_admin.get_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id)
+
+# Remove client roles assigned to client's scope
+keycloak_admin.delete_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
+
 # Get all ID Providers
 idps = keycloak_admin.get_idps()
 

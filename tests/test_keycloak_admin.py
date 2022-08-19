@@ -1088,6 +1088,62 @@ def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
     assert len(roles) == 0
 
 
+def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of other client roles."""
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+
+    # Test get client roles
+    roles = admin.get_client_roles_of_client_scope(client_id, client)
+    assert len(roles) == 0, roles
+
+    # create client role for test
+    client_role_id = admin.create_client_role(
+        client_role_id=client, payload={"name": "client-role-test"}, skip_exists=True
+    )
+    assert client_role_id, client_role_id
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_client_roles_to_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_client_roles_to_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 1
+    client_role_names = [x["name"] for x in roles]
+    assert "client-role-test" in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_client_roles_of_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_client_roles_of_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 0
+
+
 def test_client_roles(admin: KeycloakAdmin, client: str):
     """Test client roles."""
     # Test get client roles
