@@ -1306,7 +1306,7 @@ class KeycloakAdmin:
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
-        :return: Keycloak server response (RoleRepresentation)
+        :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path))
@@ -1329,12 +1329,11 @@ class KeycloakAdmin:
     def get_client_roles(self, client_id):
         """Get all roles for the client.
 
-        :param client_id: id of client (not client-id)
-
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
-        :return: Keycloak server response (RoleRepresentation)
+        :param client_id: id of client (not client-id)
+        :return: Keycloak server response (array RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_ROLES.format(**params_path))
@@ -1345,13 +1344,12 @@ class KeycloakAdmin:
 
         This is required for further actions with this role.
 
-        :param client_id: id of client (not client-id)
-        :param role_name: role’s name (not id!)
-
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
-        :return: role_id
+        :param client_id: id of client (not client-id)
+        :param role_name: role’s name (not id!)
+        :return: Keycloak server response (RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_ROLE.format(**params_path))
@@ -1517,11 +1515,11 @@ class KeycloakAdmin:
     def get_realm_role(self, role_name):
         """Get realm role by role name.
 
-        :param role_name: role's name, not id!
-
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
-        :return: role_id
+
+        :param role_name: role's name, not id!
+        :return: Keycloak server response (RoleRepresentation)
         """
         params_path = {"realm-name": self.realm_name, "role-name": role_name}
         data_raw = self.raw_get(
