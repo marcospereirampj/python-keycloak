@@ -1100,6 +1100,205 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
 
+@pytest.mark.parametrize(
+    "testcase, arg_brief_repr, includes_attributes",
+    [
+        ("brief True", {"brief_representation": True}, False),
+        ("brief False", {"brief_representation": False}, True),
+        ("default", {}, False),
+    ],
+)
+def test_role_attributes(
+    admin: KeycloakAdmin,
+    realm: str,
+    client: str,
+    arg_brief_repr: dict,
+    includes_attributes: bool,
+    testcase: str,
+):
+    """Test getting role attributes for bulk calls.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param arg_brief_repr: Brief representation
+    :type arg_brief_repr: dict
+    :param includes_attributes: Indicator whether to include attributes
+    :type includes_attributes: bool
+    :param testcase: Test case
+    :type testcase: str
+    """
+    # setup
+    attribute_role = "test-realm-role-w-attr"
+    test_attrs = {"attr1": ["val1"], "attr2": ["val2-1", "val2-2"]}
+    role_id = admin.create_realm_role(
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert role_id, role_id
+
+    cli_role_id = admin.create_client_role(
+        client,
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert cli_role_id, cli_role_id
+
+    if not includes_attributes:
+        test_attrs = None
+
+    # tests
+    roles = admin.get_realm_roles(**arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    roles = admin.get_client_roles(client, **arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == cli_role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    # cleanup
+    res = admin.delete_realm_role(role_name=attribute_role)
+    assert res == dict(), res
+
+    res = admin.delete_client_role(client, role_name=attribute_role)
+    assert res == dict(), res
+
+
+def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test client realm roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.realm_name = realm
+
+    # Test get realm roles
+    roles = admin.get_realm_roles()
+    assert len(roles) == 3, roles
+    role_names = [x["name"] for x in roles]
+    assert "uma_authorization" in role_names, role_names
+    assert "offline_access" in role_names, role_names
+
+    # create realm role for test
+    role_id = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id, role_id
+
+    # Test realm role client assignment
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_realm_roles_to_client_scope(
+        client_id=client_id,
+        roles=[
+            admin.get_realm_role(role_name="offline_access"),
+            admin.get_realm_role(role_name="test-realm-role"),
+        ],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 2
+    client_role_names = [x["name"] for x in roles]
+    assert "offline_access" in client_role_names, client_role_names
+    assert "test-realm-role" in client_role_names, client_role_names
+    assert "uma_authorization" not in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 1
+    assert "test-realm-role" in [x["name"] for x in roles]
+
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="test-realm-role")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 0
+
+
+def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of other client roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+
+    # Test get client roles
+    roles = admin.get_client_roles_of_client_scope(client_id, client)
+    assert len(roles) == 0, roles
+
+    # create client role for test
+    client_role_id = admin.create_client_role(
+        client_role_id=client, payload={"name": "client-role-test"}, skip_exists=True
+    )
+    assert client_role_id, client_role_id
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_client_roles_to_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_client_roles_to_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 1
+    client_role_names = [x["name"] for x in roles]
+    assert "client-role-test" in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_client_roles_of_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_client_roles_of_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 0
+
+
 def test_client_roles(admin: KeycloakAdmin, client: str):
     """Test client roles.
 
