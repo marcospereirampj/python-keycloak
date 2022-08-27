@@ -45,10 +45,29 @@ class Permission:
 
     https://keycloak.gitbooks.io/documentation/authorization_services/topics/permission/overview.html
 
+    :param name: Name
+    :type name: str
+    :param type: Type
+    :type type: str
+    :param logic: Logic
+    :type logic: str
+    :param decision_strategy: Decision strategy
+    :type decision_strategy: str
+
     """
 
     def __init__(self, name, type, logic, decision_strategy):
-        """Init method."""
+        """Init method.
+
+        :param name: Name
+        :type name: str
+        :param type: Type
+        :type type: str
+        :param logic: Logic
+        :type logic: str
+        :param decision_strategy: Decision strategy
+        :type decision_strategy: str
+        """
         self.name = name
         self.type = type
         self.logic = logic
@@ -57,16 +76,28 @@ class Permission:
         self.scopes = []
 
     def __repr__(self):
-        """Repr method."""
+        """Repr method.
+
+        :returns: Class representation
+        :rtype: str
+        """
         return "<Permission: %s (%s)>" % (self.name, self.type)
 
     def __str__(self):
-        """Str method."""
+        """Str method.
+
+        :returns: Class string representation
+        :rtype: str
+        """
         return "Permission: %s (%s)" % (self.name, self.type)
 
     @property
     def name(self):
-        """Get name."""
+        """Get name.
+
+        :returns: name
+        :rtype: str
+        """
         return self._name
 
     @name.setter
@@ -75,7 +106,11 @@ class Permission:
 
     @property
     def type(self):
-        """Get type."""
+        """Get type.
+
+        :returns: type
+        :rtype: str
+        """
         return self._type
 
     @type.setter
@@ -84,7 +119,11 @@ class Permission:
 
     @property
     def logic(self):
-        """Get logic."""
+        """Get logic.
+
+        :returns: Logic
+        :rtype: str
+        """
         return self._logic
 
     @logic.setter
@@ -93,7 +132,11 @@ class Permission:
 
     @property
     def decision_strategy(self):
-        """Get decision strategy."""
+        """Get decision strategy.
+
+        :returns: Decision strategy
+        :rtype: str
+        """
         return self._decision_strategy
 
     @decision_strategy.setter
@@ -102,7 +145,11 @@ class Permission:
 
     @property
     def resources(self):
-        """Get resources."""
+        """Get resources.
+
+        :returns: Resources
+        :rtype: list
+        """
         return self._resources
 
     @resources.setter
@@ -111,7 +158,11 @@ class Permission:
 
     @property
     def scopes(self):
-        """Get scopes."""
+        """Get scopes.
+
+        :returns: Scopes
+        :rtype: list
+        """
         return self._scopes
 
     @scopes.setter

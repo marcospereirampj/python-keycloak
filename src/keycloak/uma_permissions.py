@@ -48,7 +48,16 @@ class UMAPermission:
     """
 
     def __init__(self, permission=None, resource="", scope=""):
-        """Init method."""
+        """Init method.
+
+        :param permission: Permission
+        :type permission: UMAPermission
+        :param resource: Resource
+        :type resource: str
+        :param scope: Scope
+        :type scope: str
+        :raises PermissionDefinitionError: In case bad permission definition
+        """
         self.resource = resource
         self.scope = scope
 
@@ -63,26 +72,55 @@ class UMAPermission:
                 self.scope = str(permission.scope)
 
     def __str__(self):
-        """Str method."""
+        """Str method.
+
+        :returns: String representation
+        :rtype: str
+        """
         scope = self.scope
         if scope:
             scope = "#" + scope
         return "{}{}".format(self.resource, scope)
 
     def __eq__(self, __o: object) -> bool:
-        """Eq method."""
+        """Eq method.
+
+        :param __o: The other object
+        :type __o: object
+        :returns: Equality boolean
+        :rtype: bool
+        """
         return str(self) == str(__o)
 
     def __repr__(self) -> str:
-        """Repr method."""
+        """Repr method.
+
+        :returns: The object representation
+        :rtype: str
+        """
         return self.__str__()
 
     def __hash__(self) -> int:
-        """Hash method."""
+        """Hash method.
+
+        :returns: Hash of the object
+        :rtype: int
+        """
         return hash(str(self))
 
-    def __call__(self, permission=None, resource="", scope="") -> object:
-        """Call method."""
+    def __call__(self, permission=None, resource="", scope="") -> "UMAPermission":
+        """Call method.
+
+        :param permission: Permission
+        :type permission: UMAPermission
+        :param resource: Resource
+        :type resource: str
+        :param scope: Scope
+        :type scope: str
+        :returns: The combined UMA permission
+        :rtype: UMAPermission
+        :raises PermissionDefinitionError: In case bad permission definition
+        """
         result_resource = self.resource
         result_scope = self.scope
 
@@ -114,7 +152,11 @@ class Resource(UMAPermission):
     """
 
     def __init__(self, resource):
-        """Init method."""
+        """Init method.
+
+        :param resource: Resource
+        :type resource: str
+        """
         super().__init__(resource=resource)
 
 
@@ -128,7 +170,11 @@ class Scope(UMAPermission):
     """
 
     def __init__(self, scope):
-        """Init method."""
+        """Init method.
+
+        :param scope: Scope
+        :type scope: str
+        """
         super().__init__(scope=scope)
 
 
@@ -147,17 +193,33 @@ class AuthStatus:
     """
 
     def __init__(self, is_logged_in, is_authorized, missing_permissions):
-        """Init method."""
+        """Init method.
+
+        :param is_logged_in: Is logged in indicator
+        :type is_logged_in: bool
+        :param is_authorized: Is authorized indicator
+        :type is_authorized: bool
+        :param missing_permissions: Missing permissions
+        :type missing_permissions: set
+        """
         self.is_logged_in = is_logged_in
         self.is_authorized = is_authorized
         self.missing_permissions = missing_permissions
 
     def __bool__(self):
-        """Bool method."""
+        """Bool method.
+
+        :returns: Boolean representation
+        :rtype: bool
+        """
         return self.is_authorized
 
     def __repr__(self):
-        """Repr method."""
+        """Repr method.
+
+        :returns: The object representation
+        :rtype: str
+        """
         return (
             f"AuthStatus("
             f"is_authorized={self.is_authorized}, "
@@ -169,11 +231,11 @@ class AuthStatus:
 def build_permission_param(permissions):
     """Transform permissions to a set, so they are usable for requests.
 
-    :param permissions: either str (resource#scope),
-        iterable[str] (resource#scope),
-        dict[str,str] (resource: scope),
-        dict[str,iterable[str]] (resource: scopes)
-    :return: result bool
+    :param permissions: Permissions
+    :type permissions: str | Iterable[str] | dict[str, str] | dict[str, Iterabble[str]]
+    :returns: Permission parameters
+    :rtype: set
+    :raises KeycloakPermissionFormatError: In case of bad permission format
     """
     if permissions is None or permissions == "":
         return set()

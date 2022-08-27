@@ -86,6 +86,7 @@ language = "en"
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+suppress_warnings = ["ref.python"]
 
 add_function_parentheses = False
 add_module_names = True

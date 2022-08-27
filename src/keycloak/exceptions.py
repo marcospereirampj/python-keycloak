@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Keycloak custom exeptions module."""
+"""Keycloak custom exceptions module."""
 
 import requests
 
@@ -36,7 +36,15 @@ class KeycloakError(Exception):
     """
 
     def __init__(self, error_message="", response_code=None, response_body=None):
-        """Init method."""
+        """Init method.
+
+        :param error_message: The error message
+        :type error_message: str
+        :param response_code: The code of the response
+        :type response_code: int
+        :param response_body: Body of the response
+        :type response_body: bytes
+        """
         Exception.__init__(self, error_message)
 
         self.response_code = response_code
@@ -44,7 +52,11 @@ class KeycloakError(Exception):
         self.error_message = error_message
 
     def __str__(self):
-        """Str method."""
+        """Str method.
+
+        :returns: String representation of the object
+        :rtype: str
+        """
         if self.response_code is not None:
             return "{0}: {1}".format(self.response_code, self.error_message)
         else:
@@ -136,7 +148,21 @@ class PermissionDefinitionError(Exception):
 
 
 def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
-    """Raise an exception for the response."""
+    """Raise an exception for the response.
+
+    :param response: The response object
+    :type response: Response
+    :param error: Error object to raise
+    :type error: dict or Exception
+    :param expected_codes: Set of expected codes, which should not raise the exception
+    :type expected_codes: Sequence[int]
+    :param skip_exists: Indicates whether the response on already existing object should be ignored
+    :type skip_exists: bool
+
+    :returns: Content of the response message
+    :type: bytes or dict
+    :raises KeycloakError: In case of unexpected status codes
+    """  # noqa: DAR401,DAR402
     if expected_codes is None:
         expected_codes = [200, 201, 204]
 

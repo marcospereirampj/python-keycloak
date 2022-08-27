@@ -81,7 +81,25 @@ class KeycloakOpenID:
         proxies=None,
         timeout=60,
     ):
-        """Init method."""
+        """Init method.
+
+        :param server_url: Keycloak server url
+        :type server_url: str
+        :param client_id: client id
+        :type client_id: str
+        :param realm_name: realm name
+        :type realm_name: str
+        :param client_secret_key: client secret key
+        :type client_secret_key: str
+        :param verify: True if want check connection SSL
+        :type verify: bool
+        :param custom_headers: dict of custom header to pass to each HTML request
+        :type custom_headers: dict
+        :param proxies: dict of proxies to sent the request by.
+        :type proxies: dict
+        :param timeout: connection timeout in seconds
+        :type timeout: int
+        """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
         self.realm_name = realm_name
@@ -94,7 +112,11 @@ class KeycloakOpenID:
 
     @property
     def client_id(self):
-        """Get client id."""
+        """Get client id.
+
+        :returns: Client id
+        :rtype: str
+        """
         return self._client_id
 
     @client_id.setter
@@ -103,7 +125,11 @@ class KeycloakOpenID:
 
     @property
     def client_secret_key(self):
-        """Get the client secret key."""
+        """Get the client secret key.
+
+        :returns: Client secret key
+        :rtype: str
+        """
         return self._client_secret_key
 
     @client_secret_key.setter
@@ -112,7 +138,11 @@ class KeycloakOpenID:
 
     @property
     def realm_name(self):
-        """Get the realm name."""
+        """Get the realm name.
+
+        :returns: Realm name
+        :rtype: str
+        """
         return self._realm_name
 
     @realm_name.setter
@@ -121,7 +151,11 @@ class KeycloakOpenID:
 
     @property
     def connection(self):
-        """Get connection."""
+        """Get connection.
+
+        :returns: Connection manager object
+        :rtype: ConnectionManager
+        """
         return self._connection
 
     @connection.setter
@@ -130,7 +164,11 @@ class KeycloakOpenID:
 
     @property
     def authorization(self):
-        """Get authorization."""
+        """Get authorization.
+
+        :returns: The authorization manager
+        :rtype: Authorization
+        """
         return self._authorization
 
     @authorization.setter
@@ -140,8 +178,10 @@ class KeycloakOpenID:
     def _add_secret_key(self, payload):
         """Add secret key if exists.
 
-        :param payload:
-        :return:
+        :param payload: Payload
+        :type payload: dict
+        :returns: Payload with the secret key
+        :rtype: dict
         """
         if self.client_secret_key:
             payload.update({"client_secret": self.client_secret_key})
@@ -151,18 +191,24 @@ class KeycloakOpenID:
     def _build_name_role(self, role):
         """Build name of a role.
 
-        :param role:
-        :return:
+        :param role: Role name
+        :type role: str
+        :returns: Role path
+        :rtype: str
         """
         return self.client_id + "/" + role
 
     def _token_info(self, token, method_token_info, **kwargs):
         """Getter for the token data.
 
-        :param token:
-        :param method_token_info:
-        :param kwargs:
-        :return:
+        :param token: Token
+        :type token: str
+        :param method_token_info: Token info method to use
+        :type method_token_info: str
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :returns: Token info
+        :rtype: dict
         """
         if method_token_info == "introspect":
             token_info = self.introspect(token)
@@ -178,7 +224,8 @@ class KeycloakOpenID:
         endpoint. It lists endpoints and other configuration options relevant to
         the OpenID Connect implementation in Keycloak.
 
-        :return It lists endpoints and other configuration options relevant.
+        :returns: It lists endpoints and other configuration options relevant
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_WELL_KNOWN.format(**params_path))
@@ -190,9 +237,9 @@ class KeycloakOpenID:
         :param redirect_uri: Redirect url to receive oauth code
         :type redirect_uri: str
         :param scope: Scope of authorization request, split with the blank space
-        :type: scope: str
+        :type scope: str
         :param state: State will be returned to the redirect_uri
-        :type: str
+        :type state: str
         :returns: Authorization URL Full Build
         :rtype: str
         """
@@ -224,13 +271,22 @@ class KeycloakOpenID:
 
         http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
 
-        :param username:
-        :param password:
-        :param grant_type:
-        :param code:
-        :param redirect_uri:
-        :param totp:
-        :return:
+        :param username: Username
+        :type username: str
+        :param password: Password
+        :type password: str
+        :param grant_type: Grant type
+        :type grant_type: str
+        :param code: Code
+        :type code: str
+        :param redirect_uri: Redirect URI
+        :type redirect_uri: str
+        :param totp: Time-based one-time password
+        :type totp: int
+        :param extra: Additional extra arguments
+        :type extra: dict
+        :returns: Keycloak token
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
@@ -261,9 +317,12 @@ class KeycloakOpenID:
 
         http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
 
-        :param refresh_token:
-        :param grant_type:
-        :return:
+        :param refresh_token: Refresh token from Keycloak
+        :type refresh_token: str
+        :param grant_type: Grant type
+        :type grant_type: str
+        :returns: New token
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
@@ -289,13 +348,20 @@ class KeycloakOpenID:
         Use a token to obtain an entirely different token. See
         https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-exchange
 
-        :param token:
-        :param client_id:
-        :param audience:
-        :param subject:
-        :param requested_token_type:
-        :param scope:
-        :return:
+        :param token: Access token
+        :type token: str
+        :param client_id: Client id
+        :type client_id: str
+        :param audience: Audience
+        :type audience: str
+        :param subject: Subject
+        :type subject: str
+        :param requested_token_type: Token type specification
+        :type requested_token_type: str
+        :param scope: Scope
+        :type scope: str
+        :returns: Exchanged token
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
@@ -319,8 +385,10 @@ class KeycloakOpenID:
 
         http://openid.net/specs/openid-connect-core-1_0.html#UserInfo
 
-        :param token:
-        :return:
+        :param token: Access token
+        :type token: str
+        :returns: Userinfo object
+        :rtype: dict
         """
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name}
@@ -330,8 +398,10 @@ class KeycloakOpenID:
     def logout(self, refresh_token):
         """Log out the authenticated user.
 
-        :param refresh_token:
-        :return:
+        :param refresh_token: Refresh token from Keycloak
+        :type refresh_token: str
+        :returns: Keycloak server response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "refresh_token": refresh_token}
@@ -348,7 +418,8 @@ class KeycloakOpenID:
 
         https://tools.ietf.org/html/rfc7517
 
-        :return:
+        :returns: Certificates
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_CERTS.format(**params_path))
@@ -359,7 +430,8 @@ class KeycloakOpenID:
 
         The public key is exposed by the realm page directly.
 
-        :return:
+        :returns: The public key
+        :rtype: str
         """
         params_path = {"realm-name": self.realm_name}
         data_raw = self.connection.raw_get(URL_REALM.format(**params_path))
@@ -374,7 +446,12 @@ class KeycloakOpenID:
         authorization policies associated with the resources being requested. With an RPT,
         client applications can gain access to protected resources at the resource server.
 
-        :return:
+        :param token: Access token
+        :type token: str
+        :param resource_server_id: Resource server ID
+        :type resource_server_id: str
+        :returns: Entitlements
+        :rtype: dict
         """
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
@@ -393,11 +470,16 @@ class KeycloakOpenID:
 
         https://tools.ietf.org/html/rfc7662
 
-        :param token:
-        :param rpt:
-        :param token_type_hint:
+        :param token: Access token
+        :type token: str
+        :param rpt: Requesting party token
+        :type rpt: str
+        :param token_type_hint: Token type hint
+        :type token_type_hint: str
 
-        :return:
+        :returns: Token info
+        :rtype: dict
+        :raises KeycloakRPTNotFound: In case of RPT not specified
         """
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "token": token}
@@ -426,10 +508,16 @@ class KeycloakOpenID:
 
         https://tools.ietf.org/html/rfc7517
 
-        :param token:
-        :param key:
-        :param algorithms:
-        :return:
+        :param token: Keycloak token
+        :type token: str
+        :param key: Decode key
+        :type key: str
+        :param algorithms: Algorithms to use for decoding
+        :type algorithms: list[str]
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+        :returns: Decoded token
+        :rtype: dict
         """
         return jwt.decode(token, key, algorithms=algorithms, audience=self.client_id, **kwargs)
 
@@ -437,7 +525,7 @@ class KeycloakOpenID:
         """Load Keycloak settings (authorization).
 
         :param path: settings file (json)
-        :return:
+        :type path: str
         """
         with open(path, "r") as fp:
             authorization_json = json.load(fp)
@@ -447,8 +535,16 @@ class KeycloakOpenID:
     def get_policies(self, token, method_token_info="introspect", **kwargs):
         """Get policies by user token.
 
-        :param token: user token
-        :return: policies list
+        :param token: User token
+        :type token: str
+        :param method_token_info: Method for token info decoding
+        :type method_token_info: str
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :return: Policies
+        :rtype: dict
+        :raises KeycloakAuthorizationConfigError: In case of bad authorization configuration
+        :raises KeycloakInvalidTokenError: In case of bad token
         """
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
@@ -478,9 +574,15 @@ class KeycloakOpenID:
         """Get permission by user token.
 
         :param token: user token
+        :type token: str
         :param method_token_info: Decode token method
+        :type method_token_info: str
         :param kwargs: parameters for decode
-        :return: permissions list
+        :type kwargs: dict
+        :returns: permissions list
+        :rtype: list
+        :raises KeycloakAuthorizationConfigError: In case of bad authorization configuration
+        :raises KeycloakInvalidTokenError: In case of bad token
         """
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
@@ -515,8 +617,11 @@ class KeycloakOpenID:
         http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
 
         :param token: user token
+        :type token: str
         :param permissions: list of uma permissions list(resource:scope) requested by the user
-        :return: permissions list
+        :type permissions: str
+        :returns: Keycloak server response
+        :rtype: dict
         """
         permission = build_permission_param(permissions)
 
@@ -536,8 +641,13 @@ class KeycloakOpenID:
         """Determine whether user has uma permissions with specified user token.
 
         :param token: user token
+        :type token: str
         :param permissions: list of uma permissions (resource:scope)
-        :return: auth status
+        :type permissions: str
+        :return: Authentication status
+        :rtype: AuthStatus
+        :raises KeycloakAuthenticationError: In case of failed authentication
+        :raises KeycloakPostError: In case of failed request to Keycloak
         """
         needed = build_permission_param(permissions)
         try:
