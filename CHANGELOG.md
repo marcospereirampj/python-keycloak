@@ -1,5 +1,29 @@
 # Changelog
 
+## v2.5.0 (2022-08-19)
+
+### Feat
+
+- added missing functionality to include attributes when returning realm roles according to specifications
+
+## v2.4.0 (2022-08-19)
+
+### Feat
+
+- add client scope-mappings client roles operations
+
+## v2.3.0 (2022-08-13)
+
+### Feat
+
+- Add token_type/scope to token exchange api
+
+## v2.2.0 (2022-08-12)
+
+### Feat
+
+- add client scope-mappings realm roles operations
+
 ## v2.1.1 (2022-07-19)
 
 ### Refactor

@@ -22,7 +22,11 @@ def test_keycloak_version():
 
 
 def test_keycloak_admin_bad_init(env):
-    """Test keycloak admin bad init."""
+    """Test keycloak admin bad init.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    """
     with pytest.raises(TypeError) as err:
         KeycloakAdmin(
             server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
@@ -43,7 +47,11 @@ def test_keycloak_admin_bad_init(env):
 
 
 def test_keycloak_admin_init(env):
-    """Test keycloak admin init."""
+    """Test keycloak admin init.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    """
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
@@ -118,7 +126,11 @@ def test_keycloak_admin_init(env):
 
 
 def test_realms(admin: KeycloakAdmin):
-    """Test realms."""
+    """Test realms.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     # Get realms
     realms = admin.get_realms()
     assert len(realms) == 1, realms
@@ -183,7 +195,13 @@ def test_realms(admin: KeycloakAdmin):
 
 
 def test_import_export_realms(admin: KeycloakAdmin, realm: str):
-    """Test import and export of realms."""
+    """Test import and export of realms.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     realm_export = admin.export_realm(export_clients=True, export_groups_and_role=True)
@@ -201,7 +219,13 @@ def test_import_export_realms(admin: KeycloakAdmin, realm: str):
 
 
 def test_users(admin: KeycloakAdmin, realm: str):
-    """Test users."""
+    """Test users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Check no users present
@@ -293,7 +317,13 @@ def test_users(admin: KeycloakAdmin, realm: str):
 
 
 def test_users_pagination(admin: KeycloakAdmin, realm: str):
-    """Test user pagination."""
+    """Test user pagination.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     for ind in range(admin.PAGE_SIZE + 50):
@@ -311,7 +341,13 @@ def test_users_pagination(admin: KeycloakAdmin, realm: str):
 
 
 def test_idps(admin: KeycloakAdmin, realm: str):
-    """Test IDPs."""
+    """Test IDPs.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Create IDP
@@ -383,7 +419,13 @@ def test_idps(admin: KeycloakAdmin, realm: str):
 
 
 def test_user_credentials(admin: KeycloakAdmin, user: str):
-    """Test user credentials."""
+    """Test user credentials.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param user: Keycloak user
+    :type user: str
+    """
     res = admin.set_user_password(user_id=user, password="booya", temporary=True)
     assert res == dict(), res
 
@@ -411,7 +453,13 @@ def test_user_credentials(admin: KeycloakAdmin, user: str):
 
 
 def test_social_logins(admin: KeycloakAdmin, user: str):
-    """Test social logins."""
+    """Test social logins.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param user: Keycloak user
+    :type user: str
+    """
     res = admin.add_user_social_login(
         user_id=user, provider_id="gitlab", provider_userid="test", provider_username="test"
     )
@@ -451,7 +499,11 @@ def test_social_logins(admin: KeycloakAdmin, user: str):
 
 
 def test_server_info(admin: KeycloakAdmin):
-    """Test server info."""
+    """Test server info.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     info = admin.get_server_info()
     assert set(info.keys()) == {
         "systemInfo",
@@ -471,7 +523,13 @@ def test_server_info(admin: KeycloakAdmin):
 
 
 def test_groups(admin: KeycloakAdmin, user: str):
-    """Test groups."""
+    """Test groups.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param user: Keycloak user
+    :type user: str
+    """
     # Test get groups
     groups = admin.get_groups()
     assert len(groups) == 0
@@ -615,7 +673,13 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
 
 def test_clients(admin: KeycloakAdmin, realm: str):
-    """Test clients."""
+    """Test clients.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Test get clients
@@ -875,7 +939,13 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
 
 def test_realm_roles(admin: KeycloakAdmin, realm: str):
-    """Test realm roles."""
+    """Test realm roles.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Test get realm roles
@@ -1030,8 +1100,213 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
 
+@pytest.mark.parametrize(
+    "testcase, arg_brief_repr, includes_attributes",
+    [
+        ("brief True", {"brief_representation": True}, False),
+        ("brief False", {"brief_representation": False}, True),
+        ("default", {}, False),
+    ],
+)
+def test_role_attributes(
+    admin: KeycloakAdmin,
+    realm: str,
+    client: str,
+    arg_brief_repr: dict,
+    includes_attributes: bool,
+    testcase: str,
+):
+    """Test getting role attributes for bulk calls.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param arg_brief_repr: Brief representation
+    :type arg_brief_repr: dict
+    :param includes_attributes: Indicator whether to include attributes
+    :type includes_attributes: bool
+    :param testcase: Test case
+    :type testcase: str
+    """
+    # setup
+    attribute_role = "test-realm-role-w-attr"
+    test_attrs = {"attr1": ["val1"], "attr2": ["val2-1", "val2-2"]}
+    role_id = admin.create_realm_role(
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert role_id, role_id
+
+    cli_role_id = admin.create_client_role(
+        client,
+        payload={"name": attribute_role, "attributes": test_attrs},
+        skip_exists=True,
+    )
+    assert cli_role_id, cli_role_id
+
+    if not includes_attributes:
+        test_attrs = None
+
+    # tests
+    roles = admin.get_realm_roles(**arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    roles = admin.get_client_roles(client, **arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == cli_role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    # cleanup
+    res = admin.delete_realm_role(role_name=attribute_role)
+    assert res == dict(), res
+
+    res = admin.delete_client_role(client, role_name=attribute_role)
+    assert res == dict(), res
+
+
+def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test client realm roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.realm_name = realm
+
+    # Test get realm roles
+    roles = admin.get_realm_roles()
+    assert len(roles) == 3, roles
+    role_names = [x["name"] for x in roles]
+    assert "uma_authorization" in role_names, role_names
+    assert "offline_access" in role_names, role_names
+
+    # create realm role for test
+    role_id = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id, role_id
+
+    # Test realm role client assignment
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_realm_roles_to_client_scope(
+        client_id=client_id,
+        roles=[
+            admin.get_realm_role(role_name="offline_access"),
+            admin.get_realm_role(role_name="test-realm-role"),
+        ],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 2
+    client_role_names = [x["name"] for x in roles]
+    assert "offline_access" in client_role_names, client_role_names
+    assert "test-realm-role" in client_role_names, client_role_names
+    assert "uma_authorization" not in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 1
+    assert "test-realm-role" in [x["name"] for x in roles]
+
+    res = admin.delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[admin.get_realm_role(role_name="test-realm-role")]
+    )
+    assert res == dict(), res
+    roles = admin.get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 0
+
+
+def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of other client roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+
+    # Test get client roles
+    roles = admin.get_client_roles_of_client_scope(client_id, client)
+    assert len(roles) == 0, roles
+
+    # create client role for test
+    client_role_id = admin.create_client_role(
+        client_role_id=client, payload={"name": "client-role-test"}, skip_exists=True
+    )
+    assert client_role_id, client_role_id
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        admin.assign_client_roles_to_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.assign_client_roles_to_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 1
+    client_role_names = [x["name"] for x in roles]
+    assert "client-role-test" in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_client_roles_of_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    res = admin.delete_client_roles_of_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+    roles = admin.get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 0
+
+
 def test_client_roles(admin: KeycloakAdmin, client: str):
-    """Test client roles."""
+    """Test client roles.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param client: Keycloak client
+    :type client: str
+    """
     # Test get client roles
     res = admin.get_client_roles(client_id=client)
     assert len(res) == 0
@@ -1194,7 +1469,14 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
 
 
 def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
-    """Test enable token exchange."""
+    """Test enable token exchange.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :raises AssertionError: In case of bad configuration
+    """
     # Test enabling token exchange between two confidential clients
     admin.realm_name = realm
 
@@ -1283,7 +1565,13 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
 
 
 def test_email(admin: KeycloakAdmin, user: str):
-    """Test email."""
+    """Test email.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param user: Keycloak user
+    :type user: str
+    """
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
         admin.send_update_account(user_id=user, payload=dict())
@@ -1296,7 +1584,11 @@ def test_email(admin: KeycloakAdmin, user: str):
 
 
 def test_get_sessions(admin: KeycloakAdmin):
-    """Test get sessions."""
+    """Test get sessions.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     sessions = admin.get_sessions(user_id=admin.get_user_id(username=admin.username))
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
@@ -1305,7 +1597,13 @@ def test_get_sessions(admin: KeycloakAdmin):
 
 
 def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
-    """Test get client installation provider."""
+    """Test get client installation provider.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param client: Keycloak client
+    :type client: str
+    """
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_installation_provider(client_id=client, provider_id="bad")
     assert err.match('404: b\'{"error":"Unknown Provider"}\'')
@@ -1324,7 +1622,13 @@ def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
 
 
 def test_auth_flows(admin: KeycloakAdmin, realm: str):
-    """Test auth flows."""
+    """Test auth flows.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
@@ -1471,7 +1775,13 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
 
 def test_authentication_configs(admin: KeycloakAdmin, realm: str):
-    """Test authentication configs."""
+    """Test authentication configs.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Test list of auth providers
@@ -1503,7 +1813,13 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
 
 def test_sync_users(admin: KeycloakAdmin, realm: str):
-    """Test sync users."""
+    """Test sync users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Only testing the error message
@@ -1513,7 +1829,13 @@ def test_sync_users(admin: KeycloakAdmin, realm: str):
 
 
 def test_client_scopes(admin: KeycloakAdmin, realm: str):
-    """Test client scopes."""
+    """Test client scopes.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Test get client scopes
@@ -1651,7 +1973,13 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
 
 def test_components(admin: KeycloakAdmin, realm: str):
-    """Test components."""
+    """Test components.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     # Test get components
@@ -1702,7 +2030,13 @@ def test_components(admin: KeycloakAdmin, realm: str):
 
 
 def test_keys(admin: KeycloakAdmin, realm: str):
-    """Test keys."""
+    """Test keys.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
     assert set(admin.get_keys()["active"].keys()) == {"AES", "HS256", "RS256", "RSA-OAEP"}
     assert {k["algorithm"] for k in admin.get_keys()["keys"]} == {
@@ -1714,7 +2048,13 @@ def test_keys(admin: KeycloakAdmin, realm: str):
 
 
 def test_events(admin: KeycloakAdmin, realm: str):
-    """Test events."""
+    """Test events.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
 
     events = admin.get_events()
@@ -1734,7 +2074,13 @@ def test_events(admin: KeycloakAdmin, realm: str):
 
 
 def test_auto_refresh(admin: KeycloakAdmin, realm: str):
-    """Test auto refresh token."""
+    """Test auto refresh token.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     # Test get refresh
     admin.auto_refresh_token = list()
     admin.connection = ConnectionManager(
@@ -1818,7 +2164,13 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str):
-    """Test requried actions."""
+    """Test required actions.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
     ractions = admin.get_required_actions()
     assert isinstance(ractions, list)
@@ -1836,7 +2188,13 @@ def test_get_required_actions(admin: KeycloakAdmin, realm: str):
 
 
 def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
-    """Test get required action by alias."""
+    """Test get required action by alias.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
     ractions = admin.get_required_actions()
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
@@ -1846,7 +2204,13 @@ def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str):
 
 
 def test_update_required_action(admin: KeycloakAdmin, realm: str):
-    """Test update required action."""
+    """Test update required action.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
     admin.realm_name = realm
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
     old = copy.deepcopy(ra)
@@ -1860,7 +2224,19 @@ def test_update_required_action(admin: KeycloakAdmin, realm: str):
 def test_get_composite_client_roles_of_group(
     admin: KeycloakAdmin, realm: str, client: str, group: str, composite_client_role: str
 ):
-    """Test get composite client roles of group."""
+    """Test get composite client roles of group.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param group: Keycloak group
+    :type group: str
+    :param composite_client_role: Composite client role
+    :type composite_client_role: str
+    """
     admin.realm_name = realm
     role = admin.get_client_role(client, composite_client_role)
     admin.assign_group_client_roles(group_id=group, client_id=client, roles=[role])
@@ -1871,7 +2247,19 @@ def test_get_composite_client_roles_of_group(
 def test_get_role_client_level_children(
     admin: KeycloakAdmin, realm: str, client: str, composite_client_role: str, client_role: str
 ):
-    """Test get children of composite client role."""
+    """Test get children of composite client role.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param composite_client_role: Composite client role
+    :type composite_client_role: str
+    :param client_role: Client role
+    :type client_role: str
+    """
     admin.realm_name = realm
     child = admin.get_client_role(client, client_role)
     parent = admin.get_client_role(client, composite_client_role)
@@ -1880,7 +2268,17 @@ def test_get_role_client_level_children(
 
 
 def test_upload_certificate(admin: KeycloakAdmin, realm: str, client: str, selfsigned_cert: tuple):
-    """Test upload certificate."""
+    """Test upload certificate.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param selfsigned_cert: Selfsigned certificates
+    :type selfsigned_cert: tuple
+    """
     admin.realm_name = realm
     cert, _ = selfsigned_cert
     cert = cert.decode("utf-8").strip()

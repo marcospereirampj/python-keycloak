@@ -31,19 +31,40 @@ class Role:
     manager, and employee are all typical roles that may exist in an organization.
 
     https://keycloak.gitbooks.io/documentation/server_admin/topics/roles.html
+
+    :param name: Name
+    :type name: str
+    :param required: Required role indicator
+    :type required: bool
     """
 
     def __init__(self, name, required=False):
-        """Init method."""
+        """Init method.
+
+        :param name: Name
+        :type name: str
+        :param required: Required role indicator
+        :type required: bool
+        """
         self.name = name
         self.required = required
 
     def get_name(self):
-        """Get name."""
+        """Get name.
+
+        :returns: Name
+        :rtype: str
+        """
         return self.name
 
     def __eq__(self, other):
-        """Eq method."""
+        """Eq method.
+
+        :param other: The other object
+        :type other: str
+        :returns: Equality bool
+        :rtype: bool | NotImplemented
+        """
         if isinstance(other, str):
             return self.name == other
         return NotImplemented

@@ -44,7 +44,11 @@ class Authorization:
 
     @property
     def policies(self):
-        """Get policies."""
+        """Get policies.
+
+        :returns: Policies
+        :rtype: dict
+        """
         return self._policies
 
     @policies.setter
@@ -55,7 +59,7 @@ class Authorization:
         """Load policies, roles and permissions (scope/resources).
 
         :param data: keycloak authorization data (dict)
-        :returns: None
+        :type data: dict
         """
         for pol in data["policies"]:
             if pol["type"] == "role":

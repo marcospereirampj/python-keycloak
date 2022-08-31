@@ -22,7 +22,11 @@ from keycloak.keycloak_openid import KeycloakOpenID
 
 
 def test_keycloak_openid_init(env):
-    """Test KeycloakOpenId's init method."""
+    """Test KeycloakOpenId's init method.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    """
     oid = KeycloakOpenID(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         realm_name="master",
@@ -37,7 +41,11 @@ def test_keycloak_openid_init(env):
 
 
 def test_well_known(oid: KeycloakOpenID):
-    """Test the well_known method."""
+    """Test the well_known method.
+
+    :param oid: Keycloak OpenID client
+    :type oid: KeycloakOpenID
+    """
     res = oid.well_known()
     assert res is not None
     assert res != dict()
@@ -100,7 +108,13 @@ def test_well_known(oid: KeycloakOpenID):
 
 
 def test_auth_url(env, oid: KeycloakOpenID):
-    """Test the auth_url method."""
+    """Test the auth_url method.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    :param oid: Keycloak OpenID client
+    :type oid: KeycloakOpenID
+    """
     res = oid.auth_url(redirect_uri="http://test.test/*")
     assert (
         res
@@ -111,7 +125,11 @@ def test_auth_url(env, oid: KeycloakOpenID):
 
 
 def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
-    """Test the token method."""
+    """Test the token method.
+
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
     assert token == {
@@ -155,7 +173,13 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 def test_exchange_token(
     oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
-    """Test the exchange token method."""
+    """Test the exchange token method.
+
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     # Verify existing user
     oid, username, password = oid_with_credentials
 
@@ -197,7 +221,11 @@ def test_exchange_token(
 
 
 def test_logout(oid_with_credentials):
-    """Test logout."""
+    """Test logout.
+
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials
 
     token = oid.token(username=username, password=password)
@@ -209,19 +237,34 @@ def test_logout(oid_with_credentials):
 
 
 def test_certs(oid: KeycloakOpenID):
-    """Test certificates."""
+    """Test certificates.
+
+    :param oid: Keycloak OpenID client
+    :type oid: KeycloakOpenID
+    """
     assert len(oid.certs()["keys"]) == 2
 
 
 def test_public_key(oid: KeycloakOpenID):
-    """Test public key."""
+    """Test public key.
+
+    :param oid: Keycloak OpenID client
+    :type oid: KeycloakOpenID
+    """
     assert oid.public_key() is not None
 
 
 def test_entitlement(
     oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
-    """Test entitlement."""
+    """Test entitlement.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
     resource_server_id = admin.get_client_authz_resources(
@@ -233,7 +276,11 @@ def test_entitlement(
 
 
 def test_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
-    """Test introspect."""
+    """Test introspect.
+
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
 
@@ -247,7 +294,11 @@ def test_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 
 
 def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
-    """Test decode token."""
+    """Test decode token.
+
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
 
@@ -262,7 +313,12 @@ def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 
 
 def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
-    """Test load authorization config."""
+    """Test load authorization config.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials_authz
 
     oid.load_authorization_config(path="tests/data/authz_settings.json")
@@ -277,7 +333,12 @@ def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpe
 
 
 def test_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
-    """Test get policies."""
+    """Test get policies.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
 
@@ -310,7 +371,12 @@ def test_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str
 
 
 def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
-    """Test get policies."""
+    """Test get policies.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
 
@@ -354,7 +420,12 @@ def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
 
 
 def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
-    """Test UMA permissions."""
+    """Test UMA permissions.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
 
@@ -365,7 +436,14 @@ def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
 def test_has_uma_access(
     oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
 ):
-    """Test has UMA access."""
+    """Test has UMA access.
+
+    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
+        server with client credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
 
