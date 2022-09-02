@@ -5,10 +5,9 @@ build:
   tools:
     python: "3.10"
   jobs:
-    pre_create_environment:
-      - which python
-      - poetry config virtualenvs.create false
     post_install:
-      - poetry install -E docs
+      - python -m pip install poetry
+      - python -m poetry config virtualenvs.create false
+      - python -m poetry install -E docs
       - pip list
       - poetry show
