@@ -221,7 +221,7 @@ consents = keycloak_admin.consents_user(user_id="user-id-keycloak")
 
 # Send User Action
 response = keycloak_admin.send_update_account(user_id="user-id-keycloak",
-                                              payload=json.dumps(['UPDATE_PASSWORD']))
+                                              payload=['UPDATE_PASSWORD'])
 
 # Send Verify Email
 response = keycloak_admin.send_verify_email(user_id="user-id-keycloak")
