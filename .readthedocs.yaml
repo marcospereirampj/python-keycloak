@@ -6,9 +6,7 @@ build:
     python: "3.10"
   jobs:
     pre_create_environment:
-      - asdf plugin add poetry
-      - asdf install poetry latest
-      - asdf global poetry latest
+      - which python
       - poetry config virtualenvs.create false
     post_install:
       - poetry install -E docs
