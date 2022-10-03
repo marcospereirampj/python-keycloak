@@ -1,11 +1,12 @@
 """Test the keycloak admin object."""
 
 import copy
+from typing import Tuple
 
 import pytest
 
 import keycloak
-from keycloak import KeycloakAdmin
+from keycloak import KeycloakAdmin, KeycloakOpenID
 from keycloak.connection import ConnectionManager
 from keycloak.exceptions import (
     KeycloakAuthenticationError,
@@ -1135,15 +1136,12 @@ def test_role_attributes(
     attribute_role = "test-realm-role-w-attr"
     test_attrs = {"attr1": ["val1"], "attr2": ["val2-1", "val2-2"]}
     role_id = admin.create_realm_role(
-        payload={"name": attribute_role, "attributes": test_attrs},
-        skip_exists=True,
+        payload={"name": attribute_role, "attributes": test_attrs}, skip_exists=True
     )
     assert role_id, role_id
 
     cli_role_id = admin.create_client_role(
-        client,
-        payload={"name": attribute_role, "attributes": test_attrs},
-        skip_exists=True,
+        client, payload={"name": attribute_role, "attributes": test_attrs}, skip_exists=True
     )
     assert cli_role_id, cli_role_id
 
@@ -2285,3 +2283,120 @@ def test_upload_certificate(admin: KeycloakAdmin, realm: str, client: str, selfs
     admin.upload_certificate(client, cert)
     cl = admin.get_client(client)
     assert cl["attributes"]["jwt.credential.certificate"] == "".join(cert.splitlines()[1:-1])
+
+
+def test_get_bruteforce_status_for_user(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str], realm: str
+):
+    """Test users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    oid, username, password = oid_with_credentials
+    admin.realm_name = realm
+
+    # Turn on bruteforce protection
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": True})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is True
+
+    # Test login user with wrong credentials
+    try:
+        oid.token(username=username, password="wrongpassword")
+    except KeycloakAuthenticationError:
+        pass
+
+    user_id = admin.get_user_id(username)
+    bruteforce_status = admin.get_bruteforce_detection_status(user_id)
+
+    assert bruteforce_status["numFailures"] == 1
+
+    # Cleanup
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": False})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is False
+
+
+def test_clear_bruteforce_attempts_for_user(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str], realm: str
+):
+    """Test users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    oid, username, password = oid_with_credentials
+    admin.realm_name = realm
+
+    # Turn on bruteforce protection
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": True})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is True
+
+    # Test login user with wrong credentials
+    try:
+        oid.token(username=username, password="wrongpassword")
+    except KeycloakAuthenticationError:
+        pass
+
+    user_id = admin.get_user_id(username)
+    bruteforce_status = admin.get_bruteforce_detection_status(user_id)
+    assert bruteforce_status["numFailures"] == 1
+
+    res = admin.clear_bruteforce_attempts_for_user(user_id)
+    bruteforce_status = admin.get_bruteforce_detection_status(user_id)
+    assert bruteforce_status["numFailures"] == 0
+
+    # Cleanup
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": False})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is False
+
+
+def test_clear_bruteforce_attempts_for_all_users(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str], realm: str
+):
+    """Test users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    oid, username, password = oid_with_credentials
+    admin.realm_name = realm
+
+    # Turn on bruteforce protection
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": True})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is True
+
+    # Test login user with wrong credentials
+    try:
+        oid.token(username=username, password="wrongpassword")
+    except KeycloakAuthenticationError:
+        pass
+
+    user_id = admin.get_user_id(username)
+    bruteforce_status = admin.get_bruteforce_detection_status(user_id)
+    assert bruteforce_status["numFailures"] == 1
+
+    res = admin.clear_all_bruteforce_attempts()
+    bruteforce_status = admin.get_bruteforce_detection_status(user_id)
+    assert bruteforce_status["numFailures"] == 0
+
+    # Cleanup
+    res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": False})
+    res = admin.get_realm(realm_name=realm)
+    assert res["bruteForceProtected"] is False

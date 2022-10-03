@@ -3597,3 +3597,41 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_REQUIRED_ACTIONS_ALIAS.format(**params_path), data=payload
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
+
+    def get_bruteforce_detection_status(self, user_id):
+        """Get bruteforce detection status for user.
+
+        :param user_id: User id
+        :type user_id: str
+        :return: Bruteforce status.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_ATTACK_DETECTION_USER.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def clear_bruteforce_attempts_for_user(self, user_id):
+        """Clear bruteforce attempts for user.
+
+        :param user_id: User id
+        :type user_id: str
+        :return: empty dictionary.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": user_id}
+        data_raw = self.raw_delete(
+            urls_patterns.URL_ADMIN_ATTACK_DETECTION_USER.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def clear_all_bruteforce_attempts(self):
+        """Clear bruteforce attempts for all users in realm.
+
+        :return: empty dictionary.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_delete(urls_patterns.URL_ADMIN_ATTACK_DETECTION.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
