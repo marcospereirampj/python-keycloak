@@ -1,16 +1,17 @@
-# Changelog
-
-## v2.5.0 (2022-08-19)
+## v2.6.0 (2022-10-03)
 
 ### Feat
 
-- added missing functionality to include attributes when returning realm roles according to specifications
+- attack detection API implementation
+
+## v2.5.0 (2022-08-19)
 
 ## v2.4.0 (2022-08-19)
 
 ### Feat
 
 - add client scope-mappings client roles operations
+- added missing functionality to include attributes when returning realm roles according to specifications
 
 ## v2.3.0 (2022-08-13)
 
@@ -26,19 +27,18 @@
 
 ## v2.1.1 (2022-07-19)
 
-### Refactor
-
-- applied linting
-
 ### Fix
 
 - removed whitespace from urls
+
+### Refactor
+
+- applied linting
 
 ## v2.1.0 (2022-07-18)
 
 ### Feat
 
-- add functions covering some missing REST API calls
 - add unit tests
 - add docstrings
 - add functions covering some missing REST API calls
@@ -55,14 +55,13 @@
 
 ## v2.0.0 (2022-07-17)
 
-### Fix
-
-- check client existence based on clientId
-- check client existence based on clientId
-
 ### BREAKING CHANGE
 
 - Renamed parameter client_name to client_id in get_client_id method
+
+### Fix
+
+- check client existence based on clientId
 
 ## v1.9.1 (2022-07-13)
 
@@ -82,16 +81,14 @@
 
 ## v1.8.1 (2022-07-13)
 
-### Fix
-
-- Support the auth_url method called with scope & state params now
-- Support the auth_url method called with scope & state params now
-- raise correct exceptions
-
 ### Feat
 
 - added flake8-docstrings and upgraded dependencies
-- use poetry for package management
+
+### Fix
+
+- Support the auth_url method called with scope & state params now
+- raise correct exceptions
 
 ### Refactor
 
@@ -101,7 +98,6 @@
 
 ### Feat
 
-- Ability to set custom timeout for KeycloakOpenId and KeycloakAdmin
 - Ability to set custom timeout for KCOpenId and KCAdmin
 
 ## v1.7.0 (2022-06-16)
@@ -121,13 +117,11 @@
 ### Feat
 
 - Add update_idp
-- Add update_idp
 
 ## v1.4.0 (2022-06-02)
 
 ### Feat
 
-- Add update_mapper_in_idp
 - Add update_mapper_in_idp
 
 ## v1.3.0 (2022-05-31)
@@ -158,23 +152,21 @@
 ### Fix
 
 - allow query parameters for users count
-- allow query parameters for users count
 
 ## v1.0.0 (2022-05-25)
-
-### Fix
-
-- correct spelling of public API method
 
 ### BREAKING CHANGE
 
 - Renames `KeycloakOpenID.well_know` to `KeycloakOpenID.well_known`
 
+### Fix
+
+- correct spelling of public API method
+
 ## v0.29.1 (2022-05-24)
 
 ### Fix
 
-- allow client_credentials token if username and password not spec…
 - allow client_credentials token if username and password not specified
 
 ## v0.29.0 (2022-05-23)
@@ -185,14 +177,13 @@
 
 ## v0.28.3 (2022-05-23)
 
-### Fix
-
-- import classes in the base module
-- import classes in the base module
-
 ### Feat
 
 - added UMA-permission request functionality
+
+### Fix
+
+- import classes in the base module
 
 ## v0.28.2 (2022-05-19)
 
@@ -205,7 +196,6 @@
 ### Fix
 
 - Add missing keycloak.authorization package
-- Add missing keycloak.authorization package
 
 ## v0.28.0 (2022-05-19)
 
@@ -217,15 +207,15 @@
 - fixed admin client to pass the tests
 - initial setup of CICD and linting
 
-### Refactor
-
-- isort conf.py
-- Merge branch 'master' into feature/cicd
-
 ### Fix
 
 - full tox fix ready
 - raise correct errors
+
+### Refactor
+
+- isort conf.py
+- Merge branch 'master' into feature/cicd
 
 ## v0.27.1 (2022-05-18)
 
@@ -243,7 +233,6 @@
 
 ### Feat
 
-- add KeycloakAdmin.set_events
 - add KeycloakAdmin.set_events
 
 ## v0.25.0 (2021-05-05)
@@ -267,69 +256,3 @@
 ## v0.18.0 (2019-12-10)
 
 ## v0.17.6 (2019-10-10)
-
-## v0.5.0 (2017-08-21)
-
-### Feat
-
-- Basic functions for Keycloak API (well_know, token, userinfo, logout, certs,
-  entitlement, instropect)
-
-## v0.6.0 (2017-08-23)
-
-### Feat
-
-- Added load authorization settings
-
-## v0.7.0 (2017-08-23)
-
-### Feat
-
-- Added polices
-
-## v0.8.0 (2017-08-23)
-
-### Feat
-
-- Added permissions
-
-## v0.9.0 (2017-09-05)
-
-### Feat
-
-- Added functions for Admin Keycloak API
-
-## v0.10.0 (2017-10-23)
-
-### Feat
-
-- Updated libraries versions
-- Updated Docs
-
-## v0.11.0 (2017-12-12)
-
-### Feat
-
-- Changed Instropect RPT
-
-## v0.12.0 (2018-01-25)
-
-### Feat
-
-- Add groups functions
-- Add Admin Tasks for user and client role management
-- Function to trigger user sync from provider
-
-## v0.12.1 (2018-08-04)
-
-### Feat
-
-- Add get_idps
-- Rework group functions
-
-## master
-
-### Feat
-
-- Renamed `KeycloakOpenID.well_know` to `KeycloakOpenID.well_known`
-- Add `KeycloakOpenID.token_exchange` to support Token Exchange
