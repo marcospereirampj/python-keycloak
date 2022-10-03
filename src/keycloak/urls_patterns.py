@@ -195,3 +195,8 @@ URL_ADMIN_CLIENT_ROLE_CHILDREN = (
 URL_ADMIN_CLIENT_CERT_UPLOAD = URL_ADMIN_CLIENT_CERTS + "/upload-certificate"
 URL_ADMIN_REQUIRED_ACTIONS = URL_ADMIN_REALM + "/authentication/required-actions"
 URL_ADMIN_REQUIRED_ACTIONS_ALIAS = URL_ADMIN_REQUIRED_ACTIONS + "/{action-alias}"
+
+URL_ADMIN_ATTACK_DETECTION = "admin/realms/{realm-name}/attack-detection/brute-force/users"
+URL_ADMIN_ATTACK_DETECTION_USER = (
+    "admin/realms/{realm-name}/attack-detection/brute-force/users/{id}"
+)
