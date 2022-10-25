@@ -6,6 +6,6 @@ build:
     python: "3.10"
   jobs:
     post_install:
-      - /home/docs/checkouts/readthedocs.org/user_builds/python-keycloak/envs/latest/bin/python -m pip install poetry
-      - /home/docs/checkouts/readthedocs.org/user_builds/python-keycloak/envs/latest/bin/python -m poetry config virtualenvs.create false
-      - /home/docs/checkouts/readthedocs.org/user_builds/python-keycloak/envs/latest/bin/python -m poetry install -E docs
+      - pip install -U poetry
+      - poetry config virtualenvs.create false
+      - poetry install -E docs
