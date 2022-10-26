@@ -2,94 +2,94 @@ name: Lint
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   check-commits:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: webiny/action-conventional-commits@v1.0.3
+      - uses: actions/checkout@v3
+      - uses: webiny/action-conventional-commits@v1.0.3
 
   check-linting:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
-    - name: Check linting, formatting
-      run: |
-        tox -e check
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: Check linting, formatting
+        run: |
+          tox -e check
 
   check-docs:
     runs-on: ubuntu-latest
     needs:
-    - check-commits
-    - check-linting
+      - check-commits
+      - check-linting
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
-    - name: Check documentation build
-      run: |
-        tox -e docs
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: Check documentation build
+        run: |
+          tox -e docs
 
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
     needs:
-    - check-commits
-    - check-linting
+      - check-commits
+      - check-linting
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: docker-practice/actions-setup-docker@master
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
-    - name: Run tests
-      run: |
-        tox -e tests
-    - name: Keycloak logs
-      run: |
-        cat keycloak_test_logs.txt
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: docker-practice/actions-setup-docker@master
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: Run tests
+        run: |
+          tox -e tests
+      - name: Keycloak logs
+        run: |
+          cat keycloak_test_logs.txt
 
   build:
     runs-on: ubuntu-latest
     needs:
-    - test
-    - check-docs
+      - test
+      - check-docs
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
-    - name: Run build
-      run: |
-        tox -e build
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: Run build
+        run: |
+          tox -e build
