@@ -109,6 +109,9 @@ URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = (
 URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION = (
     URL_ADMIN_CLIENT + "/authz/resource-server/permission/resource?max=-1"
 )
+URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope?max=-1"
+)
 URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES = (
     URL_ADMIN_CLIENT + "/authz/resource-server/policy/{policy-id}/scopes"
 )

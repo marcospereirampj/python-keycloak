@@ -1426,6 +1426,48 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def create_client_authz_scope_based_permission(self, client_id, payload, skip_exists=False):
+        """Create scope-based permission of client.
+
+        Payload example::
+
+            payload={
+                "type": "resource",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Permission-Name",
+                "resources": [
+                    resource_id
+                ],
+                "policies": [
+                    policy_id
+                ],
+                "scopes": [
+                    scope_id
+                ]
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object already exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
+        )
+
     def get_client_authz_scopes(self, client_id):
         """Get scopes from client.
 
