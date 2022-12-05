@@ -1318,6 +1318,98 @@ def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str
     assert len(roles) == 0
 
 
+def test_client_default_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of default client scopes.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    # Test get client default scopes
+    # keycloak default roles: web-origins, acr, profile, roles, email
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
+
+    # Test add a client scope to client default scopes
+    default_client_scope = "test-client-default-scope"
+    new_client_scope = {
+        "name": default_client_scope,
+        "description": f"Test Client Scope: {default_client_scope}",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    new_client_scope_id = admin.create_client_scope(new_client_scope, skip_exists=False)
+    new_default_client_scope_data = {
+        "realm": realm,
+        "client": client_id,
+        "clientScopeId": new_client_scope_id,
+    }
+    admin.add_client_default_client_scope(
+        client_id, new_client_scope_id, new_default_client_scope_data
+    )
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 6, default_client_scopes
+
+    # Test remove a client default scope
+    admin.delete_client_default_client_scope(client_id, new_client_scope_id)
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
+
+
+def test_client_optional_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of optional client scopes.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    # Test get client optional scopes
+    # keycloak optional roles: microprofile-jwt, offline_access, address, phone
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 4, optional_client_scopes
+
+    # Test add a client scope to client optional scopes
+    optional_client_scope = "test-client-optional-scope"
+    new_client_scope = {
+        "name": optional_client_scope,
+        "description": f"Test Client Scope: {optional_client_scope}",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    new_client_scope_id = admin.create_client_scope(new_client_scope, skip_exists=False)
+    new_optional_client_scope_data = {
+        "realm": realm,
+        "client": client_id,
+        "clientScopeId": new_client_scope_id,
+    }
+    admin.add_client_optional_client_scope(
+        client_id, new_client_scope_id, new_optional_client_scope_data
+    )
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 5, optional_client_scopes
+
+    # Test remove a client optional scope
+    admin.delete_client_optional_client_scope(client_id, new_client_scope_id)
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 4, optional_client_scopes
+
+
 def test_client_roles(admin: KeycloakAdmin, client: str):
     """Test client roles.
 
