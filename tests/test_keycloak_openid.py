@@ -135,6 +135,7 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     assert token == {
         "access_token": mock.ANY,
         "expires_in": 300,
+        "id_token": mock.ANY,
         "not-before-policy": 0,
         "refresh_expires_in": 1800,
         "refresh_token": mock.ANY,
@@ -148,6 +149,7 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     assert token == {
         "access_token": mock.ANY,
         "expires_in": 300,
+        "id_token": mock.ANY,
         "not-before-policy": 0,
         "refresh_expires_in": 1800,
         "refresh_token": mock.ANY,
@@ -161,6 +163,7 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     assert token == {
         "access_token": mock.ANY,
         "expires_in": 300,
+        "id_token": mock.ANY,
         "not-before-policy": 0,
         "refresh_expires_in": 1800,
         "refresh_token": mock.ANY,
