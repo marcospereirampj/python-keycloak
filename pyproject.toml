@@ -44,7 +44,20 @@ m2r2 = {version = "^0.3.2", optional = true}
 sphinx-autoapi = {version = "^2.0.0", optional = true}
 requests-toolbelt = "^0.9.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.extras]
+docs = [
+    "mock",
+    "alabaster",
+    "commonmark",
+    "recommonmark",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "readthedocs-sphinx-ext",
+    "m2r2",
+    "sphinx-autoapi",
+]
+
+[tool.poetry.group.dev.dependencies]
 tox = "^3.25.0"
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
@@ -58,19 +71,7 @@ commitizen = "^2.28.0"
 cryptography = "^37.0.4"
 codespell = "^2.1.0"
 darglint = "^1.8.1"
-
-[tool.poetry.extras]
-docs = [
-    "mock",
-    "alabaster",
-    "commonmark",
-    "recommonmark",
-    "sphinx",
-    "sphinx-rtd-theme",
-    "readthedocs-sphinx-ext",
-    "m2r2",
-    "sphinx-autoapi",
-]
+twine = "^4.0.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
