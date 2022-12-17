@@ -506,21 +506,24 @@ def test_server_info(admin: KeycloakAdmin):
     :type admin: KeycloakAdmin
     """
     info = admin.get_server_info()
-    assert set(info.keys()) == {
-        "systemInfo",
-        "memoryInfo",
-        "profileInfo",
-        "themes",
-        "socialProviders",
-        "identityProviders",
-        "providers",
-        "protocolMapperTypes",
-        "builtinProtocolMappers",
-        "clientInstallations",
-        "componentTypes",
-        "passwordPolicies",
-        "enums",
-    }, info.keys()
+    assert set(info.keys()).issubset(
+        {
+            "systemInfo",
+            "memoryInfo",
+            "profileInfo",
+            "themes",
+            "socialProviders",
+            "identityProviders",
+            "providers",
+            "protocolMapperTypes",
+            "builtinProtocolMappers",
+            "clientInstallations",
+            "componentTypes",
+            "passwordPolicies",
+            "enums",
+            "cryptoInfo",
+        }
+    ), info.keys()
 
 
 def test_groups(admin: KeycloakAdmin, user: str):
@@ -790,7 +793,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_settings(client_id=client_id)
-    assert err.match('500: b\'{"error":"HTTP 500 Internal Server Error"}\'')
+    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
     # Authz resources
     res = admin.get_client_authz_resources(client_id=auth_client_id)
@@ -799,7 +802,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resources(client_id=client_id)
-    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
     res = admin.create_client_authz_resource(
         client_id=auth_client_id, payload={"name": "test-resource"}
@@ -885,7 +888,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_scopes(client_id=client_id)
-    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
     # Test service account user
     res = admin.get_client_service_account_user(client_id=auth_client_id)

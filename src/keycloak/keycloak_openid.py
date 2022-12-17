@@ -260,6 +260,7 @@ class KeycloakOpenID:
         code="",
         redirect_uri="",
         totp=None,
+        scope="openid",
         **extra
     ):
         """Retrieve user token.
@@ -283,6 +284,8 @@ class KeycloakOpenID:
         :type redirect_uri: str
         :param totp: Time-based one-time password
         :type totp: int
+        :param scope: Scope, defaults to openid
+        :type scope: str
         :param extra: Additional extra arguments
         :type extra: dict
         :returns: Keycloak token
@@ -296,6 +299,7 @@ class KeycloakOpenID:
             "grant_type": grant_type,
             "code": code,
             "redirect_uri": redirect_uri,
+            "scope": scope,
         }
         if extra:
             payload.update(extra)
@@ -341,7 +345,7 @@ class KeycloakOpenID:
         audience: str,
         subject: str,
         requested_token_type: str = "urn:ietf:params:oauth:token-type:refresh_token",
-        scope: str = "",
+        scope: str = "openid",
     ) -> dict:
         """Exchange user token.
 
@@ -358,7 +362,7 @@ class KeycloakOpenID:
         :type subject: str
         :param requested_token_type: Token type specification
         :type requested_token_type: str
-        :param scope: Scope
+        :param scope: Scope, defaults to openid
         :type scope: str
         :returns: Exchanged token
         :rtype: dict

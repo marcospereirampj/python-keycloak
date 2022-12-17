@@ -1,3 +1,10 @@
+## v2.6.1 (2022-12-13)
+
+### Fix
+
+- use version from the package
+- default scope to openid
+
 ## v2.6.0 (2022-10-03)
 
 ### Feat
