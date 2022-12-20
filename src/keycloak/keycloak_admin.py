@@ -790,7 +790,6 @@ class KeycloakAdmin:
         users = self.get_users()
         for user in users:
             user_id = user["id"]
-            print(f"Disabling user with id: {user_id}")
             self.disable_user(user_id=user_id)
         
     def enable_all_users(self):
@@ -799,7 +798,6 @@ class KeycloakAdmin:
         users = self.get_users()
         for user in users:
             user_id = user["id"]
-            print(f"Enabling user with id: {user_id}")
             self.enable_user(user_id=user_id)
 
     def delete_user(self, user_id):
