@@ -772,7 +772,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         return self.update_user(user_id=user_id, payload={"enabled": False})
-        
+
     def enable_user(self, user_id):
         """Enable the user from the realm.
 
@@ -783,18 +783,16 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         return self.update_user(user_id=user_id, payload={"enabled": True})
-    
+
     def disable_all_users(self):
-        """Disable all existing users.
-        """
+        """Disable all existing users."""
         users = self.get_users()
         for user in users:
             user_id = user["id"]
             self.disable_user(user_id=user_id)
-        
+
     def enable_all_users(self):
-        """Disable all existing users.
-        """
+        """Disable all existing users."""
         users = self.get_users()
         for user in users:
             user_id = user["id"]
