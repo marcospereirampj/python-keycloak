@@ -762,6 +762,42 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
+    def disable_user(self, user_id):
+        """Disable the user from the realm. Disabled users can not log in.
+
+        :param user_id: User id
+        :type user_id: str
+
+        :return: Http response
+        :rtype: bytes
+        """
+        return self.update_user(user_id=user_id, payload={"enabled": False})
+
+    def enable_user(self, user_id):
+        """Enable the user from the realm.
+
+        :param user_id: User id
+        :type user_id: str
+
+        :return: Http response
+        :rtype: bytes
+        """
+        return self.update_user(user_id=user_id, payload={"enabled": True})
+
+    def disable_all_users(self):
+        """Disable all existing users."""
+        users = self.get_users()
+        for user in users:
+            user_id = user["id"]
+            self.disable_user(user_id=user_id)
+
+    def enable_all_users(self):
+        """Disable all existing users."""
+        users = self.get_users()
+        for user in users:
+            user_id = user["id"]
+            self.enable_user(user_id=user_id)
+
     def delete_user(self, user_id):
         """Delete the user.
 
