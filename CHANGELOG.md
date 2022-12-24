@@ -1,4 +1,16 @@
+## v2.7.0 (2022-12-24)
+
+### Refactor
+
+- code formatting after tox checks
+- remove print statements
+
 ## v2.6.1 (2022-12-13)
+
+### Feat
+
+- option for enabling users
+- helping functions for disabling users
 
 ### Fix
 
