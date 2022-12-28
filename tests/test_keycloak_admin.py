@@ -901,8 +901,8 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         )
     assert err.match('404: b\'{"error":"Could not find client"')
     assert admin.create_client_authz_scopes(
-        client_id=auth_client_id, payload={"name": "test-authz-scope"}, skip_exists=True
-    ) == {"msg": "Already exists"}
+        client_id=auth_client_id, payload={"name": "test-authz-scope"}
+    )
 
     res = admin.get_client_authz_scopes(client_id=auth_client_id)
     assert len(res) == 1
