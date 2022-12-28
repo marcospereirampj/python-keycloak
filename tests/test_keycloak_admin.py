@@ -897,9 +897,9 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_scopes(
-            client_id=auth_client_id, payload={"name": "test-authz-scope"}
+            client_id='invalid_client_id', payload={"name": "test-authz-scope"}
         )
-    assert err.match('409: b\'{"error":"invalid_request"')
+    assert err.match('404: b\'{"error":"Could not find client"')
     assert admin.create_client_authz_scopes(
         client_id=auth_client_id, payload={"name": "test-authz-scope"}, skip_exists=True
     ) == {"msg": "Already exists"}
