@@ -1475,6 +1475,25 @@ class KeycloakAdmin:
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def create_client_authz_scopes(self, client_id, payload):
+        """Create scopes for client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :param payload: ScopeRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_ScopeRepresentation
+        :type payload: dict
+        :type client_id: str
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+
     def get_client_authz_permissions(self, client_id):
         """Get permissions from client.
 

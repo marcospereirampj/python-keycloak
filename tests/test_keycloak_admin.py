@@ -890,6 +890,24 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         admin.get_client_authz_scopes(client_id=client_id)
     assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
 
+    res = admin.create_client_authz_scopes(
+        client_id=auth_client_id, payload={"name": "test-authz-scope"}
+    )
+    assert res["name"] == "test-authz-scope", res
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_client_authz_scopes(
+            client_id=auth_client_id, payload={"name": "test-authz-scope"}
+        )
+    assert err.match('409: b\'{"error":"invalid_request"')
+    assert admin.create_client_authz_scopes(
+        client_id=auth_client_id, payload={"name": "test-authz-scope"}, skip_exists=True
+    ) == {"msg": "Already exists"}
+
+    res = admin.get_client_authz_scopes(client_id=auth_client_id)
+    assert len(res) == 2
+    assert {x["name"] for x in res} == {"Default Scope", "test-authz-scope"}
+
     # Test service account user
     res = admin.get_client_service_account_user(client_id=auth_client_id)
     assert res["username"] == "service-account-authz-client", res
