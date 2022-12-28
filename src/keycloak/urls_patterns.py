@@ -118,6 +118,10 @@ URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES = (
 URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION = (
     URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope/{scope-id}"
 )
+URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION = (
+    URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope?max=-1"
+)
+
 URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY = URL_ADMIN_CLIENT + "/authz/resource-server/policy/client"
 
 URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER = URL_ADMIN_CLIENT + "/service-account-user"
