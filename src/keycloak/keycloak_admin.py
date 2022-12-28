@@ -676,7 +676,7 @@ class KeycloakAdmin:
         )
         raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def users_count(self, query=None):
         """Count users.
@@ -1196,7 +1196,7 @@ class KeycloakAdmin:
         )
         try:
             _last_slash_idx = data_raw.headers["Location"].rindex("/")
-            return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+            return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
         except KeyError:
             return
 
@@ -1547,7 +1547,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def update_client(self, client_id, payload):
         """Update a client.
@@ -1725,7 +1725,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def add_composite_client_roles_to_role(self, client_role_id, role_name, roles):
         """Add composite roles to client role.
@@ -1866,7 +1866,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_realm_role(self, role_name):
         """Get realm role by role name.
@@ -2722,7 +2722,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def update_client_scope(self, client_scope_id, payload):
         """Update a client scope.
@@ -3087,7 +3087,7 @@ class KeycloakAdmin:
         )
         raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_component(self, component_id):
         """Get representation of the component.
@@ -3461,7 +3461,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_client_authz_scope_permission(self, payload, client_id):
-        """create permissions for a authz scope.
+        """Create permissions for a authz scope.
 
         Payload example::
 
@@ -3480,8 +3480,6 @@ class KeycloakAdmin:
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
         :type client_id: str
-        :param scope_id: No Document
-        :type scope_id: str
         :return: Keycloak server response
         :rtype: bytes
         """
