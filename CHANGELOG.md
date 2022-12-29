@@ -1,3 +1,17 @@
+## v2.8.0 (2022-12-29)
+
+### Feat
+
+- **api**: add tests for create_authz_scopes
+
+### Fix
+
+- fix testing create_client_authz_scopes parameters
+- fix linting
+- add testcase for invalid client id
+- create authz clients test case
+- create authz clients test case
+
 ## v2.7.0 (2022-12-24)
 
 ### Refactor
