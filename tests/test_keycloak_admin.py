@@ -1575,7 +1575,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
             "scopes": [token_exchange_scope_id],
             "policies": [client_policy_id],
         },
-        client_id="realm_management_id",
+        client_id=realm_management_id,
     )
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_scope(payload={"name": "test-scope"})
