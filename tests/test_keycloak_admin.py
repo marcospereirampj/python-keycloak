@@ -1565,7 +1565,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     )
 
     # Create permissions on the target client to reference this policy
-    res = admin.create_client_authz_scope_permission(
+    admin.create_client_authz_scope_permission(
         payload={
             "name": "test-permission",
             "type": "scope",
@@ -1580,9 +1580,11 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_scope(payload={"name": "test-scope"})
     assert err.match('404: b\'{"errorMessage":"Could not find client"}\'')
-    permission_name = admin.get_client_authz_scope_permission(
-        client_id=realm_management_id)["name"]
+    permission_name = admin.get_client_authz_scope_permission(client_id=realm_management_id)[
+        "name"
+    ]
     assert permission_name == "test-permission"
+
 
 def test_email(admin: KeycloakAdmin, user: str):
     """Test email.
