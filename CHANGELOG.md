@@ -1,3 +1,9 @@
+## v2.9.0 (2023-01-11)
+
+### Feat
+
+- added default realm roles handlers
+
 ## v2.8.0 (2022-12-29)
 
 ### Feat
