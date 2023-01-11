@@ -988,7 +988,7 @@ class KeycloakAdmin:
         data_raw = self.raw_put(
             urls_patterns.URL_ADMIN_SEND_UPDATE_ACCOUNT.format(**params_path),
             data=json.dumps(payload),
-            **params_query
+            **params_query,
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
@@ -1012,7 +1012,7 @@ class KeycloakAdmin:
         data_raw = self.raw_put(
             urls_patterns.URL_ADMIN_SEND_VERIFY_EMAIL.format(**params_path),
             data={},
-            **params_query
+            **params_query,
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
@@ -1656,6 +1656,62 @@ class KeycloakAdmin:
         return self.__fetch_all(
             urls_patterns.URL_ADMIN_REALM_ROLES_MEMBERS.format(**params_path), query
         )
+
+    def get_default_realm_role_id(self):
+        """Get the ID of the default realm role.
+
+        :return: Realm role ID
+        :rtype: str
+        """
+        all_realm_roles = self.get_realm_roles()
+        default_realm_roles = [
+            realm_role
+            for realm_role in all_realm_roles
+            if realm_role["name"] == f"default-roles-{self.realm_name}"
+        ]
+        return default_realm_roles[0]["id"]
+
+    def get_realm_default_roles(self):
+        """Get all the default realm roles.
+
+        :return: Keycloak Server Response (UserRepresentation)
+        :rtype: list
+        """
+        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES_REALM.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def remove_realm_default_roles(self, payload):
+        """Remove a set of default realm roles.
+
+        :param payload: List of RoleRepresentations
+        :type payload: list
+        :return: Keycloak Server Response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        data_raw = self.raw_delete(
+            urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def add_realm_default_roles(self, payload):
+        """Add a set of default realm roles.
+
+        :param payload: List of RoleRepresentations
+        :type payload: list
+        :return: Keycloak Server Response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError)
 
     def get_client_roles(self, client_id, brief_representation=True):
         """Get all roles for the client.
@@ -2664,7 +2720,7 @@ class KeycloakAdmin:
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_USER_STORAGE.format(**params_path),
             data=json.dumps(data),
-            **params_query
+            **params_query,
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 

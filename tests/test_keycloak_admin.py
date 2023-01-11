@@ -2421,3 +2421,76 @@ def test_clear_bruteforce_attempts_for_all_users(
     res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": False})
     res = admin.get_realm(realm_name=realm)
     assert res["bruteForceProtected"] is False
+
+
+def test_default_realm_role_present(realm: str, admin: KeycloakAdmin) -> None:
+    """Test that the default realm role is present in a brand new realm.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    assert f"default-roles-{realm}" in [x["name"] for x in admin.get_realm_roles()]
+    assert (
+        len([x["name"] for x in admin.get_realm_roles() if x["name"] == f"default-roles-{realm}"])
+        == 1
+    )
+
+
+def test_get_default_realm_role_id(realm: str, admin: KeycloakAdmin) -> None:
+    """Test getter for the ID of the default realm role.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    assert (
+        admin.get_default_realm_role_id()
+        == [x["id"] for x in admin.get_realm_roles() if x["name"] == f"default-roles-{realm}"][0]
+    )
+
+
+def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
+    """Test getting, adding and deleting default realm roles.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+
+    # Test listing all default realm roles
+    roles = admin.get_realm_default_roles()
+    assert len(roles) == 2
+    assert {x["name"] for x in roles} == {"offline_access", "uma_authorization"}
+
+    with pytest.raises(KeycloakGetError) as err:
+        admin.realm_name = "doesnotexist"
+        admin.get_realm_default_roles()
+    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    admin.realm_name = realm
+
+    # Test removing a default realm role
+    res = admin.remove_realm_default_roles(payload=[roles[0]])
+    assert res == {}
+    assert roles[0] not in admin.get_realm_default_roles()
+    assert len(admin.get_realm_default_roles()) == 1
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.remove_realm_default_roles(payload=[{"id": "bad id"}])
+    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+
+    # Test adding a default realm role
+    res = admin.add_realm_default_roles(payload=[roles[0]])
+    assert res == {}
+    assert roles[0] in admin.get_realm_default_roles()
+    assert len(admin.get_realm_default_roles()) == 2
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.add_realm_default_roles(payload=[{"id": "bad id"}])
+    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
