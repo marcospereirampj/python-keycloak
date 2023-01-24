@@ -25,7 +25,8 @@
 
 # OPENID URLS
 URL_REALM = "realms/{realm-name}"
-URL_WELL_KNOWN = "realms/{realm-name}/.well-known/openid-configuration"
+URL_WELL_KNOWN_BASE = "realms/{realm-name}/.well-known"
+URL_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/openid-configuration"
 URL_TOKEN = "realms/{realm-name}/protocol/openid-connect/token"
 URL_USERINFO = "realms/{realm-name}/protocol/openid-connect/userinfo"
 URL_LOGOUT = "realms/{realm-name}/protocol/openid-connect/logout"
@@ -200,3 +201,7 @@ URL_ADMIN_ATTACK_DETECTION = "admin/realms/{realm-name}/attack-detection/brute-f
 URL_ADMIN_ATTACK_DETECTION_USER = (
     "admin/realms/{realm-name}/attack-detection/brute-force/users/{id}"
 )
+
+
+# UMA URLS
+URL_UMA_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/uma2-configuration"
