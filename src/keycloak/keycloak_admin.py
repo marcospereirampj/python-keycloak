@@ -154,9 +154,21 @@ class KeycloakAdmin:
         self.custom_headers = custom_headers
         self.timeout = timeout
 
-        # Get token Admin
-        if not self.token:
+        if self.token is None:
             self.get_token()
+
+        headers = {
+            "Authorization": "Bearer " + self.token.get("access_token"),
+            "Content-Type": "application/json",
+        } if self.token is not None else {}
+
+        if self.custom_headers is not None:
+            # merge custom headers to main headers
+            headers.update(self.custom_headers)
+
+        self.connection = ConnectionManager(
+            base_url=self.server_url, headers=headers, timeout=60, verify=self.verify
+        )
 
     @property
     def server_url(self):
@@ -3378,22 +3390,8 @@ class KeycloakAdmin:
             self.token = self.keycloak_openid.token(
                 self.username, self.password, grant_type=grant_type, totp=self.totp
             )
-
-            headers = {
-                "Authorization": "Bearer " + self.token.get("access_token"),
-                "Content-Type": "application/json",
-            }
         else:
             self.token = None
-            headers = {}
-
-        if self.custom_headers is not None:
-            # merge custom headers to main headers
-            headers.update(self.custom_headers)
-
-        self.connection = ConnectionManager(
-            base_url=self.server_url, headers=headers, timeout=60, verify=self.verify
-        )
 
     def refresh_token(self):
         """Refresh the token.
