@@ -157,10 +157,14 @@ class KeycloakAdmin:
         if self.token is None:
             self.get_token()
 
-        headers = {
-            "Authorization": "Bearer " + self.token.get("access_token"),
-            "Content-Type": "application/json",
-        } if self.token is not None else {}
+        headers = (
+            {
+                "Authorization": "Bearer " + self.token.get("access_token"),
+                "Content-Type": "application/json",
+            }
+            if self.token is not None
+            else {}
+        )
 
         if self.custom_headers is not None:
             # merge custom headers to main headers
