@@ -28,8 +28,7 @@ try:
 except ImportError:  # pragma: no cover
     from urlparse import urljoin
 
-import requests
-from requests.adapters import HTTPAdapter
+import httpx
 
 from .exceptions import KeycloakConnectionError
 
@@ -67,26 +66,19 @@ class ConnectionManager(object):
         self.headers = headers
         self.timeout = timeout
         self.verify = verify
-        self._s = requests.Session()
+        self._s = httpx.AsyncClient(verify=verify)
         self._s.auth = lambda x: x  # don't let requests add auth headers
 
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
-        for protocol in ("https://", "http://"):
-            adapter = HTTPAdapter(max_retries=1)
-            # adds POST to retry whitelist
-            allowed_methods = set(adapter.max_retries.allowed_methods)
-            allowed_methods.add("POST")
-            adapter.max_retries.allowed_methods = frozenset(allowed_methods)
-
-            self._s.mount(protocol, adapter)
+        self._s.transport = httpx.AsyncHTTPTransport(retries=1)
 
         if proxies:
             self._s.proxies.update(proxies)
 
-    def __del__(self):
+    async def close(self):
         """Del method."""
-        self._s.close()
+        await self._s.aclose()
 
     @property
     def base_url(self):
@@ -182,7 +174,7 @@ class ConnectionManager(object):
         """
         self.headers.pop(key, None)
 
-    def raw_get(self, path, **kwargs):
+    async def raw_get(self, path, **kwargs):
         """Submit get request to the path.
 
         :param path: Path for request.
@@ -194,17 +186,17 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.get(
+            return await self._s.request(
+                "GET",
                 urljoin(self.base_url, path),
                 params=kwargs,
                 headers=self.headers,
                 timeout=self.timeout,
-                verify=self.verify,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
 
-    def raw_post(self, path, data, **kwargs):
+    async def raw_post(self, path, data, **kwargs):
         """Submit post request to the path.
 
         :param path: Path for request.
@@ -218,18 +210,17 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.post(
+            return await self._s.post(
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
                 headers=self.headers,
                 timeout=self.timeout,
-                verify=self.verify,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
 
-    def raw_put(self, path, data, **kwargs):
+    async def raw_put(self, path, data, **kwargs):
         """Submit put request to the path.
 
         :param path: Path for request.
@@ -243,18 +234,17 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.put(
+            return await self._s.put(
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
                 headers=self.headers,
                 timeout=self.timeout,
-                verify=self.verify,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
 
-    def raw_delete(self, path, data=None, **kwargs):
+    async def raw_delete(self, path, data=None, **kwargs):
         """Submit delete request to the path.
 
         :param path: Path for request.
@@ -268,13 +258,13 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.delete(
+            return await self._s.request(
+                "DELETE",
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data or dict(),
                 headers=self.headers,
                 timeout=self.timeout,
-                verify=self.verify,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)

@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime, timedelta
 
 import pytest
+import pytest_asyncio
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -134,8 +135,8 @@ def env():
     return KeycloakTestEnv()
 
 
-@pytest.fixture
-def admin(env: KeycloakTestEnv):
+@pytest_asyncio.fixture
+async def admin(env: KeycloakTestEnv):
     """Fixture for initialized KeycloakAdmin class.
 
     :param env: Keycloak test environment
@@ -143,15 +144,17 @@ def admin(env: KeycloakTestEnv):
     :returns: Keycloak admin
     :rtype: KeycloakAdmin
     """
-    return KeycloakAdmin(
+    admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
         password=env.KEYCLOAK_ADMIN_PASSWORD,
     )
+    await admin.connect()
+    return admin
 
 
-@pytest.fixture
-def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
+@pytest_asyncio.fixture
+async def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     """Fixture for initialized KeycloakOpenID class.
 
     :param env: Keycloak test environment
@@ -167,7 +170,7 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     admin.realm_name = realm
     # Create client
     client = str(uuid.uuid4())
-    client_id = admin.create_client(
+    client_id = await admin.create_client(
         payload={
             "name": client,
             "clientId": client,
@@ -183,11 +186,11 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
         client_id=client,
     )
     # Cleanup
-    admin.delete_client(client_id=client_id)
+    await admin.delete_client(client_id=client_id)
 
 
-@pytest.fixture
-def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
+@pytest_asyncio.fixture
+async def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     """Fixture for an initialized KeycloakOpenID class and a random user credentials.
 
     :param env: Keycloak test environment
@@ -204,7 +207,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
     # Create client
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
-    client_id = admin.create_client(
+    client_id = await admin.create_client(
         payload={
             "name": client,
             "clientId": client,
@@ -218,7 +221,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
     # Create user
     username = str(uuid.uuid4())
     password = str(uuid.uuid4())
-    user_id = admin.create_user(
+    user_id = await admin.create_user(
         payload={
             "username": username,
             "email": f"{username}@test.test",
@@ -239,12 +242,12 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
     )
 
     # Cleanup
-    admin.delete_client(client_id=client_id)
-    admin.delete_user(user_id=user_id)
+    await admin.delete_client(client_id=client_id)
+    await admin.delete_user(user_id=user_id)
 
 
-@pytest.fixture
-def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
+@pytest_asyncio.fixture
+async def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     """Fixture for an initialized KeycloakOpenID class and a random user credentials.
 
     :param env: Keycloak test environment
@@ -261,7 +264,7 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
     # Create client
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
-    client_id = admin.create_client(
+    client_id = await admin.create_client(
         payload={
             "name": client,
             "clientId": client,
@@ -274,17 +277,19 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
             "serviceAccountsEnabled": True,
         }
     )
-    admin.create_client_authz_role_based_policy(
+    role = await admin.get_realm_role(role_name="offline_access")
+    payload = {
+        "name": "test-authz-rb-policy",
+        "roles": [{"id": role["id"]}],
+    }
+    await admin.create_client_authz_role_based_policy(
         client_id=client_id,
-        payload={
-            "name": "test-authz-rb-policy",
-            "roles": [{"id": admin.get_realm_role(role_name="offline_access")["id"]}],
-        },
+        payload=payload,
     )
     # Create user
     username = str(uuid.uuid4())
     password = str(uuid.uuid4())
-    user_id = admin.create_user(
+    user_id = await admin.create_user(
         payload={
             "username": username,
             "email": f"{username}@test.test",
@@ -305,12 +310,12 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
     )
 
     # Cleanup
-    admin.delete_client(client_id=client_id)
-    admin.delete_user(user_id=user_id)
+    await admin.delete_client(client_id=client_id)
+    await admin.delete_user(user_id=user_id)
 
 
-@pytest.fixture
-def realm(admin: KeycloakAdmin) -> str:
+@pytest_asyncio.fixture
+async def realm(admin: KeycloakAdmin) -> str:
     """Fixture for a new random realm.
 
     :param admin: Keycloak admin
@@ -319,13 +324,13 @@ def realm(admin: KeycloakAdmin) -> str:
     :rtype: str
     """
     realm_name = str(uuid.uuid4())
-    admin.create_realm(payload={"realm": realm_name, "enabled": True})
+    await admin.create_realm(payload={"realm": realm_name, "enabled": True})
     yield realm_name
-    admin.delete_realm(realm_name=realm_name)
+    await admin.delete_realm(realm_name=realm_name)
 
 
-@pytest.fixture
-def user(admin: KeycloakAdmin, realm: str) -> str:
+@pytest_asyncio.fixture
+async def user(admin: KeycloakAdmin, realm: str) -> str:
     """Fixture for a new random user.
 
     :param admin: Keycloak admin
@@ -337,13 +342,13 @@ def user(admin: KeycloakAdmin, realm: str) -> str:
     """
     admin.realm_name = realm
     username = str(uuid.uuid4())
-    user_id = admin.create_user(payload={"username": username, "email": f"{username}@test.test"})
+    user_id = await admin.create_user(payload={"username": username, "email": f"{username}@test.test"})
     yield user_id
-    admin.delete_user(user_id=user_id)
+    await admin.delete_user(user_id=user_id)
 
 
-@pytest.fixture
-def group(admin: KeycloakAdmin, realm: str) -> str:
+@pytest_asyncio.fixture
+async def group(admin: KeycloakAdmin, realm: str) -> str:
     """Fixture for a new random group.
 
     :param admin: Keycloak admin
@@ -355,13 +360,13 @@ def group(admin: KeycloakAdmin, realm: str) -> str:
     """
     admin.realm_name = realm
     group_name = str(uuid.uuid4())
-    group_id = admin.create_group(payload={"name": group_name})
+    group_id = await admin.create_group(payload={"name": group_name})
     yield group_id
-    admin.delete_group(group_id=group_id)
+    await admin.delete_group(group_id=group_id)
 
 
-@pytest.fixture
-def client(admin: KeycloakAdmin, realm: str) -> str:
+@pytest_asyncio.fixture
+async def client(admin: KeycloakAdmin, realm: str) -> str:
     """Fixture for a new random client.
 
     :param admin: Keycloak admin
@@ -373,13 +378,13 @@ def client(admin: KeycloakAdmin, realm: str) -> str:
     """
     admin.realm_name = realm
     client = str(uuid.uuid4())
-    client_id = admin.create_client(payload={"name": client, "clientId": client})
+    client_id = await admin.create_client(payload={"name": client, "clientId": client})
     yield client_id
-    admin.delete_client(client_id=client_id)
+    await admin.delete_client(client_id=client_id)
 
 
-@pytest.fixture
-def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
+@pytest_asyncio.fixture
+async def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
     """Fixture for a new random client role.
 
     :param admin: Keycloak admin
@@ -393,13 +398,13 @@ def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
     """
     admin.realm_name = realm
     role = str(uuid.uuid4())
-    admin.create_client_role(client, {"name": role, "composite": False})
+    await admin.create_client_role(client, {"name": role, "composite": False})
     yield role
-    admin.delete_client_role(client, role)
+    await admin.delete_client_role(client, role)
 
 
-@pytest.fixture
-def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_role: str) -> str:
+@pytest_asyncio.fixture
+async def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_role: str) -> str:
     """Fixture for a new random composite client role.
 
     :param admin: Keycloak admin
@@ -415,11 +420,11 @@ def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_
     """
     admin.realm_name = realm
     role = str(uuid.uuid4())
-    admin.create_client_role(client, {"name": role, "composite": True})
-    role_repr = admin.get_client_role(client, client_role)
-    admin.add_composite_client_roles_to_role(client, role, roles=[role_repr])
+    await admin.create_client_role(client, {"name": role, "composite": True})
+    role_repr = await admin.get_client_role(client, client_role)
+    await admin.add_composite_client_roles_to_role(client, role, roles=[role_repr])
     yield role
-    admin.delete_client_role(client, role)
+    await admin.delete_client_role(client, role)
 
 
 @pytest.fixture
