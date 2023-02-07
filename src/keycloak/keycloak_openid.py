@@ -498,7 +498,9 @@ class KeycloakOpenID:
 
         payload = self._add_secret_key(payload)
 
-        data_raw = await self.connection.raw_post(URL_INTROSPECT.format(**params_path), data=payload)
+        data_raw = await self.connection.raw_post(
+            URL_INTROSPECT.format(**params_path), data=payload
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def decode_token(self, token, key, algorithms=["RS256"], **kwargs):
@@ -613,7 +615,7 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    #async def uma_permissions(self, token, permissions=""):
+    # async def uma_permissions(self, token, permissions=""):
     #    """Get UMA permissions by user token with requested permissions.
 
     #    The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
@@ -642,7 +644,7 @@ class KeycloakOpenID:
     #    data_raw = await self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
     #    return raise_error_from_response(data_raw, KeycloakPostError)
 
-    #async def has_uma_access(self, token, permissions):
+    # async def has_uma_access(self, token, permissions):
     #    """Determine whether user has uma permissions with specified user token.
 
     #    :param token: user token

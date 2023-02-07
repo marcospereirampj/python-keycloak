@@ -278,15 +278,9 @@ async def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Ke
         }
     )
     role = await admin.get_realm_role(role_name="offline_access")
-    payload = {
-        "name": "test-authz-rb-policy",
-        "roles": [{"id": role["id"]}],
-    }
+    payload = {"name": "test-authz-rb-policy", "roles": [{"id": role["id"]}]}
     print(payload)
-    await admin.create_client_authz_role_based_policy(
-        client_id=client_id,
-        payload=payload,
-    )
+    await admin.create_client_authz_role_based_policy(client_id=client_id, payload=payload)
     # Create user
     username = str(uuid.uuid4())
     password = str(uuid.uuid4())
@@ -343,7 +337,9 @@ async def user(admin: KeycloakAdmin, realm: str) -> str:
     """
     admin.realm_name = realm
     username = str(uuid.uuid4())
-    user_id = await admin.create_user(payload={"username": username, "email": f"{username}@test.test"})
+    user_id = await admin.create_user(
+        payload={"username": username, "email": f"{username}@test.test"}
+    )
     yield user_id
     await admin.delete_user(user_id=user_id)
 
@@ -405,7 +401,9 @@ async def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
 
 
 @pytest_asyncio.fixture
-async def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_role: str) -> str:
+async def composite_client_role(
+    admin: KeycloakAdmin, realm: str, client: str, client_role: str
+) -> str:
     """Fixture for a new random composite client role.
 
     :param admin: Keycloak admin

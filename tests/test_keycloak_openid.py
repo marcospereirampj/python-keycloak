@@ -194,18 +194,9 @@ async def test_exchange_token(
     admin.realm_name = oid.realm_name
     user_id = await admin.get_user_id(username=username)
     client_id = await admin.get_client_id(client_id="realm-management")
-    roles = [
-        await admin.get_client_role(
-            client_id=client_id,
-            role_name="impersonation",
-        )
-    ]
+    roles = [await admin.get_client_role(client_id=client_id, role_name="impersonation")]
     print(roles)
-    await admin.assign_client_role(
-        user_id=user_id,
-        client_id=client_id,
-        roles=roles
-    )
+    await admin.assign_client_role(user_id=user_id, client_id=client_id, roles=roles)
 
     token = await oid.token(username=username, password=password)
     assert await oid.userinfo(token=token["access_token"]) == {
@@ -285,9 +276,7 @@ async def test_entitlement(
     token = await oid.token(username=username, password=password)
     client_id = await admin.get_client_id(oid.client_id)
     with pytest.raises(KeycloakDeprecationError):
-        resource_servers = await admin.get_client_authz_resources(
-            client_id=client_id
-        )
+        resource_servers = await admin.get_client_authz_resources(client_id=client_id)
         resource_server_id = resource_servers[0]["_id"]
         await oid.entitlement(token=token["access_token"], resource_server_id=resource_server_id)
 
@@ -330,14 +319,13 @@ async def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str
         key="-----BEGIN PUBLIC KEY-----\n" + public_key + "\n-----END PUBLIC KEY-----",
         options={"verify_aud": False},
     )
-    assert (
-        decoded_token["preferred_username"]
-        == username
-    )
+    assert decoded_token["preferred_username"] == username
 
 
 @pytest.mark.asyncio
-async def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
+async def test_load_authorization_config(
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+):
     """Test load authorization config.
 
     :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
@@ -377,17 +365,24 @@ async def test_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, st
     key = "-----BEGIN PUBLIC KEY-----\n" + await oid.public_key() + "\n-----END PUBLIC KEY-----"
     orig_client_id = oid.client_id
     oid.client_id = "account"
-    assert await oid.get_policies(token=token["access_token"], method_token_info="decode", key=key) == []
+    assert (
+        await oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+        == []
+    )
     policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
     policy.add_role(role="account/view-profile")
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in await oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+        for x in await oid.get_policies(
+            token=token["access_token"], method_token_info="decode", key=key
+        )
     ] == ["Policy: test (role)"]
     assert [
         repr(x)
-        for x in await oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+        for x in await oid.get_policies(
+            token=token["access_token"], method_token_info="decode", key=key
+        )
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id
 
@@ -417,7 +412,8 @@ async def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID,
     orig_client_id = oid.client_id
     oid.client_id = "account"
     assert (
-        await oid.get_permissions(token=token["access_token"], method_token_info="decode", key=key) == []
+        await oid.get_permissions(token=token["access_token"], method_token_info="decode", key=key)
+        == []
     )
     policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
     policy.add_role(role="account/view-profile")
@@ -446,8 +442,8 @@ async def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID,
         await oid.get_permissions(token=token["access_token"])
 
 
-#@pytest.mark.asyncio
-#async def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
+# @pytest.mark.asyncio
+# async def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
 #    """Test UMA permissions.
 #
 #    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
@@ -462,10 +458,10 @@ async def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID,
 #    assert uma_permissions[0]["rsname"] == "Default Resource"
 #
 #
-#@pytest.mark.asyncio
-#async def test_has_uma_access(
+# @pytest.mark.asyncio
+# async def test_has_uma_access(
 #    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
-#):
+# ):
 #    """Test has UMA access.
 #
 #    :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization

@@ -1689,7 +1689,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response (UserRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "role-id": await self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.realm_name,
+            "role-id": await self.get_default_realm_role_id(),
+        }
         data_raw = await self.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES_REALM.format(**params_path)
         )
@@ -1703,7 +1706,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "role-id": await self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.realm_name,
+            "role-id": await self.get_default_realm_role_id(),
+        }
         data_raw = await self.raw_delete(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
             data=json.dumps(payload),
@@ -1718,7 +1724,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "role-id": await self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.realm_name,
+            "role-id": await self.get_default_realm_role_id(),
+        }
         data_raw = await self.raw_post(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
             data=json.dumps(payload),
@@ -1799,7 +1808,9 @@ class KeycloakAdmin:
         """
         if skip_exists:
             try:
-                res = await self.get_client_role(client_id=client_role_id, role_name=payload["name"])
+                res = await self.get_client_role(
+                    client_id=client_role_id, role_name=payload["name"]
+                )
                 return res["name"]
             except KeycloakGetError:
                 pass
@@ -3684,7 +3695,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    #async def upload_certificate(self, client_id, certcont):
+    # async def upload_certificate(self, client_id, certcont):
     #    """Upload a new certificate for the client.
 
     #    :param client_id: id of the client.
