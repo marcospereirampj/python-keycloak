@@ -28,14 +28,15 @@ def test_headers():
     assert not cm.exist_param_headers(key="H")
 
 
-def test_bad_connection():
+@pytest.mark.asyncio
+async def test_bad_connection():
     """Test bad connection."""
     cm = ConnectionManager(base_url="http://not.real.domain")
     with pytest.raises(KeycloakConnectionError):
-        cm.raw_get(path="bad")
+        await cm.raw_get(path="bad")
     with pytest.raises(KeycloakConnectionError):
-        cm.raw_delete(path="bad")
+        await cm.raw_delete(path="bad")
     with pytest.raises(KeycloakConnectionError):
-        cm.raw_post(path="bad", data={})
+        await cm.raw_post(path="bad", data={})
     with pytest.raises(KeycloakConnectionError):
-        cm.raw_put(path="bad", data={})
+        await cm.raw_put(path="bad", data={})

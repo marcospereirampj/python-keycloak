@@ -492,7 +492,7 @@ class KeycloakOpenID:
         if token_type_hint == "requesting_party_token":
             if rpt:
                 payload.update({"token": rpt, "token_type_hint": token_type_hint})
-                await self.connection.add_param_headers("Authorization", "Bearer " + token)
+                self.connection.add_param_headers("Authorization", "Bearer " + token)
             else:
                 raise KeycloakRPTNotFound("Can't found RPT.")
 
@@ -613,70 +613,70 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    async def uma_permissions(self, token, permissions=""):
-        """Get UMA permissions by user token with requested permissions.
+    #async def uma_permissions(self, token, permissions=""):
+    #    """Get UMA permissions by user token with requested permissions.
 
-        The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
-        invoked by confidential clients.
+    #    The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
+    #    invoked by confidential clients.
 
-        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+    #    http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
 
-        :param token: user token
-        :type token: str
-        :param permissions: list of uma permissions list(resource:scope) requested by the user
-        :type permissions: str
-        :returns: Keycloak server response
-        :rtype: dict
-        """
-        permission = build_permission_param(permissions)
+    #    :param token: user token
+    #    :type token: str
+    #    :param permissions: list of uma permissions list(resource:scope) requested by the user
+    #    :type permissions: str
+    #    :returns: Keycloak server response
+    #    :rtype: dict
+    #    """
+    #    permission = build_permission_param(permissions)
 
-        params_path = {"realm-name": self.realm_name}
-        payload = {
-            "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
-            "permission": permission,
-            "response_mode": "permissions",
-            "audience": self.client_id,
-        }
+    #    params_path = {"realm-name": self.realm_name}
+    #    payload = {
+    #        "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
+    #        "permission": permission,
+    #        "response_mode": "permissions",
+    #        "audience": self.client_id,
+    #    }
 
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        data_raw = await self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-        return raise_error_from_response(data_raw, KeycloakPostError)
+    #    self.connection.add_param_headers("Authorization", "Bearer " + token)
+    #    data_raw = await self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+    #    return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def has_uma_access(self, token, permissions):
-        """Determine whether user has uma permissions with specified user token.
+    #async def has_uma_access(self, token, permissions):
+    #    """Determine whether user has uma permissions with specified user token.
 
-        :param token: user token
-        :type token: str
-        :param permissions: list of uma permissions (resource:scope)
-        :type permissions: str
-        :return: Authentication status
-        :rtype: AuthStatus
-        :raises KeycloakAuthenticationError: In case of failed authentication
-        :raises KeycloakPostError: In case of failed request to Keycloak
-        """
-        needed = build_permission_param(permissions)
-        try:
-            granted = await self.uma_permissions(token, permissions)
-        except (KeycloakPostError, KeycloakAuthenticationError) as e:
-            if e.response_code == 403:  # pragma: no cover
-                return AuthStatus(
-                    is_logged_in=True, is_authorized=False, missing_permissions=needed
-                )
-            elif e.response_code == 401:
-                return AuthStatus(
-                    is_logged_in=False, is_authorized=False, missing_permissions=needed
-                )
-            raise
+    #    :param token: user token
+    #    :type token: str
+    #    :param permissions: list of uma permissions (resource:scope)
+    #    :type permissions: str
+    #    :return: Authentication status
+    #    :rtype: AuthStatus
+    #    :raises KeycloakAuthenticationError: In case of failed authentication
+    #    :raises KeycloakPostError: In case of failed request to Keycloak
+    #    """
+    #    needed = build_permission_param(permissions)
+    #    try:
+    #        granted = await self.uma_permissions(token, permissions)
+    #    except (KeycloakPostError, KeycloakAuthenticationError) as e:
+    #        if e.response_code == 403:  # pragma: no cover
+    #            return AuthStatus(
+    #                is_logged_in=True, is_authorized=False, missing_permissions=needed
+    #            )
+    #        elif e.response_code == 401:
+    #            return AuthStatus(
+    #                is_logged_in=False, is_authorized=False, missing_permissions=needed
+    #            )
+    #        raise
 
-        for resource_struct in granted:
-            resource = resource_struct["rsname"]
-            scopes = resource_struct.get("scopes", None)
-            if not scopes:
-                needed.discard(resource)
-                continue
-            for scope in scopes:  # pragma: no cover
-                needed.discard("{}#{}".format(resource, scope))
+    #    for resource_struct in granted:
+    #        resource = resource_struct["rsname"]
+    #        scopes = resource_struct.get("scopes", None)
+    #        if not scopes:
+    #            needed.discard(resource)
+    #            continue
+    #        for scope in scopes:  # pragma: no cover
+    #            needed.discard("{}#{}".format(resource, scope))
 
-        return AuthStatus(
-            is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
-        )
+    #    return AuthStatus(
+    #        is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
+    #    )

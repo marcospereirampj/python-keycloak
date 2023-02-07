@@ -74,7 +74,7 @@ class ConnectionManager(object):
         self._s.transport = httpx.AsyncHTTPTransport(retries=1)
 
         if proxies:
-            self._s.proxies.update(proxies)
+            self._s.proxies = proxies
 
     async def close(self):
         """Del method."""
@@ -214,6 +214,7 @@ class ConnectionManager(object):
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
+                files=kwargs.get('files'),
                 headers=self.headers,
                 timeout=self.timeout,
             )

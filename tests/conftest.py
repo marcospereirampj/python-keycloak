@@ -282,6 +282,7 @@ async def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Ke
         "name": "test-authz-rb-policy",
         "roles": [{"id": role["id"]}],
     }
+    print(payload)
     await admin.create_client_authz_role_based_policy(
         client_id=client_id,
         payload=payload,

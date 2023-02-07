@@ -3684,28 +3684,31 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def upload_certificate(self, client_id, certcont):
-        """Upload a new certificate for the client.
+    #async def upload_certificate(self, client_id, certcont):
+    #    """Upload a new certificate for the client.
 
-        :param client_id: id of the client.
-        :type client_id: str
-        :param certcont: the content of the certificate.
-        :type certcont: str
-        :return: dictionary {"certificate": "<certcont>"},
-                 where <certcont> is the content of the uploaded certificate.
-        :rtype: dict
-        """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "attr": "jwt.credential"}
-        m = MultipartEncoder(fields={"keystoreFormat": "Certificate PEM", "file": certcont})
-        new_headers = copy.deepcopy(self.connection.headers)
-        new_headers["Content-Type"] = m.content_type
-        self.connection.headers = new_headers
-        data_raw = await self.raw_post(
-            urls_patterns.URL_ADMIN_CLIENT_CERT_UPLOAD.format(**params_path),
-            data=m,
-            headers=new_headers,
-        )
-        return raise_error_from_response(data_raw, KeycloakPostError)
+    #    :param client_id: id of the client.
+    #    :type client_id: str
+    #    :param certcont: the content of the certificate.
+    #    :type certcont: str
+    #    :return: dictionary {"certificate": "<certcont>"},
+    #             where <certcont> is the content of the uploaded certificate.
+    #    :rtype: dict
+    #    """
+    #    params_path = {"realm-name": self.realm_name, "id": client_id, "attr": "jwt.credential"}
+    #    #m = MultipartEncoder(fields={"keystoreFormat": "Certificate PEM", "file": certcont})
+    #    #data = {"keystoreFormat": "Certificate PEM", "file": certcont}
+    #    data = {"file": certcont}
+    #    new_headers = copy.deepcopy(self.connection.headers)
+    #    new_headers["Content-Type"] = "multipart/form-data"
+    #    self.connection.headers = new_headers
+    #    data_raw = await self.raw_post(
+    #        urls_patterns.URL_ADMIN_CLIENT_CERT_UPLOAD.format(**params_path),
+    #        data={},
+    #        files=data,
+    #        headers=new_headers,
+    #    )
+    #    return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def get_required_action_by_alias(self, action_alias):
         """Get a required action by its alias.
