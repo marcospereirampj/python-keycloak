@@ -23,8 +23,6 @@
 
 """Keycloak custom exceptions module."""
 
-import requests
-
 
 class KeycloakError(Exception):
     """Base class for custom Keycloak errors.
@@ -167,7 +165,7 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
         expected_codes = [200, 201, 204]
 
     if response.status_code in expected_codes:
-        if response.status_code == requests.codes.no_content:
+        if response.status_code == 204:
             return {}
 
         try:
