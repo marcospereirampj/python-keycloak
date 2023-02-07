@@ -1,6 +1,6 @@
 [![Documentation Status](https://readthedocs.org/projects/python-keycloak/badge/?version=latest)](http://python-keycloak.readthedocs.io/en/latest/?badge=latest)
 
-# Async Pilot Keycloak fork
+# Async Python Keycloak fork
 This repo is a fork of https://github.com/marcospereirampj/python-keycloak at version 2.9.0 by Indoc Research to support async.
 
 # Python Keycloak
