@@ -1,5 +1,7 @@
-[![CircleCI](https://github.com/marcospereirampj/python-keycloak/actions/workflows/daily.yaml/badge.svg)](https://github.com/marcospereirampj/python-keycloak/)
 [![Documentation Status](https://readthedocs.org/projects/python-keycloak/badge/?version=latest)](http://python-keycloak.readthedocs.io/en/latest/?badge=latest)
+
+# Async Pilot Keycloak fork
+This repo is a fork of https://github.com/marcospereirampj/python-keycloak at version 2.9.0 by Indoc Research to support async.
 
 # Python Keycloak
 
@@ -15,14 +17,14 @@ For review- see https://github.com/marcospereirampj/python-keycloak
 
 ### Manually
 
-`$ python setup.py install`
+`$ pip install .`
 
 ## Dependencies
 
 python-keycloak depends on:
 
 - Python 3
-- [requests](https://requests.readthedocs.io)
+- [httpx](https://www.python-httpx.org/)
 - [python-jose](http://python-jose.readthedocs.io/en/latest/)
 - [urllib3](https://urllib3.readthedocs.io/en/stable/)
 
@@ -70,73 +72,76 @@ keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                                  client_secret_key="secret")
 
 # Get WellKnow
-config_well_known = keycloak_openid.well_known()
+config_well_known = await keycloak_openid.well_known()
 
 # Get Code With Oauth Authorization Request
-auth_url = keycloak_openid.auth_url(
+auth_url = await keycloak_openid.auth_url(
     redirect_uri="your_call_back_url",
     scope="email",
     state="your_state_info")
 
 # Get Access Token With Code
-access_token = keycloak_openid.token(
+access_token = await keycloak_openid.token(
     grant_type='authorization_code',
     code='the_code_you_get_from_auth_url_callback',
     redirect_uri="your_call_back_url")
 
 
 # Get Token
-token = keycloak_openid.token("user", "password")
-token = keycloak_openid.token("user", "password", totp="012345")
+token = await keycloak_openid.token("user", "password")
+token = await keycloak_openid.token("user", "password", totp="012345")
 
 # Get token using Token Exchange
-token = keycloak_openid.exchange_token(token['access_token'], "my_client", "other_client", "some_user")
+token = await keycloak_openid.exchange_token(token['access_token'], "my_client", "other_client", "some_user")
 
 # Get Userinfo
-userinfo = keycloak_openid.userinfo(token['access_token'])
+userinfo = await keycloak_openid.userinfo(token['access_token'])
 
 # Refresh token
-token = keycloak_openid.refresh_token(token['refresh_token'])
+token = await keycloak_openid.refresh_token(token['refresh_token'])
 
 # Logout
-keycloak_openid.logout(token['refresh_token'])
+await keycloak_openid.logout(token['refresh_token'])
 
 # Get Certs
-certs = keycloak_openid.certs()
+certs = await keycloak_openid.certs()
 
 # Get RPT (Entitlement)
-token = keycloak_openid.token("user", "password")
-rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
+token = await keycloak_openid.token("user", "password")
+rpt = await keycloak_openid.entitlement(token['access_token'], "resource_id")
 
 # Instropect RPT
-token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
+token_rpt_info = await keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
                                                                        token_type_hint="requesting_party_token"))
 
 # Introspect Token
-token_info = keycloak_openid.introspect(token['access_token'])
+token_info = await keycloak_openid.introspect(token['access_token'])
 
 # Decode Token
 KEYCLOAK_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" + keycloak_openid.public_key() + "\n-----END PUBLIC KEY-----"
 options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
-token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
+token_info = await keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
 
 # Get permissions by token
-token = keycloak_openid.token("user", "password")
-keycloak_openid.load_authorization_config("example-authz-config.json")
-policies = keycloak_openid.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
-permissions = keycloak_openid.get_permissions(token['access_token'], method_token_info='introspect')
+token = await keycloak_openid.token("user", "password")
+await keycloak_openid.load_authorization_config("example-authz-config.json")
+await policies = keycloak_openid.get_policies(token['access_token'], method_token_info='decode', key=KEYCLOAK_PUBLIC_KEY)
+await permissions = keycloak_openid.get_permissions(token['access_token'], method_token_info='introspect')
 
 # Get UMA-permissions by token
-token = keycloak_openid.token("user", "password")
-permissions = keycloak_openid.uma_permissions(token['access_token'])
+# Currently unsupported for async version
+# token = keycloak_openid.token("user", "password")
+# permissions = keycloak_openid.uma_permissions(token['access_token'])
 
 # Get UMA-permissions by token with specific resource and scope requested
-token = keycloak_openid.token("user", "password")
-permissions = keycloak_openid.uma_permissions(token['access_token'], permissions="Resource#Scope")
+# Currently unsupported for async version
+# token = keycloak_openid.token("user", "password")
+# permissions = keycloak_openid.uma_permissions(token['access_token'], permissions="Resource#Scope")
 
 # Get auth status for a specific resource and scope by token
-token = keycloak_openid.token("user", "password")
-auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Scope")
+# Currently unsupported for async version
+# token = keycloak_openid.token("user", "password")
+# auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Scope")
 
 
 # KEYCLOAK ADMIN
@@ -150,9 +155,10 @@ keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
                                user_realm_name="only_if_other_realm_than_master",
                                client_secret_key="client-secret",
                                verify=True)
+await keycloak_admin.connect()
 
 # Add user
-new_user = keycloak_admin.create_user({"email": "example@example.com",
+new_user = await keycloak_admin.create_user({"email": "example@example.com",
                                        "username": "example@example.com",
                                        "enabled": True,
                                        "firstName": "Example",
@@ -160,7 +166,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
 
 # Add user and raise exception if username already exists
 # exist_ok currently defaults to True for backwards compatibility reasons
-new_user = keycloak_admin.create_user({"email": "example@example.com",
+new_user = await keycloak_admin.create_user({"email": "example@example.com",
                                        "username": "example@example.com",
                                        "enabled": True,
                                        "firstName": "Example",
@@ -168,7 +174,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                                       exist_ok=False)
 
 # Add user and set password
-new_user = keycloak_admin.create_user({"email": "example@example.com",
+new_user = await keycloak_admin.create_user({"email": "example@example.com",
                                        "username": "example@example.com",
                                        "enabled": True,
                                        "firstName": "Example",
@@ -176,7 +182,7 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                     "credentials": [{"value": "secret","type": "password",}]})
 
 # Add user and specify a locale
-new_user = keycloak_admin.create_user({"email": "example@example.fr",
+new_user = await keycloak_admin.create_user({"email": "example@example.fr",
                                        "username": "example@example.fr",
                                        "enabled": True,
                                        "firstName": "Example",
@@ -186,92 +192,92 @@ new_user = keycloak_admin.create_user({"email": "example@example.fr",
                                        }})
 
 # User counter
-count_users = keycloak_admin.users_count()
+count_users = await keycloak_admin.users_count()
 
 # Get users Returns a list of users, filtered according to query parameters
-users = keycloak_admin.get_users({})
+users = await keycloak_admin.get_users({})
 
 # Get user ID from username
-user_id_keycloak = keycloak_admin.get_user_id("username-keycloak")
+user_id_keycloak = await keycloak_admin.get_user_id("username-keycloak")
 
 # Get User
-user = keycloak_admin.get_user("user-id-keycloak")
+user = await keycloak_admin.get_user("user-id-keycloak")
 
 # Update User
-response = keycloak_admin.update_user(user_id="user-id-keycloak",
+response = await keycloak_admin.update_user(user_id="user-id-keycloak",
                                       payload={'firstName': 'Example Update'})
 
 # Update User Password
-response = keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
+response = await keycloak_admin.set_user_password(user_id="user-id-keycloak", password="secret", temporary=True)
 
 # Get User Credentials
-credentials = keycloak_admin.get_credentials(user_id='user_id')
+credentials = await keycloak_admin.get_credentials(user_id='user_id')
 
 # Get User Credential by ID
-credential = keycloak_admin.get_credential(user_id='user_id', credential_id='credential_id')
+credential = await keycloak_admin.get_credential(user_id='user_id', credential_id='credential_id')
 
 # Delete User Credential
-response = keycloak_admin.delete_credential(user_id='user_id', credential_id='credential_id')
+response = await keycloak_admin.delete_credential(user_id='user_id', credential_id='credential_id')
 
 # Delete User
-response = keycloak_admin.delete_user(user_id="user-id-keycloak")
+response = await keycloak_admin.delete_user(user_id="user-id-keycloak")
 
 # Get consents granted by the user
-consents = keycloak_admin.consents_user(user_id="user-id-keycloak")
+consents = await keycloak_admin.consents_user(user_id="user-id-keycloak")
 
 # Send User Action
-response = keycloak_admin.send_update_account(user_id="user-id-keycloak",
+response = await keycloak_admin.send_update_account(user_id="user-id-keycloak",
                                               payload=['UPDATE_PASSWORD'])
 
 # Send Verify Email
-response = keycloak_admin.send_verify_email(user_id="user-id-keycloak")
+response = await keycloak_admin.send_verify_email(user_id="user-id-keycloak")
 
 # Get sessions associated with the user
-sessions = keycloak_admin.get_sessions(user_id="user-id-keycloak")
+sessions = await keycloak_admin.get_sessions(user_id="user-id-keycloak")
 
 # Get themes, social providers, auth providers, and event listeners available on this server
-server_info = keycloak_admin.get_server_info()
+server_info = await keycloak_admin.get_server_info()
 
 # Get clients belonging to the realm Returns a list of clients belonging to the realm
-clients = keycloak_admin.get_clients()
+clients = await keycloak_admin.get_clients()
 
 # Get client - id (not client-id) from client by name
-client_id = keycloak_admin.get_client_id("my-client")
+client_id = await keycloak_admin.get_client_id("my-client")
 
 # Get representation of the client - id of client (not client-id)
-client = keycloak_admin.get_client(client_id="client_id")
+client = await keycloak_admin.get_client(client_id="client_id")
 
 # Get all roles for the realm or client
-realm_roles = keycloak_admin.get_realm_roles()
+realm_roles = await keycloak_admin.get_realm_roles()
 
 # Get all roles for the client
-client_roles = keycloak_admin.get_client_roles(client_id="client_id")
+client_roles = await keycloak_admin.get_client_roles(client_id="client_id")
 
 # Get client role
-role = keycloak_admin.get_client_role(client_id="client_id", role_name="role_name")
+role = await keycloak_admin.get_client_role(client_id="client_id", role_name="role_name")
 
 # Warning: Deprecated
 # Get client role id from name
-role_id = keycloak_admin.get_client_role_id(client_id="client_id", role_name="test")
+role_id = await keycloak_admin.get_client_role_id(client_id="client_id", role_name="test")
 
 # Create client role
-keycloak_admin.create_client_role(client_role_id='client_id', payload={'name': 'roleName', 'clientRole': True})
+await keycloak_admin.create_client_role(client_role_id='client_id', payload={'name': 'roleName', 'clientRole': True})
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
-keycloak_admin.assign_client_role(client_id="client_id", user_id="user_id", role_id="role_id", role_name="test")
+await keycloak_admin.assign_client_role(client_id="client_id", user_id="user_id", role_id="role_id", role_name="test")
 
 # Retrieve client roles of a user.
-keycloak_admin.get_client_roles_of_user(user_id="user_id", client_id="client_id")
+await keycloak_admin.get_client_roles_of_user(user_id="user_id", client_id="client_id")
 
 # Retrieve available client roles of a user.
-keycloak_admin.get_available_client_roles_of_user(user_id="user_id", client_id="client_id")
+await keycloak_admin.get_available_client_roles_of_user(user_id="user_id", client_id="client_id")
 
 # Retrieve composite client roles of a user.
-keycloak_admin.get_composite_client_roles_of_user(user_id="user_id", client_id="client_id")
+await keycloak_admin.get_composite_client_roles_of_user(user_id="user_id", client_id="client_id")
 
 # Delete client roles of a user.
-keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles={"id": "role-id"})
-keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
+await keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles={"id": "role-id"})
+await keycloak_admin.delete_client_roles_of_user(client_id="client_id", user_id="user_id", roles=[{"id": "role-id_1"}, {"id": "role-id_2"}])
 
 # Get all client authorization resources
 client_resources = get_client_authz_resources(client_id="client_id")
@@ -286,62 +292,62 @@ client_permissions = get_client_authz_permissions(client_id="client_id")
 client_policies = get_client_authz_policies(client_id="client_id")
 
 # Create new group
-group = keycloak_admin.create_group({"name": "Example Group"})
+group = await keycloak_admin.create_group({"name": "Example Group"})
 
 # Get all groups
-groups = keycloak_admin.get_groups()
+groups = await keycloak_admin.get_groups()
 
 # Get group
-group = keycloak_admin.get_group(group_id='group_id')
+group = await keycloak_admin.get_group(group_id='group_id')
 
 # Get group by name
-group = keycloak_admin.get_group_by_path(path='/group/subgroup', search_in_subgroups=True)
+group = await keycloak_admin.get_group_by_path(path='/group/subgroup', search_in_subgroups=True)
 
 # Function to trigger user sync from provider
 sync_users(storage_id="storage_di", action="action")
 
 # Get client role id from name
-role_id = keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")
+role_id = await keycloak_admin.get_client_role_id(client_id=client_id, role_name="test")
 
 # Get all roles for the realm or client
-realm_roles = keycloak_admin.get_roles()
+realm_roles = await keycloak_admin.get_roles()
 
 # Assign client role to user. Note that BOTH role_name and role_id appear to be required.
-keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
+await keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, role_id=role_id, role_name="test")
 
 # Assign realm roles to user
-keycloak_admin.assign_realm_roles(user_id=user_id, roles=realm_roles)
+await keycloak_admin.assign_realm_roles(user_id=user_id, roles=realm_roles)
 
 # Assign realm roles to client's scope
-keycloak_admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=realm_roles)
+await keycloak_admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=realm_roles)
 
 # Get realm roles assigned to client's scope
-keycloak_admin.get_realm_roles_of_client_scope(client_id=client_id)
+await keycloak_admin.get_realm_roles_of_client_scope(client_id=client_id)
 
 # Remove realm roles assigned to client's scope
-keycloak_admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=realm_roles)
+await keycloak_admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=realm_roles)
 
-another_client_id = keycloak_admin.get_client_id("my-client-2")
+another_client_id = await keycloak_admin.get_client_id("my-client-2")
 
 # Assign client roles to client's scope
-keycloak_admin.assign_client_roles_to_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
+await keycloak_admin.assign_client_roles_to_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
 
 # Get client roles assigned to client's scope
-keycloak_admin.get_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id)
+await keycloak_admin.get_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id)
 
 # Remove client roles assigned to client's scope
-keycloak_admin.delete_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
+await keycloak_admin.delete_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
 
 # Get all ID Providers
-idps = keycloak_admin.get_idps()
+idps = await keycloak_admin.get_idps()
 
 # Create a new Realm
-keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)
+await keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)
 
 # Changing Realm
-keycloak_admin = KeycloakAdmin(realm_name="main", ...)
-keycloak_admin.get_users() # Get user in main realm
-keycloak_admin.realm_name = "demo" # Change realm to 'demo'
-keycloak_admin.get_users() # Get users in realm 'demo'
-keycloak_admin.create_user(...) # Creates a new user in 'demo'
+await keycloak_admin = KeycloakAdmin(realm_name="main", ...)
+await keycloak_admin.get_users() # Get user in main realm
+await keycloak_admin.realm_name = "demo" # Change realm to 'demo'
+await keycloak_admin.get_users() # Get users in realm 'demo'
+await keycloak_admin.create_user(...) # Creates a new user in 'demo'
 ```
