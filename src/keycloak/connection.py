@@ -214,7 +214,7 @@ class ConnectionManager(object):
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
-                files=kwargs.get('files'),
+                files=kwargs.get("files"),
                 headers=self.headers,
                 timeout=self.timeout,
             )

@@ -1,8 +1,12 @@
-name: Daily check
+name: Run Tests
 
 on:
-  schedule:
-    - cron: "0 4 * * *"
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
