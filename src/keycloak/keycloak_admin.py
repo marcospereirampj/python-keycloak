@@ -26,12 +26,9 @@
 
 """The keycloak admin module."""
 
-import copy
 import json
 from builtins import isinstance
 from typing import Iterable
-
-from requests_toolbelt import MultipartEncoder
 
 from . import urls_patterns
 from .connection import ConnectionManager
