@@ -1561,6 +1561,142 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_client_default_client_scopes(self, client_id):
+        """Get all default client scopes from client.
+
+        :param client_id: id of the client in which the new default client scope should be added
+        :type client_id: str
+
+        :return: list of client scopes with id and name
+        :rtype: list
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_client_default_client_scope(self, client_id, client_scope_id, payload):
+        """Add a client scope to the default client scopes from client.
+
+        Payload example::
+
+            payload={
+                "realm":"testrealm",
+                "client":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "clientScopeId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+            }
+
+        :param client_id: id of the client in which the new default client scope should be added
+        :type client_id: str
+        :param client_scope_id: id of the new client scope that should be added
+        :type client_scope_id: str
+        :param payload: dictionary with realm, client and clientScopeId
+        :type payload: dict
+
+        :return: Http response
+        :rtype: bytes
+        """
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": client_id,
+            "client_scope_id": client_scope_id,
+        }
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError)
+
+    def delete_client_default_client_scope(self, client_id, client_scope_id):
+        """Delete a client scope from the default client scopes of the client.
+
+        :param client_id: id of the client in which the default client scope should be deleted
+        :type client_id: str
+        :param client_scope_id: id of the client scope that should be deleted
+        :type client_scope_id: str
+
+        :return: list of client scopes with id and name
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": client_id,
+            "client_scope_id": client_scope_id,
+        }
+        data_raw = self.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPE.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def get_client_optional_client_scopes(self, client_id):
+        """Get all optional client scopes from client.
+
+        :param client_id: id of the client in which the new optional client scope should be added
+        :type client_id: str
+
+        :return: list of client scopes with id and name
+        :rtype: list
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_client_optional_client_scope(self, client_id, client_scope_id, payload):
+        """Add a client scope to the optional client scopes from client.
+
+        Payload example::
+
+            payload={
+                "realm":"testrealm",
+                "client":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "clientScopeId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+            }
+
+        :param client_id: id of the client in which the new optional client scope should be added
+        :type client_id: str
+        :param client_scope_id: id of the new client scope that should be added
+        :type client_scope_id: str
+        :param payload: dictionary with realm, client and clientScopeId
+        :type payload: dict
+
+        :return: Http response
+        :rtype: bytes
+        """
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": client_id,
+            "client_scope_id": client_scope_id,
+        }
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError)
+
+    def delete_client_optional_client_scope(self, client_id, client_scope_id):
+        """Delete a client scope from the optional client scopes of the client.
+
+        :param client_id: id of the client in which the optional client scope should be deleted
+        :type client_id: str
+        :param client_scope_id: id of the client scope that should be deleted
+        :type client_scope_id: str
+
+        :return: list of client scopes with id and name
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.realm_name,
+            "id": client_id,
+            "client_scope_id": client_scope_id,
+        }
+        data_raw = self.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPE.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
+
     def create_client(self, payload, skip_exists=False):
         """Create a client.
 
