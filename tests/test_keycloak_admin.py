@@ -90,6 +90,15 @@ def test_keycloak_admin_init(env):
     )
     assert admin.token
 
+    token = admin.token
+    admin = KeycloakAdmin(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        token=token,
+        realm_name=None,
+        user_realm_name=None,
+    )
+    assert admin.token == token
+
     admin.create_realm(payload={"realm": "authz", "enabled": True})
     admin.realm_name = "authz"
     admin.create_client(
