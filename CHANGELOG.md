@@ -1,9 +1,12 @@
+## v2.11.0 (2023-02-08)
+
 ## v2.10.0 (2023-02-08)
 
 ### Feat
 
 - update header if token is given
 - init KeycloakAdmin with token
+- Add Client Scopes of Client
 
 ## v2.9.0 (2023-01-11)
 
