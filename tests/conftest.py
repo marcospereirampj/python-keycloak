@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from keycloak import KeycloakAdmin, KeycloakOpenID
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakUMA
 
 
 class KeycloakTestEnv(object):
@@ -475,3 +475,20 @@ def selfsigned_cert():
     )
 
     return cert_pem, key_pem
+
+
+@pytest.fixture
+def uma(env: KeycloakTestEnv, realm: str):
+    """Fixture for initialized KeycloakUMA class.
+
+    :param env: Keycloak test environment
+    :type env: KeycloakTestEnv
+    :param realm: Keycloak realm
+    :type realm: str
+    :yields: Keycloak OpenID client
+    :rtype: KeycloakOpenID
+    """
+    # Return UMA
+    yield KeycloakUMA(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}", realm_name=realm
+    )
