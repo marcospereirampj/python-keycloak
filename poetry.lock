@@ -476,6 +476,21 @@ files = [
 ]
 
 [[package]]
+name = "deprecation"
+version = "2.1.0"
+description = "A library to handle automated deprecations"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "deprecation-2.1.0-py2.py3-none-any.whl", hash = "sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a"},
+    {file = "deprecation-2.1.0.tar.gz", hash = "sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff"},
+]
+
+[package.dependencies]
+packaging = "*"
+
+[[package]]
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
@@ -2094,4 +2109,4 @@ docs = ["Sphinx", "alabaster", "commonmark", "m2r2", "mock", "readthedocs-sphinx
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "8d76b155adddd2eacd0304397b33465d5c67f09165d8de641c71f5ce7b979be2"
+content-hash = "45f461f05bdc8da0d12a858c57782cc3a24fb4fb91175e6e0a290cd0304c10e9"

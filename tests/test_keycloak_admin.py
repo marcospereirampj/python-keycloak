@@ -2197,12 +2197,10 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
     """
     # Test get refresh
     admin.auto_refresh_token = list()
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
 
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.get_realm(realm_name=realm)
@@ -2213,12 +2211,10 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
     assert admin.get_realm(realm_name=realm)
 
     # Test bad refresh token
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
     admin.token["refresh_token"] = "bad"
     with pytest.raises(KeycloakPostError) as err:
         admin.get_realm(realm_name="test-refresh")
@@ -2230,12 +2226,10 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     # Test post refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.create_realm(payload={"realm": "test-refresh"})
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
@@ -2247,12 +2241,10 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     # Test update refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
@@ -2263,12 +2255,10 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
     )
 
     # Test delete refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.delete_realm(realm_name="test-refresh")
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
