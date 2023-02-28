@@ -75,6 +75,8 @@ class KeycloakAdmin:
     :type auto_refresh_token: list
     :param timeout: connection timeout in seconds
     :type timeout: int
+    :param connection: A KeycloakOpenIDConnectionManager as an alternative to individual params.
+    :type connection: KeycloakOpenIDConnectionManager
     """
 
     PAGE_SIZE = 100
@@ -96,6 +98,7 @@ class KeycloakAdmin:
         user_realm_name=None,
         auto_refresh_token=None,
         timeout=60,
+        connection: KeycloakOpenIDConnectionManager = None,
     ):
         """Init method.
 
@@ -127,8 +130,10 @@ class KeycloakAdmin:
         :type auto_refresh_token: list
         :param timeout: connection timeout in seconds
         :type timeout: int
+        :param connection: An OpenID Connection as an alternative to individual params.
+        :type connection: KeycloakOpenIDConnectionManager
         """
-        self.connection = KeycloakOpenIDConnectionManager(
+        self.connection = connection or KeycloakOpenIDConnectionManager(
             server_url=server_url,
             username=username,
             password=password,
