@@ -3,7 +3,9 @@
 import copy
 from typing import Tuple
 
+import freezegun
 import pytest
+from dateutil import parser as datetime_parser
 
 import keycloak
 from keycloak import KeycloakAdmin, KeycloakOpenID
@@ -20,31 +22,6 @@ from keycloak.exceptions import (
 def test_keycloak_version():
     """Test version."""
     assert keycloak.__version__, keycloak.__version__
-
-
-def test_keycloak_admin_bad_init(env):
-    """Test keycloak admin bad init.
-
-    :param env: Environment fixture
-    :type env: KeycloakTestEnv
-    """
-    with pytest.raises(TypeError) as err:
-        KeycloakAdmin(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-            username=env.KEYCLOAK_ADMIN,
-            password=env.KEYCLOAK_ADMIN_PASSWORD,
-            auto_refresh_token=1,
-        )
-    assert err.match("Expected a list of strings")
-
-    with pytest.raises(TypeError) as err:
-        KeycloakAdmin(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-            username=env.KEYCLOAK_ADMIN,
-            password=env.KEYCLOAK_ADMIN_PASSWORD,
-            auto_refresh_token=["patch"],
-        )
-    assert err.match("Unexpected method in auto_refresh_token")
 
 
 def test_keycloak_admin_init(env):
@@ -2187,16 +2164,17 @@ def test_events(admin: KeycloakAdmin, realm: str):
     assert events == list()
 
 
-def test_auto_refresh(admin: KeycloakAdmin, realm: str):
+@freezegun.freeze_time("2023-02-25 10:00:00")
+def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
     """Test auto refresh token.
 
-    :param admin: Keycloak Admin client
-    :type admin: KeycloakAdmin
+    :param admin_frozen: Keycloak Admin client with time frozen in place
+    :type admin_frozen: KeycloakAdmin
     :param realm: Keycloak realm
     :type realm: str
     """
+    admin = admin_frozen
     # Test get refresh
-    admin.auto_refresh_token = list()
     admin.connection.custom_headers = {
         "Authorization": "Bearer bad",
         "Content-Type": "application/json",
@@ -2206,65 +2184,46 @@ def test_auto_refresh(admin: KeycloakAdmin, realm: str):
         admin.get_realm(realm_name=realm)
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
 
-    admin.auto_refresh_token = ["get"]
-    del admin.token["refresh_token"]
-    assert admin.get_realm(realm_name=realm)
+    # Freeze time to simulate the access token expiring
+    with freezegun.freeze_time("2023-02-25 10:05:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.get_realm(realm_name=realm)
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:05:00")
 
-    # Test bad refresh token
-    admin.connection.custom_headers = {
-        "Authorization": "Bearer bad",
-        "Content-Type": "application/json",
-    }
-    admin.token["refresh_token"] = "bad"
-    with pytest.raises(KeycloakPostError) as err:
-        admin.get_realm(realm_name="test-refresh")
-    assert err.match(
-        '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''
-    )
-    admin.realm_name = "master"
-    admin.get_token()
-    admin.realm_name = realm
+    # Test bad refresh token, but first make sure access token has expired again
+    with freezegun.freeze_time("2023-02-25 10:10:00"):
+        admin.connection.custom_headers = {"Content-Type": "application/json"}
+        admin.connection.token["refresh_token"] = "bad"
+        with pytest.raises(KeycloakPostError) as err:
+            admin.get_realm(realm_name="test-refresh")
+        assert err.match(
+            '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''
+        )
+        admin.connection.get_token()
 
     # Test post refresh
-    admin.connection.custom_headers = {
-        "Authorization": "Bearer bad",
-        "Content-Type": "application/json",
-    }
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.create_realm(payload={"realm": "test-refresh"})
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post"]
-    admin.realm_name = "master"
-    admin.user_logout(user_id=admin.get_user_id(username=admin.username))
-    assert admin.create_realm(payload={"realm": "test-refresh"}) == b""
-    admin.realm_name = realm
+    with freezegun.freeze_time("2023-02-25 10:15:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:15:00")
+        admin.connection.token = None
+        assert admin.create_realm(payload={"realm": "test-refresh"}) == b""
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:15:00")
 
     # Test update refresh
-    admin.connection.custom_headers = {
-        "Authorization": "Bearer bad",
-        "Content-Type": "application/json",
-    }
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post", "put"]
-    assert (
-        admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"}) == dict()
-    )
+    with freezegun.freeze_time("2023-02-25 10:25:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:25:00")
+        admin.connection.token = None
+        assert (
+            admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
+            == dict()
+        )
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:25:00")
 
     # Test delete refresh
-    admin.connection.custom_headers = {
-        "Authorization": "Bearer bad",
-        "Content-Type": "application/json",
-    }
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.delete_realm(realm_name="test-refresh")
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post", "put", "delete"]
-    assert admin.delete_realm(realm_name="test-refresh") == dict()
+    with freezegun.freeze_time("2023-02-25 10:35:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:35:00")
+        admin.connection.token = None
+        assert admin.delete_realm(realm_name="test-refresh") == dict()
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:35:00")
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str):

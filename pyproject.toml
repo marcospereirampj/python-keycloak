@@ -73,6 +73,7 @@ cryptography = "^37.0.4"
 codespell = "^2.1.0"
 darglint = "^1.8.1"
 twine = "^4.0.2"
+freezegun = "^1.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -81,6 +81,7 @@ class KeycloakAdmin:
 
     PAGE_SIZE = 100
 
+    _auto_refresh_token = None
     _connection = None
 
     def __init__(
@@ -146,8 +147,8 @@ class KeycloakAdmin:
             user_realm_name=user_realm_name,
             custom_headers=custom_headers,
             timeout=timeout,
-            auto_refresh_token=auto_refresh_token or [],
         )
+        self.auto_refresh_token = auto_refresh_token
 
     @property
     @deprecation.deprecated(
@@ -450,7 +451,7 @@ class KeycloakAdmin:
         :returns: List of methods for automatic token refresh
         :rtype: list
         """
-        return self.connection.auto_refresh_token
+        return self._auto_refresh_token
 
     @auto_refresh_token.setter
     @deprecation.deprecated(
@@ -460,7 +461,7 @@ class KeycloakAdmin:
         details="Use the self.connection.custom_headers property instead",
     )
     def auto_refresh_token(self, value):
-        self.connection.auto_refresh_token = value
+        self._auto_refresh_token = value or []
 
     def __fetch_all(self, url, query=None):
         """Paginate over get requests.
@@ -572,9 +573,6 @@ class KeycloakAdmin:
         :return: RealmRepresentation
         :rtype: dict
         """
-        import debugpy
-
-        debugpy.breakpoint()
         params_path = {"realm-name": realm_name}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_REALM.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])

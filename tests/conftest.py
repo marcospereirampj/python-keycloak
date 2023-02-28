@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Tuple
 
+import freezegun
 import pytest
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -139,6 +140,23 @@ def env():
 @pytest.fixture
 def admin(env: KeycloakTestEnv):
     """Fixture for initialized KeycloakAdmin class.
+
+    :param env: Keycloak test environment
+    :type env: KeycloakTestEnv
+    :returns: Keycloak admin
+    :rtype: KeycloakAdmin
+    """
+    return KeycloakAdmin(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        username=env.KEYCLOAK_ADMIN,
+        password=env.KEYCLOAK_ADMIN_PASSWORD,
+    )
+
+
+@pytest.fixture
+@freezegun.freeze_time("2023-02-25 10:00:00")
+def admin_frozen(env: KeycloakTestEnv):
+    """Fixture for initialized KeycloakAdmin class, with time frozen.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv

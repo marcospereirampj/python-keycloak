@@ -29,7 +29,6 @@ class to handle authentication and token manipulation.
 
 import json
 from datetime import datetime, timedelta
-from typing import Iterable
 
 from jose import jwt
 
@@ -698,7 +697,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
     _client_id = None
     _verify = None
     _client_secret_key = None
-    _auto_refresh_token = None
     _connection = None
     _custom_headers = None
     _user_realm_name = None
@@ -717,7 +715,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         client_secret_key=None,
         custom_headers=None,
         user_realm_name=None,
-        auto_refresh_token=None,
         timeout=60,
     ):
         """Init method.
@@ -745,12 +742,12 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         :type custom_headers: dict
         :param user_realm_name: The realm name of the user, if different from realm_name
         :type user_realm_name: str
-        :param auto_refresh_token: list of methods that allows automatic token refresh.
-            Ex: ['get', 'put', 'post', 'delete']
-        :type auto_refresh_token: list
         :param timeout: connection timeout in seconds
         :type timeout: int
         """
+        # token is renewed when it hits 90% of its lifetime. This is to account for any possible
+        # clock skew.
+        self.token_renewal_fraction = 0.9
         self.server_url = server_url
         self.username = username
         self.password = password
@@ -760,12 +757,8 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         self.client_id = client_id
         self.verify = verify
         self.client_secret_key = client_secret_key
-        self.auto_refresh_token = auto_refresh_token or []
         self.user_realm_name = user_realm_name
         self.timeout = timeout
-        # token is renewed when it hits 90% of its lifetime. This is to account for any possible
-        # clock skew.
-        self.token_renewal_fraction = 0.9
 
         if self.token is None:
             self.get_token()
@@ -929,31 +922,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
             # merge custom headers to main headers
             self.headers.update(self.custom_headers)
 
-    @property
-    def auto_refresh_token(self):
-        """Get auto refresh token.
-
-        :returns: List of methods for automatic token refresh
-        :rtype: list
-        """
-        return self._auto_refresh_token
-
-    @auto_refresh_token.setter
-    def auto_refresh_token(self, value):
-        allowed_methods = {"get", "post", "put", "delete"}
-        if not isinstance(value, Iterable):
-            raise TypeError(
-                "Expected a list of strings among {allowed}".format(allowed=allowed_methods)
-            )
-        if not all(method in allowed_methods for method in value):
-            raise TypeError(
-                "Unexpected method in auto_refresh_token, accepted methods are {allowed}".format(
-                    allowed=allowed_methods
-                )
-            )
-
-        self._auto_refresh_token = value
-
     def get_token(self):
         """Get admin token.
 
@@ -995,7 +963,7 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
 
         :raises KeycloakPostError: In case the refresh token request failed.
         """
-        refresh_token = self.token.get("refresh_token", None)
+        refresh_token = self.token.get("refresh_token", None) if self.token else None
         if refresh_token is None:
             self.get_token()
         else:
@@ -1033,9 +1001,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_get(*args, **kwargs)
-        if "get" in self.auto_refresh_token and r.status_code == 401:
-            self.refresh_token()
-            return super().raw_get(*args, **kwargs)
         return r
 
     def raw_post(self, *args, **kwargs):
@@ -1053,9 +1018,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_post(*args, **kwargs)
-        if "post" in self.auto_refresh_token and r.status_code == 401:
-            self.refresh_token()
-            return super().raw_post(*args, **kwargs)
         return r
 
     def raw_put(self, *args, **kwargs):
@@ -1073,9 +1035,6 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_put(*args, **kwargs)
-        if "put" in self.auto_refresh_token and r.status_code == 401:
-            self.refresh_token()
-            return super().raw_put(*args, **kwargs)
         return r
 
     def raw_delete(self, *args, **kwargs):
@@ -1093,7 +1052,4 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_delete(*args, **kwargs)
-        if "delete" in self.auto_refresh_token and r.status_code == 401:
-            self.refresh_token()
-            return super().raw_delete(*args, **kwargs)
         return r
