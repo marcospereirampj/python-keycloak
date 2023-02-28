@@ -702,6 +702,7 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
     _connection = None
     _custom_headers = None
     _user_realm_name = None
+    _expires_at = None
 
     def __init__(
         self,
@@ -762,13 +763,12 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         self.auto_refresh_token = auto_refresh_token or []
         self.user_realm_name = user_realm_name
         self.timeout = timeout
+        # token is renewed when it hits 90% of its lifetime. This is to account for any possible
+        # clock skew.
+        self.token_renewal_fraction = 0.9
 
         if self.token is None:
             self.get_token()
-
-        self.expires_at = datetime.now() + timedelta(
-            seconds=self.token["expires_in"] if self.token else 0
-        )
 
         self.headers = (
             {
@@ -887,6 +887,18 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
     @token.setter
     def token(self, value):
         self._token = value
+        self._expires_at = datetime.now() + timedelta(
+            seconds=int(self.token_renewal_fraction * self.token["expires_in"] if value else 0)
+        )
+
+    @property
+    def expires_at(self):
+        """Get token expiry time.
+
+        :returns: Datetime at which the current token will expire
+        :rtype: datetime
+        """
+        return self._expires_at
 
     @property
     def user_realm_name(self):
