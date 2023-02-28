@@ -210,6 +210,10 @@ URL_ADMIN_ATTACK_DETECTION_USER = (
     "admin/realms/{realm-name}/attack-detection/brute-force/users/{id}"
 )
 
+URL_ADMIN_CLEAR_KEYS_CACHE = URL_ADMIN_REALM + "/clear-keys-cache"
+URL_ADMIN_CLEAR_REALM_CACHE = URL_ADMIN_REALM + "/clear-realm-cache"
+URL_ADMIN_CLEAR_USER_CACHE = URL_ADMIN_REALM + "/clear-user-cache"
+
 
 # UMA URLS
 URL_UMA_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/uma2-configuration"
