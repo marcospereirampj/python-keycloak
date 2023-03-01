@@ -33,7 +33,8 @@ from builtins import isinstance
 import deprecation
 from requests_toolbelt import MultipartEncoder
 
-from . import __version__, urls_patterns
+from . import urls_patterns
+from ._version import __version__
 from .exceptions import (
     KeycloakDeleteError,
     KeycloakGetError,
@@ -41,7 +42,7 @@ from .exceptions import (
     KeycloakPutError,
     raise_error_from_response,
 )
-from .keycloak_openid import KeycloakOpenIDConnectionManager
+from .openid_connection import KeycloakOpenIDConnectionManager
 
 
 class KeycloakAdmin:

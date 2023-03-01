@@ -36,7 +36,7 @@ from .exceptions import (
     KeycloakPutError,
     raise_error_from_response,
 )
-from .keycloak_openid import KeycloakOpenIDConnectionManager
+from .openid_connection import KeycloakOpenIDConnectionManager
 from .urls_patterns import URL_UMA_WELL_KNOWN
 
 

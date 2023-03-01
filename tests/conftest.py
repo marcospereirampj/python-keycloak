@@ -14,8 +14,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakUMA
-from keycloak.keycloak_openid import KeycloakOpenIDConnectionManager
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnectionManager, KeycloakUMA
 
 
 class KeycloakTestEnv(object):

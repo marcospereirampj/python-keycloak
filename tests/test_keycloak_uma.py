@@ -3,14 +3,13 @@ import re
 
 import pytest
 
+from keycloak import KeycloakOpenIDConnectionManager, KeycloakUMA
 from keycloak.exceptions import (
     KeycloakDeleteError,
     KeycloakGetError,
     KeycloakPostError,
     KeycloakPutError,
 )
-from keycloak.keycloak_openid import KeycloakOpenIDConnectionManager
-from keycloak.keycloak_uma import KeycloakUMA
 
 
 def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnectionManager):
