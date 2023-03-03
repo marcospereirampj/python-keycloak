@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 CMD_ARGS=$1
-KEYCLOAK_DOCKER_IMAGE="quay.io/keycloak/keycloak:latest"
+KEYCLOAK_DOCKER_IMAGE_TAG="${KEYCLOAK_DOCKER_IMAGE_TAG:-latest}"
+KEYCLOAK_DOCKER_IMAGE="quay.io/keycloak/keycloak:$KEYCLOAK_DOCKER_IMAGE_TAG"
 
 function keycloak_stop() {
     if [ "$(docker ps -q -f name=unittest_keycloak)" ]; then
