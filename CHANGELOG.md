@@ -1,3 +1,9 @@
+## v2.12.2 (2023-03-05)
+
+### Fix
+
+- get_group_by_path uses Keycloak API to load (#417)
+
 ## v2.12.1 (2023-03-05)
 
 ### Fix
