@@ -1155,36 +1155,22 @@ class KeycloakAdmin:
 
         return self.__fetch_all(url, query)
 
-    def get_group_by_path(self, path, search_in_subgroups=False):
+    def get_group_by_path(self, path):
         """Get group id based on name or path.
 
-        A straight name or path match with a top-level group will return first.
-        Subgroups are traversed, the first to match path (or name with path) is returned.
+        Returns full group details for a group defined by path
 
         GroupRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
 
         :param path: group path
         :type path: str
-        :param search_in_subgroups: True if want search in the subgroups
-        :type search_in_subgroups: bool
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        groups = self.get_groups()
-
-        # TODO: Review this code is necessary
-        for group in groups:
-            if group["path"] == path:
-                return group
-            elif search_in_subgroups and group["subGroups"]:
-                for group in group["subGroups"]:
-                    if group["path"] == path:
-                        return group
-                    res = self.get_subgroups(group, path)
-                    if res is not None:
-                        return res
-        return None
+        params_path = {"realm-name": self.realm_name, "path": path}
+        data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm.

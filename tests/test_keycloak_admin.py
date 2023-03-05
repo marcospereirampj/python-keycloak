@@ -606,20 +606,14 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     # Test get group by path
     res = admin.get_group_by_path(path="/main-group/subgroup-1")
-    assert res is None, res
-
-    res = admin.get_group_by_path(path="/main-group/subgroup-1", search_in_subgroups=True)
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    res = admin.get_group_by_path(
-        path="/main-group/subgroup-2/subsubgroup-1/test", search_in_subgroups=True
-    )
-    assert res is None, res
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
+    assert err.match('404: b\'{"error":"Group path does not exist"}\'')
 
-    res = admin.get_group_by_path(
-        path="/main-group/subgroup-2/subsubgroup-1", search_in_subgroups=True
-    )
+    res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
