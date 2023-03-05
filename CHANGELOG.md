@@ -1,3 +1,9 @@
+## v2.13.1 (2023-03-05)
+
+### Fix
+
+- Check if applyPolicies exists in the config (#367)
+
 ## v2.13.0 (2023-03-05)
 
 ### Feat
