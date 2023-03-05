@@ -1,3 +1,9 @@
+## v2.13.0 (2023-03-05)
+
+### Feat
+
+- implement cache clearing API (#414)
+
 ## v2.12.2 (2023-03-05)
 
 ### Fix
