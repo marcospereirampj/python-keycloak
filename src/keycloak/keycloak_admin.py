@@ -3876,3 +3876,39 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name}
         data_raw = self.raw_delete(urls_patterns.URL_ADMIN_ATTACK_DETECTION.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def clear_keys_cache(self):
+        """Clear keys cache.
+
+        :return: empty dictionary.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLEAR_KEYS_CACHE.format(**params_path), data=""
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    def clear_realm_cache(self):
+        """Clear realm cache.
+
+        :return: empty dictionary.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLEAR_REALM_CACHE.format(**params_path), data=""
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    def clear_user_cache(self):
+        """Clear user cache.
+
+        :return: empty dictionary.
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_CLEAR_USER_CACHE.format(**params_path), data=""
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])

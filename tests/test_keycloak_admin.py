@@ -2589,3 +2589,42 @@ def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
     with pytest.raises(KeycloakPostError) as err:
         admin.add_realm_default_roles(payload=[{"id": "bad id"}])
     assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+
+
+def test_clear_keys_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the keys cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_keys_cache()
+    assert res == {}
+
+
+def test_clear_realm_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the realm cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_realm_cache()
+    assert res == {}
+
+
+def test_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the user cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_user_cache()
+    assert res == {}
