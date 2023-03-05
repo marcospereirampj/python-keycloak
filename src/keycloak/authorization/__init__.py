@@ -86,8 +86,9 @@ class Authorization:
 
                 permission.scopes = ast.literal_eval(pol["config"]["scopes"])
 
-                for policy_name in ast.literal_eval(pol["config"]["applyPolicies"]):
-                    self.policies[policy_name].add_permission(permission)
+                if "applyPolicies" in pol["config"]:
+                    for policy_name in ast.literal_eval(pol["config"]["applyPolicies"]):
+                        self.policies[policy_name].add_permission(permission)
 
             if pol["type"] == "resource":
                 permission = Permission(
