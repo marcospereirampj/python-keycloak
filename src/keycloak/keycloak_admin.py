@@ -156,7 +156,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.server_url property instead",
+        details="Use the connection.server_url property instead",
     )
     def server_url(self):
         """Get server url.
@@ -171,7 +171,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.server_url property instead",
+        details="Use the connection.server_url property instead",
     )
     def server_url(self, value):
         self.connection.server_url = value
@@ -181,7 +181,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.realm_name property instead",
+        details="Use the connection.realm_name property instead",
     )
     def realm_name(self):
         """Get realm name.
@@ -196,7 +196,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.realm_name property instead",
+        details="Use the connection.realm_name property instead",
     )
     def realm_name(self, value):
         self.connection.realm_name = value
@@ -219,7 +219,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.client_id property instead",
+        details="Use the connection.client_id property instead",
     )
     def client_id(self):
         """Get client id.
@@ -234,7 +234,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.client_id property instead",
+        details="Use the connection.client_id property instead",
     )
     def client_id(self, value):
         self.connection.client_id = value
@@ -244,7 +244,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.client_secret_key property instead",
+        details="Use the connection.client_secret_key property instead",
     )
     def client_secret_key(self):
         """Get client secret key.
@@ -259,7 +259,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.client_secret_key property instead",
+        details="Use the connection.client_secret_key property instead",
     )
     def client_secret_key(self, value):
         self.connection.client_secret_key = value
@@ -269,7 +269,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.verify property instead",
+        details="Use the connection.verify property instead",
     )
     def verify(self):
         """Get verify.
@@ -284,7 +284,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.verify property instead",
+        details="Use the connection.verify property instead",
     )
     def verify(self, value):
         self.connection.verify = value
@@ -294,7 +294,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.username property instead",
+        details="Use the connection.username property instead",
     )
     def username(self):
         """Get username.
@@ -309,7 +309,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.username property instead",
+        details="Use the connection.username property instead",
     )
     def username(self, value):
         self.connection.username = value
@@ -319,7 +319,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.password property instead",
+        details="Use the connection.password property instead",
     )
     def password(self):
         """Get password.
@@ -334,7 +334,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.password property instead",
+        details="Use the connection.password property instead",
     )
     def password(self, value):
         self.connection.password = value
@@ -344,7 +344,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.totp property instead",
+        details="Use the connection.totp property instead",
     )
     def totp(self):
         """Get totp.
@@ -359,7 +359,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.totp property instead",
+        details="Use the connection.totp property instead",
     )
     def totp(self, value):
         self.connection.totp = value
@@ -369,7 +369,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.token property instead",
+        details="Use the connection.token property instead",
     )
     def token(self):
         """Get token.
@@ -384,7 +384,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.token property instead",
+        details="Use the connection.token property instead",
     )
     def token(self, value):
         self.connection.token = value
@@ -394,7 +394,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.user_realm_name property instead",
+        details="Use the connection.user_realm_name property instead",
     )
     def user_realm_name(self):
         """Get user realm name.
@@ -409,7 +409,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.user_realm_name property instead",
+        details="Use the connection.user_realm_name property instead",
     )
     def user_realm_name(self, value):
         self.connection.user_realm_name = value
@@ -419,7 +419,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.custom_headers property instead",
+        details="Use the connection.custom_headers property instead",
     )
     def custom_headers(self):
         """Get custom headers.
@@ -434,7 +434,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.custom_headers property instead",
+        details="Use the connection.custom_headers property instead",
     )
     def custom_headers(self, value):
         self.connection.custom_headers = value
@@ -444,7 +444,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.auto_refresh_token property instead",
+        details="Use the connection.auto_refresh_token property instead",
     )
     def auto_refresh_token(self):
         """Get auto refresh token.
@@ -459,7 +459,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.custom_headers property instead",
+        details="Use the connection.custom_headers property instead",
     )
     def auto_refresh_token(self, value):
         self._auto_refresh_token = value or []
@@ -3571,7 +3571,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.raw_get function instead",
+        details="Use the connection.raw_get function instead",
     )
     def raw_get(self, *args, **kwargs):
         """Call connection.raw_get.
@@ -3592,7 +3592,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.raw_post function instead",
+        details="Use the connection.raw_post function instead",
     )
     def raw_post(self, *args, **kwargs):
         """Call connection.raw_post.
@@ -3613,7 +3613,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.raw_put function instead",
+        details="Use the connection.raw_put function instead",
     )
     def raw_put(self, *args, **kwargs):
         """Call connection.raw_put.
@@ -3634,7 +3634,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.raw_delete function instead",
+        details="Use the connection.raw_delete function instead",
     )
     def raw_delete(self, *args, **kwargs):
         """Call connection.raw_delete.
@@ -3655,7 +3655,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.get_token function instead",
+        details="Use the connection.get_token function instead",
     )
     def get_token(self):
         """Get admin token.
@@ -3671,7 +3671,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the self.connection.refresh_token function instead",
+        details="Use the connection.refresh_token function instead",
     )
     def refresh_token(self):
         """Refresh the token.
