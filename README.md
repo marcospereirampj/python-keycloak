@@ -142,9 +142,9 @@ auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Sc
 # KEYCLOAK ADMIN
 
 from keycloak import KeycloakAdmin
-from keycloak import KeycloakOpenIDConnectionManager
+from keycloak import KeycloakOpenIDConnection
 
-keycloak_connection = KeycloakOpenIDConnectionManager(
+keycloak_connection = KeycloakOpenIDConnection(
                         server_url="http://localhost:8080/",
                         username='example-admin',
                         password='secret',
@@ -352,10 +352,10 @@ keycloak_admin.create_user(...) # Creates a new user in 'demo'
 
 # KEYCLOAK UMA
 
-from keycloak import KeycloakOpenIDConnectionManager
+from keycloak import KeycloakOpenIDConnection
 from keycloak import KeycloakUMA
 
-keycloak_connection = KeycloakOpenIDConnectionManager(
+keycloak_connection = KeycloakOpenIDConnection(
                         server_url="http://localhost:8080/",
                         realm_name="master",
                         client_id="my_client",

@@ -42,7 +42,7 @@ from .exceptions import (
     KeycloakPutError,
     raise_error_from_response,
 )
-from .openid_connection import KeycloakOpenIDConnectionManager
+from .openid_connection import KeycloakOpenIDConnection
 
 
 class KeycloakAdmin:
@@ -76,8 +76,8 @@ class KeycloakAdmin:
     :type auto_refresh_token: list
     :param timeout: connection timeout in seconds
     :type timeout: int
-    :param connection: A KeycloakOpenIDConnectionManager as an alternative to individual params.
-    :type connection: KeycloakOpenIDConnectionManager
+    :param connection: A KeycloakOpenIDConnection as an alternative to individual params.
+    :type connection: KeycloakOpenIDConnection
     """
 
     PAGE_SIZE = 100
@@ -100,7 +100,7 @@ class KeycloakAdmin:
         user_realm_name=None,
         auto_refresh_token=None,
         timeout=60,
-        connection: KeycloakOpenIDConnectionManager = None,
+        connection: KeycloakOpenIDConnection = None,
     ):
         """Init method.
 
@@ -133,9 +133,9 @@ class KeycloakAdmin:
         :param timeout: connection timeout in seconds
         :type timeout: int
         :param connection: An OpenID Connection as an alternative to individual params.
-        :type connection: KeycloakOpenIDConnectionManager
+        :type connection: KeycloakOpenIDConnection
         """
-        self.connection = connection or KeycloakOpenIDConnectionManager(
+        self.connection = connection or KeycloakOpenIDConnection(
             server_url=server_url,
             username=username,
             password=password,
@@ -206,7 +206,7 @@ class KeycloakAdmin:
         """Get connection.
 
         :returns: Connection manager
-        :rtype: KeycloakOpenIDConnectionManager
+        :rtype: KeycloakOpenIDConnection
         """
         return self._connection
 

@@ -14,7 +14,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnectionManager, KeycloakUMA
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection, KeycloakUMA
 
 
 class KeycloakTestEnv(object):
@@ -503,10 +503,10 @@ def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
     :param oid_with_credentials_authz: Keycloak OpenID client with pre-configured user credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
     :yields: Keycloak OpenID connection manager
-    :rtype: KeycloakOpenIDConnectionManager
+    :rtype: KeycloakOpenIDConnection
     """
     oid, _, _ = oid_with_credentials_authz
-    connection = KeycloakOpenIDConnectionManager(
+    connection = KeycloakOpenIDConnection(
         server_url=oid.connection.base_url,
         realm_name=oid.realm_name,
         client_id=oid.client_id,
@@ -517,11 +517,11 @@ def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
 
 
 @pytest.fixture
-def uma(oid_connection_with_authz: KeycloakOpenIDConnectionManager):
+def uma(oid_connection_with_authz: KeycloakOpenIDConnection):
     """Fixture for initialized KeycloakUMA class.
 
     :param oid_connection_with_authz: Keycloak open id connection with pre-configured authz client
-    :type oid_connection_with_authz: KeycloakOpenIDConnectionManager
+    :type oid_connection_with_authz: KeycloakOpenIDConnection
     :yields: Keycloak OpenID client
     :rtype: KeycloakOpenID
     """

@@ -43,7 +43,7 @@ from .exceptions import (
 from .keycloak_admin import KeycloakAdmin
 from .keycloak_openid import KeycloakOpenID
 from .keycloak_uma import KeycloakUMA
-from .openid_connection import KeycloakOpenIDConnectionManager
+from .openid_connection import KeycloakOpenIDConnection
 
 __all__ = [
     "__version__",
@@ -63,6 +63,6 @@ __all__ = [
     "KeycloakSecretNotFound",
     "KeycloakAdmin",
     "KeycloakOpenID",
-    "KeycloakOpenIDConnectionManager",
+    "KeycloakOpenIDConnection",
     "KeycloakUMA",
 ]

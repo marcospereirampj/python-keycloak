@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from keycloak import KeycloakOpenIDConnectionManager, KeycloakUMA
+from keycloak import KeycloakOpenIDConnection, KeycloakUMA
 from keycloak.exceptions import (
     KeycloakDeleteError,
     KeycloakGetError,
@@ -12,16 +12,16 @@ from keycloak.exceptions import (
 )
 
 
-def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnectionManager):
+def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnection):
     """Test KeycloakUMA's init method.
 
     :param oid_connection_with_authz: Keycloak OpenID connection manager with preconfigured authz
-    :type oid_connection_with_authz: KeycloakOpenIDConnectionManager
+    :type oid_connection_with_authz: KeycloakOpenIDConnection
     """
     connection = oid_connection_with_authz
     uma = KeycloakUMA(connection=connection)
 
-    assert isinstance(uma.connection, KeycloakOpenIDConnectionManager)
+    assert isinstance(uma.connection, KeycloakOpenIDConnection)
     # should initially be empty
     assert uma._well_known is None
     assert uma.uma_well_known

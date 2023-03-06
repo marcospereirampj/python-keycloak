@@ -36,7 +36,7 @@ from .exceptions import (
     KeycloakPutError,
     raise_error_from_response,
 )
-from .openid_connection import KeycloakOpenIDConnectionManager
+from .openid_connection import KeycloakOpenIDConnection
 from .urls_patterns import URL_UMA_WELL_KNOWN
 
 
@@ -46,11 +46,11 @@ class KeycloakUMA:
     :param connection: OpenID connection manager
     """
 
-    def __init__(self, connection: KeycloakOpenIDConnectionManager):
+    def __init__(self, connection: KeycloakOpenIDConnection):
         """Init method.
 
         :param connection: OpenID connection manager
-        :type connection: KeycloakOpenIDConnectionManager
+        :type connection: KeycloakOpenIDConnection
         """
         self.connection = connection
         custom_headers = self.connection.custom_headers or {}

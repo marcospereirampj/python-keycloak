@@ -23,7 +23,7 @@
 
 """Keycloak OpenID Connection Manager module.
 
-The module contains mainly the implementation of KeycloakOpenIDConnectionManager class.
+The module contains mainly the implementation of KeycloakOpenIDConnection class.
 This is an extension of the ConnectionManager class, and handles the automatic refresh
 of openid tokens when required.
 """
@@ -35,7 +35,7 @@ from .exceptions import KeycloakPostError
 from .keycloak_openid import KeycloakOpenID
 
 
-class KeycloakOpenIDConnectionManager(ConnectionManager):
+class KeycloakOpenIDConnection(ConnectionManager):
     """A class to help with OpenID connections which can auto refresh tokens.
 
     :param object: _description_
