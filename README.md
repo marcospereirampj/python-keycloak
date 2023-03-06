@@ -69,7 +69,7 @@ keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                                  realm_name="example_realm",
                                  client_secret_key="secret")
 
-# Get WellKnow
+# Get WellKnown
 config_well_known = keycloak_openid.well_known()
 
 # Get Code With Oauth Authorization Request
@@ -142,14 +142,19 @@ auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Sc
 # KEYCLOAK ADMIN
 
 from keycloak import KeycloakAdmin
+from keycloak import KeycloakOpenIDConnection
 
-keycloak_admin = KeycloakAdmin(server_url="http://localhost:8080/auth/",
-                               username='example-admin',
-                               password='secret',
-                               realm_name="master",
-                               user_realm_name="only_if_other_realm_than_master",
-                               client_secret_key="client-secret",
-                               verify=True)
+keycloak_connection = KeycloakOpenIDConnection(
+                        server_url="http://localhost:8080/",
+                        username='example-admin',
+                        password='secret',
+                        realm_name="master",
+                        user_realm_name="only_if_other_realm_than_master",
+                        client_id="my_client",
+                        client_secret_key="client-secret",
+                        verify=True)
+
+keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
 
 # Add user
 new_user = keycloak_admin.create_user({"email": "example@example.com",
@@ -344,4 +349,36 @@ keycloak_admin.get_users() # Get user in main realm
 keycloak_admin.realm_name = "demo" # Change realm to 'demo'
 keycloak_admin.get_users() # Get users in realm 'demo'
 keycloak_admin.create_user(...) # Creates a new user in 'demo'
+
+# KEYCLOAK UMA
+
+from keycloak import KeycloakOpenIDConnection
+from keycloak import KeycloakUMA
+
+keycloak_connection = KeycloakOpenIDConnection(
+                        server_url="http://localhost:8080/",
+                        realm_name="master",
+                        client_id="my_client",
+                        client_secret_key="client-secret")
+
+keycloak_uma = KeycloakUMA(connection=keycloak_connection)
+
+# Create a resource set
+resource_set = keycloak_uma.resource_set_create({
+                "name": "example_resource",
+                "scopes": ["example:read", "example:write"],
+                "type": "urn:example"})
+
+# List resource sets
+resource_sets = uma.resource_set_list()
+
+# get resource set
+latest_resource = uma.resource_set_read(resource_set["_id"])
+
+# update resource set
+latest_resource["name"] = "New Resource Name"
+uma.resource_set_update(resource_set["_id"], latest_resource)
+
+# delete resource set
+uma.resource_set_delete(resource_id=resource_set["_id"])
 ```

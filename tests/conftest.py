@@ -4,7 +4,9 @@ import ipaddress
 import os
 import uuid
 from datetime import datetime, timedelta
+from typing import Tuple
 
+import freezegun
 import pytest
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -12,7 +14,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakUMA
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection, KeycloakUMA
 
 
 class KeycloakTestEnv(object):
@@ -137,6 +139,23 @@ def env():
 @pytest.fixture
 def admin(env: KeycloakTestEnv):
     """Fixture for initialized KeycloakAdmin class.
+
+    :param env: Keycloak test environment
+    :type env: KeycloakTestEnv
+    :returns: Keycloak admin
+    :rtype: KeycloakAdmin
+    """
+    return KeycloakAdmin(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        username=env.KEYCLOAK_ADMIN,
+        password=env.KEYCLOAK_ADMIN_PASSWORD,
+    )
+
+
+@pytest.fixture
+@freezegun.freeze_time("2023-02-25 10:00:00")
+def admin_frozen(env: KeycloakTestEnv):
+    """Fixture for initialized KeycloakAdmin class, with time frozen.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -478,17 +497,34 @@ def selfsigned_cert():
 
 
 @pytest.fixture
-def uma(env: KeycloakTestEnv, realm: str):
+def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Fixture for initialized KeycloakUMA class.
 
-    :param env: Keycloak test environment
-    :type env: KeycloakTestEnv
-    :param realm: Keycloak realm
-    :type realm: str
+    :param oid_with_credentials_authz: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    :yields: Keycloak OpenID connection manager
+    :rtype: KeycloakOpenIDConnection
+    """
+    oid, _, _ = oid_with_credentials_authz
+    connection = KeycloakOpenIDConnection(
+        server_url=oid.connection.base_url,
+        realm_name=oid.realm_name,
+        client_id=oid.client_id,
+        client_secret_key=oid.client_secret_key,
+        timeout=60,
+    )
+    yield connection
+
+
+@pytest.fixture
+def uma(oid_connection_with_authz: KeycloakOpenIDConnection):
+    """Fixture for initialized KeycloakUMA class.
+
+    :param oid_connection_with_authz: Keycloak open id connection with pre-configured authz client
+    :type oid_connection_with_authz: KeycloakOpenIDConnection
     :yields: Keycloak OpenID client
     :rtype: KeycloakOpenID
     """
+    connection = oid_connection_with_authz
     # Return UMA
-    yield KeycloakUMA(
-        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}", realm_name=realm
-    )
+    yield KeycloakUMA(connection=connection)
