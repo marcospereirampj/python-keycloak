@@ -444,7 +444,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the connection.auto_refresh_token property instead",
+        details="Auto-refresh will be implicitly set for all requests",
     )
     def auto_refresh_token(self):
         """Get auto refresh token.
@@ -459,7 +459,7 @@ class KeycloakAdmin:
         deprecated_in="2.13.0",
         removed_in="3.0.0",
         current_version=__version__,
-        details="Use the connection.custom_headers property instead",
+        details="Auto-refresh will be implicitly set for all requests",
     )
     def auto_refresh_token(self, value):
         self._auto_refresh_token = value or []
