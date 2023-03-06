@@ -100,7 +100,7 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
         """
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.
-        self.token_renewal_fraction = 0.9
+        self.token_lifetime_fraction = 0.9
         self.server_url = server_url
         self.username = username
         self.password = password
@@ -234,7 +234,7 @@ class KeycloakOpenIDConnectionManager(ConnectionManager):
     def token(self, value):
         self._token = value
         self._expires_at = datetime.now() + timedelta(
-            seconds=int(self.token_renewal_fraction * self.token["expires_in"] if value else 0)
+            seconds=int(self.token_lifetime_fraction * self.token["expires_in"] if value else 0)
         )
 
     @property
