@@ -29,21 +29,21 @@ Documentation = "https://python-keycloak.readthedocs.io/en/latest/"
 "Issue tracker" = "https://github.com/marcospereirampj/python-keycloak/issues"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-requests = "^2.28.2"
-python-jose = "^3.3.0"
-urllib3 = "^1.26.14"
-mock = {version = "^4.0.3", optional = true}
-alabaster = {version = "^0.7.12", optional = true}
-commonmark = {version = "^0.9.1", optional = true}
-recommonmark = {version = "^0.7.1", optional = true}
-Sphinx = {version = "^5.3.0", optional = true}
-sphinx-rtd-theme = {version = "^1.0.0", optional = true}
-readthedocs-sphinx-ext = {version = "^2.1.9", optional = true}
-m2r2 = {version = "^0.3.2", optional = true}
-sphinx-autoapi = {version = "^2.0.0", optional = true}
-requests-toolbelt = "^0.10.1"
-deprecation = "^2.1.0"
+python = ">=3.7"
+requests = ">=2.28.2"
+python-jose = ">=3.3.0"
+urllib3 = ">=1.26.14"
+mock = {version = ">=4.0.3", optional = true}
+alabaster = {version = ">=0.7.12", optional = true}
+commonmark = {version = ">=0.9.1", optional = true}
+recommonmark = {version = ">=0.7.1", optional = true}
+Sphinx = {version = ">=5.3.0", optional = true}
+sphinx-rtd-theme = {version = ">=1.0.0", optional = true}
+readthedocs-sphinx-ext = {version = ">=2.1.9", optional = true}
+m2r2 = {version = ">=0.3.2", optional = true}
+sphinx-autoapi = {version = ">=2.0.0", optional = true}
+requests-toolbelt = ">=0.10.1"
+deprecation = ">=2.1.0"
 
 [tool.poetry.extras]
 docs = [
@@ -51,7 +51,7 @@ docs = [
     "alabaster",
     "commonmark",
     "recommonmark",
-    "sphinx",
+    "Sphinx",
     "sphinx-rtd-theme",
     "readthedocs-sphinx-ext",
     "m2r2",
