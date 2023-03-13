@@ -1661,6 +1661,42 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def delete_client_authz_policy(self, client_id, policy_id):
+        """Delete a policy from client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_client_authz_policy(self, client_id, policy_id):
+        """Get a policy from client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_client_service_account_user(self, client_id):
         """Get service account user from client.
 
