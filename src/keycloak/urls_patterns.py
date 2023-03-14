@@ -38,6 +38,9 @@ URL_AUTH = (
     "&scope={scope}&state={state}"
 )
 
+URL_CLIENT_REGISTRATION = URL_REALM + "/clients-registrations/default"
+URL_CLIENT_UPDATE = URL_CLIENT_REGISTRATION + "/{client-id}"
+
 # ADMIN URLS
 URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
 URL_ADMIN_USERS_COUNT = "admin/realms/{realm-name}/users/count"
@@ -83,6 +86,7 @@ URL_ADMIN_GROUP_CHILD = "admin/realms/{realm-name}/groups/{id}/children"
 URL_ADMIN_GROUP_PERMISSIONS = "admin/realms/{realm-name}/groups/{id}/management/permissions"
 URL_ADMIN_GROUP_MEMBERS = "admin/realms/{realm-name}/groups/{id}/members"
 
+URL_ADMIN_CLIENT_INITIAL_ACCESS = "admin/realms/{realm-name}/clients-initial-access"
 URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
 URL_ADMIN_CLIENT = URL_ADMIN_CLIENTS + "/{id}"
 URL_ADMIN_CLIENT_ALL_SESSIONS = URL_ADMIN_CLIENT + "/user-sessions"

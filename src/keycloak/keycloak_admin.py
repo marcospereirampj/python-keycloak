@@ -1848,6 +1848,24 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError)
 
+    def create_initial_access_token(self, count: int = 1, expiration: int = 1):
+        """Create an initial access token.
+
+        :param count: Number of clients that can be registered
+        :type count: int
+        :param expiration: Days until expireation
+        :type expiration: int
+        :return: initial access token
+        :rtype: str
+        """
+        payload = {"count": count, "expiration": expiration}
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_INITIAL_ACCESS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[200])
+
     def create_client(self, payload, skip_exists=False):
         """Create a client.
 

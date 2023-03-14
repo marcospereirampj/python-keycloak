@@ -1,6 +1,7 @@
 """Test the keycloak admin object."""
 
 import copy
+import uuid
 from typing import Tuple
 
 import freezegun
@@ -2588,3 +2589,38 @@ def test_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
     admin.realm_name = realm
     res = admin.clear_user_cache()
     assert res == {}
+
+
+def test_initial_access_token(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test initial access token and client creation.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    res = admin.create_initial_access_token(2, 3)
+    assert "token" in res
+    assert res["count"] == 2
+    assert res["expiration"] == 3
+
+    oid, username, password = oid_with_credentials
+
+    client = str(uuid.uuid4())
+    secret = str(uuid.uuid4())
+
+    res = oid.register_client(
+        token=res["token"],
+        payload={
+            "name": client,
+            "clientId": client,
+            "enabled": True,
+            "publicClient": False,
+            "protocol": "openid-connect",
+            "secret": secret,
+            "clientAuthenticatorType": "client-secret",
+        },
+    )
+    assert res["clientId"] == client
