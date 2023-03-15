@@ -2748,7 +2748,7 @@ def test_initial_access_token(
     res = oid.register_client(
         token=res["token"],
         payload={
-            "name": client,
+            "name": "DynamicRegisteredClient",
             "clientId": client,
             "enabled": True,
             "publicClient": False,
@@ -2758,3 +2758,7 @@ def test_initial_access_token(
         },
     )
     assert res["clientId"] == client
+
+    new_secret = str(uuid.uuid4())
+    res = oid.update_client(res["registrationAccessToken"], client, payload={"secret": new_secret})
+    assert res["secret"] == new_secret
