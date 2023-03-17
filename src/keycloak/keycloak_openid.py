@@ -47,6 +47,7 @@ from .uma_permissions import AuthStatus, build_permission_param
 from .urls_patterns import (
     URL_AUTH,
     URL_CERTS,
+    URL_CLIENT_REGISTRATION,
     URL_ENTITLEMENT,
     URL_INTROSPECT,
     URL_LOGOUT,
@@ -679,3 +680,24 @@ class KeycloakOpenID:
         return AuthStatus(
             is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
         )
+
+    def register_client(self, token: str, payload: dict):
+        """Create a client.
+
+        ClientRepresentation:
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+
+        :param token: Initial access token
+        :type token: str
+        :param payload: ClientRepresentation
+        :type payload: dict
+        :return: Client Representation
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        self.connection.add_param_headers("Content-Type", "application/json")
+        data_raw = self.connection.raw_post(
+            URL_CLIENT_REGISTRATION.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError)

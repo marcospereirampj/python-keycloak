@@ -1,6 +1,7 @@
 """Test the keycloak admin object."""
 
 import copy
+import uuid
 from typing import Tuple
 
 import freezegun
@@ -831,6 +832,17 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         skip_exists=True,
     ) == {"msg": "Already exists"}
     assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 2
+
+    res = admin.create_client_authz_role_based_policy(
+        client_id=auth_client_id,
+        payload={"name": "test-authz-rb-policy-delete", "roles": [{"id": role_id}]},
+    )
+    res2 = admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert res["id"] == res2["id"]
+    admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert err.match("404: b''")
 
     # Test authz permissions
     res = admin.get_client_authz_permissions(client_id=auth_client_id)
@@ -2577,3 +2589,38 @@ def test_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
     admin.realm_name = realm
     res = admin.clear_user_cache()
     assert res == {}
+
+
+def test_initial_access_token(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test initial access token and client creation.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    res = admin.create_initial_access_token(2, 3)
+    assert "token" in res
+    assert res["count"] == 2
+    assert res["expiration"] == 3
+
+    oid, username, password = oid_with_credentials
+
+    client = str(uuid.uuid4())
+    secret = str(uuid.uuid4())
+
+    res = oid.register_client(
+        token=res["token"],
+        payload={
+            "name": client,
+            "clientId": client,
+            "enabled": True,
+            "publicClient": False,
+            "protocol": "openid-connect",
+            "secret": secret,
+            "clientAuthenticatorType": "client-secret",
+        },
+    )
+    assert res["clientId"] == client

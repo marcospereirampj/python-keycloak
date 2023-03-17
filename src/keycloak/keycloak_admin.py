@@ -1661,6 +1661,42 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def delete_client_authz_policy(self, client_id, policy_id):
+        """Delete a policy from client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_client_authz_policy(self, client_id, policy_id):
+        """Get a policy from client.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_client_service_account_user(self, client_id):
         """Get service account user from client.
 
@@ -1811,6 +1847,24 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPE.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def create_initial_access_token(self, count: int = 1, expiration: int = 1):
+        """Create an initial access token.
+
+        :param count: Number of clients that can be registered
+        :type count: int
+        :param expiration: Days until expireation
+        :type expiration: int
+        :return: initial access token
+        :rtype: str
+        """
+        payload = {"count": count, "expiration": expiration}
+        params_path = {"realm-name": self.realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_INITIAL_ACCESS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[200])
 
     def create_client(self, payload, skip_exists=False):
         """Create a client.
