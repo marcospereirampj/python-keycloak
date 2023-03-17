@@ -1,3 +1,9 @@
+## v2.14.0 (2023-03-17)
+
+### Feat
+
+- add initial access token support and policy delete method
+
 ## v2.13.2 (2023-03-06)
 
 ### Fix
