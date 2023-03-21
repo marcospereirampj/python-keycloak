@@ -545,7 +545,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "export-clients": export_clients,
             "export-groups-and-roles": export_groups_and_role,
         }
@@ -646,7 +646,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or {}
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         url = urls_patterns.URL_ADMIN_USERS.format(**params_path)
 
         if "first" in query or "max" in query:
@@ -665,7 +665,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_IDPS.format(**params_path), data=json.dumps(payload)
         )
@@ -684,7 +684,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "alias": idp_alias}
+        params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_IDP.format(**params_path), data=json.dumps(payload)
         )
@@ -703,7 +703,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
+        params_path = {"realm-name": self.connection.realm_name, "idp-alias": idp_alias}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_IDP_MAPPERS.format(**params_path), data=json.dumps(payload)
         )
@@ -725,7 +725,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "idp-alias": idp_alias,
             "mapper-id": mapper_id,
         }
@@ -750,7 +750,7 @@ class KeycloakAdmin:
         :return: array IdentityProviderMapperRepresentation
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "idp-alias": idp_alias}
+        params_path = {"realm-name": self.connection.realm_name, "idp-alias": idp_alias}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_IDP_MAPPERS.format(**params_path)
         )
@@ -767,7 +767,7 @@ class KeycloakAdmin:
         :return: array IdentityProviderRepresentation
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_IDPS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -779,7 +779,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "alias": idp_alias}
+        params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_IDP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
@@ -800,7 +800,7 @@ class KeycloakAdmin:
         :return: UserRepresentation
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
 
         if exist_ok:
             exists = self.get_user_id(username=payload["username"])
@@ -827,7 +827,7 @@ class KeycloakAdmin:
         :rtype: int
         """
         query = query or dict()
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USERS_COUNT.format(**params_path), **query
         )
@@ -861,7 +861,7 @@ class KeycloakAdmin:
         :type user_id: str
         :return: UserRepresentation
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -878,7 +878,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params = {"briefRepresentation": brief_representation}
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_GROUPS.format(**params_path), **params
         )
@@ -895,7 +895,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_USER.format(**params_path), data=json.dumps(payload)
         )
@@ -945,7 +945,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
@@ -968,7 +968,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         payload = {"type": "password", "temporary": temporary, "value": password}
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_RESET_PASSWORD.format(**params_path), data=json.dumps(payload)
         )
@@ -987,7 +987,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response (CredentialRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_CREDENTIALS.format(**params_path)
         )
@@ -1007,7 +1007,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": user_id,
             "credential_id": credential_id,
         }
@@ -1026,7 +1026,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_USER_LOGOUT.format(**params_path), data=""
         )
@@ -1043,7 +1043,7 @@ class KeycloakAdmin:
         :returns: List of UserConsentRepresentations
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_CONSENTS.format(**params_path)
         )
@@ -1059,7 +1059,7 @@ class KeycloakAdmin:
         :returns: Federated identities list
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_FEDERATED_IDENTITIES.format(**params_path)
         )
@@ -1084,7 +1084,11 @@ class KeycloakAdmin:
             "userId": provider_userid,
             "userName": provider_username,
         }
-        params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "provider": provider_id,
+        }
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path),
             data=json.dumps(payload),
@@ -1101,7 +1105,11 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id, "provider": provider_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "provider": provider_id,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_USER_FEDERATED_IDENTITY.format(**params_path)
         )
@@ -1128,7 +1136,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         params_query = {"client_id": client_id, "lifespan": lifespan, "redirect_uri": redirect_uri}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_SEND_UPDATE_ACCOUNT.format(**params_path),
@@ -1152,7 +1160,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         params_query = {"client_id": client_id, "redirect_uri": redirect_uri}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_SEND_VERIFY_EMAIL.format(**params_path),
@@ -1172,7 +1180,7 @@ class KeycloakAdmin:
         :return: UserSessionRepresentation
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GET_SESSIONS.format(**params_path)
         )
@@ -1204,7 +1212,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or {}
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         url = urls_patterns.URL_ADMIN_GROUPS.format(**params_path)
 
         if "first" in query or "max" in query:
@@ -1225,7 +1233,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1272,7 +1280,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or {}
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         url = urls_patterns.URL_ADMIN_GROUP_MEMBERS.format(**params_path)
 
         if "first" in query or "max" in query:
@@ -1293,7 +1301,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "path": path}
+        params_path = {"realm-name": self.connection.realm_name, "path": path}
         data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1314,12 +1322,12 @@ class KeycloakAdmin:
         :rtype: str
         """
         if parent is None:
-            params_path = {"realm-name": self.realm_name}
+            params_path = {"realm-name": self.connection.realm_name}
             data_raw = self.connection.raw_post(
                 urls_patterns.URL_ADMIN_GROUPS.format(**params_path), data=json.dumps(payload)
             )
         else:
-            params_path = {"realm-name": self.realm_name, "id": parent}
+            params_path = {"realm-name": self.connection.realm_name, "id": parent}
             data_raw = self.connection.raw_post(
                 urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path), data=json.dumps(payload)
             )
@@ -1347,7 +1355,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_GROUP.format(**params_path), data=json.dumps(payload)
         )
@@ -1365,7 +1373,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_GROUP_PERMISSIONS.format(**params_path),
             data=json.dumps({"enabled": enabled}),
@@ -1382,7 +1390,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id, "group-id": group_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "group-id": group_id,
+        }
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_USER_GROUP.format(**params_path), data=None
         )
@@ -1398,7 +1410,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id, "group-id": group_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "group-id": group_id,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_USER_GROUP.format(**params_path)
         )
@@ -1412,7 +1428,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
@@ -1427,7 +1443,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_CLIENTS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1442,7 +1458,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1474,7 +1490,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path)
         )
@@ -1495,7 +1511,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path),
@@ -1514,7 +1530,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path)
         )
@@ -1548,7 +1564,7 @@ class KeycloakAdmin:
         :rtype: bytes
 
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY.format(**params_path),
@@ -1587,7 +1603,7 @@ class KeycloakAdmin:
         :rtype: bytes
 
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
@@ -1606,7 +1622,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path)
         )
@@ -1624,7 +1640,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path),
             data=json.dumps(payload),
@@ -1640,7 +1656,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path)
         )
@@ -1655,7 +1671,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path)
         )
@@ -1673,7 +1689,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
         )
@@ -1691,7 +1711,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path)
         )
@@ -1706,7 +1730,7 @@ class KeycloakAdmin:
         :return: UserRepresentation
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER.format(**params_path)
         )
@@ -1721,7 +1745,7 @@ class KeycloakAdmin:
         :return: list of client scopes with id and name
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES.format(**params_path)
         )
@@ -1749,7 +1773,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client_scope_id": client_scope_id,
         }
@@ -1771,7 +1795,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client_scope_id": client_scope_id,
         }
@@ -1789,7 +1813,7 @@ class KeycloakAdmin:
         :return: list of client scopes with id and name
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES.format(**params_path)
         )
@@ -1817,7 +1841,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client_scope_id": client_scope_id,
         }
@@ -1839,7 +1863,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client_scope_id": client_scope_id,
         }
@@ -1859,7 +1883,7 @@ class KeycloakAdmin:
         :rtype: str
         """
         payload = {"count": count, "expiration": expiration}
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_INITIAL_ACCESS.format(**params_path),
             data=json.dumps(payload),
@@ -1885,7 +1909,7 @@ class KeycloakAdmin:
             if client_id is not None:
                 return client_id
 
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENTS.format(**params_path), data=json.dumps(payload)
         )
@@ -1906,7 +1930,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_CLIENT.format(**params_path), data=json.dumps(payload)
         )
@@ -1923,7 +1947,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
@@ -1943,7 +1967,11 @@ class KeycloakAdmin:
         :returns: Installation providers
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "provider-id": provider_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "provider-id": provider_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_INSTALLATION_PROVIDER.format(**params_path)
         )
@@ -1960,7 +1988,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), **params
@@ -1979,7 +2007,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or dict()
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         return self.__fetch_all(
             urls_patterns.URL_ADMIN_REALM_ROLES_MEMBERS.format(**params_path), query
         )
@@ -1994,7 +2022,7 @@ class KeycloakAdmin:
         default_realm_roles = [
             realm_role
             for realm_role in all_realm_roles
-            if realm_role["name"] == f"default-roles-{self.realm_name}"
+            if realm_role["name"] == f"default-roles-{self.connection.realm_name}"
         ]
         return default_realm_roles[0]["id"]
 
@@ -2004,7 +2032,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response (UserRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "role-id": self.get_default_realm_role_id(),
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES_REALM.format(**params_path)
         )
@@ -2018,7 +2049,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "role-id": self.get_default_realm_role_id(),
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
             data=json.dumps(payload),
@@ -2033,7 +2067,10 @@ class KeycloakAdmin:
         :return: Keycloak Server Response
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "role-id": self.get_default_realm_role_id()}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "role-id": self.get_default_realm_role_id(),
+        }
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
             data=json.dumps(payload),
@@ -2053,7 +2090,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ROLES.format(**params_path), **params
@@ -2075,7 +2112,11 @@ class KeycloakAdmin:
         :return: role_id
         :rtype: str
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "role-name": role_name,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ROLE.format(**params_path)
         )
@@ -2121,7 +2162,7 @@ class KeycloakAdmin:
             except KeycloakGetError:
                 pass
 
-        params_path = {"realm-name": self.realm_name, "id": client_role_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_role_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_ROLES.format(**params_path), data=json.dumps(payload)
         )
@@ -2144,7 +2185,11 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_role_id,
+            "role-name": role_name,
+        }
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
             data=json.dumps(payload),
@@ -2166,7 +2211,11 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_role_id,
+            "role-name": role_name,
+        }
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_CLIENT_ROLE.format(**params_path), data=json.dumps(payload)
         )
@@ -2185,7 +2234,11 @@ class KeycloakAdmin:
         :returns: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_role_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_role_id,
+            "role-name": role_name,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_CLIENT_ROLE.format(**params_path)
         )
@@ -2204,7 +2257,11 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2224,7 +2281,11 @@ class KeycloakAdmin:
         :return: Keycloak server response (UserRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "role-name": role_name,
+        }
         return self.__fetch_all(
             urls_patterns.URL_ADMIN_CLIENT_ROLE_MEMBERS.format(**params_path), query
         )
@@ -2242,7 +2303,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "role-name": role_name}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "role-name": role_name,
+        }
         return self.__fetch_all(
             urls_patterns.URL_ADMIN_CLIENT_ROLE_GROUPS.format(**params_path), query
         )
@@ -2264,7 +2329,7 @@ class KeycloakAdmin:
             except KeycloakGetError:
                 pass
 
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), data=json.dumps(payload)
         )
@@ -2285,7 +2350,7 @@ class KeycloakAdmin:
         :return: role
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path)
         )
@@ -2301,7 +2366,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path),
             data=json.dumps(payload),
@@ -2316,7 +2381,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path)
         )
@@ -2333,7 +2398,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE.format(**params_path),
             data=json.dumps(payload),
@@ -2351,7 +2416,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE.format(**params_path),
             data=json.dumps(payload),
@@ -2366,7 +2431,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "role-name": role_name}
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE.format(**params_path)
         )
@@ -2383,7 +2448,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2401,7 +2466,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2416,7 +2481,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES.format(**params_path)
         )
@@ -2436,7 +2501,7 @@ class KeycloakAdmin:
         """
         payload = roles if isinstance(roles, list) else [roles]
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client": client_roles_owner_id,
         }
@@ -2460,7 +2525,7 @@ class KeycloakAdmin:
         """
         payload = roles if isinstance(roles, list) else [roles]
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client": client_roles_owner_id,
         }
@@ -2481,7 +2546,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "client": client_roles_owner_id,
         }
@@ -2501,7 +2566,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_USER_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2519,7 +2584,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_USER_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2534,7 +2599,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_REALM_ROLES.format(**params_path)
         )
@@ -2548,7 +2613,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_REALM_ROLES_AVAILABLE.format(**params_path)
         )
@@ -2564,7 +2629,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_USER_REALM_ROLES_COMPOSITE.format(**params_path), **params
@@ -2582,7 +2647,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2600,7 +2665,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2617,7 +2682,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUPS_REALM_ROLES.format(**params_path), **params
@@ -2637,7 +2702,11 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": group_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2654,7 +2723,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": group_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES.format(**params_path)
         )
@@ -2673,7 +2746,11 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": group_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2741,7 +2818,11 @@ class KeycloakAdmin:
         :returns: Client roles of a user
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_get(
             client_level_role_mapping_url.format(**params_path), **params
         )
@@ -2760,7 +2841,11 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         payload = roles if isinstance(roles, list) else [roles]
-        params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
             data=json.dumps(payload),
@@ -2778,7 +2863,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (AuthenticationFlowRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_FLOWS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -2795,7 +2880,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (AuthenticationFlowRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "flow-id": flow_id}
+        params_path = {"realm-name": self.connection.realm_name, "flow-id": flow_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_FLOWS_ALIAS.format(**params_path)
         )
@@ -2814,7 +2899,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_FLOWS.format(**params_path), data=json.dumps(payload)
         )
@@ -2834,7 +2919,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        params_path = {"realm-name": self.connection.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_FLOWS_COPY.format(**params_path), data=json.dumps(payload)
         )
@@ -2851,7 +2936,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": flow_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": flow_id}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_FLOW.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
@@ -2865,7 +2950,7 @@ class KeycloakAdmin:
         :return: Response(json)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        params_path = {"realm-name": self.connection.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path)
         )
@@ -2884,7 +2969,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        params_path = {"realm-name": self.connection.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTIONS.format(**params_path),
             data=json.dumps(payload),
@@ -2902,7 +2987,7 @@ class KeycloakAdmin:
         :return: Response(json)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": execution_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": execution_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path)
         )
@@ -2921,7 +3006,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        params_path = {"realm-name": self.connection.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTIONS_EXECUTION.format(**params_path),
             data=json.dumps(payload),
@@ -2939,7 +3024,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (json)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": execution_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": execution_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path)
         )
@@ -2960,7 +3045,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "flow-alias": flow_alias}
+        params_path = {"realm-name": self.connection.realm_name, "flow-alias": flow_alias}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_FLOWS_EXECUTIONS_FLOW.format(**params_path),
             data=json.dumps(payload),
@@ -2975,7 +3060,7 @@ class KeycloakAdmin:
         :return: Authenticator providers
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_PROVIDERS.format(**params_path)
         )
@@ -2992,7 +3077,7 @@ class KeycloakAdmin:
         :return: AuthenticatorConfigInfoRepresentation
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "provider-id": provider_id}
+        params_path = {"realm-name": self.connection.realm_name, "provider-id": provider_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG_DESCRIPTION.format(**params_path)
         )
@@ -3008,7 +3093,7 @@ class KeycloakAdmin:
         :return: Response(json)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": config_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": config_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path)
         )
@@ -3027,7 +3112,7 @@ class KeycloakAdmin:
         :return: Response(json)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": config_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": config_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path),
             data=json.dumps(payload),
@@ -3044,7 +3129,7 @@ class KeycloakAdmin:
         :return: Keycloak server Response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": config_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": config_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path)
         )
@@ -3063,7 +3148,7 @@ class KeycloakAdmin:
         data = {"action": action}
         params_query = {"action": action}
 
-        params_path = {"realm-name": self.realm_name, "id": storage_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": storage_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_USER_STORAGE.format(**params_path),
             data=json.dumps(data),
@@ -3080,7 +3165,7 @@ class KeycloakAdmin:
         :return: Keycloak server response Array of (ClientScopeRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPES.format(**params_path)
         )
@@ -3097,7 +3182,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientScopeRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path)
         )
@@ -3140,7 +3225,7 @@ class KeycloakAdmin:
             if exists is not None:
                 return exists["id"]
 
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_SCOPES.format(**params_path), data=json.dumps(payload)
         )
@@ -3163,7 +3248,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientScopeRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path), data=json.dumps(payload)
         )
@@ -3180,7 +3265,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE.format(**params_path)
         )
@@ -3195,7 +3280,7 @@ class KeycloakAdmin:
         :returns: Keycloak server response (ProtocolMapperRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path)
         )
@@ -3213,7 +3298,7 @@ class KeycloakAdmin:
         :return: Keycloak server Response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "scope-id": client_scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER.format(**params_path),
@@ -3235,7 +3320,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "scope-id": client_scope_id,
             "protocol-mapper-id": protocol_mapper_id,
         }
@@ -3261,7 +3346,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "scope-id": client_scope_id,
             "protocol-mapper-id": protocol_mapper_id,
         }
@@ -3281,7 +3366,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES.format(**params_path)
         )
@@ -3295,7 +3380,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": scope_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE.format(**params_path)
         )
@@ -3309,8 +3394,8 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": scope_id}
-        payload = {"realm": self.realm_name, "clientScopeId": scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": scope_id}
+        payload = {"realm": self.connection.realm_name, "clientScopeId": scope_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE.format(**params_path),
             data=json.dumps(payload),
@@ -3325,7 +3410,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES.format(**params_path)
         )
@@ -3339,7 +3424,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": scope_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE.format(**params_path)
         )
@@ -3353,8 +3438,8 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": scope_id}
-        payload = {"realm": self.realm_name, "clientScopeId": scope_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": scope_id}
+        payload = {"realm": self.connection.realm_name, "clientScopeId": scope_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPE.format(**params_path),
             data=json.dumps(payload),
@@ -3371,7 +3456,7 @@ class KeycloakAdmin:
         :returns: KeycloakServerResponse (list of ProtocolMapperRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_PROTOCOL_MAPPERS.format(**params_path)
@@ -3391,7 +3476,7 @@ class KeycloakAdmin:
         :return: Keycloak server Response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_PROTOCOL_MAPPERS.format(**params_path),
@@ -3413,7 +3498,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "protocol-mapper-id": mapper_id,
         }
@@ -3438,7 +3523,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {
-            "realm-name": self.realm_name,
+            "realm-name": self.connection.realm_name,
             "id": client_id,
             "protocol-mapper-id": client_mapper_id,
         }
@@ -3458,7 +3543,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_SECRETS.format(**params_path), data=None
         )
@@ -3474,7 +3559,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (ClientRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SECRETS.format(**params_path)
         )
@@ -3494,7 +3579,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or dict()
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=None, **query
         )
@@ -3511,7 +3596,7 @@ class KeycloakAdmin:
         :return: Component id
         :rtype: str
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_COMPONENTS.format(**params_path), data=json.dumps(payload)
         )
@@ -3532,7 +3617,7 @@ class KeycloakAdmin:
         :return: ComponentRepresentation
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "component-id": component_id}
+        params_path = {"realm-name": self.connection.realm_name, "component-id": component_id}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_COMPONENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -3547,7 +3632,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "component-id": component_id}
+        params_path = {"realm-name": self.connection.realm_name, "component-id": component_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_COMPONENT.format(**params_path), data=json.dumps(payload)
         )
@@ -3561,7 +3646,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "component-id": component_id}
+        params_path = {"realm-name": self.connection.realm_name, "component-id": component_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_COMPONENT.format(**params_path)
         )
@@ -3578,7 +3663,7 @@ class KeycloakAdmin:
         :return: keys list
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_KEYS.format(**params_path), data=None
         )
@@ -3598,7 +3683,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         query = query or dict()
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=None, **query
         )
@@ -3615,7 +3700,7 @@ class KeycloakAdmin:
         :return: Http response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_EVENTS_CONFIG.format(**params_path), data=json.dumps(payload)
         )
@@ -3746,7 +3831,7 @@ class KeycloakAdmin:
         :return: UserSessionRepresentation
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
         )
@@ -3760,7 +3845,7 @@ class KeycloakAdmin:
         :return: Dict of clients and session count
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SESSION_STATS.format(**params_path)
         )
@@ -3775,7 +3860,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_MANAGEMENT_PERMISSIONS.format(**params_path)
         )
@@ -3801,7 +3886,7 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_CLIENT_MANAGEMENT_PERMISSIONS.format(**params_path),
             data=json.dumps(payload),
@@ -3819,7 +3904,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES.format(**params_path)
         )
@@ -3836,7 +3925,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "policy-id": policy_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES.format(**params_path)
         )
@@ -3853,7 +3946,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "scope-id": scope_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "scope-id": scope_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path)
         )
@@ -3885,7 +3982,11 @@ class KeycloakAdmin:
         :return: Keycloak server response
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "scope-id": scope_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "scope-id": scope_id,
+        }
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
             data=json.dumps(payload),
@@ -3901,7 +4002,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path)
         )
@@ -3928,7 +4029,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: bytes
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path),
             data=json.dumps(payload),
@@ -3947,7 +4048,11 @@ class KeycloakAdmin:
         :return: the composite client roles of the group (list of RoleRepresentation).
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "id": group_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": group_id,
+            "client-id": client_id,
+        }
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE.format(**params_path), **params
@@ -3964,7 +4069,11 @@ class KeycloakAdmin:
         :return: the child roles (list of RoleRepresentation).
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name, "role-id": role_id, "client-id": client_id}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "role-id": role_id,
+            "client-id": client_id,
+        }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ROLE_CHILDREN.format(**params_path)
         )
@@ -3981,7 +4090,11 @@ class KeycloakAdmin:
                  where <certcont> is the content of the uploaded certificate.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": client_id, "attr": "jwt.credential"}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "attr": "jwt.credential",
+        }
         m = MultipartEncoder(fields={"keystoreFormat": "Certificate PEM", "file": certcont})
         new_headers = copy.deepcopy(self.connection.headers)
         new_headers["Content-Type"] = m.content_type
@@ -4013,7 +4126,7 @@ class KeycloakAdmin:
         :return: the required actions (list of RequiredActionProviderRepresentation).
         :rtype: list
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REQUIRED_ACTIONS.format(**params_path)
         )
@@ -4031,7 +4144,7 @@ class KeycloakAdmin:
         """
         if not isinstance(payload, str):
             payload = json.dumps(payload)
-        params_path = {"realm-name": self.realm_name, "action-alias": action_alias}
+        params_path = {"realm-name": self.connection.realm_name, "action-alias": action_alias}
         data_raw = self.connection.raw_put(
             urls_patterns.URL_ADMIN_REQUIRED_ACTIONS_ALIAS.format(**params_path), data=payload
         )
@@ -4045,7 +4158,7 @@ class KeycloakAdmin:
         :return: Bruteforce status.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_ATTACK_DETECTION_USER.format(**params_path)
         )
@@ -4059,7 +4172,7 @@ class KeycloakAdmin:
         :return: empty dictionary.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name, "id": user_id}
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_ATTACK_DETECTION_USER.format(**params_path)
         )
@@ -4071,7 +4184,7 @@ class KeycloakAdmin:
         :return: empty dictionary.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_delete(
             urls_patterns.URL_ADMIN_ATTACK_DETECTION.format(**params_path)
         )
@@ -4083,7 +4196,7 @@ class KeycloakAdmin:
         :return: empty dictionary.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_KEYS_CACHE.format(**params_path), data=""
         )
@@ -4095,7 +4208,7 @@ class KeycloakAdmin:
         :return: empty dictionary.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_REALM_CACHE.format(**params_path), data=""
         )
@@ -4107,7 +4220,7 @@ class KeycloakAdmin:
         :return: empty dictionary.
         :rtype: dict
         """
-        params_path = {"realm-name": self.realm_name}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_USER_CACHE.format(**params_path), data=""
         )

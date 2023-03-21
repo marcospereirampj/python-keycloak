@@ -46,7 +46,6 @@ def test_keycloak_admin_init(env):
     assert admin.password == env.KEYCLOAK_ADMIN_PASSWORD, admin.password
     assert admin.totp is None, admin.totp
     assert admin.token is not None, admin.token
-    assert admin.auto_refresh_token == list(), admin.auto_refresh_token
     assert admin.user_realm_name is None, admin.user_realm_name
     assert admin.custom_headers is None, admin.custom_headers
     assert admin.token
