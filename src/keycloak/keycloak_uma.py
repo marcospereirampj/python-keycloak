@@ -27,8 +27,10 @@ The module contains a UMA compatible client for keycloak:
 https://docs.kantarainitiative.org/uma/wg/rec-oauth-uma-federated-authz-2.0.html
 """
 import json
+from typing import Iterable
 from urllib.parse import quote_plus
 
+from .connection import ConnectionManager
 from .exceptions import (
     KeycloakDeleteError,
     KeycloakGetError,
@@ -37,6 +39,7 @@ from .exceptions import (
     raise_error_from_response,
 )
 from .openid_connection import KeycloakOpenIDConnection
+from .uma_permissions import UMAPermission
 from .urls_patterns import URL_UMA_WELL_KNOWN
 
 
@@ -171,16 +174,62 @@ class KeycloakUMA:
         data_raw = self.connection.raw_delete(url)
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
-    def resource_set_list_ids(self):
-        """List all resource set ids.
+    def resource_set_list_ids(
+        self,
+        name: str = "",
+        exact_name: bool = False,
+        uri: str = "",
+        owner: str = "",
+        resource_type: str = "",
+        scope: str = "",
+        first: int = 0,
+        maximum: int = -1,
+    ):
+        """Query for list of resource set ids.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
 
+        :param name: query resource name
+        :type name: str
+        :param exact_name: query exact match for resource name
+        :type exact_name: bool
+        :param uri: query resource uri
+        :type uri: str
+        :param owner: query resource owner
+        :type owner: str
+        :param resource_type: query resource type
+        :type resource_type: str
+        :param scope: query resource scope
+        :type scope: str
+        :param first: index of first matching resource to return
+        :type first: int
+        :param maximum: maximum number of resources to return (-1 for all)
+        :type maximum: int
         :return: List of ids
         :rtype: List[str]
         """
-        data_raw = self.connection.raw_get(self.uma_well_known["resource_registration_endpoint"])
+        query = dict()
+        if name:
+            query["name"] = name
+            if exact_name:
+                query["exactName"] = "true"
+        if uri:
+            query["uri"] = uri
+        if owner:
+            query["owner"] = owner
+        if resource_type:
+            query["type"] = resource_type
+        if scope:
+            query["scope"] = scope
+        if first > 0:
+            query["first"] = first
+        if maximum >= 0:
+            query["max"] = maximum
+
+        data_raw = self.connection.raw_get(
+            self.uma_well_known["resource_registration_endpoint"], **query
+        )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     def resource_set_list(self):
@@ -198,3 +247,171 @@ class KeycloakUMA:
         for resource_id in self.resource_set_list_ids():
             resource = self.resource_set_read(resource_id)
             yield resource
+
+    def permission_ticket_create(self, permissions: Iterable[UMAPermission]):
+        """Create a permission ticket.
+
+        :param permissions: Iterable of uma permissions to validate the token against
+        :type permissions: Iterable[UMAPermission]
+        :returns: Keycloak decision
+        :rtype: boolean
+        :raises KeycloakPostError: In case permission resource not found
+        """
+        resources = dict()
+        for permission in permissions:
+            resource_id = getattr(permission, "resource_id", None)
+
+            if resource_id is None:
+                resource_ids = self.resource_set_list_ids(
+                    exact_name=True, name=permission.resource, first=0, maximum=1
+                )
+
+                if not resource_ids:
+                    raise KeycloakPostError("Invalid resource specified")
+
+                setattr(permission, "resource_id", resource_ids[0])
+
+            resources.setdefault(resource_id, set())
+            if permission.scope:
+                resources[resource_id].add(permission.scope)
+
+        payload = [
+            {"resource_id": resource_id, "resource_scopes": list(scopes)}
+            for resource_id, scopes in resources.items()
+        ]
+
+        data_raw = self.connection.raw_post(
+            self.uma_well_known["permission_endpoint"], data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    def permissions_check(self, token, permissions: Iterable[UMAPermission]):
+        """Check UMA permissions by user token with requested permissions.
+
+        The token endpoint is used to check UMA permissions from Keycloak. It can only be
+        invoked by confidential clients.
+
+        https://www.keycloak.org/docs/latest/authorization_services/#_service_authorization_api
+
+        :param token: user token
+        :type token: str
+        :param permissions: Iterable of uma permissions to validate the token against
+        :type permissions: Iterable[UMAPermission]
+        :returns: Keycloak decision
+        :rtype: boolean
+        """
+        payload = {
+            "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
+            "permission": ",".join(str(permission) for permission in permissions),
+            "response_mode": "decision",
+            "audience": self.connection.client_id,
+        }
+
+        # Everyone always has the null set of permissions
+        # However keycloak cannot evaluate the null set
+        if len(payload["permission"]) == 0:
+            return True
+
+        connection = ConnectionManager(self.connection.base_url)
+        connection.add_param_headers("Authorization", "Bearer " + token)
+        connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
+        data_raw = connection.raw_post(self.uma_well_known["token_endpoint"], data=payload)
+        try:
+            data = raise_error_from_response(data_raw, KeycloakPostError)
+        except KeycloakPostError:
+            return False
+        return data.get("result", False)
+
+    def policy_resource_create(self, resource_id, payload):
+        """Create permission policy for resource.
+
+        Supports name, description, scopes, roles, groups, clients
+
+        https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
+
+        :param resource_id: _id of resource
+        :type resource_id: str
+        :param payload: permission configuration
+        :type payload: dict
+        :return: PermissionRepresentation
+        :rtype: dict
+        """
+        data_raw = self.connection.raw_post(
+            self.uma_well_known["policy_endpoint"] + f"/{resource_id}", data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    def policy_update(self, policy_id, payload):
+        """Update permission policy.
+
+        https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
+        https://www.keycloak.org/docs-api/21.0.1/rest-api/index.html#_policyrepresentation
+
+        :param policy_id: id of policy permission
+        :type policy_id: str
+        :param payload: policy permission configuration
+        :type payload: dict
+        :return: PermissionRepresentation
+        :rtype: dict
+        """
+        data_raw = self.connection.raw_put(
+            self.uma_well_known["policy_endpoint"] + f"/{policy_id}", data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError)
+
+    def policy_delete(self, policy_id):
+        """Delete permission policy.
+
+        https://www.keycloak.org/docs/latest/authorization_services/#removing-a-permission
+        https://www.keycloak.org/docs-api/21.0.1/rest-api/index.html#_policyrepresentation
+
+        :param policy_id: id of permission policy
+        :type policy_id: str
+        :return: PermissionRepresentation
+        :rtype: dict
+        """
+        data_raw = self.connection.raw_delete(
+            self.uma_well_known["policy_endpoint"] + f"/{policy_id}"
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError)
+
+    def policy_query(
+        self,
+        resource: str = "",
+        name: str = "",
+        scope: str = "",
+        first: int = 0,
+        maximum: int = -1,
+    ):
+        """Query permission policies.
+
+        https://www.keycloak.org/docs/latest/authorization_services/#querying-permission
+
+        :param resource: query resource id
+        :type resource: str
+        :param name: query resource name
+        :type name: str
+        :param scope: query resource scope
+        :type scope: str
+        :param first: index of first matching resource to return
+        :type first: int
+        :param maximum: maximum number of resources to return (-1 for all)
+        :type maximum: int
+        :return: List of ids
+        :return: List of ids
+        :rtype: List[str]
+        """
+        query = dict()
+        if name:
+            query["name"] = name
+        if resource:
+            query["resource"] = resource
+        if scope:
+            query["scope"] = scope
+        if first > 0:
+            query["first"] = first
+        if maximum >= 0:
+            query["max"] = maximum
+
+        data_raw = self.connection.raw_get(self.uma_well_known["policy_endpoint"], **query)
+        return raise_error_from_response(data_raw, KeycloakGetError)
