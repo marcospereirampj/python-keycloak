@@ -29,6 +29,7 @@
 import copy
 import json
 from builtins import isinstance
+from typing import Optional
 
 import deprecation
 from requests_toolbelt import MultipartEncoder
@@ -100,7 +101,7 @@ class KeycloakAdmin:
         user_realm_name=None,
         auto_refresh_token=None,
         timeout=60,
-        connection: KeycloakOpenIDConnection = None,
+        connection: Optional[KeycloakOpenIDConnection] = None,
     ):
         """Init method.
 
