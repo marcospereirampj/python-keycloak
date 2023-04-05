@@ -149,7 +149,8 @@ class KeycloakAdmin:
             custom_headers=custom_headers,
             timeout=timeout,
         )
-        self.auto_refresh_token = auto_refresh_token
+        if auto_refresh_token is not None:
+            self.auto_refresh_token = auto_refresh_token
 
     @property
     @deprecation.deprecated(
