@@ -1678,7 +1678,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
             "scopes": [token_exchange_scope_id],
             "policies": [client_policy_id],
         },
-        client_id=realm_management_id
+        client_id=realm_management_id,
     )
     permission_name = admin.get_client_authz_scope_permission(
         client_id=realm_management_id, scope_id=token_exchange_permission_id
