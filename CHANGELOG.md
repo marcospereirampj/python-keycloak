@@ -1,3 +1,9 @@
+## v2.15.2 (2023-04-05)
+
+### Fix
+
+- deprecation warnings in keycloak_admin.py (#425)
+
 ## v2.15.1 (2023-04-05)
 
 ### Fix
