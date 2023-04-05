@@ -1,3 +1,9 @@
+## v2.15.0 (2023-04-05)
+
+### Feat
+
+- Add UMA policy management and permission tickets (#426)
+
 ## v2.14.0 (2023-03-17)
 
 ### Feat
