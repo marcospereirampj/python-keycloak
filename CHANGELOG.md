@@ -1,3 +1,81 @@
+## v2.14.0 (2023-03-17)
+
+### Feat
+
+- add initial access token support and policy delete method
+
+## v2.13.2 (2023-03-06)
+
+### Fix
+
+- Refactor auto refresh (#415)
+
+## v2.13.1 (2023-03-05)
+
+### Fix
+
+- Check if applyPolicies exists in the config (#367)
+
+## v2.13.0 (2023-03-05)
+
+### Feat
+
+- implement cache clearing API (#414)
+
+## v2.12.2 (2023-03-05)
+
+### Fix
+
+- get_group_by_path uses Keycloak API to load (#417)
+
+## v2.12.1 (2023-03-05)
+
+### Fix
+
+- tests and upgraded deps (#419)
+
+## v2.12.0 (2023-02-10)
+
+### Feat
+
+- add Keycloak UMA client (#403)
+
+## v2.11.1 (2023-02-08)
+
+### Fix
+
+- do not include CODEOWNERS (#407)
+
+## v2.11.0 (2023-02-08)
+
+## v2.10.0 (2023-02-08)
+
+### Feat
+
+- update header if token is given
+- init KeycloakAdmin with token
+- Add Client Scopes of Client
+
+## v2.9.0 (2023-01-11)
+
+### Feat
+
+- added default realm roles handlers
+
+## v2.8.0 (2022-12-29)
+
+### Feat
+
+- **api**: add tests for create_authz_scopes
+
+### Fix
+
+- fix testing create_client_authz_scopes parameters
+- fix linting
+- add testcase for invalid client id
+- create authz clients test case
+- create authz clients test case
+
 ## v2.7.0 (2022-12-24)
 
 ### Refactor

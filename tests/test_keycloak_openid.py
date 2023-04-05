@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 
+from keycloak import KeycloakAdmin, KeycloakOpenID
 from keycloak.authorization import Authorization
 from keycloak.authorization.permission import Permission
 from keycloak.authorization.policy import Policy
@@ -17,8 +18,6 @@ from keycloak.exceptions import (
     KeycloakPostError,
     KeycloakRPTNotFound,
 )
-from keycloak.keycloak_admin import KeycloakAdmin
-from keycloak.keycloak_openid import KeycloakOpenID
 
 
 def test_keycloak_openid_init(env):

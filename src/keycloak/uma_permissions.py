@@ -27,7 +27,7 @@ from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinit
 
 
 class UMAPermission:
-    """A class to conveniently assembly permissions.
+    """A class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 
@@ -143,7 +143,7 @@ class UMAPermission:
 
 
 class Resource(UMAPermission):
-    """An UMAPermission Resource class to conveniently assembly permissions.
+    """A UMAPermission Resource class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 
@@ -161,7 +161,7 @@ class Resource(UMAPermission):
 
 
 class Scope(UMAPermission):
-    """An UMAPermission Scope class to conveniently assembly permissions.
+    """A UMAPermission Scope class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 

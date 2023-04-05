@@ -1,9 +1,12 @@
 """Test the keycloak admin object."""
 
 import copy
+import uuid
 from typing import Tuple
 
+import freezegun
 import pytest
+from dateutil import parser as datetime_parser
 
 import keycloak
 from keycloak import KeycloakAdmin, KeycloakOpenID
@@ -20,31 +23,6 @@ from keycloak.exceptions import (
 def test_keycloak_version():
     """Test version."""
     assert keycloak.__version__, keycloak.__version__
-
-
-def test_keycloak_admin_bad_init(env):
-    """Test keycloak admin bad init.
-
-    :param env: Environment fixture
-    :type env: KeycloakTestEnv
-    """
-    with pytest.raises(TypeError) as err:
-        KeycloakAdmin(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-            username=env.KEYCLOAK_ADMIN,
-            password=env.KEYCLOAK_ADMIN_PASSWORD,
-            auto_refresh_token=1,
-        )
-    assert err.match("Expected a list of strings")
-
-    with pytest.raises(TypeError) as err:
-        KeycloakAdmin(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-            username=env.KEYCLOAK_ADMIN,
-            password=env.KEYCLOAK_ADMIN_PASSWORD,
-            auto_refresh_token=["patch"],
-        )
-    assert err.match("Unexpected method in auto_refresh_token")
 
 
 def test_keycloak_admin_init(env):
@@ -89,6 +67,15 @@ def test_keycloak_admin_init(env):
         user_realm_name=None,
     )
     assert admin.token
+
+    token = admin.token
+    admin = KeycloakAdmin(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        token=token,
+        realm_name=None,
+        user_realm_name=None,
+    )
+    assert admin.token == token
 
     admin.create_realm(payload={"realm": "authz", "enabled": True})
     admin.realm_name = "authz"
@@ -597,20 +584,14 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     # Test get group by path
     res = admin.get_group_by_path(path="/main-group/subgroup-1")
-    assert res is None, res
-
-    res = admin.get_group_by_path(path="/main-group/subgroup-1", search_in_subgroups=True)
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    res = admin.get_group_by_path(
-        path="/main-group/subgroup-2/subsubgroup-1/test", search_in_subgroups=True
-    )
-    assert res is None, res
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
+    assert err.match('404: b\'{"error":"Group path does not exist"}\'')
 
-    res = admin.get_group_by_path(
-        path="/main-group/subgroup-2/subsubgroup-1", search_in_subgroups=True
-    )
+    res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
@@ -852,6 +833,17 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     ) == {"msg": "Already exists"}
     assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 2
 
+    res = admin.create_client_authz_role_based_policy(
+        client_id=auth_client_id,
+        payload={"name": "test-authz-rb-policy-delete", "roles": [{"id": role_id}]},
+    )
+    res2 = admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert res["id"] == res2["id"]
+    admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert err.match("404: b''")
+
     # Test authz permissions
     res = admin.get_client_authz_permissions(client_id=auth_client_id)
     assert len(res) == 1, res
@@ -889,6 +881,24 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_scopes(client_id=client_id)
     assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+
+    res = admin.create_client_authz_scopes(
+        client_id=auth_client_id, payload={"name": "test-authz-scope"}
+    )
+    assert res["name"] == "test-authz-scope", res
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_client_authz_scopes(
+            client_id="invalid_client_id", payload={"name": "test-authz-scope"}
+        )
+    assert err.match('404: b\'{"error":"Could not find client"')
+    assert admin.create_client_authz_scopes(
+        client_id=auth_client_id, payload={"name": "test-authz-scope"}
+    )
+
+    res = admin.get_client_authz_scopes(client_id=auth_client_id)
+    assert len(res) == 1
+    assert {x["name"] for x in res} == {"test-authz-scope"}
 
     # Test service account user
     res = admin.get_client_service_account_user(client_id=auth_client_id)
@@ -1298,6 +1308,98 @@ def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str
         client_id=client_id, client_roles_owner_id=client
     )
     assert len(roles) == 0
+
+
+def test_client_default_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of default client scopes.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    # Test get client default scopes
+    # keycloak default roles: web-origins, acr, profile, roles, email
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
+
+    # Test add a client scope to client default scopes
+    default_client_scope = "test-client-default-scope"
+    new_client_scope = {
+        "name": default_client_scope,
+        "description": f"Test Client Scope: {default_client_scope}",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    new_client_scope_id = admin.create_client_scope(new_client_scope, skip_exists=False)
+    new_default_client_scope_data = {
+        "realm": realm,
+        "client": client_id,
+        "clientScopeId": new_client_scope_id,
+    }
+    admin.add_client_default_client_scope(
+        client_id, new_client_scope_id, new_default_client_scope_data
+    )
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 6, default_client_scopes
+
+    # Test remove a client default scope
+    admin.delete_client_default_client_scope(client_id, new_client_scope_id)
+    default_client_scopes = admin.get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
+
+
+def test_client_optional_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of optional client scopes.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    admin.realm_name = realm
+
+    client_id = admin.create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    # Test get client optional scopes
+    # keycloak optional roles: microprofile-jwt, offline_access, address, phone
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 4, optional_client_scopes
+
+    # Test add a client scope to client optional scopes
+    optional_client_scope = "test-client-optional-scope"
+    new_client_scope = {
+        "name": optional_client_scope,
+        "description": f"Test Client Scope: {optional_client_scope}",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    new_client_scope_id = admin.create_client_scope(new_client_scope, skip_exists=False)
+    new_optional_client_scope_data = {
+        "realm": realm,
+        "client": client_id,
+        "clientScopeId": new_client_scope_id,
+    }
+    admin.add_client_optional_client_scope(
+        client_id, new_client_scope_id, new_optional_client_scope_data
+    )
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 5, optional_client_scopes
+
+    # Test remove a client optional scope
+    admin.delete_client_optional_client_scope(client_id, new_client_scope_id)
+    optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
+    assert len(optional_client_scopes) == 4, optional_client_scopes
 
 
 def test_client_roles(admin: KeycloakAdmin, client: str):
@@ -2098,94 +2200,66 @@ def test_events(admin: KeycloakAdmin, realm: str):
     assert events == list()
 
 
-def test_auto_refresh(admin: KeycloakAdmin, realm: str):
+@freezegun.freeze_time("2023-02-25 10:00:00")
+def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
     """Test auto refresh token.
 
-    :param admin: Keycloak Admin client
-    :type admin: KeycloakAdmin
+    :param admin_frozen: Keycloak Admin client with time frozen in place
+    :type admin_frozen: KeycloakAdmin
     :param realm: Keycloak realm
     :type realm: str
     """
+    admin = admin_frozen
     # Test get refresh
-    admin.auto_refresh_token = list()
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
+    admin.connection.custom_headers = {
+        "Authorization": "Bearer bad",
+        "Content-Type": "application/json",
+    }
 
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.get_realm(realm_name=realm)
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
 
-    admin.auto_refresh_token = ["get"]
-    del admin.token["refresh_token"]
-    assert admin.get_realm(realm_name=realm)
+    # Freeze time to simulate the access token expiring
+    with freezegun.freeze_time("2023-02-25 10:05:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.get_realm(realm_name=realm)
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:05:00")
 
-    # Test bad refresh token
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
-    admin.token["refresh_token"] = "bad"
-    with pytest.raises(KeycloakPostError) as err:
-        admin.get_realm(realm_name="test-refresh")
-    assert err.match(
-        '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''
-    )
-    admin.realm_name = "master"
-    admin.get_token()
-    admin.realm_name = realm
+    # Test bad refresh token, but first make sure access token has expired again
+    with freezegun.freeze_time("2023-02-25 10:10:00"):
+        admin.connection.custom_headers = {"Content-Type": "application/json"}
+        admin.connection.token["refresh_token"] = "bad"
+        with pytest.raises(KeycloakPostError) as err:
+            admin.get_realm(realm_name="test-refresh")
+        assert err.match(
+            '400: b\'{"error":"invalid_grant","error_description":"Invalid refresh token"}\''
+        )
+        admin.connection.get_token()
 
     # Test post refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.create_realm(payload={"realm": "test-refresh"})
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post"]
-    admin.realm_name = "master"
-    admin.user_logout(user_id=admin.get_user_id(username=admin.username))
-    assert admin.create_realm(payload={"realm": "test-refresh"}) == b""
-    admin.realm_name = realm
+    with freezegun.freeze_time("2023-02-25 10:15:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:15:00")
+        admin.connection.token = None
+        assert admin.create_realm(payload={"realm": "test-refresh"}) == b""
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:15:00")
 
     # Test update refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post", "put"]
-    assert (
-        admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"}) == dict()
-    )
+    with freezegun.freeze_time("2023-02-25 10:25:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:25:00")
+        admin.connection.token = None
+        assert (
+            admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
+            == dict()
+        )
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:25:00")
 
     # Test delete refresh
-    admin.connection = ConnectionManager(
-        base_url=admin.server_url,
-        headers={"Authorization": "Bearer bad", "Content-Type": "application/json"},
-        timeout=60,
-        verify=admin.verify,
-    )
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.delete_realm(realm_name="test-refresh")
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
-
-    admin.auto_refresh_token = ["get", "post", "put", "delete"]
-    assert admin.delete_realm(realm_name="test-refresh") == dict()
+    with freezegun.freeze_time("2023-02-25 10:35:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:35:00")
+        admin.connection.token = None
+        assert admin.delete_realm(realm_name="test-refresh") == dict()
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:35:00")
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str):
@@ -2427,3 +2501,150 @@ def test_clear_bruteforce_attempts_for_all_users(
     res = admin.update_realm(realm_name=realm, payload={"bruteForceProtected": False})
     res = admin.get_realm(realm_name=realm)
     assert res["bruteForceProtected"] is False
+
+
+def test_default_realm_role_present(realm: str, admin: KeycloakAdmin) -> None:
+    """Test that the default realm role is present in a brand new realm.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    assert f"default-roles-{realm}" in [x["name"] for x in admin.get_realm_roles()]
+    assert (
+        len([x["name"] for x in admin.get_realm_roles() if x["name"] == f"default-roles-{realm}"])
+        == 1
+    )
+
+
+def test_get_default_realm_role_id(realm: str, admin: KeycloakAdmin) -> None:
+    """Test getter for the ID of the default realm role.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    assert (
+        admin.get_default_realm_role_id()
+        == [x["id"] for x in admin.get_realm_roles() if x["name"] == f"default-roles-{realm}"][0]
+    )
+
+
+def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
+    """Test getting, adding and deleting default realm roles.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+
+    # Test listing all default realm roles
+    roles = admin.get_realm_default_roles()
+    assert len(roles) == 2
+    assert {x["name"] for x in roles} == {"offline_access", "uma_authorization"}
+
+    with pytest.raises(KeycloakGetError) as err:
+        admin.realm_name = "doesnotexist"
+        admin.get_realm_default_roles()
+    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    admin.realm_name = realm
+
+    # Test removing a default realm role
+    res = admin.remove_realm_default_roles(payload=[roles[0]])
+    assert res == {}
+    assert roles[0] not in admin.get_realm_default_roles()
+    assert len(admin.get_realm_default_roles()) == 1
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.remove_realm_default_roles(payload=[{"id": "bad id"}])
+    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+
+    # Test adding a default realm role
+    res = admin.add_realm_default_roles(payload=[roles[0]])
+    assert res == {}
+    assert roles[0] in admin.get_realm_default_roles()
+    assert len(admin.get_realm_default_roles()) == 2
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.add_realm_default_roles(payload=[{"id": "bad id"}])
+    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+
+
+def test_clear_keys_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the keys cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_keys_cache()
+    assert res == {}
+
+
+def test_clear_realm_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the realm cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_realm_cache()
+    assert res == {}
+
+
+def test_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
+    """Test clearing the user cache.
+
+    :param realm: Realm name
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    admin.realm_name = realm
+    res = admin.clear_user_cache()
+    assert res == {}
+
+
+def test_initial_access_token(
+    admin: KeycloakAdmin, oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test initial access token and client creation.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    res = admin.create_initial_access_token(2, 3)
+    assert "token" in res
+    assert res["count"] == 2
+    assert res["expiration"] == 3
+
+    oid, username, password = oid_with_credentials
+
+    client = str(uuid.uuid4())
+    secret = str(uuid.uuid4())
+
+    res = oid.register_client(
+        token=res["token"],
+        payload={
+            "name": client,
+            "clientId": client,
+            "enabled": True,
+            "publicClient": False,
+            "protocol": "openid-connect",
+            "secret": secret,
+            "clientAuthenticatorType": "client-secret",
+        },
+    )
+    assert res["clientId"] == client

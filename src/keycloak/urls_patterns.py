@@ -25,7 +25,8 @@
 
 # OPENID URLS
 URL_REALM = "realms/{realm-name}"
-URL_WELL_KNOWN = "realms/{realm-name}/.well-known/openid-configuration"
+URL_WELL_KNOWN_BASE = "realms/{realm-name}/.well-known"
+URL_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/openid-configuration"
 URL_TOKEN = "realms/{realm-name}/protocol/openid-connect/token"
 URL_USERINFO = "realms/{realm-name}/protocol/openid-connect/userinfo"
 URL_LOGOUT = "realms/{realm-name}/protocol/openid-connect/logout"
@@ -36,6 +37,9 @@ URL_AUTH = (
     "{authorization-endpoint}?client_id={client-id}&response_type=code&redirect_uri={redirect-uri}"
     "&scope={scope}&state={state}"
 )
+
+URL_CLIENT_REGISTRATION = URL_REALM + "/clients-registrations/default"
+URL_CLIENT_UPDATE = URL_CLIENT_REGISTRATION + "/{client-id}"
 
 # ADMIN URLS
 URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
@@ -77,10 +81,12 @@ URL_ADMIN_SERVER_INFO = "admin/serverinfo"
 
 URL_ADMIN_GROUPS = "admin/realms/{realm-name}/groups"
 URL_ADMIN_GROUP = "admin/realms/{realm-name}/groups/{id}"
+URL_ADMIN_GROUP_BY_PATH = "admin/realms/{realm-name}/group-by-path/{path}"
 URL_ADMIN_GROUP_CHILD = "admin/realms/{realm-name}/groups/{id}/children"
 URL_ADMIN_GROUP_PERMISSIONS = "admin/realms/{realm-name}/groups/{id}/management/permissions"
 URL_ADMIN_GROUP_MEMBERS = "admin/realms/{realm-name}/groups/{id}/members"
 
+URL_ADMIN_CLIENT_INITIAL_ACCESS = "admin/realms/{realm-name}/clients-initial-access"
 URL_ADMIN_CLIENTS = "admin/realms/{realm-name}/clients"
 URL_ADMIN_CLIENT = URL_ADMIN_CLIENTS + "/{id}"
 URL_ADMIN_CLIENT_ALL_SESSIONS = URL_ADMIN_CLIENT + "/user-sessions"
@@ -95,34 +101,31 @@ URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES = URL_ADMIN_CLIENT + "/scope-mapping
 URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_ROLES = (
     URL_ADMIN_CLIENT + "/scope-mappings/clients/{client}"
 )
+URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES = URL_ADMIN_CLIENT + "/optional-client-scopes"
+URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPE = (
+    URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES + "/{client_scope_id}"
+)
+URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES = URL_ADMIN_CLIENT + "/default-client-scopes"
+URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPE = (
+    URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES + "/{client_scope_id}"
+)
 
-URL_ADMIN_CLIENT_AUTHZ_SETTINGS = URL_ADMIN_CLIENT + "/authz/resource-server/settings"
-URL_ADMIN_CLIENT_AUTHZ_RESOURCES = URL_ADMIN_CLIENT + "/authz/resource-server/resource?max=-1"
-URL_ADMIN_CLIENT_AUTHZ_SCOPES = URL_ADMIN_CLIENT + "/authz/resource-server/scope?max=-1"
-URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS = URL_ADMIN_CLIENT + "/authz/resource-server/permission?max=-1"
-URL_ADMIN_CLIENT_AUTHZ_POLICIES = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/policy?max=-1&permission=false"
-)
-URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/policy/role?max=-1"
-)
+URL_ADMIN_CLIENT_AUTHZ = URL_ADMIN_CLIENT + "/authz/resource-server"
+URL_ADMIN_CLIENT_AUTHZ_SETTINGS = URL_ADMIN_CLIENT_AUTHZ + "/settings"
+URL_ADMIN_CLIENT_AUTHZ_RESOURCES = URL_ADMIN_CLIENT_AUTHZ + "/resource?max=-1"
+URL_ADMIN_CLIENT_AUTHZ_SCOPES = URL_ADMIN_CLIENT_AUTHZ + "/scope?max=-1"
+URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS = URL_ADMIN_CLIENT_AUTHZ + "/permission?max=-1"
+URL_ADMIN_CLIENT_AUTHZ_POLICIES = URL_ADMIN_CLIENT_AUTHZ + "/policy?max=-1&permission=false"
+URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/role?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/permission/resource?max=-1"
+    URL_ADMIN_CLIENT_AUTHZ + "/permission/resource?max=-1"
 )
-URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/policy/{policy-id}/scopes"
-)
-URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/policy/{policy-id}/resources"
-)
-URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope/{scope-id}"
-)
-URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION = (
-    URL_ADMIN_CLIENT + "/authz/resource-server/permission/scope?max=-1"
-)
-
-URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY = URL_ADMIN_CLIENT + "/authz/resource-server/policy/client"
+URL_ADMIN_CLIENT_AUTHZ_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/{policy-id}"
+URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES = URL_ADMIN_CLIENT_AUTHZ_POLICY + "/scopes"
+URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES = URL_ADMIN_CLIENT_AUTHZ_POLICY + "/resources"
+URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope/{scope-id}"
+URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope?max=-1"
+URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/client"
 
 URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER = URL_ADMIN_CLIENT + "/service-account-user"
 URL_ADMIN_CLIENT_CERTS = URL_ADMIN_CLIENT + "/certificates/{attr}"
@@ -193,9 +196,9 @@ URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_EVENTS + "/config"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
 
 URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE = URL_ADMIN_GROUPS_CLIENT_ROLES + "/composite"
-URL_ADMIN_CLIENT_ROLE_CHILDREN = (
-    "admin/realms/{realm-name}/roles-by-id/{role-id}/composites/clients/{client-id}"
-)
+URL_ADMIN_REALM_ROLE_COMPOSITES = "admin/realms/{realm-name}/roles-by-id/{role-id}/composites"
+URL_ADMIN_REALM_ROLE_COMPOSITES_REALM = URL_ADMIN_REALM_ROLE_COMPOSITES + "/realm"
+URL_ADMIN_CLIENT_ROLE_CHILDREN = URL_ADMIN_REALM_ROLE_COMPOSITES + "/clients/{client-id}"
 URL_ADMIN_CLIENT_CERT_UPLOAD = URL_ADMIN_CLIENT_CERTS + "/upload-certificate"
 URL_ADMIN_REQUIRED_ACTIONS = URL_ADMIN_REALM + "/authentication/required-actions"
 URL_ADMIN_REQUIRED_ACTIONS_ALIAS = URL_ADMIN_REQUIRED_ACTIONS + "/{action-alias}"
@@ -204,3 +207,11 @@ URL_ADMIN_ATTACK_DETECTION = "admin/realms/{realm-name}/attack-detection/brute-f
 URL_ADMIN_ATTACK_DETECTION_USER = (
     "admin/realms/{realm-name}/attack-detection/brute-force/users/{id}"
 )
+
+URL_ADMIN_CLEAR_KEYS_CACHE = URL_ADMIN_REALM + "/clear-keys-cache"
+URL_ADMIN_CLEAR_REALM_CACHE = URL_ADMIN_REALM + "/clear-realm-cache"
+URL_ADMIN_CLEAR_USER_CACHE = URL_ADMIN_REALM + "/clear-user-cache"
+
+
+# UMA URLS
+URL_UMA_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/uma2-configuration"
