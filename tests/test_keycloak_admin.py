@@ -1680,7 +1680,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
         client_id=realm_management_id,
     )
     permission_name = admin.get_client_authz_scope_permission(
-        client_id=realm_management_id, scope_id=token_exchange_scope_id
+        client_id=realm_management_id, scope_id=token_exchange_permission_id
     )["name"]
     assert permission_name == "test-permission"
     with pytest.raises(KeycloakPostError) as err:
