@@ -1666,7 +1666,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
         scope_id=token_exchange_permission_id,
     )
 
-    # Create permissions on the target client to reference this policy
+    # Create permissions on the target client to reference this policy 
     admin.create_client_authz_scope_permission(
         payload={
             "name": "test-permission",
