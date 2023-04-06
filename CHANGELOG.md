@@ -1,3 +1,9 @@
+## v2.15.3 (2023-04-06)
+
+### Fix
+
+- Check if _s exists in ConnectionManager before deleting it (#429)
+
 ## v2.15.2 (2023-04-05)
 
 ### Fix
