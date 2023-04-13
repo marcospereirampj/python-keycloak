@@ -1614,6 +1614,84 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def update_client_authz_role_based_policy(self, client_id, policy_id, payload):
+        """Update role-based policy of client.
+
+        Payload example::
+
+            payload={
+                "id": "policy_id"
+                "type": "role",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Policy-1",
+                "roles": [
+                    {
+                    "id": id
+                    }
+                ]
+            }
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: No Document
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id,"policy_id": policy_id}
+
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY_UPDATE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201],
+        )
+
+    def update_client_authz_group_based_policy(self, client_id,policy_id, payload):
+        """Update group-based policy of client.
+
+        Payload example::
+
+            payload={
+                "id": "policy_id"
+                "type": "group",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Policy-1",
+                "groups": [
+                    {
+                    "id": id
+                    }
+                ]
+            }
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: No Document
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy_id": policy_id}
+
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_GROUP_BASED_POLICY_UPDATE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201]
+        )
+
     def create_client_authz_scope_based_permission(self, client_id, payload, skip_exists=False):
         """Create scope-based permission of client.
 
