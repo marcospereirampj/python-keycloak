@@ -1572,7 +1572,7 @@ class KeycloakAdmin:
         :type resource_id: str
 
         :return: Keycloak server response
-        :rtype: bytes
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.connection.realm_name,
