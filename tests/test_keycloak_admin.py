@@ -803,6 +803,13 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert len(res) == 2
     assert {x["name"] for x in res} == {"Default Resource", "test-resource"}
 
+    res = admin.create_client_authz_resource(
+        client_id=auth_client_id, payload={"name": "temp-resource"}
+    )
+    assert res["name"] == "temp-resource", res
+    temp_resource_id = res["_id"]
+    admin.delete_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
+
     # Authz policies
     res = admin.get_client_authz_policies(client_id=auth_client_id)
     assert len(res) == 1, res
