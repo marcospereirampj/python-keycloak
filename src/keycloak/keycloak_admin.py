@@ -1552,8 +1552,8 @@ class KeycloakAdmin:
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
         :type client_id: str
-        :return: Keycloak server response
-        :rtype: dict
+        :return: Keycloak server response (ResourceRepresentation)
+        :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
@@ -1571,7 +1571,7 @@ class KeycloakAdmin:
             https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
 
-        :return: Keycloak server response
+        :return: Keycloak server response (ResourceRepresentation)
         :rtype: dict
         """
         params_path = {
