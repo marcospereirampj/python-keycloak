@@ -2095,6 +2095,24 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
+    def update_resource_server(self, client_id, payload):
+        """Update a client.
+
+        :param client_id: Client id
+        :type client_id: str
+        :param payload: payload
+        :type payload: dict
+
+        :return: Http response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+
     def delete_client(self, client_id):
         """Get representation of the client.
 
