@@ -790,6 +790,10 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert res["name"] == "test-resource", res
     test_resource_id = res["_id"]
 
+    res = admin.get_client_authz_resource(client_id=auth_client_id, resource_id=test_resource_id)
+    assert res["_id"] == test_resource_id, res
+    assert res["name"] == "test-resource", res
+
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_resource(
             client_id=auth_client_id, payload={"name": "test-resource"}
@@ -802,6 +806,16 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     res = admin.get_client_authz_resources(client_id=auth_client_id)
     assert len(res) == 2
     assert {x["name"] for x in res} == {"Default Resource", "test-resource"}
+
+    res = admin.create_client_authz_resource(
+        client_id=auth_client_id, payload={"name": "temp-resource"}
+    )
+    assert res["name"] == "temp-resource", res
+    temp_resource_id = res["_id"]
+    admin.delete_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
+    assert err.match("404: b''")
 
     # Authz policies
     res = admin.get_client_authz_policies(client_id=auth_client_id)
