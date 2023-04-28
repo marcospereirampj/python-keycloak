@@ -1,3 +1,9 @@
+## v2.16.0 (2023-04-28)
+
+### Feat
+
+- Add get and delete methods for client authz resources (#435)
+
 ## v2.15.4 (2023-04-28)
 
 ### Fix
