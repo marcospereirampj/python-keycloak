@@ -1,3 +1,9 @@
+## v2.15.4 (2023-04-28)
+
+### Fix
+
+- **pyproject.toml**: loose requests pgk and remove urllib3 as dependency (#434)
+
 ## v2.15.3 (2023-04-06)
 
 ### Fix
