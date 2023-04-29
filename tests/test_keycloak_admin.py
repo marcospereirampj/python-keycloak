@@ -9,7 +9,7 @@ import pytest
 from dateutil import parser as datetime_parser
 
 import keycloak
-from keycloak import KeycloakAdmin, KeycloakOpenID
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection
 from keycloak.connection import ConnectionManager
 from keycloak.exceptions import (
     KeycloakAuthenticationError,
@@ -110,6 +110,17 @@ def test_keycloak_admin_init(env):
         ).token
         is None
     )
+
+    keycloak_connection = KeycloakOpenIDConnection(
+        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        username=env.KEYCLOAK_ADMIN,
+        password=env.KEYCLOAK_ADMIN_PASSWORD,
+        realm_name="master",
+        client_id="admin-cli",
+        verify=True
+    )
+    keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
+    assert keycloak_admin.token
 
 
 def test_realms(admin: KeycloakAdmin):
