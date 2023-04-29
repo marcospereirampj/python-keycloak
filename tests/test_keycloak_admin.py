@@ -117,7 +117,7 @@ def test_keycloak_admin_init(env):
         password=env.KEYCLOAK_ADMIN_PASSWORD,
         realm_name="master",
         client_id="admin-cli",
-        verify=True
+        verify=True,
     )
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
     assert keycloak_admin.token
