@@ -87,21 +87,21 @@ class KeycloakAdmin:
     _connection = None
 
     def __init__(
-            self,
-            server_url=None,
-            username=None,
-            password=None,
-            token=None,
-            totp=None,
-            realm_name="master",
-            client_id="admin-cli",
-            verify=True,
-            client_secret_key=None,
-            custom_headers=None,
-            user_realm_name=None,
-            auto_refresh_token=None,
-            timeout=60,
-            connection: Optional[KeycloakOpenIDConnection] = None,
+        self,
+        server_url,
+        username=None,
+        password=None,
+        token=None,
+        totp=None,
+        realm_name="master",
+        client_id="admin-cli",
+        verify=True,
+        client_secret_key=None,
+        custom_headers=None,
+        user_realm_name=None,
+        auto_refresh_token=None,
+        timeout=60,
+        connection: Optional[KeycloakOpenIDConnection] = None,
     ):
         """Init method.
 
@@ -815,7 +815,7 @@ class KeycloakAdmin:
         )
         raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def users_count(self, query=None):
         """Count users.
@@ -1118,7 +1118,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     def send_update_account(
-            self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None
+        self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None
     ):
         """Send an update account email to the user.
 
@@ -1339,7 +1339,7 @@ class KeycloakAdmin:
         )
         try:
             _last_slash_idx = data_raw.headers["Location"].rindex("/")
-            return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+            return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
         except KeyError:
             return
 
@@ -1965,7 +1965,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def update_client(self, client_id, payload):
         """Update a client.
@@ -2218,7 +2218,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def add_composite_client_roles_to_role(self, client_role_id, role_name, roles):
         """Add composite roles to client role.
@@ -2385,7 +2385,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_realm_role(self, role_name):
         """Get realm role by role name.
@@ -2851,7 +2851,7 @@ class KeycloakAdmin:
         )
 
     def _get_client_roles_of_user(
-            self, client_level_role_mapping_url, user_id, client_id, **params
+        self, client_level_role_mapping_url, user_id, client_id, **params
     ):
         """Get client roles of a single user helper.
 
@@ -3281,7 +3281,7 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def update_client_scope(self, client_scope_id, payload):
         """Update a client scope.
@@ -3650,7 +3650,7 @@ class KeycloakAdmin:
         )
         raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
-        return data_raw.headers["Location"][_last_slash_idx + 1:]  # noqa: E203
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]  # noqa: E203
 
     def get_component(self, component_id):
         """Get representation of the component.
