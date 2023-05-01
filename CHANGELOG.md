@@ -1,3 +1,9 @@
+## v2.16.1 (2023-05-01)
+
+### Fix
+
+- Initializing KeycloakAdmin without server_url (#439)
+
 ## v2.16.0 (2023-04-28)
 
 ### Feat
