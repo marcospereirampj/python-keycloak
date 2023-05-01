@@ -88,7 +88,7 @@ class KeycloakAdmin:
 
     def __init__(
         self,
-        server_url,
+        server_url=None,
         username=None,
         password=None,
         token=None,
