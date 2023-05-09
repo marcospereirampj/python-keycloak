@@ -108,7 +108,7 @@ certs = keycloak_openid.certs()
 token = keycloak_openid.token("user", "password")
 rpt = keycloak_openid.entitlement(token['access_token'], "resource_id")
 
-# Instropect RPT
+# Introspect RPT
 token_rpt_info = keycloak_openid.introspect(keycloak_openid.introspect(token['access_token'], rpt=rpt['rpt'],
                                                                        token_type_hint="requesting_party_token"))
 
