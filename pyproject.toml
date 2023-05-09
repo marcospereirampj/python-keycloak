@@ -41,7 +41,7 @@ sphinx-rtd-theme = {version = "^1.0.0", optional = true}
 readthedocs-sphinx-ext = {version = "^2.1.9", optional = true}
 m2r2 = {version = "^0.3.2", optional = true}
 sphinx-autoapi = {version = "^2.0.0", optional = true}
-requests-toolbelt = "^0.10.1"
+requests-toolbelt = "^1.0.0"
 deprecation = "^2.1.0"
 
 [tool.poetry.extras]
