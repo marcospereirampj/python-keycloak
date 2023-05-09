@@ -1,3 +1,9 @@
+## v2.16.2 (2023-05-09)
+
+### Fix
+
+- issue with app engine reported in #440 (#442)
+
 ## v2.16.1 (2023-05-01)
 
 ### Fix
