@@ -1,3 +1,9 @@
+## v2.16.3 (2023-05-15)
+
+### Fix
+
+- Fixes `Authorization.load_config` breaking if a scope based permission is linked with anything other than a role based policy. Fixes #445 (#446)
+
 ## v2.16.2 (2023-05-09)
 
 ### Fix
