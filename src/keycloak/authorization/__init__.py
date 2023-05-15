@@ -88,7 +88,8 @@ class Authorization:
 
                 if "applyPolicies" in pol["config"]:
                     for policy_name in ast.literal_eval(pol["config"]["applyPolicies"]):
-                        self.policies[policy_name].add_permission(permission)
+                        if self.policies.get(policy_name) is not None:
+                            self.policies[policy_name].add_permission(permission)
 
             if pol["type"] == "resource":
                 permission = Permission(
