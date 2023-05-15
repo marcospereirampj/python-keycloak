@@ -884,6 +884,7 @@ class KeycloakAdmin:
         query = query or {}
 
         params = {"briefRepresentation": brief_representation}
+
         query.update(params)
 
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
