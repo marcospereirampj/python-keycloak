@@ -850,8 +850,8 @@ class KeycloakAdmin:
         :rtype: str
         """
         lower_user_name = username.lower()
-        users = self.get_users(query={"search": lower_user_name})
-        return next((user["id"] for user in users if user["username"] == lower_user_name), None)
+        users = self.get_users(query={"username": lower_user_name, "max": 1, "exact": True})
+        return users[0]["id"] if len(users) == 1 else None
 
     def get_user(self, user_id):
         """Get representation of the user.
