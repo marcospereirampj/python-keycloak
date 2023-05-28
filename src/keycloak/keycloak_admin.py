@@ -156,7 +156,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.server_url property instead",
     )
@@ -171,7 +171,7 @@ class KeycloakAdmin:
     @server_url.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.server_url property instead",
     )
@@ -181,7 +181,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.realm_name property instead",
     )
@@ -196,7 +196,7 @@ class KeycloakAdmin:
     @realm_name.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.realm_name property instead",
     )
@@ -219,7 +219,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.client_id property instead",
     )
@@ -234,7 +234,7 @@ class KeycloakAdmin:
     @client_id.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.client_id property instead",
     )
@@ -244,7 +244,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.client_secret_key property instead",
     )
@@ -259,7 +259,7 @@ class KeycloakAdmin:
     @client_secret_key.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.client_secret_key property instead",
     )
@@ -269,7 +269,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.verify property instead",
     )
@@ -284,7 +284,7 @@ class KeycloakAdmin:
     @verify.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.verify property instead",
     )
@@ -294,7 +294,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.username property instead",
     )
@@ -309,7 +309,7 @@ class KeycloakAdmin:
     @username.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.username property instead",
     )
@@ -319,7 +319,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.password property instead",
     )
@@ -334,7 +334,7 @@ class KeycloakAdmin:
     @password.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.password property instead",
     )
@@ -344,7 +344,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.totp property instead",
     )
@@ -359,7 +359,7 @@ class KeycloakAdmin:
     @totp.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.totp property instead",
     )
@@ -369,7 +369,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.token property instead",
     )
@@ -384,7 +384,7 @@ class KeycloakAdmin:
     @token.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.token property instead",
     )
@@ -394,7 +394,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.user_realm_name property instead",
     )
@@ -409,7 +409,7 @@ class KeycloakAdmin:
     @user_realm_name.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.user_realm_name property instead",
     )
@@ -419,7 +419,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.custom_headers property instead",
     )
@@ -434,7 +434,7 @@ class KeycloakAdmin:
     @custom_headers.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.custom_headers property instead",
     )
@@ -444,7 +444,7 @@ class KeycloakAdmin:
     @property
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Auto-refresh will be implicitly set for all requests",
     )
@@ -459,7 +459,7 @@ class KeycloakAdmin:
     @auto_refresh_token.setter
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Auto-refresh will be implicitly set for all requests",
     )
@@ -3931,7 +3931,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.raw_get function instead",
     )
@@ -3952,7 +3952,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.raw_post function instead",
     )
@@ -3973,7 +3973,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.raw_put function instead",
     )
@@ -3994,7 +3994,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.raw_delete function instead",
     )
@@ -4015,7 +4015,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.get_token function instead",
     )
@@ -4031,7 +4031,7 @@ class KeycloakAdmin:
 
     @deprecation.deprecated(
         deprecated_in="2.13.0",
-        removed_in="3.0.0",
+        removed_in="4.0.0",
         current_version=__version__,
         details="Use the connection.refresh_token function instead",
     )
