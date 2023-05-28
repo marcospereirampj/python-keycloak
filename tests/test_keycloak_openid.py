@@ -209,7 +209,6 @@ def test_exchange_token(
     # Exchange token with the new user
     new_token = oid.exchange_token(
         token=token["access_token"],
-        client_id=oid.client_id,
         audience=oid.client_id,
         subject=username,
     )
