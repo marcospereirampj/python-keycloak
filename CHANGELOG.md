@@ -1,3 +1,13 @@
+## v3.0.0 (2023-05-28)
+
+### BREAKING CHANGE
+
+- Changes the exchange token API
+
+### Refactor
+
+- Exchange token method
+
 ## v2.16.6 (2023-05-28)
 
 ### Fix
