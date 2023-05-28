@@ -1,3 +1,9 @@
+## v2.16.4 (2023-05-28)
+
+### Perf
+
+- improve performance of get_user_id (#449)
+
 ## v2.16.3 (2023-05-15)
 
 ### Fix
