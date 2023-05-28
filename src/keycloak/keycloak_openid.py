@@ -28,6 +28,7 @@ class to handle authentication and token manipulation.
 """
 
 import json
+from typing import Optional
 
 from jose import jwt
 
@@ -342,9 +343,11 @@ class KeycloakOpenID:
     def exchange_token(
         self,
         token: str,
-        client_id: str,
         audience: str,
-        subject: str,
+        subject: Optional[str] = None,
+        subject_token_type: Optional[str] = None,
+        subject_issuer: Optional[str] = None,
+        requested_issuer: Optional[str] = None,
         requested_token_type: str = "urn:ietf:params:oauth:token-type:refresh_token",
         scope: str = "openid",
     ) -> dict:
@@ -355,12 +358,16 @@ class KeycloakOpenID:
 
         :param token: Access token
         :type token: str
-        :param client_id: Client id
-        :type client_id: str
         :param audience: Audience
         :type audience: str
         :param subject: Subject
         :type subject: str
+        :param subject_token_type: Token Type specification
+        :type subject_token_type: Optional[str]
+        :param subject_issuer: Issuer
+        :type subject_issuer: Optional[str]
+        :param requested_issuer: Issuer
+        :type requested_issuer: Optional[str]
         :param requested_token_type: Token type specification
         :type requested_token_type: str
         :param scope: Scope, defaults to openid
@@ -371,11 +378,14 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         payload = {
             "grant_type": ["urn:ietf:params:oauth:grant-type:token-exchange"],
-            "client_id": client_id,
+            "client_id": self.client_id,
             "subject_token": token,
+            "subject_token_type": subject_token_type,
+            "subject_issuer": subject_issuer,
             "requested_token_type": requested_token_type,
             "audience": audience,
             "requested_subject": subject,
+            "requested_issuer": requested_issuer,
             "scope": scope,
         }
         payload = self._add_secret_key(payload)
