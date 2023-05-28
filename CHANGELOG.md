@@ -1,3 +1,9 @@
+## v2.16.5 (2023-05-28)
+
+### Fix
+
+- do not swap realm for user_realm when logging in with a client service account (#447)
+
 ## v2.16.4 (2023-05-28)
 
 ### Perf
