@@ -298,8 +298,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         grant_type = []
         if self.client_secret_key:
-            if self.user_realm_name:
-                self.realm_name = self.user_realm_name
             grant_type.append("client_credentials")
         elif self.username and self.password:
             grant_type.append("password")
