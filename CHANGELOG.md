@@ -1,3 +1,9 @@
+## v2.16.6 (2023-05-28)
+
+### Fix
+
+- relax the version constraints
+
 ## v2.16.5 (2023-05-28)
 
 ### Fix
@@ -114,13 +120,16 @@
 
 ## v2.11.0 (2023-02-08)
 
+### Feat
+
+- Add Client Scopes of Client
+
 ## v2.10.0 (2023-02-08)
 
 ### Feat
 
 - update header if token is given
 - init KeycloakAdmin with token
-- Add Client Scopes of Client
 
 ## v2.9.0 (2023-01-11)
 
@@ -169,12 +178,15 @@
 
 ## v2.5.0 (2022-08-19)
 
+### Feat
+
+- added missing functionality to include attributes when returning realm roles according to specifications
+
 ## v2.4.0 (2022-08-19)
 
 ### Feat
 
 - add client scope-mappings client roles operations
-- added missing functionality to include attributes when returning realm roles according to specifications
 
 ## v2.3.0 (2022-08-13)
 
@@ -293,8 +305,8 @@
 
 ### Feat
 
-- Add get_idp_mappers, fix #329
 - Support Token Exchange. Fixes #305
+- Add get_idp_mappers, fix #329
 
 ## v1.1.1 (2022-05-27)
 
@@ -334,15 +346,15 @@
 
 ## v0.29.0 (2022-05-23)
 
+### Feat
+
+- added UMA-permission request functionality
+
 ### Fix
 
 - added fixes based on feedback
 
 ## v0.28.3 (2022-05-23)
-
-### Feat
-
-- added UMA-permission request functionality
 
 ### Fix
 
@@ -361,8 +373,6 @@
 - Add missing keycloak.authorization package
 
 ## v0.28.0 (2022-05-19)
-
-## v (2022-05-19)
 
 ### Feat
 
