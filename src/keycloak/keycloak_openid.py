@@ -49,6 +49,7 @@ from .urls_patterns import (
     URL_AUTH,
     URL_CERTS,
     URL_CLIENT_REGISTRATION,
+    URL_DEVICE,
     URL_ENTITLEMENT,
     URL_INTROSPECT,
     URL_LOGOUT,
@@ -56,7 +57,6 @@ from .urls_patterns import (
     URL_TOKEN,
     URL_USERINFO,
     URL_WELL_KNOWN,
-    URL_DEVICE,
 )
 
 
