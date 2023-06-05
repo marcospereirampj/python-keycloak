@@ -714,33 +714,18 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def device(self):
-        """Retrieve user token.
+        """Get device authorization grant.
 
-        The token endpoint is used to obtain tokens. Tokens can either be obtained by
-        exchanging an authorization code or by supplying credentials directly depending on
-        what flow is used. The token endpoint is also used to obtain new access tokens
-        when they expire.
+        The device endpoint is used to obtain a user code verification and user authentication.
+        The response contains a device_code, user_code, verification_uri, verification_uri_complete,
+        expires_in (lifetime in seconds for device_code and user_code), and polling interval.
+        Users can either follow the verification_uri and enter the user_code or follow the verification_uri_complete.
+        After authenticating with valid credentials, users can obtain tokens using the
+        "urn:ietf:params:oauth:grant-type:device_code" grant_type and the device_code.
 
-        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+        https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
+        https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
-        :param username: Username
-        :type username: str
-        :param password: Password
-        :type password: str
-        :param grant_type: Grant type
-        :type grant_type: str
-        :param code: Code
-        :type code: str
-        :param redirect_uri: Redirect URI
-        :type redirect_uri: str
-        :param totp: Time-based one-time password
-        :type totp: int
-        :param scope: Scope, defaults to openid
-        :type scope: str
-        :param extra: Additional extra arguments
-        :type extra: dict
-        :returns: Keycloak token
-        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
