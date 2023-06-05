@@ -56,6 +56,7 @@ from .urls_patterns import (
     URL_TOKEN,
     URL_USERINFO,
     URL_WELL_KNOWN,
+    URL_DEVICE
 )
 
 
@@ -716,15 +717,19 @@ class KeycloakOpenID:
         """Get device authorization grant.
 
         The device endpoint is used to obtain a user code verification and user authentication.
-        The response contains a device_code, user_code, verification_uri, verification_uri_complete,
-        expires_in (lifetime in seconds for device_code and user_code), and polling interval.
-        Users can either follow the verification_uri and enter the user_code or follow the verification_uri_complete.
+        The response contains a device_code, user_code, verification_uri,
+        verification_uri_complete, expires_in (lifetime in seconds for device_code
+        and user_code), and polling interval.
+        Users can either follow the verification_uri and enter the user_code or
+        follow the verification_uri_complete.
         After authenticating with valid credentials, users can obtain tokens using the
         "urn:ietf:params:oauth:grant-type:device_code" grant_type and the device_code.
 
         https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
         https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
+        :returns: Device Authorization Response
+        :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
