@@ -56,7 +56,7 @@ from .urls_patterns import (
     URL_TOKEN,
     URL_USERINFO,
     URL_WELL_KNOWN,
-    URL_DEVICE
+    URL_DEVICE,
 )
 
 
