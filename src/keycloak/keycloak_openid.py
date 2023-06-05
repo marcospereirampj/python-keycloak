@@ -56,6 +56,7 @@ from .urls_patterns import (
     URL_TOKEN,
     URL_USERINFO,
     URL_WELL_KNOWN,
+    URL_DEVICE,
 )
 
 
@@ -710,4 +711,42 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(
             URL_CLIENT_REGISTRATION.format(**params_path), data=json.dumps(payload)
         )
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    def device(self):
+        """Retrieve user token.
+
+        The token endpoint is used to obtain tokens. Tokens can either be obtained by
+        exchanging an authorization code or by supplying credentials directly depending on
+        what flow is used. The token endpoint is also used to obtain new access tokens
+        when they expire.
+
+        http://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint
+
+        :param username: Username
+        :type username: str
+        :param password: Password
+        :type password: str
+        :param grant_type: Grant type
+        :type grant_type: str
+        :param code: Code
+        :type code: str
+        :param redirect_uri: Redirect URI
+        :type redirect_uri: str
+        :param totp: Time-based one-time password
+        :type totp: int
+        :param scope: Scope, defaults to openid
+        :type scope: str
+        :param extra: Additional extra arguments
+        :type extra: dict
+        :returns: Keycloak token
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        payload = {
+            "client_id": self.client_id,
+        }
+
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
