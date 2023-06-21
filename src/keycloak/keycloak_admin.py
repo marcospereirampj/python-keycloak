@@ -532,6 +532,29 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
+    def partial_import_realm(self, realm_name, payload):
+        """Partial import realm configuration from PartialImportRepresentation.
+
+        Realm partialImport is used for modifying configuration of existing realm.
+
+        PartialImportRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/#_partialimportrepresentation
+
+        :param realm_name: Realm name (not the realm id)
+        :type realm_name: str
+        :param payload: PartialImportRepresentation
+        :type payload: dict
+
+        :return: PartialImportResponse
+        :rtype: dict
+        """
+        params_path = {"realm-name": realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_REALM_PARTIAL_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[200])
+
     def export_realm(self, export_clients=False, export_groups_and_role=False):
         """Export the realm configurations in the json format.
 

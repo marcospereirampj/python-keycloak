@@ -216,6 +216,53 @@ def test_import_export_realms(admin: KeycloakAdmin, realm: str):
     assert err.match('500: b\'{"error":"unknown_error"}\'')
 
 
+def test_partial_import_realm(admin: KeycloakAdmin, realm: str):
+    """Test partial import of realm configuration.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    test_realm_role = str(uuid.uuid4())
+    test_user = str(uuid.uuid4())
+    test_client = str(uuid.uuid4())
+
+    admin.realm_name = realm
+    client_id = admin.create_client(payload={"name": test_client, "clientId": test_client})
+
+    realm_export = admin.export_realm(export_clients=True, export_groups_and_role=False)
+
+    client_config = [
+        client_entry for client_entry in realm_export["clients"] if client_entry["id"] == client_id
+    ][0]
+
+    # delete before partial import
+    admin.delete_client(client_id)
+
+    payload = {
+        "ifResourceExists": "SKIP",
+        "id": realm_export["id"],
+        "realm": realm,
+        "clients": [client_config],
+        "roles": {"realm": [{"name": test_realm_role}]},
+        "users": [{"username": test_user, "email": f"{test_user}@test.test"}],
+    }
+
+    # check add
+    res = admin.partial_import_realm(realm_name=realm, payload=payload)
+    assert res["added"] == 3
+
+    # check skip
+    res = admin.partial_import_realm(realm_name=realm, payload=payload)
+    assert res["skipped"] == 3
+
+    # check overwrite
+    payload["ifResourceExists"] = "OVERWRITE"
+    res = admin.partial_import_realm(realm_name=realm, payload=payload)
+    assert res["overwritten"] == 3
+
+
 def test_users(admin: KeycloakAdmin, realm: str):
     """Test users.
 
