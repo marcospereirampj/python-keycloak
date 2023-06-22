@@ -868,6 +868,49 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
     assert err.match("404: b''")
 
+    res = admin.create_client_authz_policy(
+        client_id=auth_client_id,
+        payload={
+            "name": "test-authz-policy",
+            "type": "time",
+            "config": {"hourEnd": "18", "hour": "9"},
+        },
+    )
+    assert res["name"] == "test-authz-policy", res
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_client_authz_policy(
+            client_id=auth_client_id,
+            payload={
+                "name": "test-authz-policy",
+                "type": "time",
+                "config": {"hourEnd": "18", "hour": "9"},
+            },
+        )
+    assert err.match('409: b\'{"error":"Policy with name')
+    assert admin.create_client_authz_policy(
+        client_id=auth_client_id,
+        payload={
+            "name": "test-authz-policy",
+            "type": "time",
+            "config": {"hourEnd": "18", "hour": "9"},
+        },
+        skip_exists=True,
+    ) == {"msg": "Already exists"}
+    assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 2
+
+    res = admin.create_client_authz_policy(
+        client_id=auth_client_id,
+        payload={
+            "name": "test-authz-policy",
+            "type": "time",
+            "config": {"hourEnd": "18", "hour": "9"},
+        },
+    )
+    res2 = admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert res["id"] == res2["id"]
+    admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+
     # Test authz permissions
     res = admin.get_client_authz_permissions(client_id=auth_client_id)
     assert len(res) == 1, res
@@ -910,6 +953,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         client_id=auth_client_id, payload={"name": "test-authz-scope"}
     )
     assert res["name"] == "test-authz-scope", res
+    test_scope_id = res["id"]
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_scopes(
@@ -923,6 +967,40 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     res = admin.get_client_authz_scopes(client_id=auth_client_id)
     assert len(res) == 1
     assert {x["name"] for x in res} == {"test-authz-scope"}
+
+    res = admin.create_client_authz_scope_based_permission(
+        client_id=auth_client_id,
+        payload={
+            "name": "test-permission-sb",
+            "resources": [test_resource_id],
+            "scope": [test_scope_id],
+        },
+    )
+    assert res, res
+    assert res["name"] == "test-permission-sb"
+    assert res["resources"] == [test_resource_id]
+    assert res["scopes"] == [test_scope_id]
+
+    with pytest.raises(KeycloakPostError) as err:
+        admin.create_client_authz_scope_based_permission(
+            client_id=auth_client_id,
+            payload={
+                "name": "test-permission-sb",
+                "resources": [test_resource_id],
+                "scope": [test_scope_id],
+            },
+        )
+    assert err.match('409: b\'{"error":"Policy with name')
+    assert admin.create_client_authz_scope_based_permission(
+        client_id=auth_client_id,
+        payload={
+            "name": "test-permission-sb",
+            "resources": [test_resource_id],
+            "scope": [test_scope_id],
+        },
+        skip_exists=True,
+    ) == {"msg": "Already exists"}
+    assert len(admin.get_client_authz_permissions(client_id=auth_client_id)) == 3
 
     # Test service account user
     res = admin.get_client_service_account_user(client_id=auth_client_id)
