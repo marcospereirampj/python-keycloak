@@ -973,7 +973,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         payload={
             "name": "test-permission-sb",
             "resources": [test_resource_id],
-            "scope": [test_scope_id],
+            "scopes": [test_scope_id],
         },
     )
     assert res, res
@@ -987,7 +987,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
             payload={
                 "name": "test-permission-sb",
                 "resources": [test_resource_id],
-                "scope": [test_scope_id],
+                "scopes": [test_scope_id],
             },
         )
     assert err.match('409: b\'{"error":"Policy with name')
@@ -996,7 +996,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         payload={
             "name": "test-permission-sb",
             "resources": [test_resource_id],
-            "scope": [test_scope_id],
+            "scopes": [test_scope_id],
         },
         skip_exists=True,
     ) == {"msg": "Already exists"}
