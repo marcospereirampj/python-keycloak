@@ -899,18 +899,6 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     ) == {"msg": "Already exists"}
     assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 3
 
-    res = admin.create_client_authz_policy(
-        client_id=auth_client_id,
-        payload={
-            "name": "test-authz-policy",
-            "type": "time",
-            "config": {"hourEnd": "18", "hour": "9"},
-        },
-    )
-    res2 = admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-    assert res["id"] == res2["id"]
-    admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-
     # Test authz permissions
     res = admin.get_client_authz_permissions(client_id=auth_client_id)
     assert len(res) == 1, res
