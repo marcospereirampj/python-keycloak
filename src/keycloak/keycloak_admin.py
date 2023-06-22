@@ -1652,7 +1652,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
         data_raw = self.connection.raw_post(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICY.format(**params_path),
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path),
             data=json.dumps(payload),
         )
         return raise_error_from_response(
