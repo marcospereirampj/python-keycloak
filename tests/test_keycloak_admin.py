@@ -897,7 +897,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         },
         skip_exists=True,
     ) == {"msg": "Already exists"}
-    assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 2
+    assert len(admin.get_client_authz_policies(client_id=auth_client_id)) == 3
 
     res = admin.create_client_authz_policy(
         client_id=auth_client_id,
