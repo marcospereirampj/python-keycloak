@@ -1,3 +1,9 @@
+## v3.1.1 (2023-06-23)
+
+### Fix
+
+- remove duplicate slash in URL_ADMIN_IDP (#459)
+
 ## v3.1.0 (2023-06-23)
 
 ### Feat
