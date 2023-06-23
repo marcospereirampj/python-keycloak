@@ -1,3 +1,9 @@
+## v3.1.0 (2023-06-23)
+
+### Feat
+
+- Add query to get users group method and permit pagination (#444)
+
 ## v3.0.0 (2023-05-28)
 
 ### BREAKING CHANGE
