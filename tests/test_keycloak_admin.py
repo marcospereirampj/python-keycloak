@@ -338,6 +338,35 @@ def test_users_pagination(admin: KeycloakAdmin, realm: str):
     assert len(users) == 20, len(users)
 
 
+def test_user_groups_pagination(admin: KeycloakAdmin, realm: str):
+    """Test user groups pagination.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.realm_name = realm
+
+    user_id = admin.create_user(
+        payload={"username": "username_1", "email": "username_1@test.test"}
+    )
+
+    for ind in range(admin.PAGE_SIZE + 50):
+        group_name = f"group_{ind}"
+        group_id = admin.create_group(payload={"name": group_name})
+        admin.group_user_add(user_id=user_id, group_id=group_id)
+
+    groups = admin.get_user_groups(user_id=user_id)
+    assert len(groups) == admin.PAGE_SIZE + 50, len(groups)
+
+    groups = admin.get_user_groups(user_id=user_id, query={"first": 100, "max": -1, "search": ""})
+    assert len(groups) == 50, len(groups)
+
+    groups = admin.get_user_groups(user_id=user_id, query={"max": 20, "first": -1, "search": ""})
+    assert len(groups) == 20, len(groups)
+
+
 def test_idps(admin: KeycloakAdmin, realm: str):
     """Test IDPs.
 

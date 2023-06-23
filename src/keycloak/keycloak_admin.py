@@ -867,24 +867,34 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_user_groups(self, user_id, brief_representation=True):
+    def get_user_groups(self, user_id, query=None, brief_representation=True):
         """Get user groups.
 
         Returns a list of groups of which the user is a member
 
         :param user_id: User id
         :type user_id: str
+        :param query: Additional query options
+        :type query: dict
         :param brief_representation: whether to omit attributes in the response
         :type brief_representation: bool
         :return: user groups list
         :rtype: list
         """
+        query = query or {}
+
         params = {"briefRepresentation": brief_representation}
+
+        query.update(params)
+
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
-        data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_USER_GROUPS.format(**params_path), **params
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+
+        url = urls_patterns.URL_ADMIN_USER_GROUPS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def update_user(self, user_id, payload):
         """Update the user.
