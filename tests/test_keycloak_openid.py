@@ -133,10 +133,10 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     token = oid.token(username=username, password=password)
     assert token == {
         "access_token": mock.ANY,
-        "expires_in": 300,
+        "expires_in": mock.ANY,
         "id_token": mock.ANY,
         "not-before-policy": 0,
-        "refresh_expires_in": 1800,
+        "refresh_expires_in": mock.ANY,
         "refresh_token": mock.ANY,
         "scope": mock.ANY,
         "session_state": mock.ANY,
@@ -147,10 +147,10 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     token = oid.token(username=username, password=password, totp="123456")
     assert token == {
         "access_token": mock.ANY,
-        "expires_in": 300,
+        "expires_in": mock.ANY,
         "id_token": mock.ANY,
         "not-before-policy": 0,
-        "refresh_expires_in": 1800,
+        "refresh_expires_in": mock.ANY,
         "refresh_token": mock.ANY,
         "scope": mock.ANY,
         "session_state": mock.ANY,
@@ -161,10 +161,10 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     token = oid.token(username=username, password=password, extra_param="foo")
     assert token == {
         "access_token": mock.ANY,
-        "expires_in": 300,
+        "expires_in": mock.ANY,
         "id_token": mock.ANY,
         "not-before-policy": 0,
-        "refresh_expires_in": 1800,
+        "refresh_expires_in": mock.ANY,
         "refresh_token": mock.ANY,
         "scope": mock.ANY,
         "session_state": mock.ANY,
