@@ -360,10 +360,10 @@ def test_user_groups_pagination(admin: KeycloakAdmin, realm: str):
     groups = admin.get_user_groups(user_id=user_id)
     assert len(groups) == admin.PAGE_SIZE + 50, len(groups)
 
-    groups = admin.get_user_groups(user_id=user_id, query={"first": 100})
+    groups = admin.get_user_groups(user_id=user_id, query={"first": 100, "max": -1, "search": ""})
     assert len(groups) == 50, len(groups)
 
-    groups = admin.get_user_groups(user_id=user_id, query={"max": 20})
+    groups = admin.get_user_groups(user_id=user_id, query={"max": 20, "first": -1, "search": ""})
     assert len(groups) == 20, len(groups)
 
 
