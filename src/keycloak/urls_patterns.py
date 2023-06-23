@@ -99,15 +99,15 @@ URL_ADMIN_CLIENT_ROLE_GROUPS = URL_ADMIN_CLIENT + "/roles/{role-name}/groups"
 URL_ADMIN_CLIENT_MANAGEMENT_PERMISSIONS = URL_ADMIN_CLIENT + "/management/permissions"
 URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_ROLES = URL_ADMIN_CLIENT + "/scope-mappings/realm"
 URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_ROLES = (
-        URL_ADMIN_CLIENT + "/scope-mappings/clients/{client}"
+    URL_ADMIN_CLIENT + "/scope-mappings/clients/{client}"
 )
 URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES = URL_ADMIN_CLIENT + "/optional-client-scopes"
 URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPE = (
-        URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES + "/{client_scope_id}"
+    URL_ADMIN_CLIENT_OPTIONAL_CLIENT_SCOPES + "/{client_scope_id}"
 )
 URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES = URL_ADMIN_CLIENT + "/default-client-scopes"
 URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPE = (
-        URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES + "/{client_scope_id}"
+    URL_ADMIN_CLIENT_DEFAULT_CLIENT_SCOPES + "/{client_scope_id}"
 )
 
 URL_ADMIN_CLIENT_AUTHZ = URL_ADMIN_CLIENT + "/authz/resource-server"
@@ -119,7 +119,7 @@ URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS = URL_ADMIN_CLIENT_AUTHZ + "/permission?max=-
 URL_ADMIN_CLIENT_AUTHZ_POLICIES = URL_ADMIN_CLIENT_AUTHZ + "/policy?max=-1&permission=false"
 URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/role?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION = (
-        URL_ADMIN_CLIENT_AUTHZ + "/permission/resource?max=-1"
+    URL_ADMIN_CLIENT_AUTHZ + "/permission/resource?max=-1"
 )
 URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/{policy-id}"
@@ -152,8 +152,8 @@ URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE = (
     "admin/realms/{realm-name}/roles/{role-name}/composites"
 )
 URL_ADMIN_REALM_EXPORT = (
-        "admin/realms/{realm-name}/partial-export?exportClients={export-clients}&"
-        + "exportGroupsAndRoles={export-groups-and-roles}"
+    "admin/realms/{realm-name}/partial-export?exportClients={export-clients}&"
+    + "exportGroupsAndRoles={export-groups-and-roles}"
 )
 
 URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES = URL_ADMIN_REALM + "/default-default-client-scopes"
