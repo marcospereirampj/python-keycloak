@@ -1,3 +1,9 @@
+## v3.2.0 (2023-06-23)
+
+### Feat
+
+- Implement missing admin method create_client_authz_scope_based_permission() and create_client_authz_policy() (#460)
+
 ## v3.1.1 (2023-06-23)
 
 ### Fix
