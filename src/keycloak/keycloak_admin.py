@@ -1632,6 +1632,163 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def create_client_authz_group_based_policy(self, client_id, payload, skip_exists=False):
+        """Create group-based policy of client.
+
+        Payload example::
+
+            payload={
+                "type": "group",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Policy-1",
+                "groups": [
+                    {
+                    "id": id
+                    }
+                ]
+            }
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: No Document
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_GROUP_BASED_POLICY.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
+        )
+
+    def update_client_authz_role_based_policy(self, client_id, policy_id, payload):
+        """Update role-based policy of client.
+
+        Payload example::
+
+            payload={
+                "id": "policy_id"
+                "type": "role",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Policy-1",
+                "roles": [
+                    {
+                    "id": id
+                    }
+                ]
+            }
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: No Document
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id,"policy_id": policy_id}
+
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY_UPDATE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201],
+        )
+
+    def update_client_authz_group_based_policy(self, client_id,policy_id, payload):
+        """Update group-based policy of client.
+
+        Payload example::
+
+            payload={
+                "id": "policy_id"
+                "type": "group",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Policy-1",
+                "groups": [
+                    {
+                    "id": id
+                    }
+                ]
+            }
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: No Document
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "policy_id": policy_id}
+
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_GROUP_BASED_POLICY_UPDATE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201]
+        )
+
+    def create_client_authz_scope_based_permission(self, client_id, payload, skip_exists=False):
+        """Create scope-based permission of client.
+
+        Payload example::
+
+            payload={
+                "type": "resource",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": "Permission-Name",
+                "scopes": [
+                    scope_id
+                ],
+                "policies": [
+                    policy_id
+                ]
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: PolicyRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+        :type payload: dict
+        :param skip_exists: Skip creation in case the object already exists
+        :type skip_exists: bool
+        :return: Keycloak server response
+        :rtype: bytes
+
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
+        )
+
+
+
     def create_client_authz_resource_based_permission(self, client_id, payload, skip_exists=False):
         """Create resource-based permission of client.
 
@@ -1993,6 +2150,24 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT.format(**params_path), data=json.dumps(payload)
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    def update_resource_server(self, client_id, payload):
+        """Update a client.
+
+        :param client_id: Client id
+        :type client_id: str
+        :param payload: payload
+        :type payload: dict
+
+        :return: Http response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
 
     def delete_client(self, client_id):
         """Get representation of the client.
