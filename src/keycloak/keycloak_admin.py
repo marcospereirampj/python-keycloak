@@ -1536,7 +1536,8 @@ class KeycloakAdmin:
     def update_client_authz_resource(self, client_id, resource_id, payload):
         """Update resource of client.
 
-        Any parameter missing from the ResourceRepresentation in the payload WILL be set to default by the Keycloak server.
+        Any parameter missing from the ResourceRepresentation in the payload WILL be set
+        to default by the Keycloak server.
 
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
