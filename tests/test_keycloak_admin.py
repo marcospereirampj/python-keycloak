@@ -852,6 +852,20 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     )
     assert res["name"] == "temp-resource", res
     temp_resource_id = res["_id"]
+    # Test update authz resources
+    res = admin.update_client_authz_resource(
+        client_id=auth_client_id,
+        resource_id=temp_resource_id,
+        payload={"name": "temp-updated-resource"},
+    )
+    assert res["name"] == "temp-updated-resource", res
+    with pytest.raises(KeycloakPutError) as err:
+        admin.update_client_authz_resource(
+            client_id=auth_client_id,
+            resource_id="invalid_resource_id",
+            payload={"name": "temp-updated-resource"},
+        )
+    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\''), err
     admin.delete_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
