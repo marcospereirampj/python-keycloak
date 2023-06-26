@@ -851,13 +851,14 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         client_id=auth_client_id, payload={"name": "temp-resource"}
     )
     assert res["name"] == "temp-resource", res
-    temp_resource_id = res["_id"]
+    temp_resource_id: str = res["_id"]
     # Test update authz resources
-    res = admin.update_client_authz_resource(
+    admin.update_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
         payload={"name": "temp-updated-resource"},
     )
+    res = admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
     assert res["name"] == "temp-updated-resource", res
     with pytest.raises(KeycloakPutError) as err:
         admin.update_client_authz_resource(
