@@ -866,7 +866,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
             resource_id="invalid_resource_id",
             payload={"name": "temp-updated-resource"},
         )
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\''), err
+    assert err.match("404: b''"), err
     admin.delete_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
