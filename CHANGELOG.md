@@ -1,3 +1,9 @@
+## v3.3.0 (2023-06-28)
+
+### Feat
+
+- added KeycloakAdmin.update_client_authz_resource() (#462)
+
 ## v3.2.0 (2023-06-23)
 
 ### Feat
