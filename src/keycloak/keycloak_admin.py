@@ -1533,6 +1533,39 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def update_client_authz_resource(self, client_id, resource_id, payload):
+        """Update resource of client.
+
+        Any parameter missing from the ResourceRepresentation in the payload WILL be set
+        to default by the Keycloak server.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: ResourceRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+        :type payload: dict
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param resource_id: id in ResourceRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+        :type resource_id: str
+
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "resource-id": resource_id,
+        }
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
     def delete_client_authz_resource(self, client_id: str, resource_id: str):
         """Delete a client resource.
 
