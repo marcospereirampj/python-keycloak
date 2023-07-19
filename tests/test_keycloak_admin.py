@@ -1119,6 +1119,10 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     role_id_2 = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
     assert role_id == role_id_2
 
+    # Test get realm role by its id
+    res = admin.get_realm_role_by_id(role_id)
+    assert res["name"] == "test-realm-role"
+
     # Test update realm role
     res = admin.update_realm_role(
         role_name="test-realm-role", payload={"name": "test-realm-role-update"}
