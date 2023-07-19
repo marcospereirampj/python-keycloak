@@ -1120,6 +1120,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert role_id == role_id_2
 
     # Test get realm role by its id
+    role_id = admin.get_realm_role(role_name="test-realm-role")["id"]
     res = admin.get_realm_role_by_id(role_id)
     assert res["name"] == "test-realm-role"
 
