@@ -303,7 +303,7 @@ groups = keycloak_admin.get_groups()
 group = keycloak_admin.get_group(group_id='group_id')
 
 # Get group by name
-group = keycloak_admin.get_group_by_path(path='/group/subgroup', search_in_subgroups=True)
+group = keycloak_admin.get_group_by_path(path='/group/subgroup')
 
 # Function to trigger user sync from provider
 sync_users(storage_id="storage_di", action="action")
