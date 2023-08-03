@@ -2284,7 +2284,23 @@ def test_keys(admin: KeycloakAdmin, realm: str):
     }
 
 
-def test_events(admin: KeycloakAdmin, realm: str):
+def test_admin_events(admin: KeycloakAdmin, realm: str):
+    """Test events.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.realm_name = realm
+
+    admin.create_client(payload={"name": "test", "clientId": "test"})
+
+    events = admin.get_admin_events()
+    assert events == list()
+
+
+def test_user_events(admin: KeycloakAdmin, realm: str):
     """Test events.
 
     :param admin: Keycloak Admin client
