@@ -1869,7 +1869,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
-    assert len(res) == 7, res
+    assert len(res) == 8, res
     assert set(res[0].keys()) == {
         "alias",
         "authenticationExecutions",
@@ -2023,7 +2023,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) == 35
+    assert len(res) == 38
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
