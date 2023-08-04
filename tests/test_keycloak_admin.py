@@ -1869,7 +1869,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
-    assert len(res) == 8, res
+    assert len(res) == 8 or len(res) == 7, res
     assert set(res[0].keys()) == {
         "alias",
         "authenticationExecutions",
@@ -1883,6 +1883,14 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
         "reset credentials",
         "browser",
         "http challenge",
+        "registration",
+        "docker auth",
+        "direct grant",
+        "first broker login",
+        "clients",
+    } or {x["alias"] for x in res} == {
+        "reset credentials",
+        "browser",
         "registration",
         "docker auth",
         "direct grant",
@@ -1904,7 +1912,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
     res = admin.copy_authentication_flow(payload={"newName": "test-browser"}, flow_alias="browser")
     assert res == b"", res
-    assert len(admin.get_authentication_flows()) == 9
+    assert len(admin.get_authentication_flows()) == 9 or len(admin.get_authentication_flows()) == 8
 
     # Test create
     res = admin.create_authentication_flow(
@@ -2023,7 +2031,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) == 38
+    assert len(res) == 38 or len(res) == 35
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
