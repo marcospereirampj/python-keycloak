@@ -395,6 +395,18 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     assert len(idps) == 1
     assert "github" == idps[0]["alias"]
 
+    # Test get idp
+    idp = admin.get_idp("github")
+    assert "github" == idp["alias"]
+    assert idp.get("config")
+    assert "test" == idp["config"]["clientId"]
+    assert "**********" == idp["config"]["clientSecret"]
+
+    # Test get idp fail
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_idp("does-not-exist")
+    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+
     # Test IdP update
     res = admin.update_idp(idp_alias="github", payload=idps[0])
 

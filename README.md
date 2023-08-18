@@ -337,8 +337,11 @@ keycloak_admin.get_client_roles_of_client_scope(client_id=another_client_id, cli
 # Remove client roles assigned to client's scope
 keycloak_admin.delete_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
 
-# Get all ID Providers
+# Get all IDP Providers
 idps = keycloak_admin.get_idps()
+
+# Get a specific IDP Provider, using its alias
+idp = keycloak_admin.get_idp("idp-alias")
 
 # Create a new Realm
 keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)

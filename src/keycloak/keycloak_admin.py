@@ -773,6 +773,23 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_IDPS.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_idp(self, idp_alias):
+        """Get IDP provider.
+
+        Get the representation of a specific IDP Provider.
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
+
+        :param: idp_alias: alias for IdP to get
+        :type idp_alias: str
+        :return: IdentityProviderRepresentation
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_IDP.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def delete_idp(self, idp_alias):
         """Delete an ID Provider.
 
