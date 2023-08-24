@@ -66,7 +66,7 @@ class KeycloakOpenID:
     :param client_id: client id
     :param realm_name: realm name
     :param client_secret_key: client secret key
-    :param verify: True if want check connection SSL
+    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
     :param custom_headers: dict of custom header to pass to each HTML request
     :param proxies: dict of proxies to sent the request by.
     :param timeout: connection timeout in seconds
@@ -93,8 +93,8 @@ class KeycloakOpenID:
         :type realm_name: str
         :param client_secret_key: client secret key
         :type client_secret_key: str
-        :param verify: True if want check connection SSL
-        :type verify: bool
+        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :type verify: Union[bool,str]
         :param custom_headers: dict of custom header to pass to each HTML request
         :type custom_headers: dict
         :param proxies: dict of proxies to sent the request by.
