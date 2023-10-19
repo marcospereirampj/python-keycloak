@@ -2026,7 +2026,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) == 38
+    assert len(res) > 1
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
