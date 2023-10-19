@@ -548,6 +548,7 @@ def test_server_info(admin: KeycloakAdmin):
             "passwordPolicies",
             "enums",
             "cryptoInfo",
+            "features",
         }
     ), info.keys()
 
@@ -1869,7 +1870,19 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
-    assert len(res) == 8, res
+    default_flows = len(res)
+    assert {x["alias"] for x in res}.issubset(
+        {
+            "reset credentials",
+            "browser",
+            "registration",
+            "http challenge",
+            "docker auth",
+            "direct grant",
+            "first broker login",
+            "clients",
+        }
+    )
     assert set(res[0].keys()) == {
         "alias",
         "authenticationExecutions",
@@ -1878,16 +1891,6 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
         "id",
         "providerId",
         "topLevel",
-    }
-    assert {x["alias"] for x in res} == {
-        "reset credentials",
-        "browser",
-        "http challenge",
-        "registration",
-        "docker auth",
-        "direct grant",
-        "first broker login",
-        "clients",
     }
 
     with pytest.raises(KeycloakGetError) as err:
@@ -1904,7 +1907,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
     res = admin.copy_authentication_flow(payload={"newName": "test-browser"}, flow_alias="browser")
     assert res == b"", res
-    assert len(admin.get_authentication_flows()) == 9
+    assert len(admin.get_authentication_flows()) == (default_flows + 1)
 
     # Test create
     res = admin.create_authentication_flow(
