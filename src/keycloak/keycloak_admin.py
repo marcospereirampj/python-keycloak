@@ -29,7 +29,7 @@
 import copy
 import json
 from builtins import isinstance
-from typing import Optional
+from typing import Optional, Union
 
 import deprecation
 from requests_toolbelt import MultipartEncoder
@@ -84,7 +84,7 @@ class KeycloakAdmin:
     PAGE_SIZE = 100
 
     _auto_refresh_token = None
-    _connection: KeycloakOpenIDConnection | None = None
+    _connection: Union[KeycloakOpenIDConnection, None] = None
 
     def __init__(
         self,
