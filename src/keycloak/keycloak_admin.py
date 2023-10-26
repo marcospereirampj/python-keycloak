@@ -34,7 +34,7 @@ from typing import Optional
 import deprecation
 from requests_toolbelt import MultipartEncoder
 
-from . import urls_patterns
+from . import urls_patterns, ConnectionManager
 from ._version import __version__
 from .exceptions import (
     KeycloakDeleteError,
@@ -84,7 +84,7 @@ class KeycloakAdmin:
     PAGE_SIZE = 100
 
     _auto_refresh_token = None
-    _connection = None
+    _connection: ConnectionManager | None = None
 
     def __init__(
         self,
