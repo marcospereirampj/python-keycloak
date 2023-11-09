@@ -3,7 +3,7 @@
 
 # Python Keycloak
 
-For review- see https://github.com/marcospereirampj/python-keycloak
+For review - see https://github.com/marcospereirampj/python-keycloak
 
 **python-keycloak** is a Python package providing access to the Keycloak API.
 

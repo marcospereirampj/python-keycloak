@@ -25,7 +25,7 @@ python -m poetry shell
 
 ## Running checks and tests
 
-We're utilizing `tox` for most of the testing workflows. However we also have an external dependency on `docker`.
+We're utilizing `tox` for most of the testing workflows. However, we also have an external dependency on `docker`.
 We're using docker to spin up a local keycloak instance which we run our test cases against. This is to avoid
 a lot of unnecessary mocking and yet have immediate feedback from the actual Keycloak instance. All of the setup
 is done for you with the tox environments, all you need is to have both tox and docker installed
@@ -50,10 +50,10 @@ If the check fails, you'll see an error message specifying what went wrong. To s
 tox -e apply-check
 ```
 
-which will apply isort and black formatting for you in the repository. The flake8 problems however need to be resolved
+which will apply isort and black formatting for you in the repository. The flake8 problems, however, need to be resolved
 manually by the developer.
 
-Additionally we require that the documentation pages are built without warnings. This check is also run via tox, using
+Additionally, we require that the documentation pages are built without warnings. This check is also run via tox, using
 the command
 
 ```sh
