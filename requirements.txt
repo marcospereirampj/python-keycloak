@@ -1,7 +1,0 @@
-requests>=2.20.0
-httmock>=1.2.5
-python-jose>=1.4.0
-twine==1.13.0
-jose~=1.0.0
-setuptools~=54.2.0
-urllib3>=1.26.5
