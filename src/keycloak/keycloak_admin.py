@@ -2163,15 +2163,13 @@ class KeycloakAdmin:
         url = urls_patterns.URL_ADMIN_REALM_ROLES
         params_path = {"realm-name": self.connection.realm_name}
         params = {"briefRepresentation": brief_representation}
-        
+
         # set the search_text path param, if it is a valid string
-        if search_text is not None and search_text.strip() != '':
+        if search_text is not None and search_text.strip() != "":
             params_path["search-text"] = search_text
             url = urls_patterns.URL_ADMIN_REALM_ROLES_SEARCH
-        
-        data_raw = self.connection.raw_get(
-            url.format(**params_path), **params
-        )
+
+        data_raw = self.connection.raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realm_role_members(self, role_name, query=None):
