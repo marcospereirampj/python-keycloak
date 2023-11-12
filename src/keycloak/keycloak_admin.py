@@ -2149,8 +2149,10 @@ class KeycloakAdmin:
 
     def get_realm_roles(self, brief_representation=True, search_text=""):
         """Get all roles for the realm or client.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
         :param brief_representation: whether to omit role attributes in the response
         :type brief_representation: bool
         :param search_text: optional search text to limit the returned result.
