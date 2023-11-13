@@ -183,7 +183,7 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     :rtype: KeycloakOpenID
     """
     # Set the realm
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     # Create client
     client = str(uuid.uuid4())
     client_id = admin.create_client(
@@ -219,7 +219,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
     :rtype: Tuple[KeycloakOpenID, str, str]
     """
     # Set the realm
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     # Create client
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
@@ -276,7 +276,7 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
     :rtype: Tuple[KeycloakOpenID, str, str]
     """
     # Set the realm
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     # Create client
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
@@ -354,7 +354,7 @@ def user(admin: KeycloakAdmin, realm: str) -> str:
     :yields: Keycloak user
     :rtype: str
     """
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     username = str(uuid.uuid4())
     user_id = admin.create_user(payload={"username": username, "email": f"{username}@test.test"})
     yield user_id
@@ -372,7 +372,7 @@ def group(admin: KeycloakAdmin, realm: str) -> str:
     :yields: Keycloak group
     :rtype: str
     """
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     group_name = str(uuid.uuid4())
     group_id = admin.create_group(payload={"name": group_name})
     yield group_id
@@ -390,7 +390,7 @@ def client(admin: KeycloakAdmin, realm: str) -> str:
     :yields: Keycloak client id
     :rtype: str
     """
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     client = str(uuid.uuid4())
     client_id = admin.create_client(payload={"name": client, "clientId": client})
     yield client_id
@@ -410,7 +410,7 @@ def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
     :yields: Keycloak client role
     :rtype: str
     """
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     role = str(uuid.uuid4())
     admin.create_client_role(client, {"name": role, "composite": False})
     yield role
@@ -432,7 +432,7 @@ def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_
     :yields: Composite client role
     :rtype: str
     """
-    admin.realm_name = realm
+    admin.change_current_realm(realm)
     role = str(uuid.uuid4())
     admin.create_client_role(client, {"name": role, "composite": True})
     role_repr = admin.get_client_role(client, client_role)

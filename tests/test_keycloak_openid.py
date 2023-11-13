@@ -186,7 +186,7 @@ def test_exchange_token(
     oid, username, password = oid_with_credentials
 
     # Allow impersonation
-    admin.realm_name = oid.realm_name
+    admin.change_current_realm(oid.realm_name)
     admin.assign_client_role(
         user_id=admin.get_user_id(username=username),
         client_id=admin.get_client_id(client_id="realm-management"),

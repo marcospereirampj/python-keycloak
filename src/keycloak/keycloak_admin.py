@@ -516,6 +516,22 @@ class KeycloakAdmin:
         query = query or {}
         return raise_error_from_response(self.connection.raw_get(url, **query), KeycloakGetError)
 
+    def get_current_realm(self) -> str:
+        """Return the currently configured realm.
+
+        :returns: Currently configured realm name
+        :rtype: str
+        """
+        return self.connection.realm_name
+
+    def change_current_realm(self, realm_name: str) -> None:
+        """Change the current realm.
+
+        :param realm_name: The name of the realm to be configured as current
+        :type realm_name: str
+        """
+        self.connection.realm_name = realm_name
+
     def import_realm(self, payload):
         """Import a new realm from a RealmRepresentation.
 
