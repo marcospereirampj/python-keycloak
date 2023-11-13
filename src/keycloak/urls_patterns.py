@@ -37,6 +37,7 @@ URL_AUTH = (
     "{authorization-endpoint}?client_id={client-id}&response_type=code&redirect_uri={redirect-uri}"
     "&scope={scope}&state={state}"
 )
+URL_DEVICE = "realms/{realm-name}/protocol/openid-connect/auth/device"
 
 URL_CLIENT_REGISTRATION = URL_REALM + "/clients-registrations/default"
 URL_CLIENT_UPDATE = URL_CLIENT_REGISTRATION + "/{client-id}"
