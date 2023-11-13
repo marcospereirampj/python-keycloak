@@ -356,6 +356,18 @@ keycloak_admin.realm_name = "demo" # Change realm to 'demo'
 keycloak_admin.get_users() # Get users in realm 'demo'
 keycloak_admin.create_user(...) # Creates a new user in 'demo'
 
+# Get User events
+keycloak_admin.get_events(query={'type': 'LOGIN', 
+                                 'user': user['id'], 
+                                 'dateFrom': '2023-08-02'})
+
+# Get Admin events
+keycloak_admin.get_admin_events(query={'resourceTypes': 'USER',
+                                                'operationTypes': 'UPDATE',
+                                                'resourcePath': 'users/' + user['id'],
+                                                'dateFrom': '2023-08-02'
+                                                })
+
 # KEYCLOAK UMA
 
 from keycloak import KeycloakOpenIDConnection
