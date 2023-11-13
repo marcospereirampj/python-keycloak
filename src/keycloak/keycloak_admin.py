@@ -2781,6 +2781,23 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_realm_role_by_id(self, role_id: str):
+        """Get realm role by role id.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
+        :param role_id: role's id, not name!
+        :type role_id: str
+        :return: role
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_ID.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def update_realm_role(self, role_name, payload):
         """Update a role for the realm by name.
 
