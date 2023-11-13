@@ -87,8 +87,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type realm_name: str
         :param client_id: client id
         :type client_id: str
-        :param verify: True if want check connection SSL
-        :type verify: bool
+        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :type verify: Union[bool,str]
         :param client_secret_key: client secret key
             (optional, required only for access type confidential)
         :type client_secret_key: str
