@@ -4155,6 +4155,36 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def create_client_authz_scope_permission(self, payload, client_id):
+        """Create permissions for a authz scope.
+
+        Payload example::
+
+            payload={
+                "name": "My Permission Name",
+                "type": "scope",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "resources": [some_resource_id],
+                "scopes": [some_scope_id],
+                "policies": [some_policy_id],
+            }
+
+        :param payload: No Document
+        :type payload: dict
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+
     def update_client_authz_scope_permission(self, payload, client_id, scope_id):
         """Update permissions for a given scope.
 
