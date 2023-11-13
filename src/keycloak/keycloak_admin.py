@@ -84,7 +84,7 @@ class KeycloakAdmin:
     PAGE_SIZE = 100
 
     _auto_refresh_token = None
-    _connection = None
+    _connection: Optional[KeycloakOpenIDConnection] = None
 
     def __init__(
         self,
