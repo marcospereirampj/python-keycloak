@@ -357,8 +357,8 @@ keycloak_admin.get_users() # Get users in realm 'demo'
 keycloak_admin.create_user(...) # Creates a new user in 'demo'
 
 # Get User events
-keycloak_admin.get_events(query={'type': 'LOGIN', 
-                                 'user': user['id'], 
+keycloak_admin.get_events(query={'type': 'LOGIN',
+                                 'user': user['id'],
                                  'dateFrom': '2023-08-02'})
 
 # Get Admin events

@@ -43,7 +43,8 @@ class ConnectionManager(object):
     :type headers: dict
     :param timeout: Timeout to use for requests to the server.
     :type timeout: int
-    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+    :param verify: Boolean value to enable or disable certificate validation or a string
+        containing a path to a CA bundle to use
     :type verify: Union[bool,str]
     :param proxies: The proxies servers requests is sent by.
     :type proxies: dict
@@ -58,7 +59,8 @@ class ConnectionManager(object):
         :type headers: dict
         :param timeout: Timeout to use for requests to the server.
         :type timeout: int
-        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :param verify: Boolean value to enable or disable certificate validation or a string
+            containing a path to a CA bundle to use
         :type verify: Union[bool,str]
         :param proxies: The proxies servers requests is sent by.
         :type proxies: dict

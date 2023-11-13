@@ -63,7 +63,8 @@ class KeycloakAdmin:
     :type realm_name: str
     :param client_id: client id
     :type client_id: str
-    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+    :param verify: Boolean value to enable or disable certificate validation or a string
+        containing a path to a CA bundle to use
     :type verify: Union[bool,str]
     :param client_secret_key: client secret key
         (optional, required only for access type confidential)
@@ -119,7 +120,8 @@ class KeycloakAdmin:
         :type realm_name: str
         :param client_id: client id
         :type client_id: str
-        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :param verify: Boolean value to enable or disable certificate validation or a string
+            containing a path to a CA bundle to use
         :type verify: Union[bool,str]
         :param client_secret_key: client secret key
             (optional, required only for access type confidential)
@@ -1239,7 +1241,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_server_info(self):
-        """Get themes, social providers, auth providers, and event listeners available on this server.
+        """Get themes, social providers, etc. on this server.
 
         ServerInfoRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_serverinforepresentation
@@ -1934,48 +1936,6 @@ class KeycloakAdmin:
 
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
-            data=json.dumps(payload),
-        )
-        return raise_error_from_response(
-            data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
-        )
-
-    def create_client_authz_scope_based_permission(self, client_id, payload, skip_exists=False):
-        """Create scope-based permission of client.
-
-        Payload example::
-
-            payload={
-                "type": "resource",
-                "logic": "POSITIVE",
-                "decisionStrategy": "UNANIMOUS",
-                "name": "Permission-Name",
-                "resources": [
-                    resource_id
-                ],
-                "policies": [
-                    policy_id
-                ],
-                "scopes": [
-                    scope_id
-                ]
-
-        :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
-        :type client_id: str
-        :param payload: PolicyRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
-        :type payload: dict
-        :param skip_exists: Skip creation in case the object already exists
-        :type skip_exists: bool
-        :return: Keycloak server response
-        :rtype: bytes
-
-        """
-        params_path = {"realm-name": self.realm_name, "id": client_id}
-
-        data_raw = self.connection.raw_post(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION.format(**params_path),
             data=json.dumps(payload),
         )
         return raise_error_from_response(
@@ -4447,7 +4407,7 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
     def update_client_authz_scope_permission(self, payload, client_id, scope_id):
         """Update permissions for a given scope.
