@@ -204,7 +204,7 @@ class KeycloakAdmin:
         self.connection.realm_name = value
 
     @property
-    def connection(self):
+    def connection(self) -> KeycloakOpenIDConnection:
         """Get connection.
 
         :returns: Connection manager
@@ -213,7 +213,7 @@ class KeycloakAdmin:
         return self._connection
 
     @connection.setter
-    def connection(self, value):
+    def connection(self, value: KeycloakOpenIDConnection) -> None:
         self._connection = value
 
     @property
