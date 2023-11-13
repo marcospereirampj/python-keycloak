@@ -54,6 +54,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
     _custom_headers = None
     _user_realm_name = None
     _expires_at = None
+    _keycloak_openid = None
 
     def __init__(
         self,
@@ -86,8 +87,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type realm_name: str
         :param client_id: client id
         :type client_id: str
-        :param verify: True if want check connection SSL
-        :type verify: bool
+        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :type verify: Union[bool,str]
         :param client_secret_key: client secret key
             (optional, required only for access type confidential)
         :type client_secret_key: str
@@ -275,27 +276,39 @@ class KeycloakOpenIDConnection(ConnectionManager):
             # merge custom headers to main headers
             self.headers.update(self.custom_headers)
 
+    @property
+    def keycloak_openid(self) -> KeycloakOpenID:
+        """Get the KeycloakOpenID object.
+
+        The KeycloakOpenID is used to refresh tokens
+
+        :returns: KeycloakOpenID
+        :rtype: KeycloakOpenID
+        """
+        if self._keycloak_openid is None:
+            if self.user_realm_name:
+                token_realm_name = self.user_realm_name
+            elif self.realm_name:
+                token_realm_name = self.realm_name
+            else:
+                token_realm_name = "master"
+
+            self._keycloak_openid = KeycloakOpenID(
+                server_url=self.server_url,
+                client_id=self.client_id,
+                realm_name=token_realm_name,
+                verify=self.verify,
+                client_secret_key=self.client_secret_key,
+                timeout=self.timeout,
+            )
+
+        return self._keycloak_openid
+
     def get_token(self):
         """Get admin token.
 
         The admin token is then set in the `token` attribute.
         """
-        if self.user_realm_name:
-            token_realm_name = self.user_realm_name
-        elif self.realm_name:
-            token_realm_name = self.realm_name
-        else:
-            token_realm_name = "master"
-
-        self.keycloak_openid = KeycloakOpenID(
-            server_url=self.server_url,
-            client_id=self.client_id,
-            realm_name=token_realm_name,
-            verify=self.verify,
-            client_secret_key=self.client_secret_key,
-            timeout=self.timeout,
-        )
-
         grant_type = []
         if self.client_secret_key:
             grant_type.append("client_credentials")
