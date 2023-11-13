@@ -1,3 +1,9 @@
+## v3.5.0 (2023-11-13)
+
+### Feat
+
+- Update dynamic client using registration access token (#491)
+
 ## v3.4.0 (2023-11-13)
 
 ### Feat
