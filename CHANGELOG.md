@@ -1,4 +1,10 @@
-## v3.3.0 (2023-06-28)
+## v3.4.0 (2023-11-13)
+
+### Feat
+
+- add an optional search criteria to the get_realm_roles function (#504)
+
+## v3.3.0 (2023-06-27)
 
 ### Feat
 
