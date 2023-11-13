@@ -198,8 +198,9 @@ URL_ADMIN_USER_FEDERATED_IDENTITY = (
     "admin/realms/{realm-name}/users/{id}/federated-identity/{provider}"
 )
 
-URL_ADMIN_EVENTS = "admin/realms/{realm-name}/events"
-URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_EVENTS + "/config"
+URL_ADMIN_USER_EVENTS = "admin/realms/{realm-name}/events"
+URL_ADMIN_ADMIN_EVENTS = "admin/realms/{realm-name}/admin-events"
+URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_USER_EVENTS + "/config"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
 
 URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE = URL_ADMIN_GROUPS_CLIENT_ROLES + "/composite"

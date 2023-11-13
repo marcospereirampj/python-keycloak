@@ -3936,6 +3936,27 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_admin_events(self, query=None):
+        """Get Administrative events.
+
+        Return a list of events, filtered according to query parameters
+
+        AdminEvents Representation array
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getevents
+        https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_get_adminrealmsrealmadmin_events
+
+        :param query: Additional query parameters
+        :type query: dict
+        :return: events list
+        :rtype: list
+        """
+        query = query or dict()
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ADMIN_EVENTS.format(**params_path), data=None, **query
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_events(self, query=None):
         """Get events.
 
@@ -3952,7 +3973,7 @@ class KeycloakAdmin:
         query = query or dict()
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=None, **query
+            urls_patterns.URL_ADMIN_USER_EVENTS.format(**params_path), data=None, **query
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
