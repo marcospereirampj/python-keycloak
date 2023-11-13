@@ -2322,7 +2322,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
-    def get_realm_roles(self, brief_representation=True):
+    def get_realm_roles(self, brief_representation=True, search_text=""):
         """Get all roles for the realm or client.
 
         RoleRepresentation
@@ -2330,14 +2330,24 @@ class KeycloakAdmin:
 
         :param brief_representation: whether to omit role attributes in the response
         :type brief_representation: bool
+        :param search_text: optional search text to limit the returned result.
+        :type search_text: str
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
+        url = urls_patterns.URL_ADMIN_REALM_ROLES
         params_path = {"realm-name": self.connection.realm_name}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), **params
         )
+
+        # set the search_text path param, if it is a valid string
+        if search_text is not None and search_text.strip() != "":
+            params_path["search-text"] = search_text
+            url = urls_patterns.URL_ADMIN_REALM_ROLES_SEARCH
+
+        data_raw = self.connection.raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realm_role_members(self, role_name, query=None):

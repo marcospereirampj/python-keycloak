@@ -1103,6 +1103,12 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert "uma_authorization" in role_names, role_names
     assert "offline_access" in role_names, role_names
 
+    # Test get realm roles with search text
+    searched_roles = admin.get_realm_roles(search_text="uma_a")
+    searched_role_names = [x["name"] for x in searched_roles]
+    assert "uma_authorization" in searched_role_names, searched_role_names
+    assert "offline_access" not in searched_role_names, searched_role_names
+
     # Test empty members
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm_role_members(role_name="does-not-exist")

@@ -249,6 +249,9 @@ client = keycloak_admin.get_client(client_id="client_id")
 # Get all roles for the realm or client
 realm_roles = keycloak_admin.get_realm_roles()
 
+# Get all roles for the realm or client that their names includes the searched text
+realm_roles = keycloak_admin.get_realm_roles(search_text="CompanyA_")
+
 # Get all roles for the client
 client_roles = keycloak_admin.get_client_roles(client_id="client_id")
 
