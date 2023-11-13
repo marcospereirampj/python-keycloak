@@ -1960,4 +1960,4 @@ docs = ["Sphinx", "alabaster", "commonmark", "m2r2", "mock", "readthedocs-sphinx
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "c46e3214bb6f752fde4d839c2430ed1cc4cccb133ad0dc0e363de788bb438986"
+content-hash = "e3fe4146aeb609f4dac4f75bbf1f0cf7e669c230244ab44292918f60f35605e0"
