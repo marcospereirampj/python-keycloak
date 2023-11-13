@@ -63,8 +63,8 @@ class KeycloakAdmin:
     :type realm_name: str
     :param client_id: client id
     :type client_id: str
-    :param verify: True if want check connection SSL
-    :type verify: bool
+    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+    :type verify: Union[bool,str]
     :param client_secret_key: client secret key
         (optional, required only for access type confidential)
     :type client_secret_key: str
@@ -84,7 +84,7 @@ class KeycloakAdmin:
     PAGE_SIZE = 100
 
     _auto_refresh_token = None
-    _connection = None
+    _connection: Optional[KeycloakOpenIDConnection] = None
 
     def __init__(
         self,
@@ -119,8 +119,8 @@ class KeycloakAdmin:
         :type realm_name: str
         :param client_id: client id
         :type client_id: str
-        :param verify: True if want check connection SSL
-        :type verify: bool
+        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :type verify: Union[bool,str]
         :param client_secret_key: client secret key
             (optional, required only for access type confidential)
         :type client_secret_key: str
@@ -204,7 +204,7 @@ class KeycloakAdmin:
         self.connection.realm_name = value
 
     @property
-    def connection(self):
+    def connection(self) -> KeycloakOpenIDConnection:
         """Get connection.
 
         :returns: Connection manager
@@ -213,7 +213,7 @@ class KeycloakAdmin:
         return self._connection
 
     @connection.setter
-    def connection(self, value):
+    def connection(self, value: KeycloakOpenIDConnection) -> None:
         self._connection = value
 
     @property
@@ -532,6 +532,29 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
+    def partial_import_realm(self, realm_name, payload):
+        """Partial import realm configuration from PartialImportRepresentation.
+
+        Realm partialImport is used for modifying configuration of existing realm.
+
+        PartialImportRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/#_partialimportrepresentation
+
+        :param realm_name: Realm name (not the realm id)
+        :type realm_name: str
+        :param payload: PartialImportRepresentation
+        :type payload: dict
+
+        :return: PartialImportResponse
+        :rtype: dict
+        """
+        params_path = {"realm-name": realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_REALM_PARTIAL_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[200])
+
     def export_realm(self, export_clients=False, export_groups_and_role=False):
         """Export the realm configurations in the json format.
 
@@ -771,6 +794,23 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_IDPS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_idp(self, idp_alias):
+        """Get IDP provider.
+
+        Get the representation of a specific IDP Provider.
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
+
+        :param: idp_alias: alias for IdP to get
+        :type idp_alias: str
+        :return: IdentityProviderRepresentation
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_IDP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def delete_idp(self, idp_alias):
@@ -1314,7 +1354,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "path": path}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path))
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_group(self, payload, parent=None, skip_exists=False):
@@ -1775,7 +1817,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
 
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION.format(**params_path),
             data=json.dumps(payload),
         )
@@ -2175,6 +2217,34 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_realm_role_groups(self, role_name, query=None, brief_representation=True):
+        """Get role groups of realm by role name.
+
+        :param role_name: Name of the role.
+        :type role_name: str
+        :param query: Additional Query parameters
+            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_parameters_226)
+        :type query: dict
+        :param brief_representation: whether to omit role attributes in the response
+        :type brief_representation: bool
+        :return: Keycloak Server Response (GroupRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+
+        params = {"briefRepresentation": brief_representation}
+
+        query.update(params)
+
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
+
+        url = urls_patterns.URL_ADMIN_REALM_ROLES_GROUPS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
     def get_realm_role_members(self, role_name, query=None):
         """Get role members of realm by role name.
 
@@ -2533,6 +2603,23 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_NAME.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_realm_role_by_id(self, role_id: str):
+        """Get realm role by role id.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
+        :param role_id: role's id, not name!
+        :type role_id: str
+        :return: role
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_ID.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -3849,6 +3936,27 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_admin_events(self, query=None):
+        """Get Administrative events.
+
+        Return a list of events, filtered according to query parameters
+
+        AdminEvents Representation array
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getevents
+        https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_get_adminrealmsrealmadmin_events
+
+        :param query: Additional query parameters
+        :type query: dict
+        :return: events list
+        :rtype: list
+        """
+        query = query or dict()
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ADMIN_EVENTS.format(**params_path), data=None, **query
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_events(self, query=None):
         """Get events.
 
@@ -3865,7 +3973,7 @@ class KeycloakAdmin:
         query = query or dict()
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_EVENTS.format(**params_path), data=None, **query
+            urls_patterns.URL_ADMIN_USER_EVENTS.format(**params_path), data=None, **query
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -4136,6 +4244,36 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def create_client_authz_scope_permission(self, payload, client_id):
+        """Create permissions for a authz scope.
+
+        Payload example::
+
+            payload={
+                "name": "My Permission Name",
+                "type": "scope",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "resources": [some_resource_id],
+                "scopes": [some_scope_id],
+                "policies": [some_policy_id],
+            }
+
+        :param payload: No Document
+        :type payload: dict
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(
+            urls_patterns.URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+
     def update_client_authz_scope_permission(self, payload, client_id, scope_id):
         """Update permissions for a given scope.
 
@@ -4377,7 +4515,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_KEYS_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
@@ -4389,7 +4527,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_REALM_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
@@ -4401,7 +4539,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_USER_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])

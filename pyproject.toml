@@ -30,6 +30,7 @@ Documentation = "https://python-keycloak.readthedocs.io/en/latest/"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
+setuptools = "*"
 requests = ">=2.20.0"
 python-jose = ">=3.3.0"
 mock = {version = "^4.0.3", optional = true}
@@ -41,7 +42,7 @@ sphinx-rtd-theme = {version = "^1.0.0", optional = true}
 readthedocs-sphinx-ext = {version = "^2.1.9", optional = true}
 m2r2 = {version = "^0.3.2", optional = true}
 sphinx-autoapi = {version = "^2.0.0", optional = true}
-requests-toolbelt = ">=1.0.0"
+requests-toolbelt = "*"
 deprecation = ">=2.1.0"
 
 [tool.poetry.extras]

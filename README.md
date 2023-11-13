@@ -306,7 +306,7 @@ groups = keycloak_admin.get_groups()
 group = keycloak_admin.get_group(group_id='group_id')
 
 # Get group by name
-group = keycloak_admin.get_group_by_path(path='/group/subgroup', search_in_subgroups=True)
+group = keycloak_admin.get_group_by_path(path='/group/subgroup')
 
 # Function to trigger user sync from provider
 sync_users(storage_id="storage_di", action="action")
@@ -340,8 +340,11 @@ keycloak_admin.get_client_roles_of_client_scope(client_id=another_client_id, cli
 # Remove client roles assigned to client's scope
 keycloak_admin.delete_client_roles_of_client_scope(client_id=another_client_id, client_roles_owner_id=client_id, roles=client_roles)
 
-# Get all ID Providers
+# Get all IDP Providers
 idps = keycloak_admin.get_idps()
+
+# Get a specific IDP Provider, using its alias
+idp = keycloak_admin.get_idp("idp-alias")
 
 # Create a new Realm
 keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)
@@ -352,6 +355,18 @@ keycloak_admin.get_users() # Get user in main realm
 keycloak_admin.realm_name = "demo" # Change realm to 'demo'
 keycloak_admin.get_users() # Get users in realm 'demo'
 keycloak_admin.create_user(...) # Creates a new user in 'demo'
+
+# Get User events
+keycloak_admin.get_events(query={'type': 'LOGIN', 
+                                 'user': user['id'], 
+                                 'dateFrom': '2023-08-02'})
+
+# Get Admin events
+keycloak_admin.get_admin_events(query={'resourceTypes': 'USER',
+                                                'operationTypes': 'UPDATE',
+                                                'resourcePath': 'users/' + user['id'],
+                                                'dateFrom': '2023-08-02'
+                                                })
 
 # KEYCLOAK UMA
 
