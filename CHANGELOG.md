@@ -1,3 +1,9 @@
+## v3.6.0 (2023-11-13)
+
+### Feat
+
+- add KeycloakAdmin.get_idp() (#478)
+
 ## v3.5.0 (2023-11-13)
 
 ### Feat
