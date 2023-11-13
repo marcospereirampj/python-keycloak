@@ -69,7 +69,8 @@ class KeycloakOpenID:
     :param client_id: client id
     :param realm_name: realm name
     :param client_secret_key: client secret key
-    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+    :param verify: Boolean value to enable or disable certificate validation or a string
+        containing a path to a CA bundle to use
     :param custom_headers: dict of custom header to pass to each HTML request
     :param proxies: dict of proxies to sent the request by.
     :param timeout: connection timeout in seconds
@@ -96,7 +97,8 @@ class KeycloakOpenID:
         :type realm_name: str
         :param client_secret_key: client secret key
         :type client_secret_key: str
-        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :param verify: Boolean value to enable or disable certificate validation or a string
+            containing a path to a CA bundle to use
         :type verify: Union[bool,str]
         :param custom_headers: dict of custom header to pass to each HTML request
         :type custom_headers: dict
@@ -715,7 +717,6 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    
     def device(self):
         """Get device authorization grant.
 
@@ -743,7 +744,6 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    
     def update_client(self, token: str, client_id: str, payload: dict):
         """Update a client.
 
