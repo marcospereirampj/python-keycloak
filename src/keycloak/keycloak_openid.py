@@ -41,6 +41,7 @@ from .exceptions import (
     KeycloakGetError,
     KeycloakInvalidTokenError,
     KeycloakPostError,
+    KeycloakPutError,
     KeycloakRPTNotFound,
     raise_error_from_response,
 )
@@ -49,6 +50,7 @@ from .urls_patterns import (
     URL_AUTH,
     URL_CERTS,
     URL_CLIENT_REGISTRATION,
+    URL_CLIENT_UPDATE,
     URL_DEVICE,
     URL_ENTITLEMENT,
     URL_INTROSPECT,
@@ -67,7 +69,7 @@ class KeycloakOpenID:
     :param client_id: client id
     :param realm_name: realm name
     :param client_secret_key: client secret key
-    :param verify: True if want check connection SSL
+    :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
     :param custom_headers: dict of custom header to pass to each HTML request
     :param proxies: dict of proxies to sent the request by.
     :param timeout: connection timeout in seconds
@@ -94,8 +96,8 @@ class KeycloakOpenID:
         :type realm_name: str
         :param client_secret_key: client secret key
         :type client_secret_key: str
-        :param verify: True if want check connection SSL
-        :type verify: bool
+        :param verify: Boolean value to enable or disable certificate validation or a string containing a path to a CA bundle to use
+        :type verify: Union[bool,str]
         :param custom_headers: dict of custom header to pass to each HTML request
         :type custom_headers: dict
         :param proxies: dict of proxies to sent the request by.
@@ -344,7 +346,7 @@ class KeycloakOpenID:
     def exchange_token(
         self,
         token: str,
-        audience: str,
+        audience: Optional[str] = None,
         subject: Optional[str] = None,
         subject_token_type: Optional[str] = None,
         subject_issuer: Optional[str] = None,
@@ -713,6 +715,7 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
+    
     def device(self):
         """Get device authorization grant.
 
@@ -739,3 +742,32 @@ class KeycloakOpenID:
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
+
+    
+    def update_client(self, token: str, client_id: str, payload: dict):
+        """Update a client.
+
+        ClientRepresentation:
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+
+        :param token: registration access token
+        :type token: str
+        :param client_id: Keycloak client id
+        :type client_id: str
+        :param payload: ClientRepresentation
+        :type payload: dict
+        :return: Client Representation
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name, "client-id": client_id}
+        self.connection.add_param_headers("Authorization", "Bearer " + token)
+        self.connection.add_param_headers("Content-Type", "application/json")
+
+        # Keycloak complains if the clientId is not set in the payload
+        if "clientId" not in payload:
+            payload["clientId"] = client_id
+
+        data_raw = self.connection.raw_put(
+            URL_CLIENT_UPDATE.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError)

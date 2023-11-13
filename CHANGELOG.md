@@ -1,3 +1,45 @@
+## v3.6.0 (2023-11-13)
+
+### Feat
+
+- add KeycloakAdmin.get_idp() (#478)
+
+## v3.5.0 (2023-11-13)
+
+### Feat
+
+- Update dynamic client using registration access token (#491)
+
+## v3.4.0 (2023-11-13)
+
+### Feat
+
+- add an optional search criteria to the get_realm_roles function (#504)
+
+## v3.3.0 (2023-06-27)
+
+### Feat
+
+- added KeycloakAdmin.update_client_authz_resource() (#462)
+
+## v3.2.0 (2023-06-23)
+
+### Feat
+
+- Implement missing admin method create_client_authz_scope_based_permission() and create_client_authz_policy() (#460)
+
+## v3.1.1 (2023-06-23)
+
+### Fix
+
+- remove duplicate slash in URL_ADMIN_IDP (#459)
+
+## v3.1.0 (2023-06-23)
+
+### Feat
+
+- Add query to get users group method and permit pagination (#444)
+
 ## v3.0.0 (2023-05-28)
 
 ### BREAKING CHANGE

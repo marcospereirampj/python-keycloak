@@ -122,10 +122,12 @@ URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/rol
 URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION = (
     URL_ADMIN_CLIENT_AUTHZ + "/permission/resource?max=-1"
 )
+URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/{policy-id}"
 URL_ADMIN_CLIENT_AUTHZ_POLICY_SCOPES = URL_ADMIN_CLIENT_AUTHZ_POLICY + "/scopes"
 URL_ADMIN_CLIENT_AUTHZ_POLICY_RESOURCES = URL_ADMIN_CLIENT_AUTHZ_POLICY + "/resources"
 URL_ADMIN_CLIENT_AUTHZ_SCOPE_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope/{scope-id}"
+URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION = URL_ADMIN_CLIENT_AUTHZ + "/permission/scope?max=-1"
 URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY = URL_ADMIN_CLIENT_AUTHZ + "/policy/client"
 
 URL_ADMIN_CLIENT_SERVICE_ACCOUNT_USER = URL_ADMIN_CLIENT + "/service-account-user"
@@ -140,13 +142,16 @@ URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER = URL_ADMIN_CLIENT_SCOPE + "/protocol-mappers
 URL_ADMIN_CLIENT_SCOPES_MAPPERS = URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER + "/{protocol-mapper-id}"
 
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
+URL_ADMIN_REALM_ROLES_SEARCH = URL_ADMIN_REALM_ROLES + "?search={search-text}"
 URL_ADMIN_REALM_ROLES_MEMBERS = URL_ADMIN_REALM_ROLES + "/{role-name}/users"
+URL_ADMIN_REALM_ROLES_GROUPS = URL_ADMIN_REALM_ROLES + "/{role-name}/groups"
 URL_ADMIN_REALMS = "admin/realms"
 URL_ADMIN_REALM = "admin/realms/{realm-name}"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"
 URL_ADMIN_IDP_MAPPERS = "admin/realms/{realm-name}/identity-provider/instances/{idp-alias}/mappers"
 URL_ADMIN_IDP_MAPPER_UPDATE = URL_ADMIN_IDP_MAPPERS + "/{mapper-id}"
-URL_ADMIN_IDP = "admin/realms//{realm-name}/identity-provider/instances/{alias}"
+URL_ADMIN_IDP = "admin/realms/{realm-name}/identity-provider/instances/{alias}"
+URL_ADMIN_REALM_ROLES_ROLE_BY_ID = URL_ADMIN_REALM + "/roles-by-id/{role-id}"
 URL_ADMIN_REALM_ROLES_ROLE_BY_NAME = "admin/realms/{realm-name}/roles/{role-name}"
 URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE = (
     "admin/realms/{realm-name}/roles/{role-name}/composites"
@@ -155,6 +160,8 @@ URL_ADMIN_REALM_EXPORT = (
     "admin/realms/{realm-name}/partial-export?exportClients={export-clients}&"
     + "exportGroupsAndRoles={export-groups-and-roles}"
 )
+
+URL_ADMIN_REALM_PARTIAL_IMPORT = "admin/realms/{realm-name}/partialImport"
 
 URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES = URL_ADMIN_REALM + "/default-default-client-scopes"
 URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE = URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES + "/{id}"
@@ -192,8 +199,9 @@ URL_ADMIN_USER_FEDERATED_IDENTITY = (
     "admin/realms/{realm-name}/users/{id}/federated-identity/{provider}"
 )
 
-URL_ADMIN_EVENTS = "admin/realms/{realm-name}/events"
-URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_EVENTS + "/config"
+URL_ADMIN_USER_EVENTS = "admin/realms/{realm-name}/events"
+URL_ADMIN_ADMIN_EVENTS = "admin/realms/{realm-name}/admin-events"
+URL_ADMIN_EVENTS_CONFIG = URL_ADMIN_USER_EVENTS + "/config"
 URL_ADMIN_CLIENT_SESSION_STATS = "admin/realms/{realm-name}/client-session-stats"
 
 URL_ADMIN_GROUPS_CLIENT_ROLES_COMPOSITE = URL_ADMIN_GROUPS_CLIENT_ROLES + "/composite"
@@ -212,7 +220,6 @@ URL_ADMIN_ATTACK_DETECTION_USER = (
 URL_ADMIN_CLEAR_KEYS_CACHE = URL_ADMIN_REALM + "/clear-keys-cache"
 URL_ADMIN_CLEAR_REALM_CACHE = URL_ADMIN_REALM + "/clear-realm-cache"
 URL_ADMIN_CLEAR_USER_CACHE = URL_ADMIN_REALM + "/clear-user-cache"
-
 
 # UMA URLS
 URL_UMA_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/uma2-configuration"
