@@ -51,6 +51,7 @@ from .urls_patterns import (
     URL_CERTS,
     URL_CLIENT_REGISTRATION,
     URL_CLIENT_UPDATE,
+    URL_DEVICE,
     URL_ENTITLEMENT,
     URL_INTROSPECT,
     URL_LOGOUT,
@@ -714,6 +715,35 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
+    
+    def device(self):
+        """Get device authorization grant.
+
+        The device endpoint is used to obtain a user code verification and user authentication.
+        The response contains a device_code, user_code, verification_uri,
+        verification_uri_complete, expires_in (lifetime in seconds for device_code
+        and user_code), and polling interval.
+        Users can either follow the verification_uri and enter the user_code or
+        follow the verification_uri_complete.
+        After authenticating with valid credentials, users can obtain tokens using the
+        "urn:ietf:params:oauth:grant-type:device_code" grant_type and the device_code.
+
+        https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
+        https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
+
+        :returns: Device Authorization Response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.realm_name}
+        payload = {
+            "client_id": self.client_id,
+        }
+
+        payload = self._add_secret_key(payload)
+        data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    
     def update_client(self, token: str, client_id: str, payload: dict):
         """Update a client.
 
