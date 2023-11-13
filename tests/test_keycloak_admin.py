@@ -1259,6 +1259,14 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     res = admin.get_composite_realm_roles_of_role(role_name=composite_role)
     assert len(res) == 0
 
+    # Test realm role group list
+    res = admin.get_realm_role_groups(role_name="test-realm-role-update")
+    assert len(res) == 1
+    assert res[0]["id"] == group_id
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_realm_role_groups(role_name="non-existent-role")
+    assert err.match('404: b\'{"error":"Could not find role"}\'')
+
     # Test delete realm role
     res = admin.delete_realm_role(role_name=composite_role)
     assert res == dict(), res
