@@ -343,7 +343,7 @@ class KeycloakOpenID:
     def exchange_token(
         self,
         token: str,
-        audience: str,
+        audience: Optional[str] = None,
         subject: Optional[str] = None,
         subject_token_type: Optional[str] = None,
         subject_issuer: Optional[str] = None,
