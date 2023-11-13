@@ -163,6 +163,8 @@ URL_ADMIN_REALM_EXPORT = (
     + "exportGroupsAndRoles={export-groups-and-roles}"
 )
 
+URL_ADMIN_REALM_PARTIAL_IMPORT = "admin/realms/{realm-name}/partialImport"
+
 URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES = URL_ADMIN_REALM + "/default-default-client-scopes"
 URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE = URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPES + "/{id}"
 URL_ADMIN_DEFAULT_OPTIONAL_CLIENT_SCOPES = URL_ADMIN_REALM + "/default-optional-client-scopes"
