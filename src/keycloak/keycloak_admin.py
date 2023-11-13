@@ -29,7 +29,7 @@
 import copy
 import json
 from builtins import isinstance
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import deprecation
 from requests_toolbelt import MultipartEncoder
@@ -739,6 +739,27 @@ class KeycloakAdmin:
 
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
+    def delete_mapper_to_idp(self, idp_alias: str, mapper_id: str) -> Dict[str, Any]:
+        """Delete an IDP mapper.
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/22.0.5/rest-api/index.html#_identityprovidermapperrepresentation
+
+        :param: idp_alias: alias for Idp to add mapper in
+        :type idp_alias: str
+        :param: mapper_id: ID of mapper
+        :type mapper_id: str
+        :returns: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,  # type:ignore
+            "idp-alias": idp_alias,
+            "mapper-id": mapper_id,
+        }
+        data_raw = self.raw_delete(urls_patterns.URL_ADMIN_IDP_MAPPER_UPDATE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
     def get_idp_mappers(self, idp_alias):
         """Get IDP mappers.
 
@@ -784,6 +805,57 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
         data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_IDP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_idp_management_permissions(self, idp_alias: str) -> Dict[str, Any]:
+        """Get management permissions for a client.
+
+        ManagementPermissionReference
+        https://www.keycloak.org/docs-api/22.0.5/rest-api/index.html#_managementpermissionreference
+
+        :param: idp_alias: idp alias name
+        :type idp_alias: str
+        :returns: Keycloak server response
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,  # type:ignore
+            "alias": idp_alias,
+        }
+        data_raw = self.raw_get(
+            urls_patterns.URL_ADMIN_IDP_MANAGEMENT_PERMISSIONS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
+    def update_idp_management_permissions(
+        self, idp_alias: str, payload: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Update management permissions for a client.
+
+        ManagementPermissionReference
+        https://www.keycloak.org/docs-api/22.0.5/rest-api/index.html#_managementpermissionreference
+
+        :param: idp_alias: idp alias name
+        :type idp_alias: str
+        :param payload: ManagementPermissionReference
+        :type payload: dict
+        :returns: Keycloak server response
+        :rtype: dict
+
+        Payload example::
+
+            payload={
+                "enabled": true
+            }
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,  # type:ignore
+            "alias": idp_alias,
+        }
+        data_raw = self.raw_put(
+            urls_patterns.URL_ADMIN_IDP_MANAGEMENT_PERMISSIONS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[200])
 
     def create_user(self, payload, exist_ok=False):
         """Create a new user.
