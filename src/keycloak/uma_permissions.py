@@ -247,7 +247,6 @@ def build_permission_param(permissions):
     try:  # treat as dictionary of permissions
         result = set()
         for resource, scopes in permissions.items():
-            print(f"resource={resource}scopes={scopes}")
             if scopes is None:
                 result.add(resource)
             elif isinstance(scopes, str):
