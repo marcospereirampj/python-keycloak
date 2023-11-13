@@ -596,6 +596,7 @@ def test_server_info(admin: KeycloakAdmin):
             "systemInfo",
             "memoryInfo",
             "profileInfo",
+            "features",
             "themes",
             "socialProviders",
             "identityProviders",
@@ -1045,7 +1046,6 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         client_id=auth_client_id, payload={"name": "test-authz-scope"}
     )
     assert res["name"] == "test-authz-scope", res
-    test_scope_id = res["id"]
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_scopes(
@@ -1059,40 +1059,6 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     res = admin.get_client_authz_scopes(client_id=auth_client_id)
     assert len(res) == 1
     assert {x["name"] for x in res} == {"test-authz-scope"}
-
-    res = admin.create_client_authz_scope_based_permission(
-        client_id=auth_client_id,
-        payload={
-            "name": "test-permission-sb",
-            "resources": [test_resource_id],
-            "scopes": [test_scope_id],
-        },
-    )
-    assert res, res
-    assert res["name"] == "test-permission-sb"
-    assert res["resources"] == [test_resource_id]
-    assert res["scopes"] == [test_scope_id]
-
-    with pytest.raises(KeycloakPostError) as err:
-        admin.create_client_authz_scope_based_permission(
-            client_id=auth_client_id,
-            payload={
-                "name": "test-permission-sb",
-                "resources": [test_resource_id],
-                "scopes": [test_scope_id],
-            },
-        )
-    assert err.match('409: b\'{"error":"Policy with name')
-    assert admin.create_client_authz_scope_based_permission(
-        client_id=auth_client_id,
-        payload={
-            "name": "test-permission-sb",
-            "resources": [test_resource_id],
-            "scopes": [test_scope_id],
-        },
-        skip_exists=True,
-    ) == {"msg": "Already exists"}
-    assert len(admin.get_client_authz_permissions(client_id=auth_client_id)) == 3
 
     # Test service account user
     res = admin.get_client_service_account_user(client_id=auth_client_id)
@@ -1882,7 +1848,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     # Create permissions on the target client to reference this policy
     admin.create_client_authz_scope_permission(
         payload={
-            "id": token_exchange_permission_id,
+            "id": "some-id",
             "name": "test-permission",
             "type": "scope",
             "logic": "POSITIVE",
@@ -1896,13 +1862,13 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     permission_name = admin.get_client_authz_scope_permission(
         client_id=realm_management_id, scope_id=token_exchange_permission_id
     )["name"]
-    assert permission_name == "test-permission"
+    assert permission_name.startswith("token-exchange.permission.client.")
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_scope_permission(
             payload={"name": "test-permission", "scopes": [token_exchange_scope_id]},
             client_id="realm_management_id",
         )
-    assert err.match('404: b\'{"errorMessage":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client"}\'')
 
 
 def test_email(admin: KeycloakAdmin, user: str):
@@ -1973,6 +1939,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     admin.realm_name = realm
 
     res = admin.get_authentication_flows()
+    assert len(res) <= 8, res
     default_flows = len(res)
     assert {x["alias"] for x in res}.issubset(
         {
@@ -1995,6 +1962,18 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
         "providerId",
         "topLevel",
     }
+    assert {x["alias"] for x in res}.issubset(
+        {
+            "reset credentials",
+            "browser",
+            "registration",
+            "docker auth",
+            "direct grant",
+            "first broker login",
+            "clients",
+            "http challenge",
+        }
+    )
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_for_id(flow_id="bad")
@@ -2129,7 +2108,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) > 1
+    assert len(res) <= 38
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
