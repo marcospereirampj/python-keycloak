@@ -1,3 +1,13 @@
+## v3.7.0 (2023-11-13)
+
+### Feat
+
+- realm changing helpers
+
+### Fix
+
+- no prints
+
 ## v3.6.1 (2023-11-13)
 
 ### Fix
