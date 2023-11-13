@@ -2369,6 +2369,34 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_realm_role_groups(self, role_name, query=None, brief_representation=True):
+        """Get role groups of realm by role name.
+
+        :param role_name: Name of the role.
+        :type role_name: str
+        :param query: Additional Query parameters
+            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_parameters_226)
+        :type query: dict
+        :param brief_representation: whether to omit role attributes in the response
+        :type brief_representation: bool
+        :return: Keycloak Server Response (GroupRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+
+        params = {"briefRepresentation": brief_representation}
+
+        query.update(params)
+
+        params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
+
+        url = urls_patterns.URL_ADMIN_REALM_ROLES_GROUPS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
     def get_realm_role_members(self, role_name, query=None):
         """Get role members of realm by role name.
 
