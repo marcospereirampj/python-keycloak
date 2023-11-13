@@ -352,7 +352,8 @@ keycloak_admin.create_realm(payload={"realm": "demo"}, skip_exists=False)
 # Changing Realm
 keycloak_admin = KeycloakAdmin(realm_name="main", ...)
 keycloak_admin.get_users() # Get user in main realm
-keycloak_admin.realm_name = "demo" # Change realm to 'demo'
+keycloak_admin.change_current_realm("demo") # Change realm to 'demo'
+keycloak_admin.get_current_realm() # Gives 'demo'
 keycloak_admin.get_users() # Get users in realm 'demo'
 keycloak_admin.create_user(...) # Creates a new user in 'demo'
 
