@@ -1314,7 +1314,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "path": path}
-        data_raw = self.raw_get(urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path))
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_group(self, payload, parent=None, skip_exists=False):
@@ -1932,7 +1934,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.realm_name, "id": client_id}
 
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPE_BASED_PERMISSION.format(**params_path),
             data=json.dumps(payload),
         )
@@ -4552,7 +4554,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_KEYS_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
@@ -4564,7 +4566,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_REALM_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
@@ -4576,7 +4578,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = self.raw_post(
+        data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLEAR_USER_CACHE.format(**params_path), data=""
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
