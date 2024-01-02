@@ -1545,9 +1545,13 @@ class KeycloakAdmin:
         :return: client_id (uuid as string)
         :rtype: str
         """
-        clients = self.get_clients()
+        params_path = {"realm-name": self.connection.realm_name, "client-id": client_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENTS_CLIENT_ID.format(**params_path)
+        )
+        data_response = raise_error_from_response(data_raw, KeycloakGetError)
 
-        for client in clients:
+        for client in data_response:
             if client_id == client.get("clientId"):
                 return client["id"]
 
