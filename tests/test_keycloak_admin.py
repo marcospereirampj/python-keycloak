@@ -374,6 +374,39 @@ def test_users(admin: KeycloakAdmin, realm: str):
     assert err.match('404: b\'{"error":"User not found"}\'')
 
 
+def test_users_roles(admin: KeycloakAdmin, realm: str):
+    """Test users roles.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    user_id = admin.create_user(payload={"username": "test", "email": "test@test.test"})
+
+    # Test all level user roles
+    client_id = admin.create_client(payload={"name": "test-client", "clientId": "test-client"})
+    admin.create_client_role(client_role_id=client_id, payload={"name": "test-role"})
+    admin.assign_client_role(
+        client_id=client_id,
+        user_id=user_id,
+        roles=[admin.get_client_role(client_id=client_id, role_name="test-role")],
+    )
+    all_roles = admin.get_all_roles_of_user(user_id=user_id)
+    realm_roles = all_roles["realmMappings"]
+    assert len(realm_roles) == 1, realm_roles
+    client_roles = all_roles["clientMappings"]
+    assert len(client_roles) == 1, client_roles
+
+    # Test all level user roles fail
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_all_roles_of_user(user_id="non-existent-id")
+    err.match('404: b\'{"error":"User not found"}\'')
+
+    admin.delete_user(user_id)
+    admin.delete_client(client_id)
+
+
 def test_users_pagination(admin: KeycloakAdmin, realm: str):
     """Test user pagination.
 

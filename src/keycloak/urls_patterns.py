@@ -51,6 +51,7 @@ URL_ADMIN_SEND_UPDATE_ACCOUNT = "admin/realms/{realm-name}/users/{id}/execute-ac
 URL_ADMIN_SEND_VERIFY_EMAIL = "admin/realms/{realm-name}/users/{id}/send-verify-email"
 URL_ADMIN_RESET_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
 URL_ADMIN_GET_SESSIONS = "admin/realms/{realm-name}/users/{id}/sessions"
+URL_ADMIN_USER_ALL_ROLES = "admin/realms/{realm-name}/users/{id}/role-mappings"
 URL_ADMIN_USER_CLIENT_ROLES = (
     "admin/realms/{realm-name}/users/{id}/role-mappings/clients/{client-id}"
 )
