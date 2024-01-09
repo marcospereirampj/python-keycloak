@@ -1324,7 +1324,7 @@ class KeycloakAdmin:
         """
         query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        url = urls_patterns.URL_ADMIN_GROUPS.format(**params_path)
+        url = urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
 
