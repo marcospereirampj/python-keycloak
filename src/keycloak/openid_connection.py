@@ -311,10 +311,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         The admin token is then set in the `token` attribute.
         """
         grant_type = []
-        if self.client_secret_key:
-            grant_type.append("client_credentials")
-        elif self.username and self.password:
+        if self.username and self.password:
             grant_type.append("password")
+        elif self.client_secret_key:
+            grant_type.append("client_credentials")
 
         if grant_type:
             self.token = self.keycloak_openid.token(
