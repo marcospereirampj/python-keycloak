@@ -1317,6 +1317,8 @@ class KeycloakAdmin:
 
         :param group_id: The group id
         :type group_id: str
+        :param query: Additional query options
+        :type query: dict
         :return: Keycloak server response (GroupRepresentation)
         :rtype: list
         """
@@ -1344,14 +1346,15 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        for subgroup in group["subGroups"]:
-            if subgroup["path"] == path:
-                return subgroup
-            elif subgroup["subGroups"]:
-                for subgroup in group["subGroups"]:
-                    result = self.get_subgroups(subgroup, path)
-                    if result:
-                        return result
+        if group.get("subGroups") is not None:
+            for subgroup in group["subGroups"]:
+                if subgroup["path"] == path:
+                    return subgroup
+                elif subgroup.get("subGroups") is not None and subgroup["subGroups"]:
+                    for subgroup in group["subGroups"]:
+                        result = self.get_subgroups(subgroup, path)
+                        if result:
+                            return result
         # went through the tree without hits
         return None
 

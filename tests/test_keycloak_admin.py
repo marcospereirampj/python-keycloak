@@ -690,7 +690,8 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     # Create 1 more subgroup
     subsubgroup_id_1 = admin.create_group(payload={"name": "subsubgroup-1"}, parent=subgroup_id_2)
-    main_group = admin.get_group(group_id=group_id)
+    main_group = admin.get_groups(query={"q": "%"})[0]
+    assert main_group["id"] == group_id
 
     # Test nested searches
     res = admin.get_subgroups(group=main_group, path="/main-group/subgroup-2/subsubgroup-1")
