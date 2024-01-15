@@ -1307,6 +1307,28 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_child_groups(self, group_id, query=None):
+        """Get child groups by parent id.
+
+        Returns a list of groups who are children of group with id
+
+        GroupRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+
+        :param group_id: The group id
+        :type group_id: str
+        :return: Keycloak server response (GroupRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
+        url = urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
     def get_subgroups(self, group, path):
         """Get subgroups.
 

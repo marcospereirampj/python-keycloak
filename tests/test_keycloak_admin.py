@@ -660,15 +660,21 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Test get groups again
     groups = admin.get_groups()
     assert len(groups) == 1, groups
-    assert len(groups[0]["subGroups"]) == 2, groups["subGroups"]
+    assert groups[0]["subGroupCount"] == 2, groups["subGroupCount"]
     assert groups[0]["id"] == group_id
-    assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
+    sub_groups = admin.get_child_groups(groups[0]["id"])
+    assert {x["id"] for x in sub_groups} == {subgroup_id_1, subgroup_id_2}
 
     # Test get groups query
     groups = admin.get_groups(query={"max": 10})
     assert len(groups) == 1, groups
+    assert groups[0]["subGroupCount"] == 2, groups["subGroupCount"]
+
+    # Test get all groups query
+    groups = admin.get_groups(query={"q": "%"})
+    assert len(groups) == 1, groups
+    assert groups[0]["subGroupCount"] == 2, groups["subGroupCount"]
     assert len(groups[0]["subGroups"]) == 2, groups["subGroups"]
-    assert groups[0]["id"] == group_id
     assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
 
     # Test get group
