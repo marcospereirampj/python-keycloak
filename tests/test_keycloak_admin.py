@@ -1638,14 +1638,14 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
 
     # Test update client role
     res = admin.update_client_role(
-        client_role_id=client,
+        client_id=client,
         role_name="client-role-test",
         payload={"name": "client-role-test-update"},
     )
     assert res == dict()
     with pytest.raises(KeycloakPutError) as err:
         res = admin.update_client_role(
-            client_role_id=client,
+            client_id=client,
             role_name="client-role-test",
             payload={"name": "client-role-test-update"},
         )

@@ -2453,14 +2453,14 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
-    def update_client_role(self, client_role_id, role_name, payload):
+    def update_client_role(self, client_id, role_name, payload):
         """Update a client role.
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
 
-        :param client_role_id: id of client (not client-id)
-        :type client_role_id: str
+        :param client_id: id of client (not client-id)
+        :type client_id: str
         :param role_name: role's name (not id!)
         :type role_name: str
         :param payload: RoleRepresentation
@@ -2470,7 +2470,7 @@ class KeycloakAdmin:
         """
         params_path = {
             "realm-name": self.connection.realm_name,
-            "id": client_role_id,
+            "id": client_id,
             "role-name": role_name,
         }
         data_raw = self.connection.raw_put(
