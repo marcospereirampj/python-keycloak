@@ -2569,6 +2569,60 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_ROLE_GROUPS.format(**params_path), query
         )
 
+    def get_role_by_id(self, role_id):
+        """Get a specific role’s representation.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
+        :param role_id: id of role
+        :type role_id: str
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_ID.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
+    def update_role_by_id(self, role_id, payload):
+        """Update the role.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
+        :param payload: RoleRepresentation
+        :type payload: dict
+        :param role_id: id of role
+        :type role_id: str
+        :returns: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_ID.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    def delete_role_by_id(self, role_id):
+        """Delete a role by its id.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+
+        :param role_id: id of role
+        :type role_id: str
+        :returns: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_REALM_ROLES_ROLE_BY_ID.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
     def create_realm_role(self, payload, skip_exists=False):
         """Create a new role for the realm or client.
 

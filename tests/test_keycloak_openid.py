@@ -208,9 +208,7 @@ def test_exchange_token(
 
     # Exchange token with the new user
     new_token = oid.exchange_token(
-        token=token["access_token"],
-        audience=oid.client_id,
-        subject=username,
+        token=token["access_token"], audience=oid.client_id, subject=username
     )
     assert oid.userinfo(token=new_token["access_token"]) == {
         "email": f"{username}@test.test",
