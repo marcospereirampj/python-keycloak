@@ -1762,6 +1762,35 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
         admin.delete_client_role(client_role_id=client, role_name="client-role-test-update")
     assert err.match('404: b\'{"error":"Could not find role"}\'')
 
+    # Test of roles by id - Get role
+    admin.create_client_role(
+        client_role_id=client, payload={"name": "client-role-by-id-test"}, skip_exists=True
+    )
+    role = admin.get_client_role(client_id=client, role_name="client-role-by-id-test")
+    res = admin.get_role_by_id(role_id=role["id"])
+    assert res["name"] == "client-role-by-id-test"
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_role_by_id(role_id="bad")
+    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+
+    # Test of roles by id - Update role
+    res = admin.update_role_by_id(
+        role_id=role["id"], payload={"name": "client-role-by-id-test-update"}
+    )
+    assert res == dict()
+    with pytest.raises(KeycloakPutError) as err:
+        res = admin.update_role_by_id(
+            role_id="bad", payload={"name": "client-role-by-id-test-update"}
+        )
+    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+
+    # Test of roles by id - Delete role
+    res = admin.delete_role_by_id(role_id=role["id"])
+    assert res == dict()
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.delete_role_by_id(role_id="bad")
+    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+
 
 def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     """Test enable token exchange.

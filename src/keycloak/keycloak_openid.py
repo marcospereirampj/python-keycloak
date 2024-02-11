@@ -736,9 +736,7 @@ class KeycloakOpenID:
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
-        payload = {
-            "client_id": self.client_id,
-        }
+        payload = {"client_id": self.client_id}
 
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
