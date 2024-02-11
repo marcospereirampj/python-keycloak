@@ -43,7 +43,6 @@ URL_CLIENT_REGISTRATION = URL_REALM + "/clients-registrations/default"
 URL_CLIENT_UPDATE = URL_CLIENT_REGISTRATION + "/{client-id}"
 
 # ADMIN URLS
-URL_ADMIN_ROOT = "admin/realms/{realm-name}"
 URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
 URL_ADMIN_USERS_COUNT = "admin/realms/{realm-name}/users/count"
 URL_ADMIN_USER = "admin/realms/{realm-name}/users/{id}"
