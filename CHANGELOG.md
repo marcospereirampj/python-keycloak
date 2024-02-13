@@ -1,3 +1,12 @@
+## v3.7.1 (2024-02-13)
+
+### Fix
+
+- action bump
+- linter check.
+- depracated endpoint and fix groups services.
+- deprecate entitlement
+
 ## v3.7.0 (2023-11-13)
 
 ### Feat
