@@ -1286,9 +1286,15 @@ class KeycloakAdmin:
         url = urls_patterns.URL_ADMIN_GROUPS.format(**params_path)
 
         if "first" in query or "max" in query:
-            return self.__fetch_paginated(url, query)
+            groups = self.__fetch_paginated(url, query)
+        groups = self.__fetch_all(url, query)
 
-        return self.__fetch_all(url, query)
+        # For version +23.0.0
+        for group in groups:
+            if group.get("subGroupCount"):
+                group["subGroups"] = self.get_group_children(group.get('id'))
+
+        return groups
 
     def get_group(self, group_id):
         """Get group by id.
@@ -1304,8 +1310,17 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        response = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
+
+        if response.status_code >= 400:
+            return raise_error_from_response(response, KeycloakGetError)
+
+        # For version +23.0.0
+        group = response.json()
+        if group.get("subGroupCount"):
+            group["subGroups"] = self.get_group_children(group.get('id'))
+
+        return group
 
     def get_subgroups(self, group, path):
         """Get subgroups.
@@ -1332,6 +1347,23 @@ class KeycloakAdmin:
                         return result
         # went through the tree without hits
         return None
+
+    def get_group_children(self, group_id):
+        """Get group children by id.
+
+        Returns full group details
+
+        GroupRepresentation
+        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+
+        :param group_id: The group id
+        :type group_id: str
+        :return: Keycloak server response (GroupRepresentation)
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_group_members(self, group_id, query=None):
         """Get members by group id.

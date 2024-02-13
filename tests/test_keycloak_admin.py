@@ -687,7 +687,8 @@ def test_groups(admin: KeycloakAdmin, user: str):
     main_group = admin.get_group(group_id=group_id)
 
     # Test nested searches
-    res = admin.get_subgroups(group=main_group, path="/main-group/subgroup-2/subsubgroup-1")
+    subgroup_2 = admin.get_group(group_id=subgroup_id_2)
+    res = admin.get_subgroups(group=subgroup_2, path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
