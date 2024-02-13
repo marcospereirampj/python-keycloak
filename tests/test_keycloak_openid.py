@@ -1,4 +1,5 @@
 """Test module for KeycloakOpenID."""
+
 from typing import Tuple
 from unittest import mock
 

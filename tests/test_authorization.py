@@ -1,4 +1,5 @@
 """Test authorization module."""
+
 import pytest
 
 from keycloak.authorization import Permission, Policy, Role
