@@ -42,22 +42,6 @@ https://github.com/marcospereirampj/python-keycloak/issues
 
 The documentation for python-keycloak is available on [readthedocs](http://python-keycloak.readthedocs.io).
 
-## Contributors
-
-- [Agriness Team](http://www.agriness.com/pt/)
-- [Marcos Pereira](marcospereira.mpj@gmail.com)
-- [Martin Devlin](https://bitbucket.org/devlinmpearson/)
-- [Shon T. Urbas](https://bitbucket.org/surbas/)
-- [Markus Spanier](https://bitbucket.org/spanierm/)
-- [Remco Kranenburg](https://bitbucket.org/Remco47/)
-- [Armin](https://bitbucket.org/arminfelder/)
-- [njordr](https://bitbucket.org/njordr/)
-- [Josha Inglis](https://bitbucket.org/joshainglis/)
-- [Alex](https://bitbucket.org/alex_zel/)
-- [Ewan Jone](https://bitbucket.org/kisamoto/)
-- [Lukas Martini](https://github.com/lutoma)
-- [Adamatics](https://www.adamatics.com)
-
 ## Usage
 
 ```python
