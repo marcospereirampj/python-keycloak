@@ -1322,9 +1322,10 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-
-        params_path = {"realm-name": self.connection.realm_name, "id": group.get('id')}
-        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path))
+        params_path = {"realm-name": self.connection.realm_name, "id": group.get("id")}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
+        )
 
         for subgroup in data_raw.json():
             if subgroup["path"] == path:
