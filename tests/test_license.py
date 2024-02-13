@@ -1,4 +1,5 @@
 """Tests for license."""
+
 import os
 
 

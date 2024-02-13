@@ -1,4 +1,5 @@
 """Test module for KeycloakUMA."""
+
 import re
 
 import pytest
