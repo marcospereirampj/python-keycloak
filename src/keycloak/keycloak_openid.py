@@ -477,7 +477,7 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
         data_raw = self.connection.raw_get(URL_ENTITLEMENT.format(**params_path))
 
-        if data_raw.status_code == 404:
+        if data_raw.status_code == 404 or data_raw.status_code == 405:
             return raise_error_from_response(data_raw, KeycloakDeprecationError)
 
         return raise_error_from_response(data_raw, KeycloakGetError)  # pragma: no cover
