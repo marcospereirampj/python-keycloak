@@ -1,3 +1,13 @@
+## v3.8.0 (2024-02-13)
+
+### Feat
+
+- Adding additional methods to support roles-by-id api calls Most of the methods rely on the role name within python keycloak, which for the vast majority is fine, however there are some role names which cannot be used by the API endpoint as they contain characters that cannot be encoded properly. Therefore this change is to allow the use of the role's id to get, update and delete roles by their id instead.'
+
+### Fix
+
+- Removing the admin realm variable which I created and is no longer needed
+
 ## v3.7.1 (2024-02-13)
 
 ### Fix
