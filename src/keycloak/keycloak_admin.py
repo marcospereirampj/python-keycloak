@@ -1292,7 +1292,7 @@ class KeycloakAdmin:
         # For version +23.0.0
         for group in groups:
             if group.get("subGroupCount"):
-                group["subGroups"] = self.get_group_children(group.get('id'))
+                group["subGroups"] = self.get_group_children(group.get("id"))
 
         return groups
 
@@ -1318,7 +1318,7 @@ class KeycloakAdmin:
         # For version +23.0.0
         group = response.json()
         if group.get("subGroupCount"):
-            group["subGroups"] = self.get_group_children(group.get('id'))
+            group["subGroups"] = self.get_group_children(group.get("id"))
 
         return group
 
@@ -1351,10 +1351,7 @@ class KeycloakAdmin:
     def get_group_children(self, group_id):
         """Get group children by id.
 
-        Returns full group details
-
-        GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        Returns full group children details
 
         :param group_id: The group id
         :type group_id: str
@@ -1362,7 +1359,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path))
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_group_members(self, group_id, query=None):
