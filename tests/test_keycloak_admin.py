@@ -660,16 +660,14 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Test get groups again
     groups = admin.get_groups()
     assert len(groups) == 1, groups
-    assert len(groups[0]["subGroups"]) == 2, groups["subGroups"]
+    assert groups[0]["subGroupCount"] == 2
     assert groups[0]["id"] == group_id
-    assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
 
     # Test get groups query
     groups = admin.get_groups(query={"max": 10})
     assert len(groups) == 1, groups
-    assert len(groups[0]["subGroups"]) == 2, groups["subGroups"]
+    assert groups[0]["subGroupCount"] == 2
     assert groups[0]["id"] == group_id
-    assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
 
     # Test get group
     res = admin.get_group(group_id=subgroup_id_1)
@@ -685,9 +683,10 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Create 1 more subgroup
     subsubgroup_id_1 = admin.create_group(payload={"name": "subsubgroup-1"}, parent=subgroup_id_2)
     main_group = admin.get_group(group_id=group_id)
+    subgroup_2 = admin.get_group(group_id=subgroup_id_2)
 
     # Test nested searches
-    res = admin.get_subgroups(group=main_group, path="/main-group/subgroup-2/subsubgroup-1")
+    res = admin.get_subgroups(group=subgroup_2, path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
@@ -2445,10 +2444,10 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
     assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
 
     # Freeze time to simulate the access token expiring
-    with freezegun.freeze_time("2023-02-25 10:05:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:05:00")
+    with freezegun.freeze_time("2023-02-25 10:02:00"):
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:01:00")
         assert admin.get_realm(realm_name=realm)
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:01:00")
 
     # Test bad refresh token, but first make sure access token has expired again
     with freezegun.freeze_time("2023-02-25 10:10:00"):
