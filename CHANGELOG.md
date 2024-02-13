@@ -1,3 +1,10 @@
+## v3.8.1 (2024-02-13)
+
+### Fix
+
+- linter check
+- updated dependencies
+
 ## v3.8.0 (2024-02-13)
 
 ### Feat
