@@ -1,3 +1,9 @@
+## v3.8.3 (2024-02-14)
+
+### Fix
+
+- name of client_id parameter
+
 ## v3.8.2 (2024-02-14)
 
 ### Fix
