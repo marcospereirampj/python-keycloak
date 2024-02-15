@@ -1,3 +1,9 @@
+## v3.8.4 (2024-02-14)
+
+### Fix
+
+- use grant type password with client secret
+
 ## v3.8.3 (2024-02-14)
 
 ### Fix
