@@ -32,16 +32,16 @@ Dependencies
 
 python-keycloak depends on:
 
-- Python 3
-- [requests](https://requests.readthedocs.io)
-- [python-jose](http://python-jose.readthedocs.io/en/latest/)
-- [urllib3](https://urllib3.readthedocs.io/en/stable/)
+- Python 3+
+- `requests <https://requests.readthedocs.io>`_
+- `python-jose <http://python-jose.readthedocs.io/en/latest/>`_
+- `urllib3 <https://urllib3.readthedocs.io/en/stable/>`_
 
 
 Tests Dependencies
------------------
+-------------------
 
-- [tox](https://tox.readthedocs.io/)
-- [pytest](https://docs.pytest.org/en/latest/)
-- [pytest-cov](https://github.com/pytest-dev/pytest-cov)
-- [wheel](https://github.com/pypa/wheel)
+- `tox <https://tox.readthedocs.io/>`_
+- `pytest <https://docs.pytest.org/en/latest/>`_
+- `pytest-cov <https://github.com/pytest-dev/pytest-cov>`_
+- `wheel <https://github.com/pypa/wheel>`_
