@@ -5,7 +5,7 @@ Quickstart
 
 Some examples of using OpenID, Admin and UMA integration.
 
-For more details, see the :ref:`api`.
+For more details, see :ref:`api`.
 
 .. toctree::
     :maxdepth: 2
