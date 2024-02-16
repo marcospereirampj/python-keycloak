@@ -22,6 +22,8 @@ The documentation for python-keycloak is available on [readthedocs](http://pytho
 
 ## Example of Using Keycloak OpenID
 
+
+
 ```python
 from keycloak import KeycloakOpenID
 
@@ -106,3 +108,5 @@ new_user = keycloak_admin.create_user({"email": "example@example.com",
                                        "lastName": "Example",
                     "credentials": [{"value": "secret","type": "password",}]})
 ```
+
+For more details, see the documentation available on [readthedocs](http://python-keycloak.readthedocs.io).
