@@ -1,4 +1,20 @@
-## v3.8.4 (2024-02-14)
+## v3.9.0 (2024-02-15)
+
+### Feat
+
+- new docs.
+- new docs.
+- new docs.
+- new docs.
+- new docs.
+- new docs.
+- new docs.
+
+### Fix
+
+- updated readme.
+
+## v3.8.4 (2024-02-15)
 
 ### Fix
 
