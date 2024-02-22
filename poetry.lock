@@ -580,24 +580,6 @@ files = [
 ]
 
 [[package]]
-name = "ecdsa"
-version = "0.18.0"
-description = "ECDSA cryptographic signature library (pure python)"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "ecdsa-0.18.0-py2.py3-none-any.whl", hash = "sha256:80600258e7ed2f16b9aa1d7c295bd70194109ad5a30fdee0eaeefef1d4c559dd"},
-    {file = "ecdsa-0.18.0.tar.gz", hash = "sha256:190348041559e21b22a1d65cee485282ca11a6f81d503fddb84d5017e9ed1e49"},
-]
-
-[package.dependencies]
-six = ">=1.9.0"
-
-[package.extras]
-gmpy = ["gmpy"]
-gmpy2 = ["gmpy2"]
-
-[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -819,6 +801,20 @@ MarkupSafe = ">=2.0"
 
 [package.extras]
 i18n = ["Babel (>=2.7)"]
+
+[[package]]
+name = "jwcrypto"
+version = "1.5.4"
+description = "Implementation of JOSE Web standards"
+optional = false
+python-versions = ">= 3.8"
+files = [
+    {file = "jwcrypto-1.5.4.tar.gz", hash = "sha256:0815fbab613db99bad85691da5f136f8860423396667728a264bcfa6e1db36b0"},
+]
+
+[package.dependencies]
+cryptography = ">=3.4"
+typing_extensions = ">=4.5.0"
 
 [[package]]
 name = "keyring"
@@ -1161,17 +1157,6 @@ files = [
 wcwidth = "*"
 
 [[package]]
-name = "pyasn1"
-version = "0.5.1"
-description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
-files = [
-    {file = "pyasn1-0.5.1-py2.py3-none-any.whl", hash = "sha256:4439847c58d40b1d0a573d07e3856e95333f1976294494c325775aeca506eb58"},
-    {file = "pyasn1-0.5.1.tar.gz", hash = "sha256:6d391a96e59b23130a5cfa74d6fd7f388dbbe26cc8f1edf39fdddf08d9d6676c"},
-]
-
-[[package]]
 name = "pycodestyle"
 version = "2.9.1"
 description = "Python style guide checker"
@@ -1308,27 +1293,6 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
-
-[[package]]
-name = "python-jose"
-version = "3.3.0"
-description = "JOSE implementation in Python"
-optional = false
-python-versions = "*"
-files = [
-    {file = "python-jose-3.3.0.tar.gz", hash = "sha256:55779b5e6ad599c6336191246e95eb2293a9ddebd555f796a65f838f07e5d78a"},
-    {file = "python_jose-3.3.0-py2.py3-none-any.whl", hash = "sha256:9b1376b023f8b298536eedd47ae1089bcdb848f1535ab30555cd92002d78923a"},
-]
-
-[package.dependencies]
-ecdsa = "!=0.15"
-pyasn1 = "*"
-rsa = "*"
-
-[package.extras]
-cryptography = ["cryptography (>=3.4.0)"]
-pycrypto = ["pyasn1", "pycrypto (>=2.6.0,<2.7.0)"]
-pycryptodome = ["pyasn1", "pycryptodome (>=3.3.1,<4.0.0)"]
 
 [[package]]
 name = "pytz"
@@ -1544,20 +1508,6 @@ typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
-
-[[package]]
-name = "rsa"
-version = "4.9"
-description = "Pure-Python RSA implementation"
-optional = false
-python-versions = ">=3.6,<4"
-files = [
-    {file = "rsa-4.9-py3-none-any.whl", hash = "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7"},
-    {file = "rsa-4.9.tar.gz", hash = "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"},
-]
-
-[package.dependencies]
-pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "secretstorage"
@@ -1972,4 +1922,4 @@ docs = ["Sphinx", "alabaster", "commonmark", "m2r2", "mock", "readthedocs-sphinx
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "f6e955202faac5714d1d730709e2f03a45e148bb93f5f4288f0f54b51c415205"
+content-hash = "fe45fda91997f6001207b828d4c17c2364b7c4b403ec3d82ef8154252e2a8f4c"
