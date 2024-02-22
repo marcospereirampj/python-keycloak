@@ -30,7 +30,7 @@ class to handle authentication and token manipulation.
 import json
 from typing import Optional
 
-from jose import jwt
+from jwcrypto import jwk, jwt
 
 from .authorization import Authorization
 from .connection import ConnectionManager
@@ -539,7 +539,16 @@ class KeycloakOpenID:
         :returns: Decoded token
         :rtype: dict
         """
-        return jwt.decode(token, key, algorithms=algorithms, audience=self.client_id, **kwargs)
+        # To keep the same API, we map the python-jose options to our claims for jwcrypto
+        # Per the jwcrypto dev, `exp` and `nbf` are always checked
+        options = kwargs.get("options", {})
+        check_claims = {}
+        if options.get("verify_aud") is True:
+            check_claims["aud"] = self.client_id
+
+        k = jwk.JWK.from_pem(key.encode("utf-8"))
+        full_jwt = jwt.JWT(jwt=token, key=k, algs=algorithms, check_claims=check_claims)
+        return jwt.json_decode(full_jwt.claims)
 
     def load_authorization_config(self, path):
         """Load Keycloak settings (authorization).
