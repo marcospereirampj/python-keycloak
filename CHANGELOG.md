@@ -1,4 +1,11 @@
-## v3.9.0 (2024-02-15)
+## v3.9.1 (2024-02-26)
+
+### Fix
+
+- use jwcrypto and remove python-jose
+- replace python-jose with jwcrypto
+
+## v3.9.0 (2024-02-16)
 
 ### Feat
 
