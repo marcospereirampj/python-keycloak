@@ -300,6 +300,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 verify=self.verify,
                 client_secret_key=self.client_secret_key,
                 timeout=self.timeout,
+                custom_headers=self.custom_headers,
             )
 
         return self._keycloak_openid
