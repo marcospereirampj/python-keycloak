@@ -124,7 +124,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
             self.headers = {
                 **self.headers,
                 "Authorization": "Bearer " + self.token.get("access_token"),
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
         super().__init__(
