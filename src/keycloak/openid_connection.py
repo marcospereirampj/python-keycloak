@@ -114,19 +114,18 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.client_secret_key = client_secret_key
         self.user_realm_name = user_realm_name
         self.timeout = timeout
+        self.headers = {}
+        self.custom_headers = custom_headers
 
         if self.token is None:
             self.get_token()
 
-        self.headers = (
-            {
+        if self.token is not None:
+            self.headers = {
+                **self.headers,
                 "Authorization": "Bearer " + self.token.get("access_token"),
                 "Content-Type": "application/json",
             }
-            if self.token is not None
-            else {}
-        )
-        self.custom_headers = custom_headers
 
         super().__init__(
             base_url=self.server_url, headers=self.headers, timeout=60, verify=self.verify
@@ -301,6 +300,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 verify=self.verify,
                 client_secret_key=self.client_secret_key,
                 timeout=self.timeout,
+                custom_headers=self.custom_headers,
             )
 
         return self._keycloak_openid
