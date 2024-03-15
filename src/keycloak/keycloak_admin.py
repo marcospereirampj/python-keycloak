@@ -1348,21 +1348,24 @@ class KeycloakAdmin:
         # went through the tree without hits
         return None
 
-    def get_group_children(self, group_id):
-        """Get group children by id.
+    def get_group_children(self, parent_group_id, query=None):
+        """Get group children by parent id.
 
         Returns full group children details
 
-        :param group_id: The group id
-        :type group_id: str
+        :param parent_group_id: The parent group id
+        :type parent_group_id: str
+        :param query: Additional query options
+        :type query: dict
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "id": parent_group_id}
+        url = urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+        return self.__fetch_all(url, query)
 
     def get_group_members(self, group_id, query=None):
         """Get members by group id.
