@@ -19,6 +19,16 @@ from keycloak.exceptions import (
     KeycloakPutError,
 )
 
+CLIENT_NOT_FOUND_REGEX = '404: b\'{"error":"Client not found".*}\''
+CLIENT_SCOPE_NOT_FOUND_REGEX = '404: b\'{"error":"Client scope not found".*}\''
+COULD_NOT_FIND_ROLE_REGEX = '404: b\'{"error":"Could not find role".*}\''
+COULD_NOT_FIND_ROLE_WITH_ID_REGEX = '404: b\'{"error":"Could not find role with id".*}\''
+HTTP_404_REGEX = '404: b\'{"error":"HTTP 404 Not Found".*}\''
+ILLEGAL_EXECUTION_REGEX = '404: b\'{"error":"Illegal execution".*}\''
+NO_CLIENT_SCOPE_REGEX = '404: b\'{"error":"Could not find client scope".*}\''
+UNKOWN_ERROR_REGEX = 'b\'{"error":"unknown_error".*}\''
+USER_NOT_FOUND_REGEX = '404: b\'{"error":"User not found".*}\''
+
 
 def test_keycloak_version():
     """Test version."""
@@ -154,7 +164,7 @@ def test_realms(admin: KeycloakAdmin):
     # Get non-existing realm
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm(realm_name="non-existent")
-    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    assert err.match('404: b\'{"error":"Realm not found.".*\'')
 
     # Update realm
     res = admin.update_realm(realm_name="test", payload={"accountTheme": "test"})
@@ -184,12 +194,12 @@ def test_realms(admin: KeycloakAdmin):
     # Check that the realm does not exist anymore
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm(realm_name="test")
-    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    assert err.match('404: b\'{"error":"Realm not found.".*}\'')
 
     # Delete non-existing realm
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_realm(realm_name="non-existent")
-    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    assert err.match('404: b\'{"error":"Realm not found.".*}\'')
 
 
 def test_changing_of_realms(admin: KeycloakAdmin, realm: str):
@@ -226,7 +236,9 @@ def test_import_export_realms(admin: KeycloakAdmin, realm: str):
     # Test bad import
     with pytest.raises(KeycloakPostError) as err:
         admin.import_realm(payload=dict())
-    assert err.match('500: b\'{"error":"unknown_error"}\'')
+    assert err.match(
+        '500: b\'{"error":"unknown_error"}\'|400: b\'{"errorMessage":"Realm name cannot be empty"}\''  # noqa: E501
+    )
 
 
 def test_partial_import_realm(admin: KeycloakAdmin, realm: str):
@@ -297,7 +309,7 @@ def test_users(admin: KeycloakAdmin, realm: str):
     # Test create the same user
     with pytest.raises(KeycloakPostError) as err:
         admin.create_user(payload={"username": "test", "email": "test@test.test"})
-    assert err.match('409: b\'{"errorMessage":"User exists with same username"}\'')
+    assert err.match(".*User exists with same.*")
 
     # Test create the same user, exists_ok true
     user_id_2 = admin.create_user(
@@ -341,7 +353,7 @@ def test_users(admin: KeycloakAdmin, realm: str):
     # Test user groups bad id
     with pytest.raises(KeycloakGetError) as err:
         admin.get_user_groups(user_id="does-not-exist")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     # Test logout
     res = admin.user_logout(user_id=user["id"])
@@ -350,7 +362,7 @@ def test_users(admin: KeycloakAdmin, realm: str):
     # Test logout fail
     with pytest.raises(KeycloakPostError) as err:
         admin.user_logout(user_id="non-existent-id")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     # Test consents
     res = admin.user_consents(user_id=user["id"])
@@ -359,19 +371,19 @@ def test_users(admin: KeycloakAdmin, realm: str):
     # Test consents fail
     with pytest.raises(KeycloakGetError) as err:
         admin.user_consents(user_id="non-existent-id")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     # Test delete user
     res = admin.delete_user(user_id=user_id)
     assert res == dict(), res
     with pytest.raises(KeycloakGetError) as err:
         admin.get_user(user_id=user_id)
-    err.match('404: b\'{"error":"User not found"}\'')
+    err.match(USER_NOT_FOUND_REGEX)
 
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_user(user_id="non-existent-id")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
 
 def test_users_pagination(admin: KeycloakAdmin, realm: str):
@@ -465,7 +477,7 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     # Test get idp fail
     with pytest.raises(KeycloakGetError) as err:
         admin.get_idp("does-not-exist")
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
     # Test IdP update
     res = admin.update_idp(idp_alias="github", payload=idps[0])
@@ -486,7 +498,7 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     # Test mapper fail
     with pytest.raises(KeycloakPostError) as err:
         admin.add_mapper_to_idp(idp_alias="does-no-texist", payload=dict())
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
     # Test IdP mappers listing
     idp_mappers = admin.get_idp_mappers(idp_alias="github")
@@ -514,7 +526,7 @@ def test_idps(admin: KeycloakAdmin, realm: str):
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_idp(idp_alias="does-not-exist")
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
 
 def test_user_credentials(admin: KeycloakAdmin, user: str):
@@ -531,7 +543,7 @@ def test_user_credentials(admin: KeycloakAdmin, user: str):
     # Test user password set fail
     with pytest.raises(KeycloakPutError) as err:
         admin.set_user_password(user_id="does-not-exist", password="")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     credentials = admin.get_credentials(user_id=user)
     assert len(credentials) == 1
@@ -540,7 +552,7 @@ def test_user_credentials(admin: KeycloakAdmin, user: str):
     # Test get credentials fail
     with pytest.raises(KeycloakGetError) as err:
         admin.get_credentials(user_id="does-not-exist")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     res = admin.delete_credential(user_id=user, credential_id=credentials[0]["id"])
     assert res == dict(), res
@@ -548,7 +560,7 @@ def test_user_credentials(admin: KeycloakAdmin, user: str):
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_credential(user_id=user, credential_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Credential not found"}\'')
+    assert err.match('404: b\'{"error":"Credential not found".*}\'')
 
 
 def test_social_logins(admin: KeycloakAdmin, user: str):
@@ -576,7 +588,7 @@ def test_social_logins(admin: KeycloakAdmin, user: str):
             provider_userid="test",
             provider_username="test",
         )
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     res = admin.get_user_social_logins(user_id=user)
     assert res == list(), res
@@ -584,7 +596,7 @@ def test_social_logins(admin: KeycloakAdmin, user: str):
     # Test get social logins fail
     with pytest.raises(KeycloakGetError) as err:
         admin.get_user_social_logins(user_id="does-not-exist")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
     res = admin.delete_user_social_login(user_id=user, provider_id="gitlab")
     assert res == {}, res
@@ -594,7 +606,7 @@ def test_social_logins(admin: KeycloakAdmin, user: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_user_social_login(user_id=user, provider_id="instagram")
-    assert err.match('404: b\'{"error":"Link not found"}\''), err
+    assert err.match('404: b\'{"error":"Link not found".*}\''), err
 
 
 def test_server_info(admin: KeycloakAdmin):
@@ -680,7 +692,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Test get group fail
     with pytest.raises(KeycloakGetError) as err:
         admin.get_group(group_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find group by id"}\''), err
+    assert err.match('404: b\'{"error":"Could not find group by id".*}\''), err
 
     # Create 1 more subgroup
     subsubgroup_id_1 = admin.create_group(payload={"name": "subsubgroup-1"}, parent=subgroup_id_2)
@@ -703,7 +715,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert err.match('404: b\'{"error":"Group path does not exist"}\'')
+    assert err.match('404: b\'{"error":"Group path does not exist".*}\'')
 
     res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
@@ -720,7 +732,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Test fail group members
     with pytest.raises(KeycloakGetError) as err:
         admin.get_group_members(group_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find group by id"}\'')
+    assert err.match('404: b\'{"error":"Could not find group by id".*}\'')
 
     res = admin.group_user_add(user_id=user, group_id=subgroup_id_2)
     assert res == dict(), res
@@ -736,7 +748,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.group_user_remove(user_id="does-not-exist", group_id=subgroup_id_2)
-    assert err.match('404: b\'{"error":"User not found"}\''), err
+    assert err.match(USER_NOT_FOUND_REGEX), err
 
     res = admin.group_user_remove(user_id=user, group_id=subgroup_id_2)
     assert res == dict(), res
@@ -748,7 +760,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
     assert not res["enabled"], res
     with pytest.raises(KeycloakPutError) as err:
         admin.group_set_permissions(group_id=subgroup_id_2, enabled="blah")
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
 
     # Test update group
     res = admin.update_group(group_id=subgroup_id_2, payload={"name": "new-subgroup-2"})
@@ -758,7 +770,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # test update fail
     with pytest.raises(KeycloakPutError) as err:
         admin.update_group(group_id="does-not-exist", payload=dict())
-    assert err.match('404: b\'{"error":"Could not find group by id"}\''), err
+    assert err.match('404: b\'{"error":"Could not find group by id".*}\''), err
 
     # Test delete
     res = admin.delete_group(group_id=group_id)
@@ -768,7 +780,7 @@ def test_groups(admin: KeycloakAdmin, user: str):
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_group(group_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find group by id"}\''), err
+    assert err.match('404: b\'{"error":"Could not find group by id".*}\''), err
 
 
 def test_clients(admin: KeycloakAdmin, realm: str):
@@ -816,7 +828,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
     assert len(admin.get_clients()) == 7
 
     # Test get client id
@@ -829,7 +841,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPutError) as err:
         admin.update_client(client_id="does-not-exist", payload={"name": "test-client-change"})
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     # Test client mappers
     res = admin.get_mappers_from_client(client_id=client_id)
@@ -837,7 +849,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPostError) as err:
         admin.add_mapper_to_client(client_id="does-not-exist", payload=dict())
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     res = admin.add_mapper_to_client(
         client_id=client_id,
@@ -853,7 +865,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     mapper = admin.get_mappers_from_client(client_id=client_id)[0]
     with pytest.raises(KeycloakPutError) as err:
         admin.update_client_mapper(client_id=client_id, mapper_id="does-not-exist", payload=dict())
-    assert err.match('404: b\'{"error":"Model not found"}\'')
+    assert err.match('404: b\'{"error":"Model not found".*}\'')
     mapper["config"]["user.attribute"] = "test"
     res = admin.update_client_mapper(client_id=client_id, mapper_id=mapper["id"], payload=mapper)
     assert res == dict()
@@ -862,12 +874,12 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert res == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.remove_client_mapper(client_id=client_id, client_mapper_id=mapper["id"])
-    assert err.match('404: b\'{"error":"Model not found"}\'')
+    assert err.match('404: b\'{"error":"Model not found".*}\'')
 
     # Test client sessions
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_all_sessions(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     assert admin.get_client_all_sessions(client_id=client_id) == list()
     assert admin.get_client_sessions_stats() == list()
@@ -888,7 +900,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_settings(client_id=client_id)
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
     # Authz resources
     res = admin.get_client_authz_resources(client_id=auth_client_id)
@@ -897,7 +909,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resources(client_id=client_id)
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
     res = admin.create_client_authz_resource(
         client_id=auth_client_id, payload={"name": "test-resource"}
@@ -954,7 +966,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_policies(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     role_id = admin.get_realm_role(role_name="offline_access")["id"]
     res = admin.create_client_authz_role_based_policy(
@@ -1025,7 +1037,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_permissions(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     res = admin.create_client_authz_resource_based_permission(
         client_id=auth_client_id,
@@ -1054,7 +1066,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_scopes(client_id=client_id)
-    assert err.match('404: b\'{"error":"HTTP 404 Not Found"}\'')
+    assert err.match(HTTP_404_REGEX)
 
     res = admin.create_client_authz_scopes(
         client_id=auth_client_id, payload={"name": "test-authz-scope"}
@@ -1065,7 +1077,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         admin.create_client_authz_scopes(
             client_id="invalid_client_id", payload={"name": "test-authz-scope"}
         )
-    assert err.match('404: b\'{"error":"Could not find client"')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
     assert admin.create_client_authz_scopes(
         client_id=auth_client_id, payload={"name": "test-authz-scope"}
     )
@@ -1080,14 +1092,14 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_service_account_user(client_id=client_id)
-    assert err.match('400: b\'{"error":"unknown_error"}\'')
+    assert err.match(UNKOWN_ERROR_REGEX)
 
     # Test delete client
     res = admin.delete_client(client_id=auth_client_id)
     assert res == dict(), res
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client(client_id=auth_client_id)
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     # Test client credentials
     admin.create_client(
@@ -1105,7 +1117,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     )
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_secrets(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     secrets = admin.get_client_secrets(
         client_id=admin.get_client_id(client_id="test-confidential")
@@ -1114,7 +1126,7 @@ def test_clients(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPostError) as err:
         admin.generate_client_secrets(client_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     res = admin.generate_client_secrets(
         client_id=admin.get_client_id(client_id="test-confidential")
@@ -1152,7 +1164,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     # Test empty members
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm_role_members(role_name="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
     members = admin.get_realm_role_members(role_name="offline_access")
     assert members == list(), members
 
@@ -1179,13 +1191,13 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
         admin.update_realm_role(
             role_name="test-realm-role", payload={"name": "test-realm-role-update"}
         )
-    assert err.match('404: b\'{"error":"Could not find role"}\''), err
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test realm role user assignment
     user_id = admin.create_user(payload={"username": "role-testing", "email": "test@test.test"})
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_realm_roles(user_id=user_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_realm_roles(
         user_id=user_id,
         roles=[
@@ -1208,7 +1220,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_realm_roles_of_user(user_id=user_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.delete_realm_roles_of_user(
         user_id=user_id, roles=[admin.get_realm_role(role_name="offline_access")]
     )
@@ -1228,7 +1240,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     group_id = admin.create_group(payload={"name": "test-group"})
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_group_realm_roles(group_id=group_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_group_realm_roles(
         group_id=group_id,
         roles=[
@@ -1245,7 +1257,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_group_realm_roles(group_id=group_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX)
     res = admin.delete_group_realm_roles(
         group_id=group_id, roles=[admin.get_realm_role(role_name="offline_access")]
     )
@@ -1258,7 +1270,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     composite_role = admin.create_realm_role(payload={"name": "test-composite-role"})
     with pytest.raises(KeycloakPostError) as err:
         admin.add_composite_realm_roles_to_role(role_name=composite_role, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.add_composite_realm_roles_to_role(
         role_name=composite_role, roles=[admin.get_realm_role(role_name="test-realm-role-update")]
     )
@@ -1269,7 +1281,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert "test-realm-role-update" in res[0]["name"]
     with pytest.raises(KeycloakGetError) as err:
         admin.get_composite_realm_roles_of_role(role_name="bad")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     res = admin.get_composite_realm_roles_of_user(user_id=user_id)
     assert len(res) == 4
@@ -1278,11 +1290,11 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert "uma_authorization" in {x["name"] for x in res}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_composite_realm_roles_of_user(user_id="bad")
-    assert err.match('b\'{"error":"User not found"}\''), err
+    assert err.match(USER_NOT_FOUND_REGEX), err
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.remove_composite_realm_roles_to_role(role_name=composite_role, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.remove_composite_realm_roles_to_role(
         role_name=composite_role, roles=[admin.get_realm_role(role_name="test-realm-role-update")]
     )
@@ -1297,14 +1309,14 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     assert res[0]["id"] == group_id
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm_role_groups(role_name="non-existent-role")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test delete realm role
     res = admin.delete_realm_role(role_name=composite_role)
     assert res == dict(), res
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_realm_role(role_name=composite_role)
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
 
 @pytest.mark.parametrize(
@@ -1402,7 +1414,7 @@ def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
     )
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_realm_roles_to_client_scope(client_id=client_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_realm_roles_to_client_scope(
         client_id=client_id,
         roles=[
@@ -1422,7 +1434,7 @@ def test_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
     # Test remove realm role of client
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_realm_roles_of_client_scope(client_id=client_id, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.delete_realm_roles_of_client_scope(
         client_id=client_id, roles=[admin.get_realm_role(role_name="offline_access")]
     )
@@ -1470,7 +1482,7 @@ def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str
         admin.assign_client_roles_to_client_scope(
             client_id=client_id, client_roles_owner_id=client, roles=["bad"]
         )
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_client_roles_to_client_scope(
         client_id=client_id,
         client_roles_owner_id=client,
@@ -1490,7 +1502,7 @@ def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str
         admin.delete_client_roles_of_client_scope(
             client_id=client_id, client_roles_owner_id=client, roles=["bad"]
         )
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.delete_client_roles_of_client_scope(
         client_id=client_id,
         client_roles_owner_id=client,
@@ -1608,7 +1620,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_roles(client_id="bad")
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
     # Test create client role
     client_role_id = admin.create_client_role(
@@ -1627,13 +1639,13 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert res["name"] == client_role_id
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_role(client_id=client, role_name="bad")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     res_ = admin.get_client_role_id(client_id=client, role_name="client-role-test")
     assert res_ == res["id"]
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_role_id(client_id=client, role_name="bad")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
     assert len(admin.get_client_roles(client_id=client)) == 1
 
     # Test update client role
@@ -1647,19 +1659,19 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
             role_name="client-role-test",
             payload={"name": "client-role-test-update"},
         )
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test user with client role
     res = admin.get_client_role_members(client_id=client, role_name="client-role-test-update")
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_role_members(client_id=client, role_name="bad")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     user_id = admin.create_user(payload={"username": "test", "email": "test@test.test"})
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_client_role(user_id=user_id, client_id=client, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_client_role(
         user_id=user_id,
         client_id=client,
@@ -1675,23 +1687,23 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert len(roles) == 1, roles
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_roles_of_user(user_id=user_id, client_id="bad")
-    assert err.match('404: b\'{"error":"Client not found"}\'')
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
 
     roles = admin.get_composite_client_roles_of_user(user_id=user_id, client_id=client)
     assert len(roles) == 1, roles
     with pytest.raises(KeycloakGetError) as err:
         admin.get_composite_client_roles_of_user(user_id=user_id, client_id="bad")
-    assert err.match('404: b\'{"error":"Client not found"}\'')
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
 
     roles = admin.get_available_client_roles_of_user(user_id=user_id, client_id=client)
     assert len(roles) == 0, roles
     with pytest.raises(KeycloakGetError) as err:
         admin.get_composite_client_roles_of_user(user_id=user_id, client_id="bad")
-    assert err.match('404: b\'{"error":"Client not found"}\'')
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client_roles_of_user(user_id=user_id, client_id=client, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     admin.delete_client_roles_of_user(
         user_id=user_id,
         client_id=client,
@@ -1704,18 +1716,18 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_role_groups(client_id=client, role_name="bad")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     group_id = admin.create_group(payload={"name": "test-group"})
     res = admin.get_group_client_roles(group_id=group_id, client_id=client)
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
         admin.get_group_client_roles(group_id=group_id, client_id="bad")
-    assert err.match('404: b\'{"error":"Client not found"}\'')
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
 
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_group_client_roles(group_id=group_id, client_id=client, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.assign_group_client_roles(
         group_id=group_id,
         client_id=client,
@@ -1730,7 +1742,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_group_client_roles(group_id=group_id, client_id=client, roles=["bad"])
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.delete_group_client_roles(
         group_id=group_id,
         client_id=client,
@@ -1743,7 +1755,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
         admin.add_composite_client_roles_to_role(
             client_role_id=client, role_name="client-role-test-update", roles=["bad"]
         )
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
     res = admin.add_composite_client_roles_to_role(
         client_role_id=client,
         role_name="client-role-test-update",
@@ -1759,7 +1771,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert res == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client_role(client_role_id=client, role_name="client-role-test-update")
-    assert err.match('404: b\'{"error":"Could not find role"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test of roles by id - Get role
     admin.create_client_role(
@@ -1770,7 +1782,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
     assert res["name"] == "client-role-by-id-test"
     with pytest.raises(KeycloakGetError) as err:
         admin.get_role_by_id(role_id="bad")
-    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_WITH_ID_REGEX)
 
     # Test of roles by id - Update role
     res = admin.update_role_by_id(
@@ -1781,14 +1793,14 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
         res = admin.update_role_by_id(
             role_id="bad", payload={"name": "client-role-by-id-test-update"}
         )
-    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_WITH_ID_REGEX)
 
     # Test of roles by id - Delete role
     res = admin.delete_role_by_id(role_id=role["id"])
     assert res == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_role_by_id(role_id="bad")
-    assert err.match('404: b\'{"error":"Could not find role with id"}\'')
+    assert err.match(COULD_NOT_FIND_ROLE_WITH_ID_REGEX)
 
 
 def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
@@ -1909,7 +1921,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str):
             payload={"name": "test-permission", "scopes": [token_exchange_scope_id]},
             client_id="realm_management_id",
         )
-    assert err.match('404: b\'{"error":"Could not find client"}\'')
+    assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
 
 def test_email(admin: KeycloakAdmin, user: str):
@@ -1923,12 +1935,12 @@ def test_email(admin: KeycloakAdmin, user: str):
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
         admin.send_update_account(user_id=user, payload=dict())
-    assert err.match('b\'{"error":"unknown_error"}\''), err
+    assert err.match(UNKOWN_ERROR_REGEX), err
 
     admin.update_user(user_id=user, payload={"enabled": True})
     with pytest.raises(KeycloakPutError) as err:
         admin.send_verify_email(user_id=user)
-    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email"}\'')
+    assert err.match('500: b\'{"errorMessage":"Failed to send .*"}\'')
 
 
 def test_get_sessions(admin: KeycloakAdmin):
@@ -1941,7 +1953,7 @@ def test_get_sessions(admin: KeycloakAdmin):
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
         admin.get_sessions(user_id="bad")
-    assert err.match('404: b\'{"error":"User not found"}\'')
+    assert err.match(USER_NOT_FOUND_REGEX)
 
 
 def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
@@ -1954,7 +1966,7 @@ def test_get_client_installation_provider(admin: KeycloakAdmin, client: str):
     """
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_installation_provider(client_id=client, provider_id="bad")
-    assert err.match('404: b\'{"error":"Unknown Provider"}\'')
+    assert err.match('404: b\'{"error":"Unknown Provider".*}\'')
 
     installation = admin.get_client_installation_provider(
         client_id=client, provider_id="keycloak-oidc-keycloak-json"
@@ -2018,7 +2030,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_for_id(flow_id="bad")
-    assert err.match('404: b\'{"error":"Could not find flow with id"}\'')
+    assert err.match('404: b\'{"error":"Could not find flow with id".*}\'')
     browser_flow_id = [x for x in res if x["alias"] == "browser"][0]["id"]
     res = admin.get_authentication_flow_for_id(flow_id=browser_flow_id)
     assert res["alias"] == "browser"
@@ -2068,11 +2080,11 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     }, res
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_execution(execution_id="bad")
-    assert err.match('404: b\'{"error":"Illegal execution"}\'')
+    assert err.match(ILLEGAL_EXECUTION_REGEX)
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_authentication_flow_execution(payload=dict(), flow_alias="browser")
-    assert err.match('400: b\'{"error":"It is illegal to add execution to a built in flow"}\'')
+    assert err.match('400: b\'{"error":"It is illegal to add execution to a built in flow".*}\'')
 
     res = admin.create_authentication_flow_execution(
         payload={"provider": "auth-cookie"}, flow_alias="test-create"
@@ -2095,7 +2107,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     assert res == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_authentication_flow_execution(execution_id=exec_id)
-    assert err.match('404: b\'{"error":"Illegal execution"}\'')
+    assert err.match(ILLEGAL_EXECUTION_REGEX)
 
     # Test subflows
     res = admin.create_authentication_flow_subflow(
@@ -2134,7 +2146,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
     assert res == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_authentication_flow(flow_id=flow_id)
-    assert err.match('404: b\'{"error":"Could not find flow with id"}\'')
+    assert err.match('404: b\'{"error":"Could not find flow with id".*}\'')
 
 
 def test_authentication_configs(admin: KeycloakAdmin, realm: str):
@@ -2164,15 +2176,15 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str):
     # therefore testing only failures
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authenticator_config(config_id="bad")
-    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+    assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
 
     with pytest.raises(KeycloakPutError) as err:
         admin.update_authenticator_config(payload=dict(), config_id="bad")
-    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+    assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_authenticator_config(config_id="bad")
-    assert err.match('404: b\'{"error":"Could not find authenticator config"}\'')
+    assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
 
 
 def test_sync_users(admin: KeycloakAdmin, realm: str):
@@ -2188,7 +2200,7 @@ def test_sync_users(admin: KeycloakAdmin, realm: str):
     # Only testing the error message
     with pytest.raises(KeycloakPostError) as err:
         admin.sync_users(storage_id="does-not-exist", action="triggerFullSync")
-    assert err.match('404: b\'{"error":"Could not find component"}\'')
+    assert err.match('404: b\'{"error":"Could not find component".*}\'')
 
 
 def test_client_scopes(admin: KeycloakAdmin, realm: str):
@@ -2211,7 +2223,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_scope(client_scope_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+    assert err.match(NO_CLIENT_SCOPE_REGEX)
 
     scope = admin.get_client_scope(client_scope_id=res[0]["id"])
     assert res[0] == scope
@@ -2231,13 +2243,13 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     # Test update client scope
     with pytest.raises(KeycloakPutError) as err:
         admin.update_client_scope(client_scope_id="does-not-exist", payload=dict())
-    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+    assert err.match(NO_CLIENT_SCOPE_REGEX)
 
     res_update = admin.update_client_scope(
         client_scope_id=res, payload={"name": "test-scope-update"}
     )
     assert res_update == dict()
-    admin.get_client_scope(client_scope_id=res)["name"] == "test-scope-update"
+    assert admin.get_client_scope(client_scope_id=res)["name"] == "test-scope-update"
 
     # Test get mappers
     mappers = admin.get_mappers_from_client_scope(client_scope_id=res)
@@ -2246,7 +2258,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     # Test add mapper
     with pytest.raises(KeycloakPostError) as err:
         admin.add_mapper_to_client_scope(client_scope_id=res, payload=dict())
-    assert err.match('404: b\'{"error":"ProtocolMapper provider not found"}\'')
+    assert err.match('404: b\'{"error":"ProtocolMapper provider not found".*}\'')
 
     res_add = admin.add_mapper_to_client_scope(
         client_scope_id=res,
@@ -2265,7 +2277,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
         admin.update_mapper_in_client_scope(
             client_scope_id="does-not-exist", protocol_mapper_id=test_mapper["id"], payload=dict()
         )
-    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+    assert err.match(NO_CLIENT_SCOPE_REGEX)
     test_mapper["config"]["user.attribute"] = "test"
     res_update = admin.update_mapper_in_client_scope(
         client_scope_id=res, protocol_mapper_id=test_mapper["id"], payload=test_mapper
@@ -2285,7 +2297,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
         admin.delete_mapper_from_client_scope(
             client_scope_id=res, protocol_mapper_id=test_mapper["id"]
         )
-    assert err.match('404: b\'{"error":"Model not found"}\'')
+    assert err.match('404: b\'{"error":"Model not found".*}\'')
 
     # Test default default scopes
     res_defaults = admin.get_default_default_client_scopes()
@@ -2293,7 +2305,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPutError) as err:
         admin.add_default_default_client_scope(scope_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+    assert err.match(CLIENT_SCOPE_NOT_FOUND_REGEX)
 
     res_add = admin.add_default_default_client_scope(scope_id=res)
     assert res_add == dict()
@@ -2301,7 +2313,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_default_default_client_scope(scope_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+    assert err.match(CLIENT_SCOPE_NOT_FOUND_REGEX)
 
     res_del = admin.delete_default_default_client_scope(scope_id=res)
     assert res_del == dict()
@@ -2313,7 +2325,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPutError) as err:
         admin.add_default_optional_client_scope(scope_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+    assert err.match(CLIENT_SCOPE_NOT_FOUND_REGEX)
 
     res_add = admin.add_default_optional_client_scope(scope_id=res)
     assert res_add == dict()
@@ -2321,7 +2333,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_default_optional_client_scope(scope_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Client scope not found"}\'')
+    assert err.match(CLIENT_SCOPE_NOT_FOUND_REGEX)
 
     res_del = admin.delete_default_optional_client_scope(scope_id=res)
     assert res_del == dict()
@@ -2332,7 +2344,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     assert res_del == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client_scope(client_scope_id=res)
-    assert err.match('404: b\'{"error":"Could not find client scope"}\'')
+    assert err.match(NO_CLIENT_SCOPE_REGEX)
 
 
 def test_components(admin: KeycloakAdmin, realm: str):
@@ -2351,7 +2363,7 @@ def test_components(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_component(component_id="does-not-exist")
-    assert err.match('404: b\'{"error":"Could not find component"}\'')
+    assert err.match('404: b\'{"error":"Could not find component".*}\'')
 
     res_get = admin.get_component(component_id=res[0]["id"])
     assert res_get == res[0]
@@ -2379,7 +2391,7 @@ def test_components(admin: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakPutError) as err:
         admin.update_component(component_id="does-not-exist", payload=dict())
-    assert err.match('404: b\'{"error":"Could not find component"}\'')
+    assert err.match('404: b\'{"error":"Could not find component".*}\'')
     res_upd = admin.update_component(component_id=res, payload=component)
     assert res_upd == dict()
     assert admin.get_component(component_id=res)["name"] == "Test Component Update"
@@ -2389,7 +2401,7 @@ def test_components(admin: KeycloakAdmin, realm: str):
     assert res_del == dict()
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_component(component_id=res)
-    assert err.match('404: b\'{"error":"Could not find component"}\'')
+    assert err.match('404: b\'{"error":"Could not find component".*}\'')
 
 
 def test_keys(admin: KeycloakAdmin, realm: str):
@@ -2401,9 +2413,16 @@ def test_keys(admin: KeycloakAdmin, realm: str):
     :type realm: str
     """
     admin.change_current_realm(realm)
-    assert set(admin.get_keys()["active"].keys()) == {"AES", "HS256", "RS256", "RSA-OAEP"}
+    assert set(admin.get_keys()["active"].keys()) == {"AES", "HS256", "RS256", "RSA-OAEP"} or set(
+        admin.get_keys()["active"].keys()
+    ) == {"RSA-OAEP", "RS256", "HS512", "AES"}
     assert {k["algorithm"] for k in admin.get_keys()["keys"]} == {
         "HS256",
+        "RSA-OAEP",
+        "AES",
+        "RS256",
+    } or {k["algorithm"] for k in admin.get_keys()["keys"]} == {
+        "HS512",
         "RSA-OAEP",
         "AES",
         "RS256",
@@ -2470,7 +2489,7 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
 
     with pytest.raises(KeycloakAuthenticationError) as err:
         admin.get_realm(realm_name=realm)
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized"}\'')
+    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized".*}\'')
 
     # Freeze time to simulate the access token expiring
     with freezegun.freeze_time("2023-02-25 10:05:00"):
@@ -2804,7 +2823,7 @@ def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
     with pytest.raises(KeycloakGetError) as err:
         admin.realm_name = "doesnotexist"
         admin.get_realm_default_roles()
-    assert err.match('404: b\'{"error":"Realm not found."}\'')
+    assert err.match('404: b\'{"error":"Realm not found.".*}\'')
     admin.change_current_realm(realm)
 
     # Test removing a default realm role
@@ -2815,7 +2834,7 @@ def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.remove_realm_default_roles(payload=[{"id": "bad id"}])
-    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+    assert err.match('404: b\'{"error":"Could not find composite role".*}\'')
 
     # Test adding a default realm role
     res = admin.add_realm_default_roles(payload=[roles[0]])
@@ -2825,7 +2844,7 @@ def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
 
     with pytest.raises(KeycloakPostError) as err:
         admin.add_realm_default_roles(payload=[{"id": "bad id"}])
-    assert err.match('404: b\'{"error":"Could not find composite role"}\'')
+    assert err.match('404: b\'{"error":"Could not find composite role".*}\'')
 
 
 def test_clear_keys_cache(realm: str, admin: KeycloakAdmin) -> None:

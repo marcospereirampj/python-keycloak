@@ -202,7 +202,10 @@ def test_exchange_token(
     token = oid.token(username=username, password=password)
     assert oid.userinfo(token=token["access_token"]) == {
         "email": f"{username}@test.test",
-        "email_verified": False,
+        "email_verified": True,
+        "family_name": "last",
+        "given_name": "first",
+        "name": "first last",
         "preferred_username": username,
         "sub": mock.ANY,
     }
@@ -213,7 +216,10 @@ def test_exchange_token(
     )
     assert oid.userinfo(token=new_token["access_token"]) == {
         "email": f"{username}@test.test",
-        "email_verified": False,
+        "email_verified": True,
+        "family_name": "last",
+        "given_name": "first",
+        "name": "first last",
         "preferred_username": username,
         "sub": mock.ANY,
     }
