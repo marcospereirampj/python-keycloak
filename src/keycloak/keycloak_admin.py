@@ -1287,7 +1287,8 @@ class KeycloakAdmin:
 
         if "first" in query or "max" in query:
             groups = self.__fetch_paginated(url, query)
-        groups = self.__fetch_all(url, query)
+        else:
+            groups = self.__fetch_all(url, query)
 
         # For version +23.0.0
         for group in groups:
