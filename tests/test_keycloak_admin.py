@@ -642,6 +642,14 @@ def test_groups(admin: KeycloakAdmin, user: str):
     group_id = admin.create_group(payload={"name": "main-group"})
     assert group_id is not None, group_id
 
+    # Test group count
+    count = admin.groups_count()
+    assert count.get("count") == 1, count
+
+    # Test group count with query
+    count = admin.groups_count(query={"search": "notpresent"})
+    assert count.get("count") == 0
+
     # Test create subgroups
     subgroup_id_1 = admin.create_group(payload={"name": "subgroup-1"}, parent=group_id)
     subgroup_id_2 = admin.create_group(payload={"name": "subgroup-2"}, parent=group_id)
