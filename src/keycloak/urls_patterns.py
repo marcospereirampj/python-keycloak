@@ -81,6 +81,7 @@ URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"
 URL_ADMIN_SERVER_INFO = "admin/serverinfo"
 
 URL_ADMIN_GROUPS = "admin/realms/{realm-name}/groups"
+URL_ADMIN_GROUPS_COUNT = "admin/realms/{realm-name}/groups/count"
 URL_ADMIN_GROUP = "admin/realms/{realm-name}/groups/{id}"
 URL_ADMIN_GROUP_BY_PATH = "admin/realms/{realm-name}/group-by-path/{path}"
 URL_ADMIN_GROUP_CHILD = "admin/realms/{realm-name}/groups/{id}/children"
