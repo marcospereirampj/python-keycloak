@@ -242,7 +242,11 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
             "username": username,
             "email": f"{username}@test.test",
             "enabled": True,
-            "credentials": [{"type": "password", "value": password}],
+            "firstName": "first",
+            "lastName": "last",
+            "emailVerified": True,
+            "requiredActions": [],
+            "credentials": [{"type": "password", "value": password, "temporary": False}],
         }
     )
 
@@ -308,7 +312,11 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
             "username": username,
             "email": f"{username}@test.test",
             "enabled": True,
-            "credentials": [{"type": "password", "value": password}],
+            "emailVerified": True,
+            "firstName": "first",
+            "lastName": "last",
+            "requiredActions": [],
+            "credentials": [{"type": "password", "value": password, "temporary": False}],
         }
     )
 
