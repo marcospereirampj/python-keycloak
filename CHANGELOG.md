@@ -1,3 +1,9 @@
+## v3.11.1 (2024-04-08)
+
+### Fix
+
+- lowercase default role name (#547)
+
 ## v3.11.0 (2024-04-08)
 
 ### Feat
@@ -221,7 +227,7 @@
 
 ### Fix
 
-- Check if \_s exists in ConnectionManager before deleting it (#429)
+- Check if _s exists in ConnectionManager before deleting it (#429)
 
 ## v2.15.2 (2023-04-05)
 
