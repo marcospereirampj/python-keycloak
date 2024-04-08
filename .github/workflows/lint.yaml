@@ -10,15 +10,15 @@ jobs:
   check-commits:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: webiny/action-conventional-commits@v1.1.0
+      - uses: actions/checkout@v4
+      - uses: webiny/action-conventional-commits@v1.3.0
 
   check-linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python 3.12
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install dependencies
@@ -36,9 +36,9 @@ jobs:
       - check-commits
       - check-linting
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python 3.12
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install dependencies
@@ -63,9 +63,9 @@ jobs:
     env:
       KEYCLOAK_DOCKER_IMAGE_TAG: ${{ matrix.keycloak-version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - uses: docker-practice/actions-setup-docker@master
@@ -87,9 +87,9 @@ jobs:
       - test
       - check-docs
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python 3.12
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install dependencies
