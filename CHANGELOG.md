@@ -1,3 +1,33 @@
+## v3.11.0 (2024-04-08)
+
+### Feat
+
+- add admin group count (#540)
+
+## v3.10.2 (2024-04-08)
+
+### Fix
+
+- fix keycloak_admin.create_user documentation/ typehint (#545)
+
+## v3.10.1 (2024-04-07)
+
+### Fix
+
+- improve KeycloakAdmin.get_client_id() performances (#511)
+
+## v3.10.0 (2024-04-07)
+
+### Feat
+
+- Allow query parameters for group children (#534)
+
+## v3.9.3 (2024-04-07)
+
+### Fix
+
+- incorporate custom headers into default header setup (#533)
+
 ## v3.9.2 (2024-04-07)
 
 ### Fix
@@ -191,7 +221,7 @@
 
 ### Fix
 
-- Check if _s exists in ConnectionManager before deleting it (#429)
+- Check if \_s exists in ConnectionManager before deleting it (#429)
 
 ## v2.15.2 (2023-04-05)
 
