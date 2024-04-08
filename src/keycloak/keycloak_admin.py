@@ -538,7 +538,7 @@ class KeycloakAdmin:
         Realm name must be unique.
 
         RealmRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
 
         :param payload: RealmRepresentation
         :type payload: dict
@@ -556,7 +556,7 @@ class KeycloakAdmin:
         Realm partialImport is used for modifying configuration of existing realm.
 
         PartialImportRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_partialimportrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_partialimportrepresentation
 
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
@@ -577,7 +577,7 @@ class KeycloakAdmin:
         """Export the realm configurations in the json format.
 
         RealmRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_partialexport
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_partialexport
 
         :param export_clients: Skip if not want to export realm clients
         :type export_clients: bool
@@ -610,7 +610,7 @@ class KeycloakAdmin:
         """Get a specific realm.
 
         RealmRepresentation:
-        https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_realmrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
 
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
@@ -625,7 +625,7 @@ class KeycloakAdmin:
         """Create a realm.
 
         RealmRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
 
         :param payload: RealmRepresentation
         :type payload: dict
@@ -648,7 +648,7 @@ class KeycloakAdmin:
         role, or client information in the payload.
 
         RealmRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
 
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
@@ -681,7 +681,7 @@ class KeycloakAdmin:
         Return a list of users, filtered according to query parameters
 
         UserRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
 
         :param query: Query parameters (optional)
         :type query: dict
@@ -701,7 +701,7 @@ class KeycloakAdmin:
         """Create an ID Provider.
 
         IdentityProviderRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
 
         :param: payload: IdentityProviderRepresentation
         :type payload: dict
@@ -718,7 +718,7 @@ class KeycloakAdmin:
         """Update an ID Provider.
 
         IdentityProviderRepresentation
-        https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identity_providers_resource
 
         :param: idp_alias: alias for IdP to update
         :type idp_alias: str
@@ -737,7 +737,7 @@ class KeycloakAdmin:
         """Create an ID Provider.
 
         IdentityProviderRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityprovidermapperrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityprovidermapperrepresentation
 
         :param: idp_alias: alias for Idp to add mapper in
         :type idp_alias: str
@@ -756,7 +756,7 @@ class KeycloakAdmin:
         """Update an IdP mapper.
 
         IdentityProviderMapperRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_update
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_update
 
         :param: idp_alias: alias for Idp to fetch mappers
         :type idp_alias: str
@@ -786,7 +786,7 @@ class KeycloakAdmin:
         Returns a list of ID Providers mappers
 
         IdentityProviderMapperRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getmappers
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getmappers
 
         :param: idp_alias: alias for Idp to fetch mappers
         :type idp_alias: str
@@ -805,7 +805,7 @@ class KeycloakAdmin:
         Returns a list of ID Providers,
 
         IdentityProviderRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
 
         :return: array IdentityProviderRepresentation
         :rtype: list
@@ -820,7 +820,7 @@ class KeycloakAdmin:
         Get the representation of a specific IDP Provider.
 
         IdentityProviderRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identityproviderrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
 
         :param: idp_alias: alias for IdP to get
         :type idp_alias: str
@@ -849,7 +849,7 @@ class KeycloakAdmin:
         Username must be unique
 
         UserRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
 
         :param payload: UserRepresentation
         :type payload: dict
@@ -878,7 +878,7 @@ class KeycloakAdmin:
     def users_count(self, query=None):
         """Count users.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_users_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_users_resource
 
         :param query: (dict) Query parameters for users count
         :type query: dict
@@ -899,7 +899,7 @@ class KeycloakAdmin:
         This is required for further actions against this user.
 
         UserRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
 
         :param username: id in UserRepresentation
         :type username: str
@@ -915,7 +915,7 @@ class KeycloakAdmin:
         """Get representation of the user.
 
         UserRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
 
         :param user_id: User id
         :type user_id: str
@@ -1025,8 +1025,8 @@ class KeycloakAdmin:
         If temporary is True, the user will have to reset
         the temporary password next time they log in.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_users_resource
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_credentialrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_users_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_credentialrepresentation
 
         :param user_id: User id
         :type user_id: str
@@ -1050,7 +1050,7 @@ class KeycloakAdmin:
         Returns a list of credential belonging to the user.
 
         CredentialRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_credentialrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_credentialrepresentation
 
         :param: user_id: user id
         :type user_id: str
@@ -1067,7 +1067,7 @@ class KeycloakAdmin:
         """Delete credential of the user.
 
         CredentialRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_credentialrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_credentialrepresentation
 
         :param: user_id: user id
         :type user_id: str
@@ -1089,7 +1089,7 @@ class KeycloakAdmin:
     def user_logout(self, user_id):
         """Log out the user.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_logout
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_logout
 
         :param user_id: User id
         :type user_id: str
@@ -1106,7 +1106,7 @@ class KeycloakAdmin:
         """Get consents granted by the user.
 
         UserConsentRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_userconsentrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userconsentrepresentation
 
         :param user_id: User id
         :type user_id: str
@@ -1243,7 +1243,7 @@ class KeycloakAdmin:
         """Get sessions associated with the user.
 
         UserSessionRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_usersessionrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_usersessionrepresentation
 
         :param user_id: Id of user
         :type user_id: str
@@ -1260,7 +1260,7 @@ class KeycloakAdmin:
         """Get themes, social providers, etc. on this server.
 
         ServerInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_serverinforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_serverinforepresentation
 
         :return: ServerInfoRepresentation
         :rtype: dict
@@ -1274,7 +1274,7 @@ class KeycloakAdmin:
         Returns a list of groups belonging to the realm
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param query: Additional query options
         :type query: dict
@@ -1303,7 +1303,7 @@ class KeycloakAdmin:
         Returns full group details
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param group_id: The group id
         :type group_id: str
@@ -1329,7 +1329,7 @@ class KeycloakAdmin:
         Utility function to iterate through nested group structures
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param group: group (GroupRepresentation)
         :type group: dict
@@ -1374,12 +1374,12 @@ class KeycloakAdmin:
         Returns group members
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_userrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_userrepresentation
 
         :param group_id: The group id
         :type group_id: str
         :param query: Additional query parameters
-            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getmembers)
+            (see https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getmembers)
         :type query: dict
         :return: Keycloak server response (UserRepresentation)
         :rtype: list
@@ -1399,7 +1399,7 @@ class KeycloakAdmin:
         Returns full group details for a group defined by path
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param path: group path
         :type path: str
@@ -1416,7 +1416,7 @@ class KeycloakAdmin:
         """Create a group in the Realm.
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param payload: GroupRepresentation
         :type payload: dict
@@ -1452,7 +1452,7 @@ class KeycloakAdmin:
         """Update group, ignores subgroups.
 
         GroupRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/#_grouprepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
         :param group_id: id of group
         :type group_id: str
@@ -1471,7 +1471,7 @@ class KeycloakAdmin:
     def groups_count(self, query=None):
         """Count groups.
 
-        https://www.keycloak.org/docs-api/24.0.1/rest-api/index.html#_groups
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_groups
 
         :param query: (dict) Query parameters for groups count
         :type query: dict
@@ -1563,7 +1563,7 @@ class KeycloakAdmin:
         Returns a list of clients belonging to the realm
 
         ClientRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :return: Keycloak server response (ClientRepresentation)
         :rtype: list
@@ -1576,7 +1576,7 @@ class KeycloakAdmin:
         """Get representation of the client.
 
         ClientRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :param client_id:  id of client (not client-id)
         :type client_id: str
@@ -1593,7 +1593,7 @@ class KeycloakAdmin:
         This is required for further actions against this client.
 
         :param client_id: clientId in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: client_id (uuid as string)
         :rtype: str
@@ -1614,7 +1614,7 @@ class KeycloakAdmin:
         """Get authorization json from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: dict
@@ -1629,10 +1629,10 @@ class KeycloakAdmin:
         """Create resources of client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: ResourceRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type payload: dict
         :param skip_exists: Skip the creation in case the resource exists
         :type skip_exists: bool
@@ -1657,16 +1657,16 @@ class KeycloakAdmin:
         to default by the Keycloak server.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: ResourceRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type payload: dict
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param resource_id: id in ResourceRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
 
         :return: Keycloak server response
@@ -1687,10 +1687,10 @@ class KeycloakAdmin:
         """Delete a client resource.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param resource_id: id in ResourceRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
 
         :return: Keycloak server response
@@ -1710,7 +1710,7 @@ class KeycloakAdmin:
         """Get resources from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response (ResourceRepresentation)
         :rtype: list
@@ -1725,10 +1725,10 @@ class KeycloakAdmin:
         """Get a client resource.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param resource_id: id in ResourceRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_resourcerepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
 
         :return: Keycloak server response (ResourceRepresentation)
@@ -1762,7 +1762,7 @@ class KeycloakAdmin:
             }
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: No Document
         :type payload: dict
@@ -1799,7 +1799,7 @@ class KeycloakAdmin:
             }
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: No Document
         :type payload: dict
@@ -1837,10 +1837,10 @@ class KeycloakAdmin:
                 ]
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: PolicyRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
         :type payload: dict
         :param skip_exists: Skip creation in case the object already exists
         :type skip_exists: bool
@@ -1862,7 +1862,7 @@ class KeycloakAdmin:
         """Get scopes from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: list
@@ -1877,9 +1877,9 @@ class KeycloakAdmin:
         """Create scopes for client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :param payload: ScopeRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_ScopeRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_ScopeRepresentation
         :type payload: dict
         :type client_id: str
         :return: Keycloak server response
@@ -1896,7 +1896,7 @@ class KeycloakAdmin:
         """Get permissions from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: list
@@ -1911,7 +1911,7 @@ class KeycloakAdmin:
         """Get policies from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: list
@@ -1926,10 +1926,10 @@ class KeycloakAdmin:
         """Delete a policy from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param policy_id: id in PolicyRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
         :type policy_id: str
         :return: Keycloak server response
         :rtype: dict
@@ -1948,10 +1948,10 @@ class KeycloakAdmin:
         """Get a policy from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param policy_id: id in PolicyRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_policyrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
         :type policy_id: str
         :return: Keycloak server response
         :rtype: dict
@@ -1970,7 +1970,7 @@ class KeycloakAdmin:
         """Get service account user from client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: UserRepresentation
         :rtype: dict
@@ -2139,7 +2139,7 @@ class KeycloakAdmin:
         """Create a client.
 
         ClientRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :param skip_exists: If true then do not raise an error if client already exists
         :type skip_exists: bool
@@ -2185,7 +2185,7 @@ class KeycloakAdmin:
         """Get representation of the client.
 
         ClientRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :param client_id: keycloak client id (not oauth client-id)
         :type client_id: str
@@ -2200,10 +2200,10 @@ class KeycloakAdmin:
         """Get content for given installation provider.
 
         Related documentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clients_resource
 
         Possible provider_id list available in the ServerInfoRepresentation#clientInstallations
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_serverinforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_serverinforepresentation
 
         :param client_id: Client id
         :type client_id: str
@@ -2226,7 +2226,7 @@ class KeycloakAdmin:
         """Get all roles for the realm or client.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param brief_representation: whether to omit role attributes in the response
         :type brief_representation: bool
@@ -2256,7 +2256,7 @@ class KeycloakAdmin:
         :param role_name: Name of the role.
         :type role_name: str
         :param query: Additional Query parameters
-            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_parameters_226)
+            (see https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_parameters_226)
         :type query: dict
         :param brief_representation: whether to omit role attributes in the response
         :type brief_representation: bool
@@ -2284,7 +2284,7 @@ class KeycloakAdmin:
         :param role_name: Name of the role.
         :type role_name: str
         :param query: Additional Query parameters
-            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_roles_resource)
+            (see https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_roles_resource)
         :type query: dict
         :return: Keycloak Server Response (UserRepresentation)
         :rtype: list
@@ -2364,7 +2364,7 @@ class KeycloakAdmin:
         """Get all roles for the client.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -2386,7 +2386,7 @@ class KeycloakAdmin:
         This is required for further actions with this role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -2411,7 +2411,7 @@ class KeycloakAdmin:
         This is required for further actions with this role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -2427,7 +2427,7 @@ class KeycloakAdmin:
         """Create a client role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_role_id: id of client (not client-id)
         :type client_role_id: str
@@ -2483,7 +2483,7 @@ class KeycloakAdmin:
         """Update a client role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -2508,7 +2508,7 @@ class KeycloakAdmin:
         """Delete a client role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param client_role_id: id of client (not client-id)
         :type client_role_id: str
@@ -2559,7 +2559,7 @@ class KeycloakAdmin:
         :param role_name: the name of role to be queried.
         :type role_name: str
         :param query: Additional query parameters
-            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
+            (see https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clients_resource)
         :type query: dict
         :return: Keycloak server response (UserRepresentation)
         :rtype: list
@@ -2581,7 +2581,7 @@ class KeycloakAdmin:
         :param role_name: the name of role to be queried.
         :type role_name: str
         :param query: Additional query parameters
-            (see https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clients_resource)
+            (see https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clients_resource)
         :type query: dict
         :return: Keycloak server response
         :rtype: list
@@ -2599,7 +2599,7 @@ class KeycloakAdmin:
         """Get a specific role’s representation.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param role_id: id of role
         :type role_id: str
@@ -2616,7 +2616,7 @@ class KeycloakAdmin:
         """Update the role.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param payload: RoleRepresentation
         :type payload: dict
@@ -2636,7 +2636,7 @@ class KeycloakAdmin:
         """Delete a role by its id.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param role_id: id of role
         :type role_id: str
@@ -2680,7 +2680,7 @@ class KeycloakAdmin:
         """Get realm role by role name.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param role_name: role's name, not id!
         :type role_name: str
@@ -2697,7 +2697,7 @@ class KeycloakAdmin:
         """Get realm role by role id.
 
         RoleRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_rolerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
 
         :param role_id: role's id, not name!
         :type role_id: str
@@ -3212,7 +3212,7 @@ class KeycloakAdmin:
         Returns all flow details
 
         AuthenticationFlowRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationflowrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
 
         :return: Keycloak server response (AuthenticationFlowRepresentation)
         :rtype: list
@@ -3227,7 +3227,7 @@ class KeycloakAdmin:
         Returns all flow details
 
         AuthenticationFlowRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationflowrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
 
         :param flow_id: the id of a flow NOT it's alias
         :type flow_id: str
@@ -3244,7 +3244,7 @@ class KeycloakAdmin:
         """Create a new authentication flow.
 
         AuthenticationFlowRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationflowrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
 
         :param payload: AuthenticationFlowRepresentation
         :type payload: dict
@@ -3283,7 +3283,7 @@ class KeycloakAdmin:
         """Delete authentication flow.
 
         AuthenticationInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationinforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationinforepresentation
 
         :param flow_id: authentication flow id
         :type flow_id: str
@@ -3314,7 +3314,7 @@ class KeycloakAdmin:
         """Update an authentication flow execution.
 
         AuthenticationExecutionInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationexecutioninforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
 
         :param payload: AuthenticationExecutionInfoRepresentation
         :type payload: dict
@@ -3334,7 +3334,7 @@ class KeycloakAdmin:
         """Get authentication flow execution.
 
         AuthenticationExecutionInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationexecutioninforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
 
         :param execution_id: the execution ID
         :type execution_id: str
@@ -3351,7 +3351,7 @@ class KeycloakAdmin:
         """Create an authentication flow execution.
 
         AuthenticationExecutionInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationexecutioninforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
 
         :param payload: AuthenticationExecutionInfoRepresentation
         :type payload: dict
@@ -3371,7 +3371,7 @@ class KeycloakAdmin:
         """Delete authentication flow execution.
 
         AuthenticationExecutionInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationexecutioninforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
 
         :param execution_id: keycloak client id (not oauth client-id)
         :type execution_id: str
@@ -3388,7 +3388,7 @@ class KeycloakAdmin:
         """Create a new sub authentication flow for a given authentication flow.
 
         AuthenticationFlowRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticationflowrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
 
         :param payload: AuthenticationFlowRepresentation
         :type payload: dict
@@ -3424,7 +3424,7 @@ class KeycloakAdmin:
         """Get authenticator's provider configuration description.
 
         AuthenticatorConfigInfoRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticatorconfiginforepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfiginforepresentation
 
         :param provider_id: Provider Id
         :type provider_id: str
@@ -3457,7 +3457,7 @@ class KeycloakAdmin:
         """Update an authenticator configuration.
 
         AuthenticatorConfigRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authenticatorconfigrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfigrepresentation
 
         :param payload: AuthenticatorConfigRepresentation
         :type payload: dict
@@ -3476,7 +3476,7 @@ class KeycloakAdmin:
     def delete_authenticator_config(self, config_id):
         """Delete a authenticator configuration.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_authentication_management_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authentication_management_resource
 
         :param config_id: Authenticator config id
         :type config_id: str
@@ -3514,7 +3514,7 @@ class KeycloakAdmin:
         """Get client scopes.
 
         Get representation of the client scopes for the realm where we are connected to
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientscopes
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
 
         :return: Keycloak server response Array of (ClientScopeRepresentation)
         :rtype: list
@@ -3529,7 +3529,7 @@ class KeycloakAdmin:
         """Get client scope.
 
         Get representation of the client scopes for the realm where we are connected to
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientscopes
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3547,7 +3547,7 @@ class KeycloakAdmin:
 
         Get representation of the client scope identified by the client scope name.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientscopes
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
         :param client_scope_name: (str) Name of the client scope
         :type client_scope_name: str
         :returns: ClientScopeRepresentation or None
@@ -3564,7 +3564,7 @@ class KeycloakAdmin:
         """Create a client scope.
 
         ClientScopeRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientscopes
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
 
         :param payload: ClientScopeRepresentation
         :type payload: dict
@@ -3593,7 +3593,7 @@ class KeycloakAdmin:
         """Update a client scope.
 
         ClientScopeRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_client_scopes_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_client_scopes_resource
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3612,7 +3612,7 @@ class KeycloakAdmin:
         """Delete existing client scope.
 
         ClientScopeRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_client_scopes_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_client_scopes_resource
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3628,7 +3628,7 @@ class KeycloakAdmin:
     def get_mappers_from_client_scope(self, client_scope_id):
         """Get a list of all mappers connected to the client scope.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_protocol_mappers_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
         :param client_scope_id: Client scope id
         :type client_scope_id: str
         :returns: Keycloak server response (ProtocolMapperRepresentation)
@@ -3643,7 +3643,7 @@ class KeycloakAdmin:
     def add_mapper_to_client_scope(self, client_scope_id, payload):
         """Add a mapper to a client scope.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_create_mapper
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_create_mapper
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3664,7 +3664,7 @@ class KeycloakAdmin:
     def delete_mapper_from_client_scope(self, client_scope_id, protocol_mapper_id):
         """Delete a mapper from a client scope.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_delete_mapper
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_delete_mapper
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3687,7 +3687,7 @@ class KeycloakAdmin:
     def update_mapper_in_client_scope(self, client_scope_id, protocol_mapper_id, payload):
         """Update an existing protocol mapper in a client scope.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_protocol_mappers_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
 
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
@@ -3803,7 +3803,7 @@ class KeycloakAdmin:
     def get_mappers_from_client(self, client_id):
         """List of all client mappers.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_protocolmapperrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocolmapperrepresentation
 
         :param client_id: Client id
         :type client_id: str
@@ -3821,7 +3821,7 @@ class KeycloakAdmin:
     def add_mapper_to_client(self, client_id, payload):
         """Add a mapper to a client.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_create_mapper
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_create_mapper
 
         :param client_id: The id of the client
         :type client_id: str
@@ -3867,7 +3867,7 @@ class KeycloakAdmin:
     def remove_client_mapper(self, client_id, client_mapper_id):
         """Remove a mapper from the client.
 
-        https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_protocol_mappers_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
 
         :param client_id: The id of the client
         :type client_id: str
@@ -3890,7 +3890,7 @@ class KeycloakAdmin:
     def generate_client_secrets(self, client_id):
         """Generate a new secret for the client.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_regeneratesecret
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_regeneratesecret
 
         :param client_id:  id of client (not client-id)
         :type client_id: str
@@ -3906,7 +3906,7 @@ class KeycloakAdmin:
     def get_client_secrets(self, client_id):
         """Get representation of the client secrets.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientsecret
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientsecret
 
         :param client_id:  id of client (not client-id)
         :type client_id: str
@@ -3925,7 +3925,7 @@ class KeycloakAdmin:
         Return a list of components, filtered according to query parameters
 
         ComponentRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
 
         :param query: Query parameters (optional)
         :type query: dict
@@ -3943,7 +3943,7 @@ class KeycloakAdmin:
         """Create a new component.
 
         ComponentRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
 
         :param payload: ComponentRepresentation
         :type payload: dict
@@ -3964,7 +3964,7 @@ class KeycloakAdmin:
         :param component_id: Component id
 
         ComponentRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
 
         :param component_id: Id of the component
         :type component_id: str
@@ -3981,7 +3981,7 @@ class KeycloakAdmin:
         :param component_id: Component id
         :type component_id: str
         :param payload: ComponentRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_componentrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
         :type payload: dict
         :return: Http response
         :rtype: bytes
@@ -4012,7 +4012,7 @@ class KeycloakAdmin:
         Return a list of keys, filtered according to query parameters
 
         KeysMetadataRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_key_resource
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_key_resource
 
         :return: keys list
         :rtype: list
@@ -4029,8 +4029,8 @@ class KeycloakAdmin:
         Return a list of events, filtered according to query parameters
 
         AdminEvents Representation array
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getevents
-        https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_get_adminrealmsrealmadmin_events
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getevents
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_get_adminrealmsrealmadmin_events
 
         :param query: Additional query parameters
         :type query: dict
@@ -4050,7 +4050,7 @@ class KeycloakAdmin:
         Return a list of events, filtered according to query parameters
 
         EventRepresentation array
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_eventrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_eventrepresentation
 
         :param query: Additional query parameters
         :type query: dict
@@ -4068,7 +4068,7 @@ class KeycloakAdmin:
         """Set realm events configuration.
 
         RealmEventsConfigRepresentation
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_realmeventsconfigrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmeventsconfigrepresentation
 
         :param payload: Payload object for the events configuration
         :type payload: dict
@@ -4199,7 +4199,7 @@ class KeycloakAdmin:
         """Get sessions associated with the client.
 
         UserSessionRepresentation
-        http://www.keycloak.org/docs-api/18.0/rest-api/index.html#_usersessionrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_usersessionrepresentation
 
         :param client_id: id of client
         :type client_id: str
@@ -4215,7 +4215,7 @@ class KeycloakAdmin:
     def get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions.
 
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_getclientsessionstats
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientsessionstats
 
         :return: Dict of clients and session count
         :rtype: dict
@@ -4230,7 +4230,7 @@ class KeycloakAdmin:
         """Get management permissions for a client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: list
@@ -4245,7 +4245,7 @@ class KeycloakAdmin:
         """Update management permissions for a client.
 
         ManagementPermissionReference
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_managementpermissionreference
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_managementpermissionreference
 
         Payload example::
 
@@ -4256,7 +4256,7 @@ class KeycloakAdmin:
         :param payload: ManagementPermissionReference
         :type payload: dict
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: bytes
@@ -4272,7 +4272,7 @@ class KeycloakAdmin:
         """Get scopes for a given policy.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param policy_id: No Document
         :type policy_id: str
@@ -4293,7 +4293,7 @@ class KeycloakAdmin:
         """Get resources for a given policy.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param policy_id: No Document
         :type policy_id: str
@@ -4314,7 +4314,7 @@ class KeycloakAdmin:
         """Get permissions for a given scope.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param scope_id: No Document
         :type scope_id: str
@@ -4349,7 +4349,7 @@ class KeycloakAdmin:
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response
         :rtype: bytes
@@ -4380,7 +4380,7 @@ class KeycloakAdmin:
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param scope_id: No Document
         :type scope_id: str
@@ -4402,7 +4402,7 @@ class KeycloakAdmin:
         """Get policies for a given client.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
@@ -4429,7 +4429,7 @@ class KeycloakAdmin:
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :return: Keycloak server response (RoleRepresentation)
         :rtype: bytes
