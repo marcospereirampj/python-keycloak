@@ -2305,7 +2305,7 @@ class KeycloakAdmin:
         default_realm_roles = [
             realm_role
             for realm_role in all_realm_roles
-            if realm_role["name"] == f"default-roles-{self.connection.realm_name}"
+            if realm_role["name"] == f"default-roles-{self.connection.realm_name}".lower()
         ]
         return default_realm_roles[0]["id"]
 
