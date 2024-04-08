@@ -857,8 +857,8 @@ class KeycloakAdmin:
             Otherwise, return existing user ID.
         :type exist_ok: bool
 
-        :return: UserRepresentation
-        :rtype: dict
+        :return: user_id
+        :rtype: str
         """
         params_path = {"realm-name": self.connection.realm_name}
 
