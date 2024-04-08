@@ -1468,6 +1468,24 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
+    def groups_count(self, query=None):
+        """Count groups.
+
+        https://www.keycloak.org/docs-api/24.0.1/rest-api/index.html#_groups
+
+        :param query: (dict) Query parameters for groups count
+        :type query: dict
+
+        :return: Keycloak Server Response
+        :rtype: dict
+        """
+        query = query or dict()
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUPS_COUNT.format(**params_path), **query
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def group_set_permissions(self, group_id, enabled=True):
         """Enable/Disable permissions for a group.
 
