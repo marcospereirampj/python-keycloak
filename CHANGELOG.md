@@ -1,3 +1,9 @@
+## v3.9.2 (2024-04-07)
+
+### Fix
+
+- get_groups pagination call was not used #537 (#541)
+
 ## v3.9.1 (2024-02-26)
 
 ### Fix
