@@ -709,7 +709,7 @@ class KeycloakOpenID:
         """Create a client.
 
         ClientRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :param token: Initial access token
         :type token: str
@@ -755,7 +755,7 @@ class KeycloakOpenID:
         """Update a client.
 
         ClientRepresentation:
-        https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_clientrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
 
         :param token: registration access token
         :type token: str

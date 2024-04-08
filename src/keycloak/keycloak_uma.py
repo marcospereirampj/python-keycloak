@@ -103,7 +103,7 @@ class KeycloakUMA:
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#rfc.section.2.2.1
 
         ResourceRepresentation
-        https://www.keycloak.org/docs-api/20.0.0/rest-api/index.html#_resourcerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
 
         :param payload: ResourceRepresentation
         :type payload: dict
@@ -122,7 +122,7 @@ class KeycloakUMA:
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#update-resource-set
 
         ResourceRepresentation
-        https://www.keycloak.org/docs-api/20.0.0/rest-api/index.html#_resourcerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
 
         :param resource_id: id of the resource
         :type resource_id: str
@@ -144,7 +144,7 @@ class KeycloakUMA:
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#read-resource-set
 
         ResourceRepresentation
-        https://www.keycloak.org/docs-api/20.0.0/rest-api/index.html#_resourcerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
 
         :param resource_id: id of the resource
         :type resource_id: str
@@ -239,7 +239,7 @@ class KeycloakUMA:
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
 
         ResourceRepresentation
-        https://www.keycloak.org/docs-api/20.0.0/rest-api/index.html#_resourcerepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
 
         :yields: Iterator over a list of ResourceRepresentations
         :rtype: Iterator[dict]
@@ -345,7 +345,7 @@ class KeycloakUMA:
         """Update permission policy.
 
         https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
-        https://www.keycloak.org/docs-api/21.0.1/rest-api/index.html#_policyrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
 
         :param policy_id: id of policy permission
         :type policy_id: str
@@ -363,7 +363,7 @@ class KeycloakUMA:
         """Delete permission policy.
 
         https://www.keycloak.org/docs/latest/authorization_services/#removing-a-permission
-        https://www.keycloak.org/docs-api/21.0.1/rest-api/index.html#_policyrepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
 
         :param policy_id: id of permission policy
         :type policy_id: str
