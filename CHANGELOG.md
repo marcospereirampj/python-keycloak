@@ -1,3 +1,9 @@
+## v3.12.0 (2024-04-10)
+
+### Feat
+
+- allows retrieval of realm and client level roles for a user (#512)
+
 ## v3.11.1 (2024-04-08)
 
 ### Fix
