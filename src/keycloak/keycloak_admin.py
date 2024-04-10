@@ -3111,6 +3111,20 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
+    def get_all_roles_of_user(self, user_id):
+        """Get all level roles for a user.
+
+        :param user_id: id of user
+        :type user_id: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": user_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_USER_ALL_ROLES.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def get_client_roles_of_user(self, user_id, client_id):
         """Get all client roles for a user.
 
