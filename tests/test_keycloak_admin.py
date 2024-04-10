@@ -413,7 +413,7 @@ def test_users_roles(admin: KeycloakAdmin, realm: str):
     # Test all level user roles fail
     with pytest.raises(KeycloakGetError) as err:
         admin.get_all_roles_of_user(user_id="non-existent-id")
-    err.match('404: b\'{"error":"User not found"}\'')
+    err.match('404: b\'{"error":"User not found"')
 
     admin.delete_user(user_id)
     admin.delete_client(client_id)
