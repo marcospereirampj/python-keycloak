@@ -1,12 +1,14 @@
 """Test the keycloak admin object."""
 
 import copy
+import os
 import uuid
 from typing import Tuple
 
 import freezegun
 import pytest
 from dateutil import parser as datetime_parser
+from packaging.version import Version
 
 import keycloak
 from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection
@@ -805,16 +807,19 @@ def test_groups(admin: KeycloakAdmin, user: str):
     res = admin.get_groups(full_hierarchy=True)
     assert len(res) == 1
     assert len(res[0]["subGroups"]) == 2
-    assert len(res[0]["subGroups"][0]["subGroups"]) == 0
-    assert len(res[0]["subGroups"][1]["subGroups"]) == 1
+    assert len([x for x in res[0]["subGroups"] if x["id"] == subgroup_id_1][0]["subGroups"]) == 0
+    assert len([x for x in res[0]["subGroups"] if x["id"] == subgroup_id_2][0]["subGroups"]) == 1
 
     # Test that query params are not allowed for full hierarchy
     with pytest.raises(ValueError) as err:
         admin.get_group_children(group_id=group_id, full_hierarchy=True, query={"max": 10})
 
     # Test that query params are passed
-    res = admin.get_group_children(group_id=group_id, query={"max": 1})
-    assert len(res) == 1
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    ) >= Version("23"):
+        res = admin.get_group_children(group_id=group_id, query={"max": 1})
+        assert len(res) == 1
 
     assert err.match("Cannot use both query and full_hierarchy parameters")
 

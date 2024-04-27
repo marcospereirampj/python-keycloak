@@ -989,8 +989,6 @@ class KeycloakAdmin:
                 group["subGroups"] = self.get_group_children(
                     group_id=group.get("id"), full_hierarchy=full_hierarchy
                 )
-            else:
-                group["subGroups"] = []
 
         return groups
 
@@ -1022,8 +1020,6 @@ class KeycloakAdmin:
             group["subGroups"] = self.get_group_children(
                 group.get("id"), full_hierarchy=full_hierarchy
             )
-        else:
-            group["subGroups"] = []
 
         return group
 
@@ -1086,8 +1082,6 @@ class KeycloakAdmin:
                 group["subGroups"] = self.get_group_children(
                     group_id=group.get("id"), full_hierarchy=full_hierarchy
                 )
-            else:
-                group["subGroups"] = []
 
         return res
 
