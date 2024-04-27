@@ -794,6 +794,33 @@ def test_groups(admin: KeycloakAdmin, user: str):
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
+    # Test nested search from main group
+    res = admin.get_subgroups(
+        group=admin.get_group(group_id=group_id, full_hierarchy=True),
+        path="/main-group/subgroup-2/subsubgroup-1",
+    )
+    assert res["id"] == subsubgroup_id_1
+
+    # Test nested search from all groups
+    res = admin.get_groups(full_hierarchy=True)
+    assert len(res) == 1
+    assert len(res[0]["subGroups"]) == 2
+    assert len(res[0]["subGroups"][0]["subGroups"]) == 0
+    assert len(res[0]["subGroups"][1]["subGroups"]) == 1
+
+    # Test that query params are not allowed for full hierarchy
+    with pytest.raises(ValueError) as err:
+        admin.get_group_children(group_id=group_id, full_hierarchy=True, query={"max": 10})
+
+    # Test that query params are passed
+    res = admin.get_group_children(group_id=group_id, query={"max": 1})
+    assert len(res) == 1
+
+    assert err.match("Cannot use both query and full_hierarchy parameters")
+
+    main_group_id_2 = admin.create_group(payload={"name": "main-group-2"})
+    assert len(admin.get_groups(full_hierarchy=True)) == 2
+
     # Test empty search
     res = admin.get_subgroups(group=main_group, path="/none")
     assert res is None, res
@@ -864,6 +891,8 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     # Test delete
     res = admin.delete_group(group_id=group_id)
+    assert res == dict(), res
+    res = admin.delete_group(group_id=main_group_id_2)
     assert res == dict(), res
     assert len(admin.get_groups()) == 0
 
@@ -3017,3 +3046,14 @@ def test_initial_access_token(
     new_secret = str(uuid.uuid4())
     res = oid.update_client(res["registrationAccessToken"], client, payload={"secret": new_secret})
     assert res["secret"] == new_secret
+
+
+def test_refresh_token(admin: KeycloakAdmin):
+    """Test refresh token on connection even if it is expired.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    assert admin.connection.token is not None
+    admin.user_logout(admin.get_user_id(admin.connection.username))
+    admin.connection.refresh_token()

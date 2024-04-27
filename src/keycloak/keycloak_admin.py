@@ -954,7 +954,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_SERVER_INFO)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def get_groups(self, query=None):
+    def get_groups(self, query=None, full_hierarchy=False):
         """Get groups.
 
         Returns a list of groups belonging to the realm
@@ -962,8 +962,15 @@ class KeycloakAdmin:
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
+        Notice that when using full_hierarchy=True, the response will be a nested structure
+        containing all the children groups. If used with query parameters, the full_hierarchy
+        will be applied to the received groups only.
+
         :param query: Additional query options
         :type query: dict
+        :param full_hierarchy: If True, return all of the nested children groups, otherwise only
+            the first level children are returned
+        :type full_hierarchy: bool
         :return: array GroupRepresentation
         :rtype: list
         """
@@ -979,11 +986,15 @@ class KeycloakAdmin:
         # For version +23.0.0
         for group in groups:
             if group.get("subGroupCount"):
-                group["subGroups"] = self.get_group_children(group.get("id"))
+                group["subGroups"] = self.get_group_children(
+                    group_id=group.get("id"), full_hierarchy=full_hierarchy
+                )
+            else:
+                group["subGroups"] = []
 
         return groups
 
-    def get_group(self, group_id):
+    def get_group(self, group_id, full_hierarchy=False):
         """Get group by id.
 
         Returns full group details
@@ -993,6 +1004,9 @@ class KeycloakAdmin:
 
         :param group_id: The group id
         :type group_id: str
+        :param full_hierarchy: If True, return all of the nested children groups, otherwise only
+            the first level children are returned
+        :type full_hierarchy: bool
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
@@ -1005,7 +1019,11 @@ class KeycloakAdmin:
         # For version +23.0.0
         group = response.json()
         if group.get("subGroupCount"):
-            group["subGroups"] = self.get_group_children(group.get("id"))
+            group["subGroups"] = self.get_group_children(
+                group.get("id"), full_hierarchy=full_hierarchy
+            )
+        else:
+            group["subGroups"] = []
 
         return group
 
@@ -1035,7 +1053,7 @@ class KeycloakAdmin:
         # went through the tree without hits
         return None
 
-    def get_group_children(self, group_id, query=None):
+    def get_group_children(self, group_id, query=None, full_hierarchy=False):
         """Get group children by parent id.
 
         Returns full group children details
@@ -1044,15 +1062,34 @@ class KeycloakAdmin:
         :type group_id: str
         :param query: Additional query options
         :type query: dict
+        :param full_hierarchy: If True, return all of the nested children groups
+        :type full_hierarchy: bool
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
+        :raises ValueError: If both query and full_hierarchy parameters are used
         """
         query = query or {}
+        if query and full_hierarchy:
+            raise ValueError("Cannot use both query and full_hierarchy parameters")
+
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         url = urls_patterns.URL_ADMIN_GROUP_CHILD.format(**params_path)
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
-        return self.__fetch_all(url, query)
+        res = self.__fetch_all(url, query)
+
+        if not full_hierarchy:
+            return res
+
+        for group in res:
+            if group.get("subGroupCount"):
+                group["subGroups"] = self.get_group_children(
+                    group_id=group.get("id"), full_hierarchy=full_hierarchy
+                )
+            else:
+                group["subGroups"] = []
+
+        return res
 
     def get_group_members(self, group_id, query=None):
         """Get members by group id.
