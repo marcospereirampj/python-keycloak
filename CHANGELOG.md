@@ -1,3 +1,24 @@
+## v4.0.0 (2024-04-27)
+
+### BREAKING CHANGE
+
+- changes signatures significantly
+- Many attributes removed from the admin class
+
+### Feat
+
+- Merge pull request #556 from marcospereirampj/release/4.0.0
+- re-enable full group hierarchy fetching
+
+### Fix
+
+- removed dead code, stabilized tests
+- removed deprecated functionality
+
+### Refactor
+
+- refactored decode_token
+
 ## v3.12.0 (2024-04-10)
 
 ### Feat
