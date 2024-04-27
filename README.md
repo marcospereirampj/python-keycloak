@@ -20,9 +20,24 @@ https://github.com/marcospereirampj/python-keycloak/issues
 
 The documentation for python-keycloak is available on [readthedocs](http://python-keycloak.readthedocs.io).
 
+## Keycloak version support
+
+The library strives to always support Keycloak's latest version. Additionally to that, we also support 5 latest major versions of Keycloak,
+in order to give our user base more time for smoother upgrades.
+
+Current list of supported Keycloak versions:
+
+- 24.X
+- 23.X
+- 22.X
+- 21.X
+- 20.X
+
+## Python version support
+
+We only support Python versions which have active or security support by the Python Software Foundation. You find the list of active python versions [here](https://endoflife.date/python).
+
 ## Example of Using Keycloak OpenID
-
-
 
 ```python
 from keycloak import KeycloakOpenID
