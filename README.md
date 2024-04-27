@@ -35,7 +35,7 @@ Current list of supported Keycloak versions:
 
 ## Python version support
 
-We only support Python versions which have active or security support by the Python Software Foundation. You find the list of active python versions [here](https://endoflife.date/python).
+We only support Python versions that have active or security support by the Python Software Foundation. You can find the list of active Python versions [here](https://endoflife.date/python).
 
 ## Example of Using Keycloak OpenID
 
