@@ -1,12 +1,14 @@
 """Test the keycloak admin object."""
 
 import copy
+import os
 import uuid
 from typing import Tuple
 
 import freezegun
 import pytest
 from dateutil import parser as datetime_parser
+from packaging.version import Version
 
 import keycloak
 from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection
@@ -46,19 +48,21 @@ def test_keycloak_admin_init(env):
         username=env.KEYCLOAK_ADMIN,
         password=env.KEYCLOAK_ADMIN_PASSWORD,
     )
-    assert admin.server_url == f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}", admin.server_url
-    assert admin.realm_name == "master", admin.realm_name
+    assert (
+        admin.connection.server_url == f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}"
+    ), admin.connection.server_url
+    assert admin.connection.realm_name == "master", admin.connection.realm_name
     assert isinstance(admin.connection, ConnectionManager), type(admin.connection)
-    assert admin.client_id == "admin-cli", admin.client_id
-    assert admin.client_secret_key is None, admin.client_secret_key
-    assert admin.verify, admin.verify
-    assert admin.username == env.KEYCLOAK_ADMIN, admin.username
-    assert admin.password == env.KEYCLOAK_ADMIN_PASSWORD, admin.password
-    assert admin.totp is None, admin.totp
-    assert admin.token is not None, admin.token
-    assert admin.user_realm_name is None, admin.user_realm_name
-    assert admin.custom_headers is None, admin.custom_headers
-    assert admin.token
+    assert admin.connection.client_id == "admin-cli", admin.connection.client_id
+    assert admin.connection.client_secret_key is None, admin.connection.client_secret_key
+    assert admin.connection.verify, admin.connection.verify
+    assert admin.connection.username == env.KEYCLOAK_ADMIN, admin.connection.username
+    assert admin.connection.password == env.KEYCLOAK_ADMIN_PASSWORD, admin.connection.password
+    assert admin.connection.totp is None, admin.connection.totp
+    assert admin.connection.token is not None, admin.connection.token
+    assert admin.connection.user_realm_name is None, admin.connection.user_realm_name
+    assert admin.connection.custom_headers is None, admin.connection.custom_headers
+    assert admin.connection.token
 
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
@@ -67,7 +71,7 @@ def test_keycloak_admin_init(env):
         realm_name=None,
         user_realm_name="master",
     )
-    assert admin.token
+    assert admin.connection.token
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
@@ -75,19 +79,19 @@ def test_keycloak_admin_init(env):
         realm_name=None,
         user_realm_name=None,
     )
-    assert admin.token
+    assert admin.connection.token
 
-    token = admin.token
+    token = admin.connection.token
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         token=token,
         realm_name=None,
         user_realm_name=None,
     )
-    assert admin.token == token
+    assert admin.connection.token == token
 
     admin.create_realm(payload={"realm": "authz", "enabled": True})
-    admin.realm_name = "authz"
+    admin.connection.realm_name = "authz"
     admin.create_client(
         payload={
             "name": "authz-client",
@@ -107,7 +111,7 @@ def test_keycloak_admin_init(env):
         user_realm_name="authz",
         client_id="authz-client",
         client_secret_key=secret["value"],
-    ).token
+    ).connection.token
     admin.delete_realm(realm_name="authz")
 
     assert (
@@ -117,7 +121,7 @@ def test_keycloak_admin_init(env):
             password=None,
             client_secret_key=None,
             custom_headers={"custom": "header"},
-        ).token
+        ).connection.token
         is None
     )
 
@@ -130,7 +134,7 @@ def test_keycloak_admin_init(env):
         verify=True,
     )
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
-    assert keycloak_admin.token
+    assert keycloak_admin.connection.token
 
 
 def test_realms(admin: KeycloakAdmin):
@@ -333,6 +337,16 @@ def test_users(admin: KeycloakAdmin, realm: str):
         admin.update_user(user_id=user_id, payload={"wrong": "payload"})
     assert err.match('400: b\'{"error":"Unrecognized field')
 
+    # Test disable user
+    res = admin.disable_user(user_id=user_id)
+    assert res == {}, res
+    assert not admin.get_user(user_id=user_id)["enabled"]
+
+    # Test enable user
+    res = admin.enable_user(user_id=user_id)
+    assert res == {}, res
+    assert admin.get_user(user_id=user_id)["enabled"]
+
     # Test get users again
     users = admin.get_users()
     usernames = [x["username"] for x in users]
@@ -384,6 +398,43 @@ def test_users(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_user(user_id="non-existent-id")
     assert err.match(USER_NOT_FOUND_REGEX)
+
+
+def test_enable_disable_all_users(admin: KeycloakAdmin, realm: str):
+    """Test enable and disable all users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    user_id_1 = admin.create_user(
+        payload={"username": "test", "email": "test@test.test", "enabled": True}
+    )
+    user_id_2 = admin.create_user(
+        payload={"username": "test2", "email": "test2@test.test", "enabled": True}
+    )
+    user_id_3 = admin.create_user(
+        payload={"username": "test3", "email": "test3@test.test", "enabled": True}
+    )
+
+    assert admin.get_user(user_id_1)["enabled"]
+    assert admin.get_user(user_id_2)["enabled"]
+    assert admin.get_user(user_id_3)["enabled"]
+
+    admin.disable_all_users()
+
+    assert not admin.get_user(user_id_1)["enabled"]
+    assert not admin.get_user(user_id_2)["enabled"]
+    assert not admin.get_user(user_id_3)["enabled"]
+
+    admin.enable_all_users()
+
+    assert admin.get_user(user_id_1)["enabled"]
+    assert admin.get_user(user_id_2)["enabled"]
+    assert admin.get_user(user_id_3)["enabled"]
 
 
 def test_users_roles(admin: KeycloakAdmin, realm: str):
@@ -745,6 +796,36 @@ def test_groups(admin: KeycloakAdmin, user: str):
     assert res is not None, res
     assert res["id"] == subsubgroup_id_1
 
+    # Test nested search from main group
+    res = admin.get_subgroups(
+        group=admin.get_group(group_id=group_id, full_hierarchy=True),
+        path="/main-group/subgroup-2/subsubgroup-1",
+    )
+    assert res["id"] == subsubgroup_id_1
+
+    # Test nested search from all groups
+    res = admin.get_groups(full_hierarchy=True)
+    assert len(res) == 1
+    assert len(res[0]["subGroups"]) == 2
+    assert len([x for x in res[0]["subGroups"] if x["id"] == subgroup_id_1][0]["subGroups"]) == 0
+    assert len([x for x in res[0]["subGroups"] if x["id"] == subgroup_id_2][0]["subGroups"]) == 1
+
+    # Test that query params are not allowed for full hierarchy
+    with pytest.raises(ValueError) as err:
+        admin.get_group_children(group_id=group_id, full_hierarchy=True, query={"max": 10})
+
+    # Test that query params are passed
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    ) >= Version("23"):
+        res = admin.get_group_children(group_id=group_id, query={"max": 1})
+        assert len(res) == 1
+
+    assert err.match("Cannot use both query and full_hierarchy parameters")
+
+    main_group_id_2 = admin.create_group(payload={"name": "main-group-2"})
+    assert len(admin.get_groups(full_hierarchy=True)) == 2
+
     # Test empty search
     res = admin.get_subgroups(group=main_group, path="/none")
     assert res is None, res
@@ -815,6 +896,8 @@ def test_groups(admin: KeycloakAdmin, user: str):
 
     # Test delete
     res = admin.delete_group(group_id=group_id)
+    assert res == dict(), res
+    res = admin.delete_group(group_id=main_group_id_2)
     assert res == dict(), res
     assert len(admin.get_groups()) == 0
 
@@ -1351,6 +1434,10 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm_role_groups(role_name="non-existent-role")
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+    # Test with query params
+    res = admin.get_realm_role_groups(role_name="test-realm-role-update", query={"max": 1})
+    assert len(res) == 1
 
     # Test delete realm role
     res = admin.delete_realm_role(role_name=composite_role)
@@ -1990,7 +2077,7 @@ def test_get_sessions(admin: KeycloakAdmin):
     :param admin: Keycloak Admin client
     :type admin: KeycloakAdmin
     """
-    sessions = admin.get_sessions(user_id=admin.get_user_id(username=admin.username))
+    sessions = admin.get_sessions(user_id=admin.get_user_id(username=admin.connection.username))
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
         admin.get_sessions(user_id="bad")
@@ -2862,7 +2949,7 @@ def test_realm_default_roles(admin: KeycloakAdmin, realm: str) -> None:
     assert {x["name"] for x in roles} == {"offline_access", "uma_authorization"}
 
     with pytest.raises(KeycloakGetError) as err:
-        admin.realm_name = "doesnotexist"
+        admin.change_current_realm("doesnotexist")
         admin.get_realm_default_roles()
     assert err.match('404: b\'{"error":"Realm not found.".*}\'')
     admin.change_current_realm(realm)
@@ -2964,3 +3051,14 @@ def test_initial_access_token(
     new_secret = str(uuid.uuid4())
     res = oid.update_client(res["registrationAccessToken"], client, payload={"secret": new_secret})
     assert res["secret"] == new_secret
+
+
+def test_refresh_token(admin: KeycloakAdmin):
+    """Test refresh token on connection even if it is expired.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    """
+    assert admin.connection.token is not None
+    admin.user_logout(admin.get_user_id(admin.connection.username))
+    admin.connection.refresh_token()

@@ -8,4 +8,4 @@ build:
     post_create_environment:
       - python -m pip install poetry
     post_install:
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install -E docs
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install

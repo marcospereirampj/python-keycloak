@@ -4,7 +4,7 @@ import ipaddress
 import os
 import uuid
 from datetime import datetime, timedelta
-from typing import Tuple
+from typing import Generator, Tuple
 
 import freezegun
 import pytest
@@ -337,7 +337,69 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
 
 
 @pytest.fixture
-def realm(admin: KeycloakAdmin) -> str:
+def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
+    """Fixture for an initialized KeycloakOpenID class and a random user credentials.
+
+    :param env: Keycloak test environment
+    :type env: KeycloakTestEnv
+    :param realm: Keycloak realm
+    :type realm: str
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :yields: Keycloak OpenID client with user credentials
+    :rtype: Tuple[KeycloakOpenID, str, str]
+    """
+    # Set the realm
+    admin.change_current_realm(realm)
+    # Create client
+    client = str(uuid.uuid4())
+    secret = str(uuid.uuid4())
+    client_id = admin.create_client(
+        payload={
+            "name": client,
+            "clientId": client,
+            "enabled": True,
+            "publicClient": False,
+            "protocol": "openid-connect",
+            "secret": secret,
+            "clientAuthenticatorType": "client-secret",
+            "attributes": {"oauth2.device.authorization.grant.enabled": True},
+        }
+    )
+    # Create user
+    username = str(uuid.uuid4())
+    password = str(uuid.uuid4())
+    user_id = admin.create_user(
+        payload={
+            "username": username,
+            "email": f"{username}@test.test",
+            "enabled": True,
+            "firstName": "first",
+            "lastName": "last",
+            "emailVerified": True,
+            "requiredActions": [],
+            "credentials": [{"type": "password", "value": password, "temporary": False}],
+        }
+    )
+
+    yield (
+        KeycloakOpenID(
+            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+            realm_name=realm,
+            client_id=client,
+            client_secret_key=secret,
+        ),
+        username,
+        password,
+    )
+
+    # Cleanup
+    admin.delete_client(client_id=client_id)
+    admin.delete_user(user_id=user_id)
+
+
+@pytest.fixture
+def realm(admin: KeycloakAdmin) -> Generator[str, None, None]:
     """Fixture for a new random realm.
 
     :param admin: Keycloak admin
@@ -352,7 +414,7 @@ def realm(admin: KeycloakAdmin) -> str:
 
 
 @pytest.fixture
-def user(admin: KeycloakAdmin, realm: str) -> str:
+def user(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
     """Fixture for a new random user.
 
     :param admin: Keycloak admin
@@ -370,7 +432,7 @@ def user(admin: KeycloakAdmin, realm: str) -> str:
 
 
 @pytest.fixture
-def group(admin: KeycloakAdmin, realm: str) -> str:
+def group(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
     """Fixture for a new random group.
 
     :param admin: Keycloak admin
@@ -388,7 +450,7 @@ def group(admin: KeycloakAdmin, realm: str) -> str:
 
 
 @pytest.fixture
-def client(admin: KeycloakAdmin, realm: str) -> str:
+def client(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
     """Fixture for a new random client.
 
     :param admin: Keycloak admin
@@ -406,7 +468,7 @@ def client(admin: KeycloakAdmin, realm: str) -> str:
 
 
 @pytest.fixture
-def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
+def client_role(admin: KeycloakAdmin, realm: str, client: str) -> Generator[str, None, None]:
     """Fixture for a new random client role.
 
     :param admin: Keycloak admin
@@ -426,7 +488,9 @@ def client_role(admin: KeycloakAdmin, realm: str, client: str) -> str:
 
 
 @pytest.fixture
-def composite_client_role(admin: KeycloakAdmin, realm: str, client: str, client_role: str) -> str:
+def composite_client_role(
+    admin: KeycloakAdmin, realm: str, client: str, client_role: str
+) -> Generator[str, None, None]:
     """Fixture for a new random composite client role.
 
     :param admin: Keycloak admin
