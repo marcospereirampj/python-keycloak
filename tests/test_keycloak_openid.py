@@ -479,3 +479,23 @@ def test_has_uma_access(
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
         + "{'Default Resource'})"
     )
+
+
+def test_device(oid_with_credentials_device: Tuple[KeycloakOpenID, str, str]):
+    """Test device authorization flow.
+
+    :param oid_with_credentials_device: Keycloak OpenID client with pre-configured user
+        credentials and device authorization flow enabled
+    :type oid_with_credentials_device: Tuple[KeycloakOpenID, str, str]
+    """
+    oid, _, _ = oid_with_credentials_device
+    res = oid.device()
+    assert res == {
+        "device_code": mock.ANY,
+        "user_code": mock.ANY,
+        "verification_uri": f"http://localhost:8081/realms/{oid.realm_name}/device",
+        "verification_uri_complete": f"http://localhost:8081/realms/{oid.realm_name}/"
+        + f"device?user_code={res['user_code']}",
+        "expires_in": 600,
+        "interval": 5,
+    }

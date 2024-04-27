@@ -335,6 +335,16 @@ def test_users(admin: KeycloakAdmin, realm: str):
         admin.update_user(user_id=user_id, payload={"wrong": "payload"})
     assert err.match('400: b\'{"error":"Unrecognized field')
 
+    # Test disable user
+    res = admin.disable_user(user_id=user_id)
+    assert res == {}, res
+    assert not admin.get_user(user_id=user_id)["enabled"]
+
+    # Test enable user
+    res = admin.enable_user(user_id=user_id)
+    assert res == {}, res
+    assert admin.get_user(user_id=user_id)["enabled"]
+
     # Test get users again
     users = admin.get_users()
     usernames = [x["username"] for x in users]
@@ -386,6 +396,43 @@ def test_users(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_user(user_id="non-existent-id")
     assert err.match(USER_NOT_FOUND_REGEX)
+
+
+def test_enable_disable_all_users(admin: KeycloakAdmin, realm: str):
+    """Test enable and disable all users.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    user_id_1 = admin.create_user(
+        payload={"username": "test", "email": "test@test.test", "enabled": True}
+    )
+    user_id_2 = admin.create_user(
+        payload={"username": "test2", "email": "test2@test.test", "enabled": True}
+    )
+    user_id_3 = admin.create_user(
+        payload={"username": "test3", "email": "test3@test.test", "enabled": True}
+    )
+
+    assert admin.get_user(user_id_1)["enabled"]
+    assert admin.get_user(user_id_2)["enabled"]
+    assert admin.get_user(user_id_3)["enabled"]
+
+    admin.disable_all_users()
+
+    assert not admin.get_user(user_id_1)["enabled"]
+    assert not admin.get_user(user_id_2)["enabled"]
+    assert not admin.get_user(user_id_3)["enabled"]
+
+    admin.enable_all_users()
+
+    assert admin.get_user(user_id_1)["enabled"]
+    assert admin.get_user(user_id_2)["enabled"]
+    assert admin.get_user(user_id_3)["enabled"]
 
 
 def test_users_roles(admin: KeycloakAdmin, realm: str):
@@ -1353,6 +1400,10 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str):
     with pytest.raises(KeycloakGetError) as err:
         admin.get_realm_role_groups(role_name="non-existent-role")
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+    # Test with query params
+    res = admin.get_realm_role_groups(role_name="test-realm-role-update", query={"max": 1})
+    assert len(res) == 1
 
     # Test delete realm role
     res = admin.delete_realm_role(role_name=composite_role)
