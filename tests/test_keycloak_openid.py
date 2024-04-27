@@ -471,7 +471,11 @@ def test_has_uma_access(
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
     )
     assert (
-        str(oid.has_uma_access(token=admin.token["access_token"], permissions="Default Resource"))
+        str(
+            oid.has_uma_access(
+                token=admin.connection.token["access_token"], permissions="Default Resource"
+            )
+        )
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
         + "{'Default Resource'})"
     )
