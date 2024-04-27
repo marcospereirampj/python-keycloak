@@ -212,7 +212,7 @@ class KeycloakOpenID:
         :type token: str
         :param method_token_info: Token info method to use
         :type method_token_info: str
-        :param kwargs: Additional keyword arguments
+        :param kwargs: Additional keyword arguments passed to the decode_token method
         :type kwargs: dict
         :returns: Token info
         :rtype: dict
@@ -516,7 +516,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_post(URL_INTROSPECT.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def decode_token(self, token, key, algorithms=["RS256"], **kwargs):
+    def decode_token(self, token, validate: bool = True, **kwargs):
         """Decode user token.
 
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data
@@ -530,25 +530,30 @@ class KeycloakOpenID:
 
         :param token: Keycloak token
         :type token: str
-        :param key: Decode key
-        :type key: str
-        :param algorithms: Algorithms to use for decoding
-        :type algorithms: list[str]
-        :param kwargs: Keyword arguments
+        :param validate: Determines whether the token should be validated with the public key.
+            Defaults to True.
+        :type validate: bool
+        :param kwargs: Additional keyword arguments for jwcrypto's JWT object
         :type kwargs: dict
         :returns: Decoded token
         :rtype: dict
         """
-        # To keep the same API, we map the python-jose options to our claims for jwcrypto
-        # Per the jwcrypto dev, `exp` and `nbf` are always checked
-        options = kwargs.get("options", {})
-        check_claims = {}
-        if options.get("verify_aud") is True:
-            check_claims["aud"] = self.client_id
+        if validate:
+            if "key" not in kwargs:
+                key = (
+                    "-----BEGIN PUBLIC KEY-----\n"
+                    + self.public_key()
+                    + "\n-----END PUBLIC KEY-----"
+                )
+                key = jwk.JWK.from_pem(key.encode("utf-8"))
+                kwargs["key"] = key
 
-        k = jwk.JWK.from_pem(key.encode("utf-8"))
-        full_jwt = jwt.JWT(jwt=token, key=k, algs=algorithms, check_claims=check_claims)
-        return jwt.json_decode(full_jwt.claims)
+            full_jwt = jwt.JWT(jwt=token, **kwargs)
+            return jwt.json_decode(full_jwt.claims)
+        else:
+            full_jwt = jwt.JWT(jwt=token, **kwargs)
+            full_jwt.token.objects["valid"] = True
+            return json.loads(full_jwt.token.payload.decode("utf-8"))
 
     def load_authorization_config(self, path):
         """Load Keycloak settings (authorization).

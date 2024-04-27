@@ -307,15 +307,13 @@ def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     """
     oid, username, password = oid_with_credentials
     token = oid.token(username=username, password=password)
+    decoded_access_token = oid.decode_token(token=token["access_token"])
+    decoded_access_token_2 = oid.decode_token(token=token["access_token"], validate=False)
+    decoded_refresh_token = oid.decode_token(token=token["refresh_token"], validate=False)
 
-    assert (
-        oid.decode_token(
-            token=token["access_token"],
-            key="-----BEGIN PUBLIC KEY-----\n" + oid.public_key() + "\n-----END PUBLIC KEY-----",
-            options={"verify_aud": False},
-        )["preferred_username"]
-        == username
-    )
+    assert decoded_access_token == decoded_access_token_2
+    assert decoded_access_token["preferred_username"] == username, decoded_access_token
+    assert decoded_refresh_token["typ"] == "Refresh", decoded_refresh_token
 
 
 def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
@@ -354,20 +352,17 @@ def test_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str
     oid.load_authorization_config(path="tests/data/authz_settings.json")
     assert oid.get_policies(token=token["access_token"]) is None
 
-    key = "-----BEGIN PUBLIC KEY-----\n" + oid.public_key() + "\n-----END PUBLIC KEY-----"
     orig_client_id = oid.client_id
     oid.client_id = "account"
-    assert oid.get_policies(token=token["access_token"], method_token_info="decode", key=key) == []
+    assert oid.get_policies(token=token["access_token"], method_token_info="decode") == []
     policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
     policy.add_role(role="account/view-profile")
     oid.authorization.policies["test"] = policy
     assert [
-        str(x)
-        for x in oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+        str(x) for x in oid.get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["Policy: test (role)"]
     assert [
-        repr(x)
-        for x in oid.get_policies(token=token["access_token"], method_token_info="decode", key=key)
+        repr(x) for x in oid.get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id
 
@@ -392,12 +387,9 @@ def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
     oid.load_authorization_config(path="tests/data/authz_settings.json")
     assert oid.get_permissions(token=token["access_token"]) is None
 
-    key = "-----BEGIN PUBLIC KEY-----\n" + oid.public_key() + "\n-----END PUBLIC KEY-----"
     orig_client_id = oid.client_id
     oid.client_id = "account"
-    assert (
-        oid.get_permissions(token=token["access_token"], method_token_info="decode", key=key) == []
-    )
+    assert oid.get_permissions(token=token["access_token"], method_token_info="decode") == []
     policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
     policy.add_role(role="account/view-profile")
     policy.add_permission(
@@ -408,15 +400,11 @@ def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in oid.get_permissions(
-            token=token["access_token"], method_token_info="decode", key=key
-        )
+        for x in oid.get_permissions(token=token["access_token"], method_token_info="decode")
     ] == ["Permission: test-perm (resource)"]
     assert [
         repr(x)
-        for x in oid.get_permissions(
-            token=token["access_token"], method_token_info="decode", key=key
-        )
+        for x in oid.get_permissions(token=token["access_token"], method_token_info="decode")
     ] == ["<Permission: test-perm (resource)>"]
     oid.client_id = orig_client_id
 

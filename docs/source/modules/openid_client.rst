@@ -116,9 +116,9 @@ Decode token
 
 .. code-block:: python
 
-    KEYCLOAK_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" + keycloak_openid.public_key() + "\n-----END PUBLIC KEY-----"
-    options = {"verify_signature": True, "verify_aud": True, "verify_exp": True}
-    token_info = keycloak_openid.decode_token(token['access_token'], key=KEYCLOAK_PUBLIC_KEY, options=options)
+    token_info = keycloak_openid.decode_token(token['access_token'])
+    # Without validation
+    token_info = keycloak_openid.decode_token(token['access_token'], validate=False)
 
 
 Get UMA-permissions by token
