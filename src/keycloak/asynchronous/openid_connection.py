@@ -31,7 +31,7 @@ of openid tokens when required.
 from datetime import datetime, timedelta
 
 from .connection import ConnectionManager
-from .exceptions import KeycloakPostError
+from keycloak import KeycloakPostError
 from .keycloak_openid import KeycloakOpenID
 
 
@@ -117,7 +117,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.headers = {}
         self.custom_headers = custom_headers
 
-        
+        super().__init__(
+            base_url=self.server_url, headers=self.headers, timeout=60, verify=self.verify
+        )
         if self.token is None:
             self.get_token()
 
@@ -128,9 +130,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 "Content-Type": "application/json",
             }
 
-        super().__init__(
-            base_url=self.server_url, headers=self.headers, timeout=60, verify=self.verify
-        )
 
     @property
     def server_url(self):
@@ -322,7 +321,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 self.username, self.password, grant_type=grant_type, totp=self.totp
             )
         else:
-            self.token = None
+            self.token = {}
 
     def refresh_token(self):
         """Refresh the token.
@@ -344,7 +343,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 if e.response_code == 400 and any(err in e.response_body for err in list_errors):
                     self.get_token()
                 else:
-                    raise
+                    raise 
 
         self.add_param_headers("Authorization", "Bearer " + self.token.get("access_token"))
 
