@@ -605,7 +605,7 @@ class KeycloakOpenID:
         return list(set(policies))
 
     def get_permissions(self, token, method_token_info="introspect", **kwargs):
-        """Get permission by user token.
+        """Get permission by user token .
 
         :param token: user token
         :type token: str
@@ -620,7 +620,7 @@ class KeycloakOpenID:
         """
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
-                "Keycloak settings not found. Load Authorization Keycloak settings."
+                "Keycloak settings not found. Load Authorization Keycloak settings ."
             )
 
         token_info = self._token_info(token, method_token_info, **kwargs)
@@ -785,7 +785,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPutError)
 
     async def a_well_known(self):
-        """Get the well_known object.
+        """Get the well_known object asynchronously.
 
         The most important endpoint to understand is the well-known configuration
         endpoint. It lists endpoints and other configuration options relevant to
@@ -799,7 +799,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_auth_url(self, redirect_uri, scope="email", state=""):
-        """Get authorization URL endpoint.
+        """Get authorization URL endpoint asynchronously.
 
         :param redirect_uri: Redirect url to receive oauth code
         :type redirect_uri: str
@@ -830,7 +830,7 @@ class KeycloakOpenID:
         scope="openid",
         **extra
     ):
-        """Retrieve user token.
+        """Retrieve user token asynchronously.
 
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -879,7 +879,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_refresh_token(self, refresh_token, grant_type=["refresh_token"]):
-        """Refresh the user token.
+        """Refresh the user token asynchronously.
 
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
         exchanging an authorization code or by supplying credentials directly depending on
@@ -916,7 +916,7 @@ class KeycloakOpenID:
         requested_token_type: str = "urn:ietf:params:oauth:token-type:refresh_token",
         scope: str = "openid",
     ) -> dict:
-        """Exchange user token.
+        """Exchange user token asynchronously.
 
         Use a token to obtain an entirely different token. See
         https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-exchange
@@ -958,7 +958,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_userinfo(self, token):
-        """Get the user info object.
+        """Get the user info object asynchronously.
 
         The userinfo endpoint returns standard claims about the authenticated user,
         and is protected by a bearer token.
@@ -976,7 +976,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_logout(self, refresh_token):
-        """Log out the authenticated user.
+        """Log out the authenticated user asynchronously.
 
         :param refresh_token: Refresh token from Keycloak
         :type refresh_token: str
@@ -990,7 +990,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
     async def a_certs(self):
-        """Get certificates.
+        """Get certificates asynchronously.
 
         The certificate endpoint returns the public keys enabled by the realm, encoded as a
         JSON Web Key (JWK). Depending on the realm settings there can be one or more keys enabled
@@ -1006,7 +1006,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_public_key(self):
-        """Retrieve the public key.
+        """Retrieve the public key asynchronously.
 
         The public key is exposed by the realm page directly.
 
@@ -1018,7 +1018,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakGetError)["public_key"]
 
     async def a_entitlement(self, token, resource_server_id):
-        """Get entitlements from the token.
+        """Get entitlements from the token asynchronously.
 
         Client applications can use a specific endpoint to obtain a special security token
         called a requesting party token (RPT). This token consists of all the entitlements
@@ -1043,7 +1043,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakGetError)  # pragma: no cover
 
     async def a_introspect(self, token, rpt=None, token_type_hint=None):
-        """Introspect the user token.
+        """Introspect the user token asynchronously.
 
         The introspection endpoint is used to retrieve the active state of a token.
         It is can only be invoked by confidential clients.
@@ -1077,7 +1077,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_decode_token(self, token, validate: bool = True, **kwargs):
-        """Decode user token.
+        """Decode user token asynchronously.
 
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data
         structure that represents a cryptographic key.  This specification
@@ -1116,7 +1116,7 @@ class KeycloakOpenID:
             return json.loads(full_jwt.token.payload.decode("utf-8"))
 
     async def a_load_authorization_config(self, path):
-        """Load Keycloak settings (authorization).
+        """Load Keycloak settings (authorization) asynchronously.
 
         :param path: settings file (json)
         :type path: str
@@ -1127,7 +1127,7 @@ class KeycloakOpenID:
         self.authorization.load_config(authorization_json)
 
     async def a_get_policies(self, token, method_token_info="introspect", **kwargs):
-        """Get policies by user token.
+        """Get policies by user token asynchronously.
 
         :param token: User token
         :type token: str
@@ -1165,7 +1165,7 @@ class KeycloakOpenID:
         return list(set(policies))
 
     async def a_get_permissions(self, token, method_token_info="introspect", **kwargs):
-        """Get permission by user token.
+        """Get permission by user token asynchronously.
 
         :param token: user token
         :type token: str
@@ -1203,7 +1203,7 @@ class KeycloakOpenID:
         return list(set(permissions))
 
     async def a_uma_permissions(self, token, permissions=""):
-        """Get UMA permissions by user token with requested permissions.
+        """Get UMA permissions by user token with requested permissions asynchronously.
 
         The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
         invoked by confidential clients.
@@ -1232,7 +1232,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_has_uma_access(self, token, permissions):
-        """Determine whether user has uma permissions with specified user token.
+        """Determine whether user has uma permissions with specified user token asynchronously.
 
         :param token: user token
         :type token: str
@@ -1271,7 +1271,7 @@ class KeycloakOpenID:
         )
 
     async def a_register_client(self, token: str, payload: dict):
-        """Create a client.
+        """Create a client asynchronously.
 
         ClientRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
@@ -1292,7 +1292,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_device(self):
-        """Get device authorization grant.
+        """Get device authorization grant asynchronously.
 
         The device endpoint is used to obtain a user code verification and user authentication.
         The response contains a device_code, user_code, verification_uri,
@@ -1317,7 +1317,7 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_update_client(self, token: str, client_id: str, payload: dict):
-        """Update a client.
+        """Update a client asynchronously.
 
         ClientRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation

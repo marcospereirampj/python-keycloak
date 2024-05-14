@@ -422,7 +422,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_resource_set_create(self, payload):
-        """Create a resource set.
+        """Create a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#rfc.section.2.2.1
@@ -441,7 +441,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
     async def a_resource_set_update(self, resource_id, payload):
-        """Update a resource set.
+        """Update a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#update-resource-set
@@ -463,7 +463,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
     async def a_resource_set_read(self, resource_id):
-        """Read a resource set.
+        """Read a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#read-resource-set
@@ -483,7 +483,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     async def a_resource_set_delete(self, resource_id):
-        """Delete a resource set.
+        """Delete a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#delete-resource-set
@@ -510,7 +510,7 @@ class KeycloakUMA:
         first: int = 0,
         maximum: int = -1,
     ):
-        """Query for list of resource set ids.
+        """Query for list of resource set ids  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -558,7 +558,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     async def a_resource_set_list(self):
-        """List all resource sets.
+        """List all resource sets  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -574,7 +574,7 @@ class KeycloakUMA:
             yield resource
 
     async def a_permission_ticket_create(self, permissions: Iterable[UMAPermission]):
-        """Create a permission ticket.
+        """Create a permission ticket  asynchronously.
 
         :param permissions: Iterable of uma permissions to validate the token against
         :type permissions: Iterable[UMAPermission]
@@ -611,7 +611,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_permissions_check(self, token, permissions: Iterable[UMAPermission]):
-        """Check UMA permissions by user token with requested permissions.
+        """Check UMA permissions by user token with requested permissions  asynchronously.
 
         The token endpoint is used to check UMA permissions from Keycloak. It can only be
         invoked by confidential clients.
@@ -648,7 +648,7 @@ class KeycloakUMA:
         return data.get("result", False)
 
     async def a_policy_resource_create(self, resource_id, payload):
-        """Create permission policy for resource.
+        """Create permission policy for resource  asynchronously.
 
         Supports name, description, scopes, roles, groups, clients
 
@@ -667,7 +667,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_policy_update(self, policy_id, payload):
-        """Update permission policy.
+        """Update permission policy  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -685,7 +685,7 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakPutError)
 
     async def a_policy_delete(self, policy_id):
-        """Delete permission policy.
+        """Delete permission policy  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#removing-a-permission
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -708,7 +708,7 @@ class KeycloakUMA:
         first: int = 0,
         maximum: int = -1,
     ):
-        """Query permission policies.
+        """Query permission policies  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#querying-permission
 
