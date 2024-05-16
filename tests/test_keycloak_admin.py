@@ -4191,3 +4191,431 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str):
         == res
     )
 
+@pytest.mark.asyncio
+async def test_a_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test realm roles.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    await admin.a_change_current_realm(realm)
+
+    # Test get realm roles
+    roles = await admin.a_get_realm_roles()
+    assert len(roles) == 3, roles
+    role_names = [x["name"] for x in roles]
+    assert "uma_authorization" in role_names, role_names
+    assert "offline_access" in role_names, role_names
+
+    # Test get realm roles with search text
+    searched_roles = await admin.a_get_realm_roles(search_text="uma_a")
+    searched_role_names = [x["name"] for x in searched_roles]
+    assert "uma_authorization" in searched_role_names, searched_role_names
+    assert "offline_access" not in searched_role_names, searched_role_names
+
+    # Test empty members
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_get_realm_role_members(role_name="does-not-exist")
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+    members = await admin.a_get_realm_role_members(role_name="offline_access")
+    assert members == list(), members
+
+    # Test create realm role
+    role_id = await admin.a_create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id, role_id
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_create_realm_role(payload={"name": "test-realm-role"})
+    assert err.match('409: b\'{"errorMessage":"Role with name test-realm-role already exists"}\'')
+    role_id_2 = await admin.a_create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id == role_id_2
+
+    # Test get realm role by its id
+    role_id = await admin.a_get_realm_role(role_name="test-realm-role")["id"]
+    res = await admin.a_get_realm_role_by_id(role_id)
+    assert res["name"] == "test-realm-role"
+
+    # Test update realm role
+    res = await admin.a_update_realm_role(
+        role_name="test-realm-role", payload={"name": "test-realm-role-update"}
+    )
+    assert res == dict(), res
+    with pytest.raises(KeycloakPutError) as err:
+        await admin.a_update_realm_role(
+            role_name="test-realm-role", payload={"name": "test-realm-role-update"}
+        )
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+    # Test realm role user assignment
+    user_id = await admin.a_create_user(payload={"username": "role-testing", "email": "test@test.test"})
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_assign_realm_roles(user_id=user_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_assign_realm_roles(
+        user_id=user_id,
+        roles=[
+            await admin.a_get_realm_role(role_name="offline_access"),
+            await admin.a_get_realm_role(role_name="test-realm-role-update"),
+        ],
+    )
+    assert res == dict(), res
+    assert admin.get_user(user_id=user_id)["username"] in [
+        x["username"] for x in await admin.a_get_realm_role_members(role_name="offline_access")
+    ]
+    assert admin.get_user(user_id=user_id)["username"] in [
+        x["username"] for x in await admin.a_get_realm_role_members(role_name="test-realm-role-update")
+    ]
+
+    roles = await admin.a_get_realm_roles_of_user(user_id=user_id)
+    assert len(roles) == 3
+    assert "offline_access" in [x["name"] for x in roles]
+    assert "test-realm-role-update" in [x["name"] for x in roles]
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_delete_realm_roles_of_user(user_id=user_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_delete_realm_roles_of_user(
+        user_id=user_id, roles=[await admin.a_get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    assert await admin.a_get_realm_role_members(role_name="offline_access") == list()
+    roles = await admin.a_get_realm_roles_of_user(user_id=user_id)
+    assert len(roles) == 2
+    assert "offline_access" not in [x["name"] for x in roles]
+    assert "test-realm-role-update" in [x["name"] for x in roles]
+
+    roles = await admin.a_get_available_realm_roles_of_user(user_id=user_id)
+    assert len(roles) == 2
+    assert "offline_access" in [x["name"] for x in roles]
+    assert "uma_authorization" in [x["name"] for x in roles]
+
+    # Test realm role group assignment
+    group_id = await admin.a_create_group(payload={"name": "test-group"})
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_assign_group_realm_roles(group_id=group_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_assign_group_realm_roles(
+        group_id=group_id,
+        roles=[
+            await admin.a_get_realm_role(role_name="offline_access"),
+            await admin.a_get_realm_role(role_name="test-realm-role-update"),
+        ],
+    )
+    assert res == dict(), res
+
+    roles = await admin.a_get_group_realm_roles(group_id=group_id)
+    assert len(roles) == 2
+    assert "offline_access" in [x["name"] for x in roles]
+    assert "test-realm-role-update" in [x["name"] for x in roles]
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_delete_group_realm_roles(group_id=group_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX)
+    res = await admin.a_delete_group_realm_roles(
+        group_id=group_id, roles=[admin.get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    roles = await admin.a_get_group_realm_roles(group_id=group_id)
+    assert len(roles) == 1
+    assert "test-realm-role-update" in [x["name"] for x in roles]
+
+    # Test composite realm roles
+    composite_role = await admin.a_create_realm_role(payload={"name": "test-composite-role"})
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_add_composite_realm_roles_to_role(role_name=composite_role, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_add_composite_realm_roles_to_role(
+        role_name=composite_role, roles=[admin.get_realm_role(role_name="test-realm-role-update")]
+    )
+    assert res == dict(), res
+
+    res = await admin.a_get_composite_realm_roles_of_role(role_name=composite_role)
+    assert len(res) == 1
+    assert "test-realm-role-update" in res[0]["name"]
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_get_composite_realm_roles_of_role(role_name="bad")
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+    res = await admin.a_get_composite_realm_roles_of_user(user_id=user_id)
+    assert len(res) == 4
+    assert "offline_access" in {x["name"] for x in res}
+    assert "test-realm-role-update" in {x["name"] for x in res}
+    assert "uma_authorization" in {x["name"] for x in res}
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_get_composite_realm_roles_of_user(user_id="bad")
+    assert err.match(USER_NOT_FOUND_REGEX), err
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_remove_composite_realm_roles_to_role(role_name=composite_role, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_remove_composite_realm_roles_to_role(
+        role_name=composite_role, roles=[admin.get_realm_role(role_name="test-realm-role-update")]
+    )
+    assert res == dict(), res
+
+    res = await admin.a_get_composite_realm_roles_of_role(role_name=composite_role)
+    assert len(res) == 0
+
+    # Test realm role group list
+    res = await admin.a_get_realm_role_groups(role_name="test-realm-role-update")
+    assert len(res) == 1
+    assert res[0]["id"] == group_id
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_get_realm_role_groups(role_name="non-existent-role")
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+    # Test with query params
+    res = await admin.a_get_realm_role_groups(role_name="test-realm-role-update", query={"max": 1})
+    assert len(res) == 1
+
+    # Test delete realm role
+    res = await admin.a_delete_realm_role(role_name=composite_role)
+    assert res == dict(), res
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_delete_realm_role(role_name=composite_role)
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "testcase, arg_brief_repr, includes_attributes",
+    [
+        ("brief True", {"brief_representation": True}, False),
+        ("brief False", {"brief_representation": False}, True),
+        ("default", {}, False),
+    ],
+)
+async def test_a_role_attributes(
+    admin: KeycloakAdmin,
+    realm: str,
+    client: str,
+    arg_brief_repr: dict,
+    includes_attributes: bool,
+    testcase: str,
+):
+    """Test getting role attributes for bulk calls.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    :param arg_brief_repr: Brief representation
+    :type arg_brief_repr: dict
+    :param includes_attributes: Indicator whether to include attributes
+    :type includes_attributes: bool
+    :param testcase: Test case
+    :type testcase: str
+    """
+    # setup
+    attribute_role = "test-realm-role-w-attr"
+    test_attrs = {"attr1": ["val1"], "attr2": ["val2-1", "val2-2"]}
+    role_id = await admin.a_create_realm_role(
+        payload={"name": attribute_role, "attributes": test_attrs}, skip_exists=True
+    )
+    assert role_id, role_id
+
+    cli_role_id = await admin.a_create_client_role(
+        client, payload={"name": attribute_role, "attributes": test_attrs}, skip_exists=True
+    )
+    assert cli_role_id, cli_role_id
+
+    if not includes_attributes:
+        test_attrs = None
+
+    # tests
+    roles = await admin.a_get_realm_roles(**arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    roles = await admin.a_get_client_roles(client, **arg_brief_repr)
+    roles_filtered = [role for role in roles if role["name"] == cli_role_id]
+    assert roles_filtered, roles_filtered
+    role = roles_filtered[0]
+    assert role.get("attributes") == test_attrs, testcase
+
+    # cleanup
+    res = await admin.a_delete_realm_role(role_name=attribute_role)
+    assert res == dict(), res
+
+    res = await admin.a_delete_client_role(client, role_name=attribute_role)
+    assert res == dict(), res
+
+@pytest.mark.asyncio
+async def test_a_client_scope_realm_roles(admin: KeycloakAdmin, realm: str):
+    """Test client realm roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    await admin.a_change_current_realm(realm)
+
+    # Test get realm roles
+    roles = await admin.a_get_realm_roles()
+    assert len(roles) == 3, roles
+    role_names = [x["name"] for x in roles]
+    assert "uma_authorization" in role_names, role_names
+    assert "offline_access" in role_names, role_names
+
+    # create realm role for test
+    role_id = await admin.a_create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    assert role_id, role_id
+
+    # Test realm role client assignment
+    client_id = await admin.a_create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_assign_realm_roles_to_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_assign_realm_roles_to_client_scope(
+        client_id=client_id,
+        roles=[
+            await admin.a_get_realm_role(role_name="offline_access"),
+            await admin.a_get_realm_role(role_name="test-realm-role"),
+        ],
+    )
+    assert res == dict(), res
+
+    roles = await admin.a_get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 2
+    client_role_names = [x["name"] for x in roles]
+    assert "offline_access" in client_role_names, client_role_names
+    assert "test-realm-role" in client_role_names, client_role_names
+    assert "uma_authorization" not in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_delete_realm_roles_of_client_scope(client_id=client_id, roles=["bad"])
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[await admin.a_get_realm_role(role_name="offline_access")]
+    )
+    assert res == dict(), res
+    roles = await admin.a_get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 1
+    assert "test-realm-role" in [x["name"] for x in roles]
+
+    res = await admin.a_delete_realm_roles_of_client_scope(
+        client_id=client_id, roles=[await admin.a_get_realm_role(role_name="test-realm-role")]
+    )
+    assert res == dict(), res
+    roles = await admin.a_get_realm_roles_of_client_scope(client_id=client_id)
+    assert len(roles) == 0
+
+@pytest.mark.asyncio
+async def test_a_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of other client roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    await admin.a_change_current_realm(realm)
+
+    client_id = await admin.a_create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+
+    # Test get client roles
+    roles = await admin.a_get_client_roles_of_client_scope(client_id, client)
+    assert len(roles) == 0, roles
+
+    # create client role for test
+    client_role_id = await admin.a_create_client_role(
+        client_role_id=client, payload={"name": "client-role-test"}, skip_exists=True
+    )
+    assert client_role_id, client_role_id
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_assign_client_roles_to_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_assign_client_roles_to_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[await admin.a_get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+
+    roles = await admin.a_get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 1
+    client_role_names = [x["name"] for x in roles]
+    assert "client-role-test" in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_delete_client_roles_of_client_scope(
+            client_id=client_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_delete_client_roles_of_client_scope(
+        client_id=client_id,
+        client_roles_owner_id=client,
+        roles=[await admin.a_get_client_role(client_id=client, role_name="client-role-test")],
+    )
+    assert res == dict(), res
+    roles = await admin.a_get_client_roles_of_client_scope(
+        client_id=client_id, client_roles_owner_id=client
+    )
+    assert len(roles) == 0
+
+
+@pytest.mark.asyncio
+async def test_a_client_default_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client assignment of default client scopes.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client
+    :type client: str
+    """
+    await admin.a_change_current_realm(realm)
+
+    client_id = await admin.a_create_client(
+        payload={"name": "role-testing-client", "clientId": "role-testing-client"}
+    )
+    # Test get client default scopes
+    # keycloak default roles: web-origins, acr, profile, roles, email
+    default_client_scopes = await admin.a_get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
+
+    # Test add a client scope to client default scopes
+    default_client_scope = "test-client-default-scope"
+    new_client_scope = {
+        "name": default_client_scope,
+        "description": f"Test Client Scope: {default_client_scope}",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    new_client_scope_id = await admin.a_create_client_scope(new_client_scope, skip_exists=False)
+    new_default_client_scope_data = {
+        "realm": realm,
+        "client": client_id,
+        "clientScopeId": new_client_scope_id,
+    }
+    await admin.a_add_client_default_client_scope(
+        client_id, new_client_scope_id, new_default_client_scope_data
+    )
+    default_client_scopes = await admin.a_get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 6, default_client_scopes
+
+    # Test remove a client default scope
+    await admin.a_delete_client_default_client_scope(client_id, new_client_scope_id)
+    default_client_scopes = await admin.a_get_client_default_client_scopes(client_id)
+    assert len(default_client_scopes) == 5, default_client_scopes
