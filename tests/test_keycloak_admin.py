@@ -5643,12 +5643,10 @@ async def test_a_update_required_action(admin: KeycloakAdmin, realm: str):
     :type realm: str
     """
     await admin.a_change_current_realm(realm)
-    ra = awaitadmin.a_get_required_action_by_alias("UPDATE_PASSWORD")
+    ra = await admin.a_get_required_action_by_alias("UPDATE_PASSWORD")
     old = copy.deepcopy(ra)
     ra["enabled"] = False
     admin.update_required_action("UPDATE_PASSWORD", ra)
     newra = await admin.a_get_required_action_by_alias("UPDATE_PASSWORD")
     assert old != newra
     assert newra["enabled"] is False
-
-
