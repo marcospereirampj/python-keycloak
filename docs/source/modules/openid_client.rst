@@ -12,7 +12,8 @@ Configure client OpenID
     from keycloak import KeycloakOpenID
 
     # Configure client
-    keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
+    # For versions older than 18 /auth/ must be added at the end of the server_url.
+    keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
                                      client_id="example_client",
                                      realm_name="example_realm",
                                      client_secret_key="secret")
