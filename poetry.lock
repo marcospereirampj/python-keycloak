@@ -368,13 +368,13 @@ files = [
 
 [[package]]
 name = "commitizen"
-version = "3.26.0"
+version = "3.27.0"
 description = "Python commitizen client tool"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "commitizen-3.26.0-py3-none-any.whl", hash = "sha256:582437b9c95f41adb96cb7d4afee508f9925625b5f7179ce092899622be4da8b"},
-    {file = "commitizen-3.26.0.tar.gz", hash = "sha256:9c2fd63117b3b352e9553246efd29a7779f565f5d84b3f18a79ff3f50fef3104"},
+    {file = "commitizen-3.27.0-py3-none-any.whl", hash = "sha256:11948fa563d5ad5464baf09eaacff3cf8cbade1ca029ed9c4978f2227f033130"},
+    {file = "commitizen-3.27.0.tar.gz", hash = "sha256:5874d0c7e8e1be3b75b1b0a2269cffe3dd5c843b860d84b0bdbb9ea86e3474b8"},
 ]
 
 [package.dependencies]
@@ -1467,13 +1467,13 @@ sphinx = ">=1.3.1"
 
 [[package]]
 name = "requests"
-version = "2.32.1"
+version = "2.32.2"
 description = "Python HTTP for Humans."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "requests-2.32.1-py3-none-any.whl", hash = "sha256:21ac9465cdf8c1650fe1ecde8a71669a93d4e6f147550483a2967d08396a56a5"},
-    {file = "requests-2.32.1.tar.gz", hash = "sha256:eb97e87e64c79e64e5b8ac75cee9dd1f97f49e289b083ee6be96268930725685"},
+    {file = "requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c"},
+    {file = "requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289"},
 ]
 
 [package.dependencies]
