@@ -471,7 +471,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         r = await super().a_raw_put(*args, **kwargs)
         return r
 
-    async def raw_delete(self, *args, **kwargs):
+    async def a_raw_delete(self, *args, **kwargs):
         """Call connection.raw_delete.
 
         If auto_refresh is set for *delete* and *access_token* is expired,

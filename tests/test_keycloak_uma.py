@@ -251,7 +251,7 @@ def test_uma_access(uma: KeycloakUMA):
         "type": "urn:test",
         "ownerManagedAccess": True,
     }
-    resource = await uma.a_resource_set_create(resource_to_create)
+    resource = uma.resource_set_create(resource_to_create)
 
     policy_to_create = {
         "name": "TestPolicy",

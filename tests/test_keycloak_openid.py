@@ -741,7 +741,7 @@ async def test_a_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str
     oid, username, password = oid_with_credentials
     token = await oid.a_token(username=username, password=password)
 
-    assert await oid.a_introspect(token=token["access_token"])["active"]
+    assert (await oid.a_introspect(token=token["access_token"]))["active"]
     assert await oid.a_introspect(
         token=token["access_token"], rpt="some", token_type_hint="requesting_party_token"
     ) == {"active": False}
@@ -822,7 +822,7 @@ async def test_a_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
         await oid.a_get_policies(token=token["access_token"])
 
 @pytest.mark.asyncio
-def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
+async def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
     """Test get policies.
 
     :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization

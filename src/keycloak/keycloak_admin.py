@@ -7563,7 +7563,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name, "id": scope_id}
-        data_raw = self.connection.a_raw_delete(
+        data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_DEFAULT_DEFAULT_CLIENT_SCOPE.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
@@ -7829,7 +7829,7 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name, "component-id": component_id}
-        data_raw = self.connection.raw_delete(
+        data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_COMPONENT.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])

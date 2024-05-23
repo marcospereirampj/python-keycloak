@@ -811,7 +811,7 @@ class KeycloakOpenID:
         :rtype: str
         """
         params_path = {
-            "authorization-endpoint": await self.a_well_known()["authorization_endpoint"],
+            "authorization-endpoint": (await self.a_well_known())["authorization_endpoint"],
             "client-id": self.client_id,
             "redirect-uri": redirect_uri,
             "scope": scope,

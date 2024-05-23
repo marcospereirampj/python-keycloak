@@ -280,7 +280,7 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.delete(
+            r = self._s.delete(
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data or dict(),
@@ -288,6 +288,7 @@ class ConnectionManager(object):
                 timeout=self.timeout,
                 verify=self.verify,
             )
+            return r
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
 
@@ -377,7 +378,6 @@ class ConnectionManager(object):
             return await self.async_s.delete(
                 urljoin(self.base_url, path),
                 params=kwargs,
-                data=data or dict(),
                 headers=self.headers,
                 timeout=self.timeout,
             )
