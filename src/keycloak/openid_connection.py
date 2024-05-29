@@ -117,6 +117,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.headers = {}
         self.custom_headers = custom_headers
 
+        
         if self.token is None:
             self.get_token()
 
@@ -417,4 +418,72 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_delete(*args, **kwargs)
+        return r
+
+    async def a_raw_get(self, *args, **kwargs):
+        """Call connection.raw_get.
+
+        If auto_refresh is set for *get* and *access_token* is expired, it will refresh the token
+        and try *get* once more.
+
+        :param args: Additional arguments
+        :type args: tuple
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :returns: Response
+        :rtype: Response
+        """
+        self._refresh_if_required()
+        r = await super().a_raw_get(*args, **kwargs)
+        return r
+
+    async def a_raw_post(self, *args, **kwargs):
+        """Call connection.raw_post.
+
+        If auto_refresh is set for *post* and *access_token* is expired, it will refresh the token
+        and try *post* once more.
+
+        :param args: Additional arguments
+        :type args: tuple
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :returns: Response
+        :rtype: Response
+        """
+        self._refresh_if_required()
+        r = await super().a_raw_post(*args, **kwargs)
+        return r
+
+    async def a_raw_put(self, *args, **kwargs):
+        """Call connection.raw_put.
+
+        If auto_refresh is set for *put* and *access_token* is expired, it will refresh the token
+        and try *put* once more.
+
+        :param args: Additional arguments
+        :type args: tuple
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :returns: Response
+        :rtype: Response
+        """
+        self._refresh_if_required()
+        r = await super().a_raw_put(*args, **kwargs)
+        return r
+
+    async def a_raw_delete(self, *args, **kwargs):
+        """Call connection.raw_delete.
+
+        If auto_refresh is set for *delete* and *access_token* is expired,
+        it will refresh the token and try *delete* once more.
+
+        :param args: Additional arguments
+        :type args: tuple
+        :param kwargs: Additional keyword arguments
+        :type kwargs: dict
+        :returns: Response
+        :rtype: Response
+        """
+        self._refresh_if_required()
+        r = await super().a_raw_delete(*args, **kwargs)
         return r
