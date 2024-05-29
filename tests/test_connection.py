@@ -9,9 +9,9 @@ from keycloak.exceptions import KeycloakConnectionError
 def test_connection_proxy():
     """Test proxies of connection manager."""
     cm = ConnectionManager(
-        base_url="http://test.test", proxies={"http://test.test": "localhost:8080"}
+        base_url="http://test.test", proxies={"http://test.test": "http://localhost:8080"}
     )
-    assert cm._s.proxies == {"http://test.test": "localhost:8080"}
+    assert cm._s.proxies == {"http://test.test": "http://localhost:8080"}
 
 
 def test_headers():
