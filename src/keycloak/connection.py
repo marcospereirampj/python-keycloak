@@ -29,6 +29,7 @@ except ImportError:  # pragma: no cover
     from urlparse import urljoin
 
 import requests
+import httpx
 from requests.adapters import HTTPAdapter
 
 from .exceptions import KeycloakConnectionError
@@ -85,6 +86,14 @@ class ConnectionManager(object):
 
         if proxies:
             self._s.proxies.update(proxies)
+
+        self.async_s = httpx.AsyncClient(verify=verify, proxies=proxies)
+        self.async_s.auth = None  # don't let requests add auth headers
+        self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
+
+    async def aclose(self):
+        if hasattr(self, "_s"):
+            await self.async_s.aclose()
 
     def __del__(self):
         """Del method."""
@@ -271,13 +280,106 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return self._s.delete(
+            r = self._s.delete(
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data or dict(),
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+            )
+            return r
+        except Exception as e:
+            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+
+    async def a_raw_get(self, path, **kwargs):
+        """Submit get request to the path.
+
+        :param path: Path for request.
+        :type path: str
+        :param kwargs: Additional arguments
+        :type kwargs: dict
+        :returns: Response the request.
+        :rtype: Response
+        :raises KeycloakConnectionError: HttpError Can't connect to server.
+        """
+        try:
+            return await self.async_s.get(
+                urljoin(self.base_url, path),
+                params=kwargs,
+                headers=self.headers,
+                timeout=self.timeout
+            )
+        except Exception as e:
+            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+
+    async def a_raw_post(self, path, data, **kwargs):
+        """Submit post request to the path.
+
+        :param path: Path for request.
+        :type path: str
+        :param data: Payload for request.
+        :type data: dict
+        :param kwargs: Additional arguments
+        :type kwargs: dict
+        :returns: Response the request.
+        :rtype: Response
+        :raises KeycloakConnectionError: HttpError Can't connect to server.
+        """
+        try:
+            return await self.async_s.post(
+                urljoin(self.base_url, path),
+                params=kwargs,
+                data=data,
+                headers=self.headers,
+                timeout=self.timeout
+            )
+        except Exception as e:
+            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+
+    async def a_raw_put(self, path, data, **kwargs):
+        """Submit put request to the path.
+
+        :param path: Path for request.
+        :type path: str
+        :param data: Payload for request.
+        :type data: dict
+        :param kwargs: Additional arguments
+        :type kwargs: dict
+        :returns: Response the request.
+        :rtype: Response
+        :raises KeycloakConnectionError: HttpError Can't connect to server.
+        """
+        try:
+            return await self.async_s.put(
+                urljoin(self.base_url, path),
+                params=kwargs,
+                data=data,
+                headers=self.headers,
+                timeout=self.timeout,
+            )
+        except Exception as e:
+            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+
+    async def a_raw_delete(self, path, data=None, **kwargs):
+        """Submit delete request to the path.
+
+        :param path: Path for request.
+        :type path: str
+        :param data: Payload for request.
+        :type data: dict | None
+        :param kwargs: Additional arguments
+        :type kwargs: dict
+        :returns: Response the request.
+        :rtype: Response
+        :raises KeycloakConnectionError: HttpError Can't connect to server.
+        """
+        try:
+            return await self.async_s.delete(
+                urljoin(self.base_url, path),
+                params=kwargs,
+                headers=self.headers,
+                timeout=self.timeout,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
