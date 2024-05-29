@@ -63,6 +63,11 @@ codespell = ">=2.1.0"
 darglint = ">=1.8.1"
 twine = ">=4.0.2"
 freezegun = ">=1.2.2"
+docutils = "<0.21"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
