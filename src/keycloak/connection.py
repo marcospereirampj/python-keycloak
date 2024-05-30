@@ -92,6 +92,7 @@ class ConnectionManager(object):
         self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
 
     async def aclose(self):
+        """Close the async connection on delete."""
         if hasattr(self, "_s"):
             await self.async_s.aclose()
 

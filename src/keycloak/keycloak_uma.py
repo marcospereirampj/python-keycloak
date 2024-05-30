@@ -417,6 +417,11 @@ class KeycloakUMA:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a__fetch_well_known(self):
+        """Get the well_known UMA2 config async.
+
+        :returns: It lists endpoints and other configuration options relevant
+        :rtype: dict
+        """
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = await self.connection.a_raw_get(URL_UMA_WELL_KNOWN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)

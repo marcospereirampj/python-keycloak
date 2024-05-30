@@ -8221,7 +8221,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_role_client_level_children(self, client_id, role_id):
-        """Get the child roles asynchronously of which the given composite client role is composed of.
+        """Get the child roles async of which the given composite client role is composed of.
 
         :param client_id: id of the client.
         :type client_id: str

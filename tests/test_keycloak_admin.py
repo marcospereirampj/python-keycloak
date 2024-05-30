@@ -6068,7 +6068,7 @@ async def test_a_clear_realm_cache(realm: str, admin: KeycloakAdmin) -> None:
 
 
 @pytest.mark.asyncio
-async def test_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
+async def test_a_clear_user_cache(realm: str, admin: KeycloakAdmin) -> None:
     """Test clearing the user cache.
 
     :param realm: Realm name
