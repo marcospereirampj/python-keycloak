@@ -117,7 +117,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.headers = {}
         self.custom_headers = custom_headers
 
-        
         if self.token is None:
             self.get_token()
 

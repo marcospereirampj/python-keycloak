@@ -382,7 +382,7 @@ class KeycloakAdmin:
 
         if "first" in query or "max" in query:
             return self.__fetch_paginated(url, query)
-        
+
         return self.__fetch_all(url, query)
 
     def create_idp(self, payload):
@@ -4250,7 +4250,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
-    #async functions start
+    # async functions start
     async def a___fetch_all(self, url, query=None):
         """Paginate asynchronously over get requests .
 
@@ -4297,7 +4297,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         query = query or {}
-        return raise_error_from_response(await self.connection.a_raw_get(url, **query), KeycloakGetError)
+        return raise_error_from_response(
+            await self.connection.a_raw_get(url, **query), KeycloakGetError
+        )
 
     async def a_get_current_realm(self) -> str:
         """Return the currently configured realm asynchronously.
@@ -4401,7 +4403,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": realm_name}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_REALM.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_REALM.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
     async def a_create_realm(self, payload, skip_exists=False):
@@ -4455,7 +4459,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": realm_name}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_REALM.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_REALM.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_get_users(self, query=None):
@@ -4477,7 +4483,7 @@ class KeycloakAdmin:
 
         if "first" in query or "max" in query:
             return await self.a___fetch_paginated(url, query)
-        
+
         return await self.a___fetch_all(url, query)
 
     async def a_create_idp(self, payload):
@@ -4594,7 +4600,9 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_IDPS.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_IDPS.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_idp(self, idp_alias):
@@ -4611,7 +4619,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_IDP.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_IDP.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_delete_idp(self, idp_alias):
@@ -4623,7 +4633,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "alias": idp_alias}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_IDP.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_IDP.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_create_user(self, payload, exist_ok=False):
@@ -4691,7 +4703,9 @@ class KeycloakAdmin:
         :rtype: str
         """
         lower_user_name = username.lower()
-        users = await self.a_get_users(query={"username": lower_user_name, "max": 1, "exact": True})
+        users = await self.a_get_users(
+            query={"username": lower_user_name, "max": 1, "exact": True}
+        )
         return users[0]["id"] if len(users) == 1 else None
 
     async def a_get_user(self, user_id):
@@ -4799,7 +4813,9 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_USER.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_USER.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_set_user_password(self, user_id, password, temporary=True):
@@ -4918,7 +4934,9 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def a_add_user_social_login(self, user_id, provider_id, provider_userid, provider_username):
+    async def a_add_user_social_login(
+        self, user_id, provider_id, provider_userid, provider_username
+    ):
         """Add a federated identity / social login provider asynchronously to the user.
 
         :param user_id: User id
@@ -5106,7 +5124,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        response = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
+        response = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_GROUP.format(**params_path)
+        )
 
         if response.status_code >= 400:
             return raise_error_from_response(response, KeycloakGetError)
@@ -5368,7 +5388,9 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_GROUP.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_get_clients(self):
@@ -5383,7 +5405,9 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw =await  self.connection.a_raw_get(urls_patterns.URL_ADMIN_CLIENTS.format(**params_path))
+        data_raw =await  self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENTS.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_client(self, client_id):
@@ -5398,7 +5422,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw =await self.connection.a_raw_get(urls_patterns.URL_ADMIN_CLIENT.format(**params_path))
+        data_raw =await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENT.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_client_id(self, client_id):
@@ -5633,7 +5659,9 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
-    async def a_create_client_authz_resource_based_permission(self, client_id, payload, skip_exists=False):
+    async def a_create_client_authz_resource_based_permission(
+        self, client_id, payload, skip_exists=False
+    ):
         """Create resource-based permission of client asynchronously.
 
         Payload example::
@@ -6007,7 +6035,9 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_CLIENT.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_get_client_installation_provider(self, client_id, provider_id):
@@ -6254,7 +6284,9 @@ class KeycloakAdmin:
         """
         if skip_exists:
             try:
-                res = await self.a_get_client_role(client_id=client_role_id, role_name=payload["name"])
+                res = await self.a_get_client_role(
+                    client_id=client_role_id, role_name=payload["name"]
+                )
                 return res["name"]
             except KeycloakGetError:
                 pass
@@ -6336,7 +6368,7 @@ class KeycloakAdmin:
             "id": client_role_id,
             "role-name": role_name,
         }
-        data_raw =await self.connection.a_raw_delete(
+        data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_CLIENT_ROLE.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
@@ -6967,7 +6999,9 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, user_id, client_id
         )
 
-    async def a_get_composite_client_roles_of_user(self, user_id, client_id, brief_representation=False):
+    async def a_get_composite_client_roles_of_user(
+        self, user_id, client_id, brief_representation=False
+    ):
         """Get composite client role-mappings for a user asynchronously.
 
         :param user_id: id of user
@@ -7046,7 +7080,9 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_FLOWS.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_FLOWS.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_authentication_flow_for_id(self, flow_id):
@@ -7119,7 +7155,9 @@ class KeycloakAdmin:
         :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name, "id": flow_id}
-        data_raw = await self.connection.a_raw_delete(urls_patterns.URL_ADMIN_FLOW.format(**params_path))
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_FLOW.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_get_authentication_flow_executions(self, flow_alias):
@@ -7800,7 +7838,9 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "component-id": component_id}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_COMPONENT.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_COMPONENT.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_update_component(self, component_id, payload):
@@ -8155,7 +8195,9 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
-    async def a_get_composite_client_roles_of_group(self, client_id, group_id, brief_representation=True):
+    async def a_get_composite_client_roles_of_group(
+        self, client_id, group_id, brief_representation=True
+        ):
         """Get the composite client roles of the given group for the given client asynchronously.
 
         :param client_id: id of the client.

@@ -874,7 +874,7 @@ class KeycloakOpenID:
         if totp:
             payload["totp"] = totp
 
-        payload =  self._add_secret_key(payload)
+        payload = self._add_secret_key(payload)
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -901,7 +901,7 @@ class KeycloakOpenID:
             "grant_type": grant_type,
             "refresh_token": refresh_token,
         }
-        payload =  self._add_secret_key(payload)
+        payload = self._add_secret_key(payload)
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -953,7 +953,7 @@ class KeycloakOpenID:
             "requested_issuer": requested_issuer,
             "scope": scope,
         }
-        payload =  self._add_secret_key(payload)
+        payload = self._add_secret_key(payload)
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -985,7 +985,7 @@ class KeycloakOpenID:
         """
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "refresh_token": refresh_token}
-        payload =  self._add_secret_key(payload)
+        payload = self._add_secret_key(payload)
         data_raw = await self.connection.a_raw_post(URL_LOGOUT.format(**params_path), data=payload)
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
@@ -1071,9 +1071,11 @@ class KeycloakOpenID:
             else:
                 raise KeycloakRPTNotFound("Can't found RPT.")
 
-        payload =  self._add_secret_key(payload)
+        payload = self._add_secret_key(payload)
 
-        data_raw = await self.connection.a_raw_post(URL_INTROSPECT.format(**params_path), data=payload)
+        data_raw = await self.connection.a_raw_post(
+            URL_INTROSPECT.format(**params_path), data=payload
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_decode_token(self, token, validate: bool = True, **kwargs):

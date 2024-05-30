@@ -488,7 +488,7 @@ def test_device(oid_with_credentials_device: Tuple[KeycloakOpenID, str, str]):
         "interval": 5,
     }
 
-#async function start
+# async function start
 
 @pytest.mark.asyncio
 async def test_a_well_known(oid: KeycloakOpenID):
@@ -557,6 +557,7 @@ async def test_a_well_known(oid: KeycloakOpenID):
     ]:
         assert key in res
 
+
 @pytest.mark.asyncio
 async def test_a_auth_url(env, oid: KeycloakOpenID):
     """Test the auth_url method.
@@ -573,6 +574,7 @@ async def test_a_auth_url(env, oid: KeycloakOpenID):
         + f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
         + "&redirect_uri=http://test.test/*&scope=email&state="
     )
+
 
 @pytest.mark.asyncio
 async def test_a_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
@@ -622,6 +624,7 @@ async def test_a_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
         "session_state": mock.ANY,
         "token_type": "Bearer",
     }
+
 
 @pytest.mark.asyncio
 async def test_a_exchange_token(
@@ -676,6 +679,7 @@ async def test_a_exchange_token(
     }
     assert token != new_token
 
+
 @pytest.mark.asyncio
 async def test_a_logout(oid_with_credentials):
     """Test logout.
@@ -692,6 +696,7 @@ async def test_a_logout(oid_with_credentials):
     with pytest.raises(KeycloakAuthenticationError):
         await oid.a_userinfo(token=token["access_token"])
 
+
 @pytest.mark.asyncio
 async def test_a_certs(oid: KeycloakOpenID):
     """Test certificates.
@@ -701,6 +706,7 @@ async def test_a_certs(oid: KeycloakOpenID):
     """
     assert len((await oid.a_certs())["keys"]) == 2
 
+
 @pytest.mark.asyncio
 async def test_a_public_key(oid: KeycloakOpenID):
     """Test public key.
@@ -709,6 +715,7 @@ async def test_a_public_key(oid: KeycloakOpenID):
     :type oid: KeycloakOpenID
     """
     assert await oid.a_public_key() is not None
+
 
 @pytest.mark.asyncio
 async def test_a_entitlement(
@@ -731,6 +738,7 @@ async def test_a_entitlement(
     with pytest.raises(KeycloakDeprecationError):
         await oid.a_entitlement(token=token["access_token"], resource_server_id=resource_server_id)
 
+
 @pytest.mark.asyncio
 async def test_a_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     """Test introspect.
@@ -747,7 +755,10 @@ async def test_a_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str
     ) == {"active": False}
 
     with pytest.raises(KeycloakRPTNotFound):
-        await oid.a_introspect(token=token["access_token"], token_type_hint="requesting_party_token")
+        await oid.a_introspect(
+            token=token["access_token"], token_type_hint="requesting_party_token"
+        )
+
 
 @pytest.mark.asyncio
 async def test_a_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
@@ -766,8 +777,11 @@ async def test_a_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, s
     assert decoded_access_token["preferred_username"] == username, decoded_access_token
     assert decoded_refresh_token["typ"] == "Refresh", decoded_refresh_token
 
+
 @pytest.mark.asyncio
-async def test_a_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
+async def test_a_load_authorization_config(
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    ):
     """Test load authorization config.
 
     :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
@@ -785,6 +799,7 @@ async def test_a_load_authorization_config(oid_with_credentials_authz: Tuple[Key
     assert isinstance(
         oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission
     )
+
 
 @pytest.mark.asyncio
 async def test_a_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
@@ -810,16 +825,19 @@ async def test_a_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
     policy.add_role(role="account/view-profile")
     oid.authorization.policies["test"] = policy
     assert [
-        str(x) for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
+        str(x) 
+        for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["Policy: test (role)"]
     assert [
-        repr(x) for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
+        repr(x) 
+        for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id
 
     await oid.a_logout(refresh_token=token["refresh_token"])
     with pytest.raises(KeycloakInvalidTokenError):
         await oid.a_get_policies(token=token["access_token"])
+
 
 @pytest.mark.asyncio
 async def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
@@ -840,7 +858,9 @@ async def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenI
 
     orig_client_id = oid.client_id
     oid.client_id = "account"
-    assert await oid.a_get_permissions(token=token["access_token"], method_token_info="decode") == []
+    assert (
+        await oid.a_get_permissions(token=token["access_token"], method_token_info="decode") == []
+    )
     policy = Policy(name="test", type="role", logic="POSITIVE", decision_strategy="UNANIMOUS")
     policy.add_role(role="account/view-profile")
     policy.add_permission(
@@ -851,17 +871,22 @@ async def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenI
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in await oid.a_get_permissions(token=token["access_token"], method_token_info="decode")
+        for x in await oid.a_get_permissions(
+            token=token["access_token"], method_token_info="decode"
+        )
     ] == ["Permission: test-perm (resource)"]
     assert [
         repr(x)
-        for x in await oid.a_get_permissions(token=token["access_token"], method_token_info="decode")
+        for x in await oid.a_get_permissions(
+            token=token["access_token"], method_token_info="decode"
+        )
     ] == ["<Permission: test-perm (resource)>"]
     oid.client_id = orig_client_id
 
     await oid.a_logout(refresh_token=token["refresh_token"])
     with pytest.raises(KeycloakInvalidTokenError):
         await oid.a_get_permissions(token=token["access_token"])
+
 
 @pytest.mark.asyncio
 async def test_a_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
@@ -875,7 +900,10 @@ async def test_a_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenI
     token = await oid.a_token(username=username, password=password)
 
     assert len(await oid.a_uma_permissions(token=token["access_token"])) == 1
-    assert (await oid.a_uma_permissions(token=token["access_token"]))[0]["rsname"] == "Default Resource"
+    assert (await oid.a_uma_permissions(token=token["access_token"]))[0][
+        "rsname"
+    ] == "Default Resource"
+
 
 @pytest.mark.asyncio
 async def test_a_has_uma_access(
@@ -897,7 +925,9 @@ async def test_a_has_uma_access(
         == "AuthStatus(is_authorized=True, is_logged_in=True, missing_permissions=set())"
     )
     assert (
-        str(await oid.a_has_uma_access(token=token["access_token"], permissions="Default Resource"))
+        str(
+            await oid.a_has_uma_access(token=token["access_token"], permissions="Default Resource")
+        )
         == "AuthStatus(is_authorized=True, is_logged_in=True, missing_permissions=set())"
     )
 
@@ -918,6 +948,7 @@ async def test_a_has_uma_access(
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
         + "{'Default Resource'})"
     )
+
 
 @pytest.mark.asyncio
 async def test_a_device(oid_with_credentials_device: Tuple[KeycloakOpenID, str, str]):

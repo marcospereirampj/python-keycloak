@@ -308,7 +308,7 @@ class ConnectionManager(object):
                 urljoin(self.base_url, path),
                 params=kwargs,
                 headers=self.headers,
-                timeout=self.timeout
+                timeout=self.timeout,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
@@ -332,7 +332,7 @@ class ConnectionManager(object):
                 params=kwargs,
                 data=data,
                 headers=self.headers,
-                timeout=self.timeout
+                timeout=self.timeout,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)

@@ -311,7 +311,7 @@ def test_uma_permission_ticket(uma: KeycloakUMA):
 
     uma.resource_set_delete(resource["_id"])
 
-#async function start
+# async function start
 
 @pytest.mark.asyncio
 async def test_a_uma_well_known(uma: KeycloakUMA):
@@ -326,6 +326,7 @@ async def test_a_uma_well_known(uma: KeycloakUMA):
     for key in ["resource_registration_endpoint"]:
         assert key in res
 
+
 @pytest.mark.asyncio
 async def test_a_uma_resource_sets(uma: KeycloakUMA):
     """Test resource sets.
@@ -334,7 +335,7 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     :type uma: KeycloakUMA
     """
     # Check that only the default resource is present
-    resource_sets = await uma.a_resource_set_list()
+    resource_sets = uma.resource_set_list()
     resource_set_list = list(resource_sets)
     assert len(resource_set_list) == 1, resource_set_list
     assert resource_set_list[0]["name"] == "Default Resource", resource_set_list[0]["name"]
@@ -421,6 +422,7 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     with pytest.raises(KeycloakDeleteError) as err:
         await uma.a_resource_set_delete(resource_id=created_resource["_id"])
     assert err.match("404: b''")
+
 
 @pytest.mark.asyncio
 async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
@@ -521,6 +523,7 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     admin.delete_realm_role(role_id)
     admin.delete_group(group_id)
 
+
 @pytest.mark.asyncio
 async def test_a_uma_access(uma: KeycloakUMA):
     """Test permission access checks.
@@ -554,6 +557,7 @@ async def test_a_uma_access(uma: KeycloakUMA):
     permissions.append(UMAPermission(resource="not valid"))
     assert not await uma.a_permissions_check(token["access_token"], permissions)
     uma.resource_set_delete(resource["_id"])
+
 
 @pytest.mark.asyncio
 async def test_a_uma_permission_ticket(uma: KeycloakUMA):
