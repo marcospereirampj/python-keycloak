@@ -31,8 +31,6 @@ import json
 from builtins import isinstance
 from typing import Optional
 
-import threading
-
 from requests_toolbelt import MultipartEncoder
 
 from . import urls_patterns

@@ -28,8 +28,8 @@ try:
 except ImportError:  # pragma: no cover
     from urlparse import urljoin
 
-import requests
 import httpx
+import requests
 from requests.adapters import HTTPAdapter
 
 from .exceptions import KeycloakConnectionError
