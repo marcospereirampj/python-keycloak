@@ -3769,11 +3769,11 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
         await admin.a_get_group_children(group_id=group_id, full_hierarchy=True, query={"max": 10})
 
     # Test that query params are passed
-    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
-        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
-    ) >= Version("23"):
-        res = await admin.a_get_group_children(group_id=group_id, query={"max": 1})
-        assert len(res) == 1
+    # if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+    #    os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    # ) >= Version("23"):
+    res = await admin.a_get_group_children(group_id=group_id, query={"max": 1})
+    assert len(res) == 1
 
     assert err.match("Cannot use both query and full_hierarchy parameters")
 
@@ -3841,7 +3841,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
     # Test update group
     res = await admin.a_update_group(group_id=subgroup_id_2, payload={"name": "new-subgroup-2"})
     assert res == dict(), res
-    assert await admin.a_get_group(group_id=subgroup_id_2)["name"] == "new-subgroup-2"
+    assert (await admin.a_get_group(group_id=subgroup_id_2))["name"] == "new-subgroup-2"
 
     # test update fail
     with pytest.raises(KeycloakPutError) as err:
@@ -4979,8 +4979,8 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str):
     )
 
     # Fetch various IDs and strings needed when creating the permission
-    token_exchange_permission_id = await admin.a_get_client_management_permissions(
-        client_id=target_client_id
+    token_exchange_permission_id = (
+        await admin.a_get_client_management_permissions(client_id=target_client_id)
     )["scopePermissions"]["token-exchange"]
     scopes = await admin.a_get_client_authz_policy_scopes(
         client_id=realm_management_id, policy_id=token_exchange_permission_id

@@ -520,10 +520,10 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     policies = await uma.a_policy_query(resource=resource_id)
     assert len(policies) == 2
 
-    uma.a_resource_set_delete(resource_id)
-    admin.delete_client(other_client_id)
-    admin.delete_realm_role(role_id)
-    admin.delete_group(group_id)
+    await uma.a_resource_set_delete(resource_id)
+    await admin.a_delete_client(other_client_id)
+    await admin.a_delete_realm_role(role_id)
+    await admin.a_delete_group(group_id)
 
 
 @pytest.mark.asyncio

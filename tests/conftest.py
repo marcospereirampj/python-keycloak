@@ -32,10 +32,10 @@ class KeycloakTestEnv(object):
 
     def __init__(
         self,
-        host: str = os.environ["KEYCLOAK_HOST"],
-        port: str = os.environ["KEYCLOAK_PORT"],
-        username: str = os.environ["KEYCLOAK_ADMIN"],
-        password: str = os.environ["KEYCLOAK_ADMIN_PASSWORD"],
+        host: str = "localhost",  # os.environ["KEYCLOAK_HOST"],
+        port: str = "8080",  # os.environ["KEYCLOAK_PORT"],
+        username: str = "admin",  # os.environ["KEYCLOAK_ADMIN"],
+        password: str = "admin",  # os.environ["KEYCLOAK_ADMIN_PASSWORD"],
     ):
         """Init method.
 
