@@ -488,7 +488,9 @@ def test_device(oid_with_credentials_device: Tuple[KeycloakOpenID, str, str]):
         "interval": 5,
     }
 
+
 # async function start
+
 
 @pytest.mark.asyncio
 async def test_a_well_known(oid: KeycloakOpenID):
@@ -781,7 +783,7 @@ async def test_a_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, s
 @pytest.mark.asyncio
 async def test_a_load_authorization_config(
     oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
-    ):
+):
     """Test load authorization config.
 
     :param oid_with_credentials_authz: Keycloak OpenID client configured as an authorization
@@ -825,11 +827,11 @@ async def test_a_get_policies(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
     policy.add_role(role="account/view-profile")
     oid.authorization.policies["test"] = policy
     assert [
-        str(x) 
+        str(x)
         for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["Policy: test (role)"]
     assert [
-        repr(x) 
+        repr(x)
         for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id

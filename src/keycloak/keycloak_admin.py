@@ -4719,7 +4719,9 @@ class KeycloakAdmin:
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
-        data_raw = await self.connection.a_raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_USER.format(**params_path)
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_user_groups(self, user_id, query=None, brief_representation=True):
@@ -5405,7 +5407,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name}
-        data_raw =await  self.connection.a_raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENTS.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -5422,7 +5424,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw =await self.connection.a_raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -8197,7 +8199,7 @@ class KeycloakAdmin:
 
     async def a_get_composite_client_roles_of_group(
         self, client_id, group_id, brief_representation=True
-        ):
+    ):
         """Get the composite client roles of the given group for the given client asynchronously.
 
         :param client_id: id of the client.

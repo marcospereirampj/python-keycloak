@@ -311,7 +311,9 @@ def test_uma_permission_ticket(uma: KeycloakUMA):
 
     uma.resource_set_delete(resource["_id"])
 
+
 # async function start
+
 
 @pytest.mark.asyncio
 async def test_a_uma_well_known(uma: KeycloakUMA):

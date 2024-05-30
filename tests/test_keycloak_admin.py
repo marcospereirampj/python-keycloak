@@ -3066,6 +3066,7 @@ def test_refresh_token(admin: KeycloakAdmin):
 
 # async function start
 
+
 @pytest.mark.asyncio
 async def test_a_realms(admin: KeycloakAdmin):
     """Test realms.
@@ -3456,7 +3457,9 @@ async def test_a_user_groups_pagination(admin: KeycloakAdmin, realm: str):
     groups = await admin.a_get_user_groups(user_id=user_id)
     assert len(groups) == admin.PAGE_SIZE + 50, len(groups)
 
-    groups = await admin.a_get_user_groups(user_id=user_id, query={"first": 100, "max": -1, "search": ""})
+    groups = await admin.a_get_user_groups(
+        user_id=user_id, query={"first": 100, "max": -1, "search": ""}
+    )
     assert len(groups) == 50, len(groups)
 
     groups = await admin.a_get_user_groups(
@@ -3736,7 +3739,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
     # Create 1 more subgroup
     subsubgroup_id_1 = await admin.a_create_group(
         payload={"name": "subsubgroup-1"}, parent=subgroup_id_2
-        )
+    )
     main_group = await admin.a_get_group(group_id=group_id)
 
     # Test nested searches
@@ -3749,7 +3752,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
 
     # Test nested search from main group
     res = await admin.a_get_subgroups(
-        group = await admin.a_get_group(group_id=group_id, full_hierarchy=True),
+        group=await admin.a_get_group(group_id=group_id, full_hierarchy=True),
         path="/main-group/subgroup-2/subsubgroup-1",
     )
     assert res["id"] == subsubgroup_id_1
@@ -4311,7 +4314,7 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str):
         x["username"] for x in await admin.a_get_realm_role_members(role_name="offline_access")
     ]
     assert admin.get_user(user_id=user_id)["username"] in [
-        x["username"] 
+        x["username"]
         for x in await admin.a_get_realm_role_members(role_name="test-realm-role-update")
     ]
 
@@ -5439,10 +5442,9 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
         client_scope_id=res, protocol_mapper_id=test_mapper["id"], payload=test_mapper
     )
     assert res_update == dict()
-    assert ((await admin.a_get_mappers_from_client_scope(client_scope_id=res))[0]["config"][
-            "user.attribute"
-        ] == "test"
-    )
+    assert (await admin.a_get_mappers_from_client_scope(client_scope_id=res))[0]["config"][
+        "user.attribute"
+    ] == "test"
 
     # Test delete mapper
     res_del = await admin.a_delete_mapper_from_client_scope(
@@ -5572,10 +5574,10 @@ async def test_a_keys(admin: KeycloakAdmin, realm: str):
     """
     await admin.a_change_current_realm(realm)
     assert set((await admin.a_get_keys())["active"].keys()) == {
-        "AES", 
-        "HS256", 
-        "RS256", 
-        "RSA-OAEP"
+        "AES",
+        "HS256",
+        "RS256",
+        "RSA-OAEP",
     } or set((await admin.a_get_keys())["active"].keys()) == {"RSA-OAEP", "RS256", "HS512", "AES"}
     assert {k["algorithm"] for k in (await admin.a_get_keys())["keys"]} == {
         "HS256",
@@ -5811,7 +5813,7 @@ async def test_a_get_role_client_level_children(
 @pytest.mark.asyncio
 async def test_a_upload_certificate(
     admin: KeycloakAdmin, realm: str, client: str, selfsigned_cert: tuple
-    ):
+):
     """Test upload certificate.
 
     :param admin: Keycloak Admin client
@@ -5965,8 +5967,8 @@ async def test_a_default_realm_role_present(realm: str, admin: KeycloakAdmin) ->
     assert (
         len(
             [
-                x["name"] 
-                for x in await admin.a_get_realm_roles() 
+                x["name"]
+                for x in await admin.a_get_realm_roles()
                 if x["name"] == f"default-roles-{realm}"
             ]
         )
@@ -5987,8 +5989,8 @@ async def test_a_get_default_realm_role_id(realm: str, admin: KeycloakAdmin) -> 
     assert (
         await admin.a_get_default_realm_role_id()
         == [
-            x["id"] 
-            for x in await admin.a_get_realm_roles() 
+            x["id"]
+            for x in await admin.a_get_realm_roles()
             if x["name"] == f"default-roles-{realm}"
         ][0]
     )
