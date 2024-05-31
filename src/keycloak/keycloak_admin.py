@@ -5036,7 +5036,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_put(
             urls_patterns.URL_ADMIN_SEND_VERIFY_EMAIL.format(**params_path),
             data={},
-            **params_query,
+            kwargs=params_query,
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
