@@ -5012,7 +5012,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_put(
             urls_patterns.URL_ADMIN_SEND_UPDATE_ACCOUNT.format(**params_path),
             data=json.dumps(payload),
-            **params_query,
+            kwargs=params_query,
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
