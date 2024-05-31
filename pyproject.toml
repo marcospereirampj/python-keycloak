@@ -33,7 +33,7 @@ python = ">=3.8,<4.0"
 requests = ">=2.20.0"
 requests-toolbelt = ">=0.6.0"
 deprecation = ">=2.1.0"
-jwcrypto = "^1.5.4"
+jwcrypto = ">=1.5.4"
 httpx = ">=0.23.2"
 
 [tool.poetry.group.docs.dependencies]
@@ -45,6 +45,7 @@ sphinx-rtd-theme = ">=1.0.0"
 readthedocs-sphinx-ext = ">=2.1.9"
 m2r2 = ">=0.3.2"
 sphinx-autoapi = ">=3.0.0"
+setuptools = ">=70.0.0"
 
 [tool.poetry.group.dev.dependencies]
 tox = ">=4.0.0"
