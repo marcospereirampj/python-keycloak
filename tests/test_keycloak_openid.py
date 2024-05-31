@@ -643,12 +643,12 @@ async def test_a_exchange_token(
     oid, username, password = oid_with_credentials
 
     # Allow impersonation
-    admin.change_current_realm(oid.realm_name)
-    admin.assign_client_role(
-        user_id=admin.get_user_id(username=username),
-        client_id=admin.get_client_id(client_id="realm-management"),
+    await admin.a_change_current_realm(oid.realm_name)
+    await admin.a_assign_client_role(
+        user_id=await admin.a_get_user_id(username=username),
+        client_id=await admin.a_get_client_id(client_id="realm-management"),
         roles=[
-            admin.get_client_role(
+            await admin.a_get_client_role(
                 client_id=admin.get_client_id(client_id="realm-management"),
                 role_name="impersonation",
             )
@@ -667,7 +667,7 @@ async def test_a_exchange_token(
     }
 
     # Exchange token with the new user
-    new_token = await oid.a_exchange_token(
+    new_token = oid.exchange_token(
         token=token["access_token"], audience=oid.client_id, subject=username
     )
     assert await oid.a_userinfo(token=new_token["access_token"]) == {

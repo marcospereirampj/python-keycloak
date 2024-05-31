@@ -3769,11 +3769,11 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
         await admin.a_get_group_children(group_id=group_id, full_hierarchy=True, query={"max": 10})
 
     # Test that query params are passed
-    # if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
-    #    os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
-    # ) >= Version("23"):
-    res = await admin.a_get_group_children(group_id=group_id, query={"max": 1})
-    assert len(res) == 1
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    ) >= Version("23"):
+        res = await admin.a_get_group_children(group_id=group_id, query={"max": 1})
+        assert len(res) == 1
 
     assert err.match("Cannot use both query and full_hierarchy parameters")
 
@@ -4324,7 +4324,7 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str):
     assert "test-realm-role-update" in [x["name"] for x in roles]
 
     with pytest.raises(KeycloakDeleteError) as err:
-        await admin.a_delete_realm_roles_of_user(user_id=user_id, roles=["bad"])
+        admin.delete_realm_roles_of_user(user_id=user_id, roles=["bad"])
     assert err.match(UNKOWN_ERROR_REGEX), err
     res = await admin.a_delete_realm_roles_of_user(
         user_id=user_id, roles=[await admin.a_get_realm_role(role_name="offline_access")]
@@ -4901,7 +4901,7 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str):
         roles=[await admin.a_get_realm_role(role_name="offline_access")],
     )
     assert res == dict()
-    assert await admin.a_get_client_role(client_id=client, role_name="client-role-test-update")[
+    assert (await admin.a_get_client_role(client_id=client, role_name="client-role-test-update"))[
         "composite"
     ]
 
@@ -4921,7 +4921,7 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str):
         client_role_id=client, payload={"name": "client-role-by-id-test"}, skip_exists=True
     )
     role = await admin.a_get_client_role(client_id=client, role_name="client-role-by-id-test")
-    res = admin.a_get_role_by_id(role_id=role["id"])
+    res = await admin.a_get_role_by_id(role_id=role["id"])
     assert res["name"] == "client-role-by-id-test"
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_role_by_id(role_id="bad")
@@ -5005,15 +5005,17 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str):
 
     # Create a client policy for source client
     policy_name = "Exchange source client token with target client token"
-    client_policy_id = await admin.a_create_client_authz_client_policy(
-        payload={
-            "type": "client",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "name": policy_name,
-            "clients": [source_client_id],
-        },
-        client_id=realm_management_id,
+    client_policy_id = (
+        await admin.a_create_client_authz_client_policy(
+            payload={
+                "type": "client",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "name": policy_name,
+                "clients": [source_client_id],
+            },
+            client_id=realm_management_id,
+        )
     )["id"]
     policies = await admin.a_get_client_authz_client_policies(client_id=realm_management_id)
     for policy in policies:
@@ -5024,8 +5026,10 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str):
         raise AssertionError("Missing client policy")
 
     # Update permissions on the target client to reference this policy
-    permission_name = await admin.a_get_client_authz_scope_permission(
-        client_id=realm_management_id, scope_id=token_exchange_permission_id
+    permission_name = (
+        await admin.a_get_client_authz_scope_permission(
+            client_id=realm_management_id, scope_id=token_exchange_permission_id
+        )
     )["name"]
     await admin.a_update_client_authz_scope_permission(
         payload={
@@ -5056,8 +5060,10 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str):
         },
         client_id=realm_management_id,
     )
-    permission_name = await admin.a_get_client_authz_scope_permission(
-        client_id=realm_management_id, scope_id=token_exchange_permission_id
+    permission_name = (
+        await admin.a_get_client_authz_scope_permission(
+            client_id=realm_management_id, scope_id=token_exchange_permission_id
+        )
     )["name"]
     assert permission_name.startswith("token-exchange.permission.client.")
     with pytest.raises(KeycloakPostError) as err:

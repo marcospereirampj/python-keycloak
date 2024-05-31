@@ -328,8 +328,9 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return await self.async_s.post(
-                urljoin(self.base_url, path),
+            return await self.async_s.request(
+                method="POST",
+                url=urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
                 headers=self.headers,
@@ -376,8 +377,10 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            return await self.async_s.delete(
-                urljoin(self.base_url, path),
+            return await self.async_s.request(
+                method="DELETE",
+                url=urljoin(self.base_url, path),
+                data=data or dict(),
                 params=kwargs,
                 headers=self.headers,
                 timeout=self.timeout,
