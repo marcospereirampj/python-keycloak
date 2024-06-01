@@ -59,10 +59,9 @@ def test_keycloak_admin_init(env):
     assert admin.connection.username == env.KEYCLOAK_ADMIN, admin.connection.username
     assert admin.connection.password == env.KEYCLOAK_ADMIN_PASSWORD, admin.connection.password
     assert admin.connection.totp is None, admin.connection.totp
-    assert admin.connection.token is not None, admin.connection.token
+    assert admin.connection.token is None, admin.connection.token
     assert admin.connection.user_realm_name is None, admin.connection.user_realm_name
     assert admin.connection.custom_headers is None, admin.connection.custom_headers
-    assert admin.connection.token
 
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
@@ -71,7 +70,7 @@ def test_keycloak_admin_init(env):
         realm_name=None,
         user_realm_name="master",
     )
-    assert admin.connection.token
+    assert admin.connection.token is None
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         username=env.KEYCLOAK_ADMIN,
@@ -79,8 +78,9 @@ def test_keycloak_admin_init(env):
         realm_name=None,
         user_realm_name=None,
     )
-    assert admin.connection.token
+    assert admin.connection.token is None
 
+    admin.get_realms()
     token = admin.connection.token
     admin = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
@@ -106,12 +106,14 @@ def test_keycloak_admin_init(env):
         }
     )
     secret = admin.generate_client_secrets(client_id=admin.get_client_id("authz-client"))
-    assert KeycloakAdmin(
+    adminAuth = KeycloakAdmin(
         server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
         user_realm_name="authz",
         client_id="authz-client",
         client_secret_key=secret["value"],
-    ).connection.token
+    )
+    adminAuth.connection.refresh_token()
+    assert adminAuth.connection.token is not None
     admin.delete_realm(realm_name="authz")
 
     assert (
@@ -134,6 +136,7 @@ def test_keycloak_admin_init(env):
         verify=True,
     )
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
+    keycloak_admin.connection.get_token()
     assert keycloak_admin.connection.token
 
 
@@ -2609,6 +2612,7 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
     :type realm: str
     """
     admin = admin_frozen
+    admin.get_realm(realm_name=realm)
     # Test get refresh
     admin.connection.custom_headers = {
         "Authorization": "Bearer bad",
@@ -3059,6 +3063,7 @@ def test_refresh_token(admin: KeycloakAdmin):
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
     """
+    admin.get_realms()
     assert admin.connection.token is not None
     admin.user_logout(admin.get_user_id(admin.connection.username))
     admin.connection.refresh_token()
@@ -5655,6 +5660,7 @@ async def test_a_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
     :type realm: str
     """
     admin = admin_frozen
+    admin.get_realm(realm)
     # Test get refresh
     admin.connection.custom_headers = {
         "Authorization": "Bearer bad",
@@ -6136,6 +6142,7 @@ async def test_a_refresh_token(admin: KeycloakAdmin):
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
     """
+    admin.get_realms()
     assert admin.connection.token is not None
     await admin.a_user_logout(await admin.a_get_user_id(admin.connection.username))
     admin.connection.refresh_token()
