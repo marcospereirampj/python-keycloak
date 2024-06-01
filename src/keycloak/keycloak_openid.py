@@ -315,7 +315,14 @@ class KeycloakOpenID:
             payload["totp"] = totp
 
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def refresh_token(self, refresh_token, grant_type=["refresh_token"]):
@@ -342,7 +349,14 @@ class KeycloakOpenID:
             "refresh_token": refresh_token,
         }
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def exchange_token(
@@ -394,7 +408,14 @@ class KeycloakOpenID:
             "scope": scope,
         }
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def userinfo(self, token):
@@ -668,7 +689,14 @@ class KeycloakOpenID:
         }
 
         self.connection.add_param_headers("Authorization", "Bearer " + token)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     def has_uma_access(self, token, permissions):
@@ -875,7 +903,14 @@ class KeycloakOpenID:
             payload["totp"] = totp
 
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_refresh_token(self, refresh_token, grant_type=["refresh_token"]):
@@ -902,7 +937,14 @@ class KeycloakOpenID:
             "refresh_token": refresh_token,
         }
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_exchange_token(
@@ -954,7 +996,14 @@ class KeycloakOpenID:
             "scope": scope,
         }
         payload = self._add_secret_key(payload)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_userinfo(self, token):
@@ -1230,7 +1279,14 @@ class KeycloakOpenID:
         }
 
         self.connection.add_param_headers("Authorization", "Bearer " + token)
+        content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        (
+            self.connection.add_param_headers("Content-Type", content_type)
+            if content_type
+            else self.connection.del_param_headers("Content-Type")
+        )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_has_uma_access(self, token, permissions):
