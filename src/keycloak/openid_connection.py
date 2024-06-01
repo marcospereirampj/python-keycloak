@@ -103,6 +103,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.
         self.token_lifetime_fraction = 0.9
+        self.headers = {}
         self.server_url = server_url
         self.username = username
         self.password = password
@@ -114,18 +115,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.client_secret_key = client_secret_key
         self.user_realm_name = user_realm_name
         self.timeout = timeout
-        self.headers = {}
         self.custom_headers = custom_headers
-
-        if self.token is None:
-            self.get_token()
-
-        if self.token is not None:
-            self.headers = {
-                **self.headers,
-                "Authorization": "Bearer " + self.token.get("access_token"),
-                "Content-Type": "application/json",
-            }
+        self.headers = {**self.headers, "Content-Type": "application/json"}
 
         super().__init__(
             base_url=self.server_url, headers=self.headers, timeout=60, verify=self.verify
@@ -237,6 +228,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self._expires_at = datetime.now() + timedelta(
             seconds=int(self.token_lifetime_fraction * self.token["expires_in"] if value else 0)
         )
+        if value is not None:
+            self.add_param_headers("Authorization", "Bearer " + value.get("access_token"))
 
     @property
     def expires_at(self):
@@ -345,8 +338,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 else:
                     raise
 
-        self.add_param_headers("Authorization", "Bearer " + self.token.get("access_token"))
-
     def _refresh_if_required(self):
         if datetime.now() >= self.expires_at:
             self.refresh_token()
@@ -419,6 +410,53 @@ class KeycloakOpenIDConnection(ConnectionManager):
         r = super().raw_delete(*args, **kwargs)
         return r
 
+    async def a_get_token(self):
+        """Get admin token.
+
+        The admin token is then set in the `token` attribute.
+        """
+        grant_type = []
+        if self.username and self.password:
+            grant_type.append("password")
+        elif self.client_secret_key:
+            grant_type.append("client_credentials")
+
+        if grant_type:
+            self.token = await self.keycloak_openid.a_token(
+                self.username, self.password, grant_type=grant_type, totp=self.totp
+            )
+        else:
+            self.token = None
+
+    async def a_refresh_token(self):
+        """Refresh the token.
+
+        :raises KeycloakPostError: In case the refresh token request failed.
+        """
+        refresh_token = self.token.get("refresh_token", None) if self.token else None
+        if refresh_token is None:
+            await self.a_get_token()
+        else:
+            try:
+                self.token = await self.keycloak_openid.a_refresh_token(refresh_token)
+            except KeycloakPostError as e:
+                list_errors = [
+                    b"Refresh token expired",
+                    b"Token is not active",
+                    b"Session not active",
+                ]
+                if e.response_code == 400 and any(err in e.response_body for err in list_errors):
+                    await self.a_get_token()
+                else:
+                    raise
+
+        self.add_param_headers("Authorization", "Bearer " + self.token.get("access_token"))
+
+    async def a__refresh_if_required(self):
+        """Refresh the token if it is expired."""
+        if datetime.now() >= self.expires_at:
+            await self.a_refresh_token()
+
     async def a_raw_get(self, *args, **kwargs):
         """Call connection.raw_get.
 
@@ -432,7 +470,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :returns: Response
         :rtype: Response
         """
-        self._refresh_if_required()
+        await self.a__refresh_if_required()
         r = await super().a_raw_get(*args, **kwargs)
         return r
 
@@ -449,7 +487,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :returns: Response
         :rtype: Response
         """
-        self._refresh_if_required()
+        await self.a__refresh_if_required()
         r = await super().a_raw_post(*args, **kwargs)
         return r
 
@@ -466,7 +504,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :returns: Response
         :rtype: Response
         """
-        self._refresh_if_required()
+        await self.a__refresh_if_required()
         r = await super().a_raw_put(*args, **kwargs)
         return r
 
@@ -483,6 +521,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :returns: Response
         :rtype: Response
         """
-        self._refresh_if_required()
+        await self.a__refresh_if_required()
         r = await super().a_raw_delete(*args, **kwargs)
         return r

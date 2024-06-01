@@ -30,6 +30,8 @@ import json
 from typing import Iterable
 from urllib.parse import quote_plus
 
+from async_property import async_property
+
 from .connection import ConnectionManager
 from .exceptions import (
     KeycloakDeleteError,
@@ -56,9 +58,6 @@ class KeycloakUMA:
         :type connection: KeycloakOpenIDConnection
         """
         self.connection = connection
-        custom_headers = self.connection.custom_headers or {}
-        custom_headers.update({"Content-Type": "application/json"})
-        self.connection.custom_headers = custom_headers
         self._well_known = None
 
     def _fetch_well_known(self):
@@ -94,6 +93,17 @@ class KeycloakUMA:
         # per instance cache
         if not self._well_known:
             self._well_known = self._fetch_well_known()
+        return self._well_known
+
+    @async_property
+    async def a_uma_well_known(self):
+        """Get the well_known UMA2 config async.
+
+        :returns: It lists endpoints and other configuration options relevant
+        :rtype: dict
+        """
+        if not self._well_known:
+            self._well_known = await self.a__fetch_well_known()
         return self._well_known
 
     def resource_set_create(self, payload):
@@ -441,7 +451,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = await self.connection.a_raw_post(
-            self.uma_well_known["resource_registration_endpoint"], data=json.dumps(payload)
+            (await self.a_uma_well_known)["resource_registration_endpoint"],
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
@@ -462,7 +473,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = await self.connection.a_raw_put(url, data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
@@ -482,7 +494,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = await self.connection.a_raw_get(url)
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
@@ -499,7 +512,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = await self.connection.a_raw_delete(url)
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
@@ -558,7 +572,7 @@ class KeycloakUMA:
             query["max"] = maximum
 
         data_raw = await self.connection.a_raw_get(
-            self.uma_well_known["resource_registration_endpoint"], **query
+            (await self.a_uma_well_known)["resource_registration_endpoint"], **query
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
@@ -611,7 +625,7 @@ class KeycloakUMA:
         ]
 
         data_raw = await self.connection.a_raw_post(
-            self.uma_well_known["permission_endpoint"], data=json.dumps(payload)
+            (await self.a_uma_well_known)["permission_endpoint"], data=json.dumps(payload)
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -645,7 +659,9 @@ class KeycloakUMA:
         connection = ConnectionManager(self.connection.base_url)
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await connection.a_raw_post(self.uma_well_known["token_endpoint"], data=payload)
+        data_raw = await connection.a_raw_post(
+            (await self.a_uma_well_known)["token_endpoint"], data=payload
+        )
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)
         except KeycloakPostError:
@@ -667,7 +683,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = await self.connection.a_raw_post(
-            self.uma_well_known["policy_endpoint"] + f"/{resource_id}", data=json.dumps(payload)
+            (await self.a_uma_well_known)["policy_endpoint"] + f"/{resource_id}",
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -685,7 +702,8 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = await self.connection.a_raw_put(
-            self.uma_well_known["policy_endpoint"] + f"/{policy_id}", data=json.dumps(payload)
+            (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}",
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
@@ -701,7 +719,7 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = await self.connection.a_raw_delete(
-            self.uma_well_known["policy_endpoint"] + f"/{policy_id}"
+            (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}"
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError)
 
@@ -743,5 +761,7 @@ class KeycloakUMA:
         if maximum >= 0:
             query["max"] = maximum
 
-        data_raw = await self.connection.a_raw_get(self.uma_well_known["policy_endpoint"], **query)
+        data_raw = await self.connection.a_raw_get(
+            (await self.a_uma_well_known)["policy_endpoint"], **query
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
