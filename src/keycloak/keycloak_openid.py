@@ -112,7 +112,11 @@ class KeycloakOpenID:
         self.realm_name = realm_name
         headers = custom_headers if custom_headers is not None else dict()
         self.connection = ConnectionManager(
-            base_url=server_url, headers=headers, timeout=timeout, verify=verify, proxies=proxies
+            base_url=server_url,
+            headers={"Content-Type": "application/json", **headers},
+            timeout=timeout,
+            verify=verify,
+            proxies=proxies,
         )
 
         self.authorization = Authorization()
