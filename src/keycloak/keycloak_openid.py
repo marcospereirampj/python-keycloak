@@ -112,11 +112,7 @@ class KeycloakOpenID:
         self.realm_name = realm_name
         headers = custom_headers if custom_headers is not None else dict()
         self.connection = ConnectionManager(
-            base_url=server_url,
-            headers={"Content-Type": "application/json", **headers},
-            timeout=timeout,
-            verify=verify,
-            proxies=proxies,
+            base_url=server_url, headers=headers, timeout=timeout, verify=verify, proxies=proxies
         )
 
         self.authorization = Authorization()
@@ -786,6 +782,8 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         orig_bearer = self.connection.headers.get("Authorization")
         self.connection.add_param_headers("Authorization", "Bearer " + token)
+        orig_content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/json")
         data_raw = self.connection.raw_post(
             URL_CLIENT_REGISTRATION.format(**params_path), data=json.dumps(payload)
         )
@@ -793,6 +791,11 @@ class KeycloakOpenID:
             self.connection.add_param_headers("Authorization", orig_bearer)
             if orig_bearer is not None
             else self.connection.del_param_headers("Authorization")
+        )
+        (
+            self.connection.add_param_headers("Content-Type", orig_content_type)
+            if orig_content_type is not None
+            else self.connection.del_param_headers("Content-Type")
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -839,6 +842,8 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name, "client-id": client_id}
         orig_bearer = self.connection.headers.get("Authorization")
         self.connection.add_param_headers("Authorization", "Bearer " + token)
+        orig_content_type = self.connection.headers.get("Content-Type")
+        self.connection.add_param_headers("Content-Type", "application/json")
 
         # Keycloak complains if the clientId is not set in the payload
         if "clientId" not in payload:
@@ -851,6 +856,11 @@ class KeycloakOpenID:
             self.connection.add_param_headers("Authorization", orig_bearer)
             if orig_bearer is not None
             else self.connection.del_param_headers("Authorization")
+        )
+        (
+            self.connection.add_param_headers("Content-Type", orig_content_type)
+            if orig_content_type is not None
+            else self.connection.del_param_headers("Content-Type")
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
