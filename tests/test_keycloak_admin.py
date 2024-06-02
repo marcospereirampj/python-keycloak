@@ -6114,7 +6114,7 @@ async def test_a_initial_access_token(
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
 
-    res = oid.register_client(
+    res = await oid.a_register_client(
         token=res["token"],
         payload={
             "name": "DynamicRegisteredClient",
