@@ -450,8 +450,6 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 else:
                     raise
 
-        self.add_param_headers("Authorization", "Bearer " + self.token.get("access_token"))
-
     async def a__refresh_if_required(self):
         """Refresh the token if it is expired."""
         if datetime.now() >= self.expires_at:
