@@ -6146,3 +6146,17 @@ async def test_a_refresh_token(admin: KeycloakAdmin):
     assert admin.connection.token is not None
     await admin.a_user_logout(await admin.a_get_user_id(admin.connection.username))
     admin.connection.refresh_token()
+
+
+def test_counter_part():
+    """Test that each function has its async counter part."""
+    admin_methods = [func for func in dir(KeycloakAdmin) if callable(getattr(KeycloakAdmin, func))]
+    sync_methods = [
+        method
+        for method in admin_methods
+        if not method.startswith("a_") and not method.startswith("_")
+    ]
+
+    for method in sync_methods:
+        async_method = f"a_{method}"
+        assert (async_method in admin_methods) is True
