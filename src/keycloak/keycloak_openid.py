@@ -548,7 +548,11 @@ class KeycloakOpenID:
                 key = jwk.JWK.from_pem(key.encode("utf-8"))
                 kwargs["key"] = key
 
+            key = kwargs.pop("key")
+            leeway = kwargs.pop("leeway", 60)
             full_jwt = jwt.JWT(jwt=token, **kwargs)
+            full_jwt.leeway = leeway
+            full_jwt.validate(key)
             return jwt.json_decode(full_jwt.claims)
         else:
             full_jwt = jwt.JWT(jwt=token, **kwargs)
