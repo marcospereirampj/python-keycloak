@@ -599,3 +599,17 @@ async def test_a_uma_permission_ticket(uma: KeycloakUMA):
         uma.permission_ticket_create(permissions)
 
     await uma.a_resource_set_delete(resource["_id"])
+
+
+def test_counter_part():
+    """Test that each function has its async counter part."""
+    uma_methods = [func for func in dir(KeycloakUMA) if callable(getattr(KeycloakUMA, func))]
+    sync_methods = [
+        method
+        for method in uma_methods
+        if not method.startswith("a_") and not method.startswith("_")
+    ]
+
+    for method in sync_methods:
+        async_method = f"a_{method}"
+        assert (async_method in uma_methods) is True

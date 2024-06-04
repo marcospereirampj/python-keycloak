@@ -83,6 +83,24 @@ class KeycloakUMA:
         """
         return url.format(**{k: quote_plus(v) for k, v in kwargs.items()})
 
+    @staticmethod
+    async def a_format_url(url, **kwargs):
+        """Substitute url path parameters.
+
+        Given a parameterized url string, returns the string after url encoding and substituting
+        the given params. For example,
+        `format_url("https://myserver/{my_resource}/{id}", my_resource="hello world", id="myid")`
+        would produce `https://myserver/hello+world/myid`.
+
+        :param url: url string to format
+        :type url: str
+        :param kwargs: dict containing kwargs to substitute
+        :type kwargs: dict
+        :return: formatted string
+        :rtype: str
+        """
+        return url.format(**{k: quote_plus(v) for k, v in kwargs.items()})
+
     @property
     def uma_well_known(self):
         """Get the well_known UMA2 config.
