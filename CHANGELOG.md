@@ -1,3 +1,9 @@
+## v4.0.1 (2024-06-04)
+
+### Fix
+
+- Leeway config (#568)
+
 ## v4.0.0 (2024-04-27)
 
 ### BREAKING CHANGE
