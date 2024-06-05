@@ -1,13 +1,13 @@
 .. admin:
 
 Use Python Keycloak Asynchronously
-========================
+==================================
 
 Asynchronous admin client
 -------------------------
 
 Configure admin client
--------------------------
+------------------------
 
 .. code-block:: python
 
@@ -21,7 +21,7 @@ Configure admin client
 
 
 Configure admin client with connection
---------------------------------------------------
+-----------------------------------------
 
 .. code-block:: python
 
@@ -42,7 +42,7 @@ Configure admin client with connection
 
 
 Create user asynchronously
--------------------------
+----------------------------
 
 .. code-block:: python
 
@@ -54,7 +54,7 @@ Create user asynchronously
 
 
 Add user asynchronously and raise exception if username already exists
------------------------------------------------------------
+-----------------------------------------------------------------------
 
 The exist_ok currently defaults to True for backwards compatibility reasons.
 
@@ -68,7 +68,7 @@ The exist_ok currently defaults to True for backwards compatibility reasons.
                                             exist_ok=False)
 
 Add user asynchronously and set password
----------------------------
+----------------------------------------
 
 .. code-block:: python
 
@@ -81,7 +81,7 @@ Add user asynchronously and set password
 
 
 Add user asynchronous and specify a locale
-------------------------------
+-------------------------------------------
 
 .. code-block:: python
 
@@ -102,14 +102,14 @@ Asynchronous User counter
     count_users = await keycloak_admin.a_users_count()
 
 Get users Returns a list of users asynchronously, filtered according to query parameters
-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 
 .. code-block:: python
 
     users = await keycloak_admin.a_get_users({})
 
 Get user ID asynchronously from username
-------------------------------
+-----------------------------------------
 
 .. code-block:: python
 
@@ -133,7 +133,7 @@ Update user asynchronously
 
 
 Update user password asynchronously
-------------------------------
+------------------------------------
 
 .. code-block:: python
 
@@ -141,21 +141,21 @@ Update user password asynchronously
 
 
 Get user credentials asynchronously
-------------------------------
+------------------------------------
 
 .. code-block:: python
 
     credentials = await keycloak_admin.a_get_credentials(user_id='user_id')
 
 Get user credential asynchronously by ID
-------------------------------
+-----------------------------------------
 
 .. code-block:: python
 
     credential = await keycloak_admin.a_get_credential(user_id='user_id', credential_id='credential_id')
 
 Delete user credential asynchronously
-------------------------------
+---------------------------------------
 
 .. code-block:: python
 
@@ -169,14 +169,14 @@ Delete User asynchronously
     response = await  keycloak_admin.a_delete_user(user_id="user-id-keycloak")
 
 Get consents granted asynchronously by the user
---------------------------------
+------------------------------------------------
 
 .. code-block:: python
 
     consents = await keycloak_admin.a_consents_user(user_id="user-id-keycloak")
 
 Send user action asynchronously
-------------------------------
+---------------------------------
 
 .. code-block:: python
 
@@ -184,14 +184,14 @@ Send user action asynchronously
                                                   payload=['UPDATE_PASSWORD'])
 
 Send verify email asynchronously
-------------------------------
+----------------------------------
 
 .. code-block:: python
 
     response = await keycloak_admin.a_send_verify_email(user_id="user-id-keycloak")
 
 Get sessions associated asynchronously with the user
---------------------------------------
+-----------------------------------------------------
 
 .. code-block:: python
 
@@ -201,10 +201,10 @@ Get sessions associated asynchronously with the user
 
 
 Asynchronous OpenID Client
-========================
+===========================
 
 Asynchronous Configure client OpenID
--------------------------
+-------------------------------------
 
 .. code-block:: python
 
@@ -219,7 +219,7 @@ Asynchronous Configure client OpenID
 
 
 Get .well_know asynchronously
------------------------
+------------------------------
 
 .. code-block:: python
 
@@ -227,7 +227,7 @@ Get .well_know asynchronously
 
 
 Get code asynchronously with OAuth authorization request
-----------------------------------------------
+---------------------------------------------------------
 
 .. code-block:: python
 
@@ -249,7 +249,7 @@ Get access token asynchronously with code
 
 
 Get access asynchronously token with user and password
-----------------------------------------------
+-------------------------------------------------------
 
 .. code-block:: python
 
@@ -330,7 +330,7 @@ Get UMA-permissions asynchronously by token
     permissions = await keycloak_openid.a_uma_permissions(token['access_token'])
 
 Get UMA-permissions asynchronously by token with specific resource and scope requested
---------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 
 .. code-block:: python
 
@@ -353,7 +353,7 @@ Asynchronous UMA
 
 
 Asynchronous Configure client UMA
--------------------------
+----------------------------------
 
 .. code-block:: python
 
@@ -370,7 +370,7 @@ Asynchronous Configure client UMA
 
 
 Create a resource set asynchronously
--------------------------
+---------------------------------------
 
 .. code-block:: python
 
@@ -380,21 +380,21 @@ Create a resource set asynchronously
                     "type": "urn:example"})
 
 List resource sets asynchronously
--------------------------
+----------------------------------
 
 .. code-block:: python
 
     resource_sets = await uma.a_resource_set_list()
 
 Get resource set asynchronously
--------------------------
+--------------------------------
 
 .. code-block:: python
 
     latest_resource = await uma.a_resource_set_read(resource_set["_id"])
 
 Update resource set asynchronously
--------------------------
+-------------------------------------
 
 .. code-block:: python
 
@@ -402,7 +402,7 @@ Update resource set asynchronously
     await uma.a_resource_set_update(resource_set["_id"], latest_resource)
 
 Delete resource set asynchronously
-------------------------
+------------------------------------
 .. code-block:: python
 
     await uma.a_resource_set_delete(resource_id=resource_set["_id"])

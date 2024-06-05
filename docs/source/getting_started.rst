@@ -13,3 +13,4 @@ For more details, see :ref:`api`.
     modules/openid_client
     modules/admin
     modules/uma
+    modules/async
