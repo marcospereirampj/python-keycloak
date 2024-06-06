@@ -1,6 +1,6 @@
 """Test module for KeycloakOpenID."""
 
-from inspect import signature
+from inspect import iscoroutinefunction, signature
 from typing import Tuple
 from unittest import mock
 
@@ -984,6 +984,9 @@ def test_counter_part():
         for method in openid_methods
         if not method.startswith("a_") and not method.startswith("_")
     ]
+    async_methods = [
+        method for method in openid_methods if iscoroutinefunction(getattr(KeycloakOpenID, method))
+    ]
 
     for method in sync_methods:
         async_method = f"a_{method}"
@@ -991,3 +994,9 @@ def test_counter_part():
         sync_sign = signature(getattr(KeycloakOpenID, method))
         async_sign = signature(getattr(KeycloakOpenID, async_method))
         assert sync_sign.parameters == async_sign.parameters
+
+    for async_method in async_methods:
+        if async_method[2:].startswith("_"):
+            continue
+
+        assert async_method[2:] in sync_methods

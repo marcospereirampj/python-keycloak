@@ -1,6 +1,6 @@
 """Connection test module."""
 
-from inspect import signature
+from inspect import iscoroutinefunction, signature
 
 import pytest
 
@@ -62,11 +62,35 @@ def test_counter_part():
     con_methods = [
         func for func in dir(ConnectionManager) if callable(getattr(ConnectionManager, func))
     ]
-    sync_methods = [method for method in con_methods if method.startswith("a_")]
+    sync_methods = [
+        method
+        for method in con_methods
+        if not method.startswith("a_") and not method.startswith("_")
+    ]
+    async_methods = [
+        method for method in con_methods if iscoroutinefunction(getattr(ConnectionManager, method))
+    ]
 
     for method in sync_methods:
-        async_method = method[2:]
+        if method in [
+            "aclose",
+            "add_param_headers",
+            "del_param_headers",
+            "clean_headers",
+            "exist_param_headers",
+            "param_headers",
+        ]:
+            continue
+        async_method = f"a_{method}"
         assert (async_method in con_methods) is True
         sync_sign = signature(getattr(ConnectionManager, method))
         async_sign = signature(getattr(ConnectionManager, async_method))
         assert sync_sign.parameters == async_sign.parameters
+
+    for async_method in async_methods:
+        if async_method in ["aclose"]:
+            continue
+        if async_method[2:].startswith("_"):
+            continue
+
+        assert async_method[2:] in sync_methods
