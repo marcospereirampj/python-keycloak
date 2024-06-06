@@ -3,6 +3,7 @@
 import copy
 import os
 import uuid
+from inspect import signature
 from typing import Tuple
 
 import freezegun
@@ -6160,3 +6161,6 @@ def test_counter_part():
     for method in sync_methods:
         async_method = f"a_{method}"
         assert (async_method in admin_methods) is True
+        sync_sign = signature(getattr(KeycloakAdmin, method))
+        async_sign = signature(getattr(KeycloakAdmin, async_method))
+        assert sync_sign.parameters == async_sign.parameters

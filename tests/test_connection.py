@@ -1,5 +1,7 @@
 """Connection test module."""
 
+from inspect import signature
+
 import pytest
 
 from keycloak.connection import ConnectionManager
@@ -65,3 +67,6 @@ def test_counter_part():
     for method in sync_methods:
         async_method = method[2:]
         assert (async_method in con_methods) is True
+        sync_sign = signature(getattr(ConnectionManager, method))
+        async_sign = signature(getattr(ConnectionManager, async_method))
+        assert sync_sign.parameters == async_sign.parameters

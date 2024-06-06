@@ -1,5 +1,6 @@
 """Test module for KeycloakOpenID."""
 
+from inspect import signature
 from typing import Tuple
 from unittest import mock
 
@@ -987,3 +988,6 @@ def test_counter_part():
     for method in sync_methods:
         async_method = f"a_{method}"
         assert (async_method in openid_methods) is True
+        sync_sign = signature(getattr(KeycloakOpenID, method))
+        async_sign = signature(getattr(KeycloakOpenID, async_method))
+        assert sync_sign.parameters == async_sign.parameters

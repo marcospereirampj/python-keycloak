@@ -1,6 +1,7 @@
 """Test module for KeycloakUMA."""
 
 import re
+from inspect import signature
 
 import pytest
 
@@ -613,3 +614,6 @@ def test_counter_part():
     for method in sync_methods:
         async_method = f"a_{method}"
         assert (async_method in uma_methods) is True
+        sync_sign = signature(getattr(KeycloakUMA, method))
+        async_sign = signature(getattr(KeycloakUMA, async_method))
+        assert sync_sign.parameters == async_sign.parameters
