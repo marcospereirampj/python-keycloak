@@ -26,22 +26,3 @@ Or, download the source code.
 Once you have a copy of the source, you can embed it in your own Python package, or install it into your site-packages easily::
 
     python -m pip install .
-
-Dependencies
------------------
-
-python-keycloak depends on:
-
-- Python 3+
-- `requests <https://requests.readthedocs.io>`_
-- `python-jose <http://python-jose.readthedocs.io/en/latest/>`_
-- `urllib3 <https://urllib3.readthedocs.io/en/stable/>`_
-
-
-Tests Dependencies
--------------------
-
-- `tox <https://tox.readthedocs.io/>`_
-- `pytest <https://docs.pytest.org/en/latest/>`_
-- `pytest-cov <https://github.com/pytest-dev/pytest-cov>`_
-- `wheel <https://github.com/pypa/wheel>`_
