@@ -4051,7 +4051,7 @@ class KeycloakAdmin:
             data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
-    
+
     def get_client_authz_client_policies(self, client_id):
         """Get policies for a given client.
 
@@ -4066,7 +4066,7 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
-    
+
     def get_client_authz_permission_associated_policies(self, client_id, policy_id):
         """Get associated policies for a given client policy.
 
@@ -4083,10 +4083,12 @@ class KeycloakAdmin:
             "policy-id": policy_id,
         }
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY_ASSOCIATED_POLICIES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY_ASSOCIATED_POLICIES.format(
+                **params_path
+            )
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
-    
+
     def create_client_authz_client_policy(self, payload, client_id):
         """Create a new policy for a given client.
 
