@@ -1102,6 +1102,8 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         payload={"name": "test-authz-rb-policy", "roles": [{"id": role_id}]},
     )
     assert res["name"] == "test-authz-rb-policy", res
+    role_based_policy_id = res["id"]
+    role_based_policy_name = res["name"]
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_role_based_policy(
@@ -1174,6 +1176,8 @@ def test_clients(admin: KeycloakAdmin, realm: str):
     assert res, res
     assert res["name"] == "test-permission-rb"
     assert res["resources"] == [test_resource_id]
+    resource_based_permission_id = res["id"]
+    resource_based_permission_name = res["name"]
 
     with pytest.raises(KeycloakPostError) as err:
         admin.create_client_authz_resource_based_permission(
@@ -1187,6 +1191,29 @@ def test_clients(admin: KeycloakAdmin, realm: str):
         skip_exists=True,
     ) == {"msg": "Already exists"}
     assert len(admin.get_client_authz_permissions(client_id=auth_client_id)) == 2
+
+    # Test associating client policy with resource based permission
+    res = admin.update_client_authz_resource_permission(
+        client_id=auth_client_id,
+        resource_id=resource_based_permission_id,
+        payload={
+            "id": resource_based_permission_id,
+            "name": resource_based_permission_name,
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [test_resource_id],
+            "scopes": [],
+            "policies": [role_based_policy_id],
+        },
+    )
+
+    # Test getting associated policies for a permission
+    associated_policies = admin.get_client_authz_permission_associated_policies(
+        client_id=auth_client_id, policy_id=resource_based_permission_id
+    )
+    assert len(associated_policies) == 1
+    assert associated_policies[0]["name"].startswith(role_based_policy_name)
 
     # Test authz scopes
     res = admin.get_client_authz_scopes(client_id=auth_client_id)
@@ -4088,6 +4115,8 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str):
         skip_exists=True,
     ) == {"msg": "Already exists"}
     assert len(await admin.a_get_client_authz_policies(client_id=auth_client_id)) == 2
+    role_based_policy_id = res["id"]
+    role_based_policy_name = res["name"]
 
     res = await admin.a_create_client_authz_role_based_policy(
         client_id=auth_client_id,
@@ -4147,6 +4176,8 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str):
     assert res, res
     assert res["name"] == "test-permission-rb"
     assert res["resources"] == [test_resource_id]
+    resource_based_permission_id = res["id"]
+    resource_based_permission_name = res["name"]
 
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_create_client_authz_resource_based_permission(
@@ -4160,6 +4191,29 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str):
         skip_exists=True,
     ) == {"msg": "Already exists"}
     assert len(await admin.a_get_client_authz_permissions(client_id=auth_client_id)) == 2
+
+    # Test associating client policy with resource based permission
+    res = await admin.a_update_client_authz_resource_permission(
+        client_id=auth_client_id,
+        resource_id=resource_based_permission_id,
+        payload={
+            "id": resource_based_permission_id,
+            "name": resource_based_permission_name,
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [test_resource_id],
+            "scopes": [],
+            "policies": [role_based_policy_id],
+        },
+    )
+
+    # Test getting associated policies for a permission
+    associated_policies = await admin.a_get_client_authz_permission_associated_policies(
+        client_id=auth_client_id, policy_id=resource_based_permission_id
+    )
+    assert len(associated_policies) == 1
+    assert associated_policies[0]["name"].startswith(role_based_policy_name)
 
     # Test authz scopes
     res = await admin.a_get_client_authz_scopes(client_id=auth_client_id)
