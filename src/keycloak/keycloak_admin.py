@@ -4071,9 +4071,11 @@ class KeycloakAdmin:
         """Get associated policies for a given client policy.
 
         :param client_id: id in ClientRepresentation
-            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
-        :param policy_id: id in RoleRepresentation
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
