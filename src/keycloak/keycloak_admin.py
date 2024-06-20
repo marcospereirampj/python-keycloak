@@ -4310,11 +4310,14 @@ class KeycloakAdmin:
     # async functions start
     async def a___fetch_all(self, url, query=None):
         """Paginate asynchronously over get requests .
+
         Wrapper function to paginate GET requests.
+
         :param url: The url on which the query is executed
         :type url: str
         :param query: Existing query parameters (optional)
         :type query: dict
+
         :return: Combined results of paginated queries
         :rtype: list
         """
@@ -4342,6 +4345,7 @@ class KeycloakAdmin:
 
     async def a___fetch_paginated(self, url, query=None):
         """Make a specific paginated request asynchronously.
+
         :param url: The url on which the query is executed
         :type url: str
         :param query: Pagination settings
@@ -4356,6 +4360,7 @@ class KeycloakAdmin:
 
     async def a_get_current_realm(self) -> str:
         """Return the currently configured realm asynchronously.
+
         :returns: Currently configured realm name
         :rtype: str
         """
@@ -4363,6 +4368,7 @@ class KeycloakAdmin:
 
     async def a_change_current_realm(self, realm_name: str) -> None:
         """Change the current realm asynchronously.
+
         :param realm_name: The name of the realm to be configured as current
         :type realm_name: str
         """
@@ -4370,9 +4376,12 @@ class KeycloakAdmin:
 
     async def a_import_realm(self, payload):
         """Import a new realm asynchronously from a RealmRepresentation.
+
         Realm name must be unique.
+
         RealmRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
+
         :param payload: RealmRepresentation
         :type payload: dict
         :return: RealmRepresentation
@@ -4385,13 +4394,17 @@ class KeycloakAdmin:
 
     async def a_partial_import_realm(self, realm_name, payload):
         """Partial import realm configuration asynchronously from PartialImportRepresentation.
+
         Realm partialImport is used for modifying configuration of existing realm.
+
         PartialImportRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_partialimportrepresentation
+
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
         :param payload: PartialImportRepresentation
         :type payload: dict
+
         :return: PartialImportResponse
         :rtype: dict
         """
@@ -4404,12 +4417,15 @@ class KeycloakAdmin:
 
     async def a_export_realm(self, export_clients=False, export_groups_and_role=False):
         """Export the realm configurations asynchronously in the json format.
+
         RealmRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_partialexport
+
         :param export_clients: Skip if not want to export realm clients
         :type export_clients: bool
         :param export_groups_and_role: Skip if not want to export realm groups and roles
         :type export_groups_and_role: bool
+
         :return: realm configurations JSON
         :rtype: dict
         """
@@ -4425,6 +4441,7 @@ class KeycloakAdmin:
 
     async def a_get_realms(self):
         """List all realms in asynchronouslyKeycloak deployment.
+
         :return: realms list
         :rtype: list
         """
@@ -4433,8 +4450,10 @@ class KeycloakAdmin:
 
     async def a_get_realm(self, realm_name):
         """Get a specific realm asynchronously.
+
         RealmRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
+
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
         :return: RealmRepresentation
@@ -4448,8 +4467,10 @@ class KeycloakAdmin:
 
     async def a_create_realm(self, payload, skip_exists=False):
         """Create a realm asynchronously.
+
         RealmRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
+
         :param payload: RealmRepresentation
         :type payload: dict
         :param skip_exists: Skip if Realm already exist.
@@ -4466,10 +4487,13 @@ class KeycloakAdmin:
 
     async def a_update_realm(self, realm_name, payload):
         """Update a realm asynchronously.
+
         This will only update top level attributes and will ignore any user,
         role, or client information in the payload.
+
         RealmRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmrepresentation
+
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
         :param payload: RealmRepresentation
@@ -4485,6 +4509,7 @@ class KeycloakAdmin:
 
     async def a_delete_realm(self, realm_name):
         """Delete a realm asynchronously.
+
         :param realm_name: Realm name (not the realm id)
         :type realm_name: str
         :return: Http response
@@ -4498,9 +4523,12 @@ class KeycloakAdmin:
 
     async def a_get_users(self, query=None):
         """Get all users asynchronously.
+
         Return a list of users, filtered according to query parameters
+
         UserRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
+
         :param query: Query parameters (optional)
         :type query: dict
         :return: users list
@@ -4517,8 +4545,10 @@ class KeycloakAdmin:
 
     async def a_create_idp(self, payload):
         """Create an ID Provider asynchronously.
+
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
+
         :param: payload: IdentityProviderRepresentation
         :type payload: dict
         :returns: Keycloak server response
@@ -4532,8 +4562,10 @@ class KeycloakAdmin:
 
     async def a_update_idp(self, idp_alias, payload):
         """Update an ID Provider asynchronously.
+
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identity_providers_resource
+
         :param: idp_alias: alias for IdP to update
         :type idp_alias: str
         :param: payload: The IdentityProviderRepresentation
@@ -4549,8 +4581,10 @@ class KeycloakAdmin:
 
     async def a_add_mapper_to_idp(self, idp_alias, payload):
         """Create an ID Provider asynchronously.
+
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityprovidermapperrepresentation
+
         :param: idp_alias: alias for Idp to add mapper in
         :type idp_alias: str
         :param: payload: IdentityProviderMapperRepresentation
@@ -4566,8 +4600,10 @@ class KeycloakAdmin:
 
     async def a_update_mapper_in_idp(self, idp_alias, mapper_id, payload):
         """Update an IdP mapper asynchronously.
+
         IdentityProviderMapperRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_update
+
         :param: idp_alias: alias for Idp to fetch mappers
         :type idp_alias: str
         :param: mapper_id: Mapper Id to update
@@ -4592,9 +4628,12 @@ class KeycloakAdmin:
 
     async def a_get_idp_mappers(self, idp_alias):
         """Get IDP mappers asynchronously.
+
         Returns a list of ID Providers mappers
+
         IdentityProviderMapperRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getmappers
+
         :param: idp_alias: alias for Idp to fetch mappers
         :type idp_alias: str
         :return: array IdentityProviderMapperRepresentation
@@ -4608,9 +4647,12 @@ class KeycloakAdmin:
 
     async def a_get_idps(self):
         """Get IDPs asynchronously.
+
         Returns a list of ID Providers,
+
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
+
         :return: array IdentityProviderRepresentation
         :rtype: list
         """
@@ -4622,9 +4664,12 @@ class KeycloakAdmin:
 
     async def a_get_idp(self, idp_alias):
         """Get IDP provider asynchronously.
+
         Get the representation of a specific IDP Provider.
+
         IdentityProviderRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_identityproviderrepresentation
+
         :param: idp_alias: alias for IdP to get
         :type idp_alias: str
         :return: IdentityProviderRepresentation
@@ -4638,6 +4683,7 @@ class KeycloakAdmin:
 
     async def a_delete_idp(self, idp_alias):
         """Delete an ID Provider asynchronously.
+
         :param: idp_alias: idp alias name
         :type idp_alias: str
         :returns: Keycloak server response
@@ -4651,14 +4697,18 @@ class KeycloakAdmin:
 
     async def a_create_user(self, payload, exist_ok=False):
         """Create a new user asynchronously.
+
         Username must be unique
+
         UserRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
+
         :param payload: UserRepresentation
         :type payload: dict
         :param exist_ok: If False, raise KeycloakGetError if username already exists.
             Otherwise, return existing user ID.
         :type exist_ok: bool
+
         :return: user_id
         :rtype: str
         """
@@ -4679,9 +4729,12 @@ class KeycloakAdmin:
 
     async def a_users_count(self, query=None):
         """Count users asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_users_resource
+
         :param query: (dict) Query parameters for users count
         :type query: dict
+
         :return: counter
         :rtype: int
         """
@@ -4694,11 +4747,15 @@ class KeycloakAdmin:
 
     async def a_get_user_id(self, username):
         """Get internal keycloak user id from username asynchronously.
+
         This is required for further actions against this user.
+
         UserRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
+
         :param username: id in UserRepresentation
         :type username: str
+
         :return: user_id
         :rtype: str
         """
@@ -4710,8 +4767,10 @@ class KeycloakAdmin:
 
     async def a_get_user(self, user_id):
         """Get representation of the user asynchronously.
+
         UserRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userrepresentation
+
         :param user_id: User id
         :type user_id: str
         :return: UserRepresentation
@@ -4724,7 +4783,9 @@ class KeycloakAdmin:
 
     async def a_get_user_groups(self, user_id, query=None, brief_representation=True):
         """Get user groups asynchronously.
+
         Returns a list of groups of which the user is a member
+
         :param user_id: User id
         :type user_id: str
         :param query: Additional query options
@@ -4751,10 +4812,12 @@ class KeycloakAdmin:
 
     async def a_update_user(self, user_id, payload):
         """Update the user asynchronously.
+
         :param user_id: User id
         :type user_id: str
         :param payload: UserRepresentation
         :type payload: dict
+
         :return: Http response
         :rtype: bytes
         """
@@ -4766,8 +4829,10 @@ class KeycloakAdmin:
 
     async def a_disable_user(self, user_id):
         """Disable the user asynchronously from the realm. Disabled users can not log in.
+
         :param user_id: User id
         :type user_id: str
+
         :return: Http response
         :rtype: bytes
         """
@@ -4775,8 +4840,10 @@ class KeycloakAdmin:
 
     async def a_enable_user(self, user_id):
         """Enable the user from the realm asynchronously.
+
         :param user_id: User id
         :type user_id: str
+
         :return: Http response
         :rtype: bytes
         """
@@ -4798,6 +4865,7 @@ class KeycloakAdmin:
 
     async def a_delete_user(self, user_id):
         """Delete the user asynchronously.
+
         :param user_id: User id
         :type user_id: str
         :return: Http response
@@ -4811,10 +4879,13 @@ class KeycloakAdmin:
 
     async def a_set_user_password(self, user_id, password, temporary=True):
         """Set up a password for the user asynchronously.
+
         If temporary is True, the user will have to reset
         the temporary password next time they log in.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_users_resource
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_credentialrepresentation
+
         :param user_id: User id
         :type user_id: str
         :param password: New password
@@ -4833,9 +4904,12 @@ class KeycloakAdmin:
 
     async def a_get_credentials(self, user_id):
         """Get user credentials asynchronously.
+
         Returns a list of credential belonging to the user.
+
         CredentialRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_credentialrepresentation
+
         :param: user_id: user id
         :type user_id: str
         :returns: Keycloak server response (CredentialRepresentation)
@@ -4849,8 +4923,10 @@ class KeycloakAdmin:
 
     async def a_delete_credential(self, user_id, credential_id):
         """Delete credential of the user asynchronously.
+
         CredentialRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_credentialrepresentation
+
         :param: user_id: user id
         :type user_id: str
         :param: credential_id: credential id
@@ -4870,7 +4946,9 @@ class KeycloakAdmin:
 
     async def a_user_logout(self, user_id):
         """Log out the user.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_logout
+
         :param user_id: User id
         :type user_id: str
         :returns: Keycloak server response
@@ -4884,8 +4962,10 @@ class KeycloakAdmin:
 
     async def a_user_consents(self, user_id):
         """Get consents granted asynchronously by the user.
+
         UserConsentRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userconsentrepresentation
+
         :param user_id: User id
         :type user_id: str
         :returns: List of UserConsentRepresentations
@@ -4899,6 +4979,7 @@ class KeycloakAdmin:
 
     async def a_get_user_social_logins(self, user_id):
         """Get user social logins asynchronously.
+
         Returns a list of federated identities/social logins of which the user has been associated
         with
         :param user_id: User id
@@ -4916,6 +4997,7 @@ class KeycloakAdmin:
         self, user_id, provider_id, provider_userid, provider_username
     ):
         """Add a federated identity / social login provider asynchronously to the user.
+
         :param user_id: User id
         :type user_id: str
         :param provider_id: Social login provider id
@@ -4945,6 +5027,7 @@ class KeycloakAdmin:
 
     async def a_delete_user_social_login(self, user_id, provider_id):
         """Delete a federated identity / social login provider asynchronously from the user.
+
         :param user_id: User id
         :type user_id: str
         :param provider_id: Social login provider id
@@ -4966,7 +5049,9 @@ class KeycloakAdmin:
         self, user_id, payload, client_id=None, lifespan=None, redirect_uri=None
     ):
         """Send an update account email to the user asynchronously.
+
         An email contains a link the user can click to perform a set of required actions.
+
         :param user_id: User id
         :type user_id: str
         :param payload: A list of actions for the user to complete
@@ -4977,6 +5062,7 @@ class KeycloakAdmin:
         :type lifespan: int
         :param redirect_uri: The redirect uri (optional)
         :type redirect_uri: str
+
         :returns: Keycloak server response
         :rtype: bytes
         """
@@ -4991,13 +5077,16 @@ class KeycloakAdmin:
 
     async def a_send_verify_email(self, user_id, client_id=None, redirect_uri=None):
         """Send a update account email to the user asynchronously.
+
         An email contains a link the user can click to perform a set of required actions.
+
         :param user_id: User id
         :type user_id: str
         :param client_id: Client id (optional)
         :type client_id: str
         :param redirect_uri: Redirect uri (optional)
         :type redirect_uri: str
+
         :returns: Keycloak server response
         :rtype: bytes
         """
@@ -5012,8 +5101,10 @@ class KeycloakAdmin:
 
     async def a_get_sessions(self, user_id):
         """Get sessions associated with the user asynchronously.
+
         UserSessionRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_usersessionrepresentation
+
         :param user_id: Id of user
         :type user_id: str
         :return: UserSessionRepresentation
@@ -5027,8 +5118,10 @@ class KeycloakAdmin:
 
     async def a_get_server_info(self):
         """Get themes, social providers, etc. on this server asynchronously.
+
         ServerInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_serverinforepresentation
+
         :return: ServerInfoRepresentation
         :rtype: dict
         """
@@ -5037,12 +5130,16 @@ class KeycloakAdmin:
 
     async def a_get_groups(self, query=None, full_hierarchy=False):
         """Get groups asynchronously.
+
         Returns a list of groups belonging to the realm
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         Notice that when using full_hierarchy=True, the response will be a nested structure
         containing all the children groups. If used with query parameters, the full_hierarchy
         will be applied to the received groups only.
+
         :param query: Additional query options
         :type query: dict
         :param full_hierarchy: If True, return all of the nested children groups, otherwise only
@@ -5071,9 +5168,12 @@ class KeycloakAdmin:
 
     async def a_get_group(self, group_id, full_hierarchy=False):
         """Get group by id asynchronously.
+
         Returns full group details
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         :param group_id: The group id
         :type group_id: str
         :param full_hierarchy: If True, return all of the nested children groups, otherwise only
@@ -5101,9 +5201,12 @@ class KeycloakAdmin:
 
     async def a_get_subgroups(self, group, path):
         """Get subgroups asynchronously.
+
         Utility function to iterate through nested group structures
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         :param group: group (GroupRepresentation)
         :type group: dict
         :param path: group path (string)
@@ -5124,7 +5227,9 @@ class KeycloakAdmin:
 
     async def a_get_group_children(self, group_id, query=None, full_hierarchy=False):
         """Get group children by parent id asynchronously.
+
         Returns full group children details
+
         :param group_id: The parent group id
         :type group_id: str
         :param query: Additional query options
@@ -5158,9 +5263,12 @@ class KeycloakAdmin:
 
     async def a_get_group_members(self, group_id, query=None):
         """Get members by group id asynchronously.
+
         Returns group members
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_userrepresentation
+
         :param group_id: The group id
         :type group_id: str
         :param query: Additional query parameters
@@ -5180,9 +5288,12 @@ class KeycloakAdmin:
 
     async def a_get_group_by_path(self, path):
         """Get group id based on name or path asynchronously .
+
         Returns full group details for a group defined by path
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         :param path: group path
         :type path: str
         :return: Keycloak server response (GroupRepresentation)
@@ -5196,14 +5307,17 @@ class KeycloakAdmin:
 
     async def a_create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm asynchronously.
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         :param payload: GroupRepresentation
         :type payload: dict
         :param parent: parent group's id. Required to create a sub-group.
         :type parent: str
         :param skip_exists: If true then do not raise an error if it already exists
         :type skip_exists: bool
+
         :return: Group id for newly created group or None for an existing group
         :rtype: str
         """
@@ -5229,12 +5343,15 @@ class KeycloakAdmin:
 
     async def a_update_group(self, group_id, payload):
         """Update group, ignores subgroups asynchronously.
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
+
         :param group_id: id of group
         :type group_id: str
         :param payload: GroupRepresentation with updated information.
         :type payload: dict
+
         :return: Http response
         :rtype: bytes
         """
@@ -5246,9 +5363,12 @@ class KeycloakAdmin:
 
     async def a_groups_count(self, query=None):
         """Count groups asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_groups
+
         :param query: (dict) Query parameters for groups count
         :type query: dict
+
         :return: Keycloak Server Response
         :rtype: dict
         """
@@ -5261,7 +5381,9 @@ class KeycloakAdmin:
 
     async def a_group_set_permissions(self, group_id, enabled=True):
         """Enable/Disable permissions for a group asynchronously.
+
         Cannot delete group if disabled
+
         :param group_id: id of group
         :type group_id: str
         :param enabled: Enabled flag
@@ -5278,6 +5400,7 @@ class KeycloakAdmin:
 
     async def a_group_user_add(self, user_id, group_id):
         """Add user to group (user_id and group_id) asynchronously.
+
         :param user_id:  id of user
         :type user_id: str
         :param group_id:  id of group to add to
@@ -5297,6 +5420,7 @@ class KeycloakAdmin:
 
     async def a_group_user_remove(self, user_id, group_id):
         """Remove user from group (user_id and group_id) asynchronously.
+
         :param user_id:  id of user
         :type user_id: str
         :param group_id:  id of group to remove from
@@ -5316,6 +5440,7 @@ class KeycloakAdmin:
 
     async def a_delete_group(self, group_id):
         """Delete a group in the Realm asynchronously.
+
         :param group_id:  id of group to delete
         :type group_id: str
         :return: Keycloak server response
@@ -5329,9 +5454,12 @@ class KeycloakAdmin:
 
     async def a_get_clients(self):
         """Get clients asynchronously.
+
         Returns a list of clients belonging to the realm
+
         ClientRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+
         :return: Keycloak server response (ClientRepresentation)
         :rtype: list
         """
@@ -5343,8 +5471,10 @@ class KeycloakAdmin:
 
     async def a_get_client(self, client_id):
         """Get representation of the client asynchronously.
+
         ClientRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+
         :param client_id:  id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
@@ -5358,7 +5488,9 @@ class KeycloakAdmin:
 
     async def a_get_client_id(self, client_id):
         """Get internal keycloak client id from client-id asynchronously.
+
         This is required for further actions against this client.
+
         :param client_id: clientId in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5379,6 +5511,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_settings(self, client_id):
         """Get authorization json from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5393,6 +5526,7 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_resource(self, client_id, payload, skip_exists=False):
         """Create resources of client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5401,6 +5535,7 @@ class KeycloakAdmin:
         :type payload: dict
         :param skip_exists: Skip the creation in case the resource exists
         :type skip_exists: bool
+
         :return: Keycloak server response
         :rtype: bytes
         """
@@ -5416,8 +5551,10 @@ class KeycloakAdmin:
 
     async def a_update_client_authz_resource(self, client_id, resource_id, payload):
         """Update resource of client asynchronously.
+
         Any parameter missing from the ResourceRepresentation in the payload WILL be set
         to default by the Keycloak server.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5430,6 +5567,7 @@ class KeycloakAdmin:
         :param resource_id: id in ResourceRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
+
         :return: Keycloak server response
         :rtype: bytes
         """
@@ -5446,12 +5584,14 @@ class KeycloakAdmin:
 
     async def a_delete_client_authz_resource(self, client_id: str, resource_id: str):
         """Delete a client resource asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param resource_id: id in ResourceRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
+
         :return: Keycloak server response
         :rtype: bytes
         """
@@ -5467,6 +5607,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_resources(self, client_id):
         """Get resources from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5481,12 +5622,14 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_resource(self, client_id: str, resource_id: str):
         """Get a client resource asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param resource_id: id in ResourceRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_resourcerepresentation
         :type resource_id: str
+
         :return: Keycloak server response (ResourceRepresentation)
         :rtype: dict
         """
@@ -5502,7 +5645,9 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_role_based_policy(self, client_id, payload, skip_exists=False):
         """Create role-based policy of client asynchronously.
+
         Payload example::
+
             payload={
                 "type": "role",
                 "logic": "POSITIVE",
@@ -5514,6 +5659,7 @@ class KeycloakAdmin:
                     }
                 ]
             }
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5523,6 +5669,7 @@ class KeycloakAdmin:
         :type skip_exists: bool
         :return: Keycloak server response
         :rtype: bytes
+
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
@@ -5536,7 +5683,9 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_policy(self, client_id, payload, skip_exists=False):
         """Create an authz policy of client asynchronously.
+
         Payload example::
+
             payload={
                 "name": "Policy-time-based",
                 "type": "time",
@@ -5547,6 +5696,7 @@ class KeycloakAdmin:
                     "hour": "9"
                 }
             }
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5556,6 +5706,7 @@ class KeycloakAdmin:
         :type skip_exists: bool
         :return: Keycloak server response
         :rtype: bytes
+
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
@@ -5571,7 +5722,9 @@ class KeycloakAdmin:
         self, client_id, payload, skip_exists=False
     ):
         """Create resource-based permission of client asynchronously.
+
         Payload example::
+
             payload={
                 "type": "resource",
                 "logic": "POSITIVE",
@@ -5583,6 +5736,7 @@ class KeycloakAdmin:
                 "policies": [
                     policy_id
                 ]
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5593,6 +5747,7 @@ class KeycloakAdmin:
         :type skip_exists: bool
         :return: Keycloak server response
         :rtype: bytes
+
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
 
@@ -5606,6 +5761,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_scopes(self, client_id):
         """Get scopes from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5620,6 +5776,7 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_scopes(self, client_id, payload):
         """Create scopes for client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :param payload: ScopeRepresentation
@@ -5638,6 +5795,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_permissions(self, client_id):
         """Get permissions from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5652,6 +5810,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_policies(self, client_id):
         """Get policies from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5666,6 +5825,7 @@ class KeycloakAdmin:
 
     async def a_delete_client_authz_policy(self, client_id, policy_id):
         """Delete a policy from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5687,6 +5847,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_policy(self, client_id, policy_id):
         """Get a policy from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5708,6 +5869,7 @@ class KeycloakAdmin:
 
     async def a_get_client_service_account_user(self, client_id):
         """Get service account user from client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -5722,8 +5884,10 @@ class KeycloakAdmin:
 
     async def a_get_client_default_client_scopes(self, client_id):
         """Get all default client scopes from client asynchronously.
+
         :param client_id: id of the client in which the new default client scope should be added
         :type client_id: str
+
         :return: list of client scopes with id and name
         :rtype: list
         """
@@ -5735,18 +5899,22 @@ class KeycloakAdmin:
 
     async def a_add_client_default_client_scope(self, client_id, client_scope_id, payload):
         """Add a client scope to the default client scopes from client asynchronously.
+
         Payload example::
+
             payload={
                 "realm":"testrealm",
                 "client":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 "clientScopeId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
             }
+
         :param client_id: id of the client in which the new default client scope should be added
         :type client_id: str
         :param client_scope_id: id of the new client scope that should be added
         :type client_scope_id: str
         :param payload: dictionary with realm, client and clientScopeId
         :type payload: dict
+
         :return: Http response
         :rtype: bytes
         """
@@ -5763,10 +5931,12 @@ class KeycloakAdmin:
 
     async def a_delete_client_default_client_scope(self, client_id, client_scope_id):
         """Delete a client scope from the default client scopes of the client asynchronously.
+
         :param client_id: id of the client in which the default client scope should be deleted
         :type client_id: str
         :param client_scope_id: id of the client scope that should be deleted
         :type client_scope_id: str
+
         :return: list of client scopes with id and name
         :rtype: list
         """
@@ -5782,8 +5952,10 @@ class KeycloakAdmin:
 
     async def a_get_client_optional_client_scopes(self, client_id):
         """Get all optional client scopes from client asynchronously.
+
         :param client_id: id of the client in which the new optional client scope should be added
         :type client_id: str
+
         :return: list of client scopes with id and name
         :rtype: list
         """
@@ -5795,18 +5967,22 @@ class KeycloakAdmin:
 
     async def a_add_client_optional_client_scope(self, client_id, client_scope_id, payload):
         """Add a client scope to the optional client scopes from client asynchronously.
+
         Payload example::
+
             payload={
                 "realm":"testrealm",
                 "client":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 "clientScopeId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
             }
+
         :param client_id: id of the client in which the new optional client scope should be added
         :type client_id: str
         :param client_scope_id: id of the new client scope that should be added
         :type client_scope_id: str
         :param payload: dictionary with realm, client and clientScopeId
         :type payload: dict
+
         :return: Http response
         :rtype: bytes
         """
@@ -5823,10 +5999,12 @@ class KeycloakAdmin:
 
     async def a_delete_client_optional_client_scope(self, client_id, client_scope_id):
         """Delete a client scope from the optional client scopes of the client asynchronously.
+
         :param client_id: id of the client in which the optional client scope should be deleted
         :type client_id: str
         :param client_scope_id: id of the client scope that should be deleted
         :type client_scope_id: str
+
         :return: list of client scopes with id and name
         :rtype: list
         """
@@ -5842,6 +6020,7 @@ class KeycloakAdmin:
 
     async def a_create_initial_access_token(self, count: int = 1, expiration: int = 1):
         """Create an initial access token asynchronously.
+
         :param count: Number of clients that can be registered
         :type count: int
         :param expiration: Days until expireation
@@ -5859,8 +6038,10 @@ class KeycloakAdmin:
 
     async def a_create_client(self, payload, skip_exists=False):
         """Create a client asynchronously.
+
         ClientRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+
         :param skip_exists: If true then do not raise an error if client already exists
         :type skip_exists: bool
         :param payload: ClientRepresentation
@@ -5886,10 +6067,12 @@ class KeycloakAdmin:
 
     async def a_update_client(self, client_id, payload):
         """Update a client asynchronously.
+
         :param client_id: Client id
         :type client_id: str
         :param payload: ClientRepresentation
         :type payload: dict
+
         :return: Http response
         :rtype: bytes
         """
@@ -5901,8 +6084,10 @@ class KeycloakAdmin:
 
     async def a_delete_client(self, client_id):
         """Get representation of the client asynchronously.
+
         ClientRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+
         :param client_id: keycloak client id (not oauth client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
@@ -5916,10 +6101,13 @@ class KeycloakAdmin:
 
     async def a_get_client_installation_provider(self, client_id, provider_id):
         """Get content for given installation provider asynchronously.
+
         Related documentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clients_resource
+
         Possible provider_id list available in the ServerInfoRepresentation#clientInstallations
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_serverinforepresentation
+
         :param client_id: Client id
         :type client_id: str
         :param provider_id: provider id to specify response format
@@ -5939,8 +6127,10 @@ class KeycloakAdmin:
 
     async def a_get_realm_roles(self, brief_representation=True, search_text=""):
         """Get all roles for the realm or client asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param brief_representation: whether to omit role attributes in the response
         :type brief_representation: bool
         :param search_text: optional search text to limit the returned result.
@@ -5965,6 +6155,7 @@ class KeycloakAdmin:
 
     async def a_get_realm_role_groups(self, role_name, query=None, brief_representation=True):
         """Get role groups of realm by role name asynchronously.
+
         :param role_name: Name of the role.
         :type role_name: str
         :param query: Additional Query parameters
@@ -5992,6 +6183,7 @@ class KeycloakAdmin:
 
     async def a_get_realm_role_members(self, role_name, query=None):
         """Get role members of realm by role name asynchronously.
+
         :param role_name: Name of the role.
         :type role_name: str
         :param query: Additional Query parameters
@@ -6008,6 +6200,7 @@ class KeycloakAdmin:
 
     async def a_get_default_realm_role_id(self):
         """Get the ID of the default realm role asynchronously.
+
         :return: Realm role ID
         :rtype: str
         """
@@ -6021,6 +6214,7 @@ class KeycloakAdmin:
 
     async def a_get_realm_default_roles(self):
         """Get all the default realm roles asyncho asynchronously.
+
         :return: Keycloak Server Response (UserRepresentation)
         :rtype: list
         """
@@ -6035,6 +6229,7 @@ class KeycloakAdmin:
 
     async def a_remove_realm_default_roles(self, payload):
         """Remove a set of default realm roles asynchronously.
+
         :param payload: List of RoleRepresentations
         :type payload: list
         :return: Keycloak Server Response
@@ -6052,6 +6247,7 @@ class KeycloakAdmin:
 
     async def a_add_realm_default_roles(self, payload):
         """Add a set of default realm roles asynchronously.
+
         :param payload: List of RoleRepresentations
         :type payload: list
         :return: Keycloak Server Response
@@ -6069,8 +6265,10 @@ class KeycloakAdmin:
 
     async def a_get_client_roles(self, client_id, brief_representation=True):
         """Get all roles for the client asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param brief_representation: whether to omit role attributes in the response
@@ -6087,9 +6285,12 @@ class KeycloakAdmin:
 
     async def a_get_client_role(self, client_id, role_name):
         """Get client role id by name asynchronously.
+
         This is required for further actions with this role.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param role_name: role's name (not id!)
@@ -6109,9 +6310,12 @@ class KeycloakAdmin:
 
     async def a_get_client_role_id(self, client_id, role_name):
         """Get client role id by name asynchronously.
+
         This is required for further actions with this role.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param role_name: role's name (not id!)
@@ -6124,8 +6328,10 @@ class KeycloakAdmin:
 
     async def a_create_client_role(self, client_role_id, payload, skip_exists=False):
         """Create a client role asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_role_id: id of client (not client-id)
         :type client_role_id: str
         :param payload: RoleRepresentation
@@ -6156,6 +6362,7 @@ class KeycloakAdmin:
 
     async def a_add_composite_client_roles_to_role(self, client_role_id, role_name, roles):
         """Add composite roles to client role asynchronously.
+
         :param client_role_id: id of client (not client-id)
         :type client_role_id: str
         :param role_name: The name of the role
@@ -6179,8 +6386,10 @@ class KeycloakAdmin:
 
     async def a_update_client_role(self, client_id, role_name, payload):
         """Update a client role asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param role_name: role's name (not id!)
@@ -6202,8 +6411,10 @@ class KeycloakAdmin:
 
     async def a_delete_client_role(self, client_role_id, role_name):
         """Delete a client role asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param client_role_id: id of client (not client-id)
         :type client_role_id: str
         :param role_name: role's name (not id!)
@@ -6223,6 +6434,7 @@ class KeycloakAdmin:
 
     async def a_assign_client_role(self, user_id, client_id, roles):
         """Assign a client role to a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param client_id: id of client (not client-id)
@@ -6246,6 +6458,7 @@ class KeycloakAdmin:
 
     async def a_get_client_role_members(self, client_id, role_name, **query):
         """Get members by client role asynchronously.
+
         :param client_id: The client id
         :type client_id: str
         :param role_name: the name of role to be queried.
@@ -6267,6 +6480,7 @@ class KeycloakAdmin:
 
     async def a_get_client_role_groups(self, client_id, role_name, **query):
         """Get group members by client role asynchronously.
+
         :param client_id: The client id
         :type client_id: str
         :param role_name: the name of role to be queried.
@@ -6288,8 +6502,10 @@ class KeycloakAdmin:
 
     async def a_get_role_by_id(self, role_id):
         """Get a specific role’s representation asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param role_id: id of role
         :type role_id: str
         :return: Keycloak server response (RoleRepresentation)
@@ -6303,8 +6519,10 @@ class KeycloakAdmin:
 
     async def a_update_role_by_id(self, role_id, payload):
         """Update the role asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param payload: RoleRepresentation
         :type payload: dict
         :param role_id: id of role
@@ -6321,8 +6539,10 @@ class KeycloakAdmin:
 
     async def a_delete_role_by_id(self, role_id):
         """Delete a role by its id asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param role_id: id of role
         :type role_id: str
         :returns: Keycloak server response
@@ -6336,6 +6556,7 @@ class KeycloakAdmin:
 
     async def a_create_realm_role(self, payload, skip_exists=False):
         """Create a new role for the realm or client asynchronously.
+
         :param payload: The role (use RoleRepresentation)
         :type payload: dict
         :param skip_exists: If true then do not raise an error if realm role already exists
@@ -6362,8 +6583,10 @@ class KeycloakAdmin:
 
     async def a_get_realm_role(self, role_name):
         """Get realm role by role name asynchronously.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param role_name: role's name, not id!
         :type role_name: str
         :return: role
@@ -6377,8 +6600,10 @@ class KeycloakAdmin:
 
     async def a_get_realm_role_by_id(self, role_id: str):
         """Get realm role by role id.
+
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+
         :param role_id: role's id, not name!
         :type role_id: str
         :return: role
@@ -6392,6 +6617,7 @@ class KeycloakAdmin:
 
     async def a_update_realm_role(self, role_name, payload):
         """Update a role for the realm by name asynchronously.
+
         :param role_name: The name of the role to be updated
         :type role_name: str
         :param payload: The role (use RoleRepresentation)
@@ -6408,6 +6634,7 @@ class KeycloakAdmin:
 
     async def a_delete_realm_role(self, role_name):
         """Delete a role for the realm by name asynchronously.
+
         :param role_name: The role name
         :type role_name: str
         :return: Keycloak server response
@@ -6421,6 +6648,7 @@ class KeycloakAdmin:
 
     async def a_add_composite_realm_roles_to_role(self, role_name, roles):
         """Add composite roles to the role asynchronously.
+
         :param role_name: The name of the role
         :type role_name: str
         :param roles: roles list or role (use RoleRepresentation) to be updated
@@ -6438,6 +6666,7 @@ class KeycloakAdmin:
 
     async def a_remove_composite_realm_roles_to_role(self, role_name, roles):
         """Remove composite roles from the role asynchronously.
+
         :param role_name: The name of the role
         :type role_name: str
         :param roles: roles list or role (use RoleRepresentation) to be removed
@@ -6455,6 +6684,7 @@ class KeycloakAdmin:
 
     async def a_get_composite_realm_roles_of_role(self, role_name):
         """Get composite roles of the role asynchronously.
+
         :param role_name: The name of the role
         :type role_name: str
         :return: Keycloak server response (array RoleRepresentation)
@@ -6468,6 +6698,7 @@ class KeycloakAdmin:
 
     async def a_assign_realm_roles_to_client_scope(self, client_id, roles):
         """Assign realm roles to a client's scope asynchronously.
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param roles: roles list or role (use RoleRepresentation)
@@ -6485,6 +6716,7 @@ class KeycloakAdmin:
 
     async def a_delete_realm_roles_of_client_scope(self, client_id, roles):
         """Delete realm roles of a client's scope asynchronously.
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param roles: roles list or role (use RoleRepresentation)
@@ -6502,6 +6734,7 @@ class KeycloakAdmin:
 
     async def a_get_realm_roles_of_client_scope(self, client_id):
         """Get all realm roles for a client's scope.
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (array RoleRepresentation)
@@ -6515,6 +6748,7 @@ class KeycloakAdmin:
 
     async def a_assign_client_roles_to_client_scope(self, client_id, client_roles_owner_id, roles):
         """Assign client roles to a client's scope asynchronously.
+
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
         :param client_roles_owner_id: id of client (not client-id) who has the roles
@@ -6538,6 +6772,7 @@ class KeycloakAdmin:
 
     async def a_delete_client_roles_of_client_scope(self, client_id, client_roles_owner_id, roles):
         """Delete client roles of a client's scope asynchronously.
+
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
         :param client_roles_owner_id: id of client (not client-id) who has the roles
@@ -6561,6 +6796,7 @@ class KeycloakAdmin:
 
     async def a_get_client_roles_of_client_scope(self, client_id, client_roles_owner_id):
         """Get all client roles for a client's scope asynchronously.
+
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param client_roles_owner_id: id of client (not client-id) who has the roles
@@ -6580,6 +6816,7 @@ class KeycloakAdmin:
 
     async def a_assign_realm_roles(self, user_id, roles):
         """Assign realm roles to a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param roles: roles list or role (use RoleRepresentation)
@@ -6597,6 +6834,7 @@ class KeycloakAdmin:
 
     async def a_delete_realm_roles_of_user(self, user_id, roles):
         """Delete realm roles of a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param roles: roles list or role (use RoleRepresentation)
@@ -6614,6 +6852,7 @@ class KeycloakAdmin:
 
     async def a_get_realm_roles_of_user(self, user_id):
         """Get all realm roles for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :return: Keycloak server response (array RoleRepresentation)
@@ -6627,6 +6866,7 @@ class KeycloakAdmin:
 
     async def a_get_available_realm_roles_of_user(self, user_id):
         """Get all available (i.e. unassigned) realm roles for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :return: Keycloak server response (array RoleRepresentation)
@@ -6640,6 +6880,7 @@ class KeycloakAdmin:
 
     async def a_get_composite_realm_roles_of_user(self, user_id, brief_representation=True):
         """Get all composite (i.e. implicit) realm roles for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param brief_representation: whether to omit role attributes in the response
@@ -6656,6 +6897,7 @@ class KeycloakAdmin:
 
     async def a_assign_group_realm_roles(self, group_id, roles):
         """Assign realm roles to a group asynchronously.
+
         :param group_id: id of group
         :type group_id: str
         :param roles: roles list or role (use GroupRoleRepresentation)
@@ -6673,6 +6915,7 @@ class KeycloakAdmin:
 
     async def a_delete_group_realm_roles(self, group_id, roles):
         """Delete realm roles of a group asynchronously.
+
         :param group_id: id of group
         :type group_id: str
         :param roles: roles list or role (use GroupRoleRepresentation)
@@ -6690,6 +6933,7 @@ class KeycloakAdmin:
 
     async def a_get_group_realm_roles(self, group_id, brief_representation=True):
         """Get all realm roles for a group asynchronously.
+
         :param group_id: id of the group
         :type group_id: str
         :param brief_representation: whether to omit role attributes in the response
@@ -6706,6 +6950,7 @@ class KeycloakAdmin:
 
     async def a_assign_group_client_roles(self, group_id, client_id, roles):
         """Assign client roles to a group asynchronously.
+
         :param group_id: id of group
         :type group_id: str
         :param client_id: id of client (not client-id)
@@ -6729,6 +6974,7 @@ class KeycloakAdmin:
 
     async def a_get_group_client_roles(self, group_id, client_id):
         """Get client roles of a group asynchronously.
+
         :param group_id: id of group
         :type group_id: str
         :param client_id: id of client (not client-id)
@@ -6748,6 +6994,7 @@ class KeycloakAdmin:
 
     async def a_delete_group_client_roles(self, group_id, client_id, roles):
         """Delete client roles of a group asynchronously.
+
         :param group_id: id of group
         :type group_id: str
         :param client_id: id of client (not client-id)
@@ -6771,6 +7018,7 @@ class KeycloakAdmin:
 
     async def a_get_all_roles_of_user(self, user_id):
         """Get all level roles for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :return: Keycloak server response (array RoleRepresentation)
@@ -6784,6 +7032,7 @@ class KeycloakAdmin:
 
     async def a_get_client_roles_of_user(self, user_id, client_id):
         """Get all client roles for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param client_id: id of client (not client-id)
@@ -6797,6 +7046,7 @@ class KeycloakAdmin:
 
     async def a_get_available_client_roles_of_user(self, user_id, client_id):
         """Get available client role-mappings for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param client_id: id of client (not client-id)
@@ -6812,6 +7062,7 @@ class KeycloakAdmin:
         self, user_id, client_id, brief_representation=False
     ):
         """Get composite client role-mappings for a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param client_id: id of client (not client-id)
@@ -6830,6 +7081,7 @@ class KeycloakAdmin:
         self, client_level_role_mapping_url, user_id, client_id, **params
     ):
         """Get client roles of a single user helper asynchronously.
+
         :param client_level_role_mapping_url: Url for the client role mapping
         :type client_level_role_mapping_url: str
         :param user_id: User id
@@ -6853,6 +7105,7 @@ class KeycloakAdmin:
 
     async def a_delete_client_roles_of_user(self, user_id, client_id, roles):
         """Delete client roles from a user asynchronously.
+
         :param user_id: id of user
         :type user_id: str
         :param client_id: id of client containing role (not client-id)
@@ -6876,9 +7129,12 @@ class KeycloakAdmin:
 
     async def a_get_authentication_flows(self):
         """Get authentication flows asynchronously.
+
         Returns all flow details
+
         AuthenticationFlowRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
         :return: Keycloak server response (AuthenticationFlowRepresentation)
         :rtype: list
         """
@@ -6890,9 +7146,12 @@ class KeycloakAdmin:
 
     async def a_get_authentication_flow_for_id(self, flow_id):
         """Get one authentication flow by it's id asynchronously.
+
         Returns all flow details
+
         AuthenticationFlowRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
         :param flow_id: the id of a flow NOT it's alias
         :type flow_id: str
         :return: Keycloak server response (AuthenticationFlowRepresentation)
@@ -6906,8 +7165,10 @@ class KeycloakAdmin:
 
     async def a_create_authentication_flow(self, payload, skip_exists=False):
         """Create a new authentication flow asynchronously.
+
         AuthenticationFlowRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
         :param payload: AuthenticationFlowRepresentation
         :type payload: dict
         :param skip_exists: Do not raise an error if authentication flow already exists
@@ -6925,7 +7186,9 @@ class KeycloakAdmin:
 
     async def a_copy_authentication_flow(self, payload, flow_alias):
         """Copy existing authentication flow under a new name asynchronously.
+
         The new name is given as 'newName' attribute of the passed payload.
+
         :param payload: JSON containing 'newName' attribute
         :type payload: dict
         :param flow_alias: the flow alias
@@ -6941,8 +7204,10 @@ class KeycloakAdmin:
 
     async def a_delete_authentication_flow(self, flow_id):
         """Delete authentication flow asynchronously.
+
         AuthenticationInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationinforepresentation
+
         :param flow_id: authentication flow id
         :type flow_id: str
         :return: Keycloak server response
@@ -6956,7 +7221,9 @@ class KeycloakAdmin:
 
     async def a_get_authentication_flow_executions(self, flow_alias):
         """Get authentication flow executions asynchronously.
+
         Returns all execution steps
+
         :param flow_alias: the flow alias
         :type flow_alias: str
         :return: Response(json)
@@ -6970,8 +7237,10 @@ class KeycloakAdmin:
 
     async def a_update_authentication_flow_executions(self, payload, flow_alias):
         """Update an authentication flow execution asynchronously.
+
         AuthenticationExecutionInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
+
         :param payload: AuthenticationExecutionInfoRepresentation
         :type payload: dict
         :param flow_alias: The flow alias
@@ -6988,8 +7257,10 @@ class KeycloakAdmin:
 
     async def a_get_authentication_flow_execution(self, execution_id):
         """Get authentication flow execution asynchronously.
+
         AuthenticationExecutionInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
+
         :param execution_id: the execution ID
         :type execution_id: str
         :return: Response(json)
@@ -7003,8 +7274,10 @@ class KeycloakAdmin:
 
     async def a_create_authentication_flow_execution(self, payload, flow_alias):
         """Create an authentication flow execution asynchronously.
+
         AuthenticationExecutionInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
+
         :param payload: AuthenticationExecutionInfoRepresentation
         :type payload: dict
         :param flow_alias: The flow alias
@@ -7021,8 +7294,10 @@ class KeycloakAdmin:
 
     async def a_delete_authentication_flow_execution(self, execution_id):
         """Delete authentication flow execution asynchronously.
+
         AuthenticationExecutionInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationexecutioninforepresentation
+
         :param execution_id: keycloak client id (not oauth client-id)
         :type execution_id: str
         :return: Keycloak server response (json)
@@ -7036,8 +7311,10 @@ class KeycloakAdmin:
 
     async def a_create_authentication_flow_subflow(self, payload, flow_alias, skip_exists=False):
         """Create a new sub authentication flow for a given authentication flow asynchronously.
+
         AuthenticationFlowRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
         :param payload: AuthenticationFlowRepresentation
         :type payload: dict
         :param flow_alias: The flow alias
@@ -7058,6 +7335,7 @@ class KeycloakAdmin:
 
     async def a_get_authenticator_providers(self):
         """Get authenticator providers list asynchronously.
+
         :return: Authenticator providers
         :rtype: list
         """
@@ -7069,8 +7347,10 @@ class KeycloakAdmin:
 
     async def a_get_authenticator_provider_config_description(self, provider_id):
         """Get authenticator's provider configuration description asynchronously.
+
         AuthenticatorConfigInfoRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfiginforepresentation
+
         :param provider_id: Provider Id
         :type provider_id: str
         :return: AuthenticatorConfigInfoRepresentation
@@ -7084,7 +7364,9 @@ class KeycloakAdmin:
 
     async def a_get_authenticator_config(self, config_id):
         """Get authenticator configuration asynchronously.
+
         Returns all configuration details.
+
         :param config_id: Authenticator config id
         :type config_id: str
         :return: Response(json)
@@ -7098,8 +7380,10 @@ class KeycloakAdmin:
 
     async def a_update_authenticator_config(self, payload, config_id):
         """Update an authenticator configuration asynchronously.
+
         AuthenticatorConfigRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfigrepresentation
+
         :param payload: AuthenticatorConfigRepresentation
         :type payload: dict
         :param config_id: Authenticator config id
@@ -7116,7 +7400,9 @@ class KeycloakAdmin:
 
     async def a_delete_authenticator_config(self, config_id):
         """Delete a authenticator configuration asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authentication_management_resource
+
         :param config_id: Authenticator config id
         :type config_id: str
         :return: Keycloak server Response
@@ -7130,6 +7416,7 @@ class KeycloakAdmin:
 
     async def a_sync_users(self, storage_id, action):
         """Trigger user sync from provider asynchronously.
+
         :param storage_id: The id of the user storage provider
         :type storage_id: str
         :param action: Action can be "triggerFullSync" or "triggerChangedUsersSync"
@@ -7150,8 +7437,10 @@ class KeycloakAdmin:
 
     async def a_get_client_scopes(self):
         """Get client scopes asynchronously.
+
         Get representation of the client scopes for the realm where we are connected to
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
+
         :return: Keycloak server response Array of (ClientScopeRepresentation)
         :rtype: list
         """
@@ -7163,8 +7452,10 @@ class KeycloakAdmin:
 
     async def a_get_client_scope(self, client_scope_id):
         """Get client scope asynchronously.
+
         Get representation of the client scopes for the realm where we are connected to
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :return: Keycloak server response (ClientScopeRepresentation)
@@ -7178,7 +7469,9 @@ class KeycloakAdmin:
 
     async def a_get_client_scope_by_name(self, client_scope_name):
         """Get client scope by name asynchronously.
+
         Get representation of the client scope identified by the client scope name.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
         :param client_scope_name: (str) Name of the client scope
         :type client_scope_name: str
@@ -7194,8 +7487,10 @@ class KeycloakAdmin:
 
     async def a_create_client_scope(self, payload, skip_exists=False):
         """Create a client scope asynchronously.
+
         ClientScopeRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientscopes
+
         :param payload: ClientScopeRepresentation
         :type payload: dict
         :param skip_exists: If true then do not raise an error if client scope already exists
@@ -7221,8 +7516,10 @@ class KeycloakAdmin:
 
     async def a_update_client_scope(self, client_scope_id, payload):
         """Update a client scope asynchronously.
+
         ClientScopeRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_client_scopes_resource
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :param payload: ClientScopeRepresentation
@@ -7238,8 +7535,10 @@ class KeycloakAdmin:
 
     async def a_delete_client_scope(self, client_scope_id):
         """Delete existing client scope asynchronously.
+
         ClientScopeRepresentation:
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_client_scopes_resource
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :return: Keycloak server response
@@ -7253,6 +7552,7 @@ class KeycloakAdmin:
 
     async def a_get_mappers_from_client_scope(self, client_scope_id):
         """Get a list of all mappers connected to the client scope asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
         :param client_scope_id: Client scope id
         :type client_scope_id: str
@@ -7267,7 +7567,9 @@ class KeycloakAdmin:
 
     async def a_add_mapper_to_client_scope(self, client_scope_id, payload):
         """Add a mapper to a client scope asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_create_mapper
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :param payload: ProtocolMapperRepresentation
@@ -7286,7 +7588,9 @@ class KeycloakAdmin:
 
     async def a_delete_mapper_from_client_scope(self, client_scope_id, protocol_mapper_id):
         """Delete a mapper from a client scope asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_delete_mapper
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :param protocol_mapper_id: Protocol mapper id
@@ -7307,7 +7611,9 @@ class KeycloakAdmin:
 
     async def a_update_mapper_in_client_scope(self, client_scope_id, protocol_mapper_id, payload):
         """Update an existing protocol mapper in a client scope asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
+
         :param client_scope_id: The id of the client scope
         :type client_scope_id: str
         :param protocol_mapper_id: The id of the protocol mapper which exists in the client scope
@@ -7333,7 +7639,9 @@ class KeycloakAdmin:
 
     async def a_get_default_default_client_scopes(self):
         """Get default default client scopes asynchronously.
+
         Return list of default default client scopes
+
         :return: Keycloak server response
         :rtype: list
         """
@@ -7345,6 +7653,7 @@ class KeycloakAdmin:
 
     async def a_delete_default_default_client_scope(self, scope_id):
         """Delete default default client scope asynchronously.
+
         :param scope_id: default default client scope id
         :type scope_id: str
         :return: Keycloak server response
@@ -7358,6 +7667,7 @@ class KeycloakAdmin:
 
     async def a_add_default_default_client_scope(self, scope_id):
         """Add default default client scope asynchronously.
+
         :param scope_id: default default client scope id
         :type scope_id: str
         :return: Keycloak server response
@@ -7373,7 +7683,9 @@ class KeycloakAdmin:
 
     async def a_get_default_optional_client_scopes(self):
         """Get default optional client scopes asynchronously.
+
         Return list of default optional client scopes
+
         :return: Keycloak server response
         :rtype: list
         """
@@ -7385,6 +7697,7 @@ class KeycloakAdmin:
 
     async def a_delete_default_optional_client_scope(self, scope_id):
         """Delete default optional client scope asynchronously.
+
         :param scope_id: default optional client scope id
         :type scope_id: str
         :return: Keycloak server response
@@ -7398,6 +7711,7 @@ class KeycloakAdmin:
 
     async def a_add_default_optional_client_scope(self, scope_id):
         """Add default optional client scope asynchronously.
+
         :param scope_id: default optional client scope id
         :type scope_id: str
         :return: Keycloak server response
@@ -7413,7 +7727,9 @@ class KeycloakAdmin:
 
     async def a_get_mappers_from_client(self, client_id):
         """List of all client mappers asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocolmapperrepresentation
+
         :param client_id: Client id
         :type client_id: str
         :returns: KeycloakServerResponse (list of ProtocolMapperRepresentation)
@@ -7429,7 +7745,9 @@ class KeycloakAdmin:
 
     async def a_add_mapper_to_client(self, client_id, payload):
         """Add a mapper to a client asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_create_mapper
+
         :param client_id: The id of the client
         :type client_id: str
         :param payload: ProtocolMapperRepresentation
@@ -7448,6 +7766,7 @@ class KeycloakAdmin:
 
     async def a_update_client_mapper(self, client_id, mapper_id, payload):
         """Update client mapper asynchronously.
+
         :param client_id: The id of the client
         :type client_id: str
         :param mapper_id: The id of the mapper to be deleted
@@ -7472,7 +7791,9 @@ class KeycloakAdmin:
 
     async def a_remove_client_mapper(self, client_id, client_mapper_id):
         """Remove a mapper from the client asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_protocol_mappers_resource
+
         :param client_id: The id of the client
         :type client_id: str
         :param client_mapper_id: The id of the mapper to be deleted
@@ -7493,7 +7814,9 @@ class KeycloakAdmin:
 
     async def a_generate_client_secrets(self, client_id):
         """Generate a new secret for the client asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_regeneratesecret
+
         :param client_id:  id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
@@ -7507,7 +7830,9 @@ class KeycloakAdmin:
 
     async def a_get_client_secrets(self, client_id):
         """Get representation of the client secrets asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientsecret
+
         :param client_id:  id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
@@ -7521,9 +7846,12 @@ class KeycloakAdmin:
 
     async def a_get_components(self, query=None):
         """Get components asynchronously.
+
         Return a list of components, filtered according to query parameters
+
         ComponentRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
+
         :param query: Query parameters (optional)
         :type query: dict
         :return: components list
@@ -7538,8 +7866,10 @@ class KeycloakAdmin:
 
     async def a_create_component(self, payload):
         """Create a new component asynchronously.
+
         ComponentRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
+
         :param payload: ComponentRepresentation
         :type payload: dict
         :return: Component id
@@ -7555,9 +7885,12 @@ class KeycloakAdmin:
 
     async def a_get_component(self, component_id):
         """Get representation of the component asynchronously.
+
         :param component_id: Component id
+
         ComponentRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_componentrepresentation
+
         :param component_id: Id of the component
         :type component_id: str
         :return: ComponentRepresentation
@@ -7571,6 +7904,7 @@ class KeycloakAdmin:
 
     async def a_update_component(self, component_id, payload):
         """Update the component asynchronously.
+
         :param component_id: Component id
         :type component_id: str
         :param payload: ComponentRepresentation
@@ -7587,6 +7921,7 @@ class KeycloakAdmin:
 
     async def a_delete_component(self, component_id):
         """Delete the component asynchronously.
+
         :param component_id: Component id
         :type component_id: str
         :return: Http response
@@ -7600,9 +7935,12 @@ class KeycloakAdmin:
 
     async def a_get_keys(self):
         """Get keys asynchronously.
+
         Return a list of keys, filtered according to query parameters
+
         KeysMetadataRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_key_resource
+
         :return: keys list
         :rtype: list
         """
@@ -7614,10 +7952,13 @@ class KeycloakAdmin:
 
     async def a_get_admin_events(self, query=None):
         """Get Administrative events asynchronously.
+
         Return a list of events, filtered according to query parameters
+
         AdminEvents Representation array
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getevents
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_get_adminrealmsrealmadmin_events
+
         :param query: Additional query parameters
         :type query: dict
         :return: events list
@@ -7632,9 +7973,12 @@ class KeycloakAdmin:
 
     async def a_get_events(self, query=None):
         """Get events asynchronously.
+
         Return a list of events, filtered according to query parameters
+
         EventRepresentation array
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_eventrepresentation
+
         :param query: Additional query parameters
         :type query: dict
         :return: events list
@@ -7649,8 +7993,10 @@ class KeycloakAdmin:
 
     async def a_set_events(self, payload):
         """Set realm events configuration asynchronously.
+
         RealmEventsConfigRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_realmeventsconfigrepresentation
+
         :param payload: Payload object for the events configuration
         :type payload: dict
         :return: Http response
@@ -7664,8 +8010,10 @@ class KeycloakAdmin:
 
     async def a_get_client_all_sessions(self, client_id):
         """Get sessions associated with the client asynchronously.
+
         UserSessionRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_usersessionrepresentation
+
         :param client_id: id of client
         :type client_id: str
         :return: UserSessionRepresentation
@@ -7679,7 +8027,9 @@ class KeycloakAdmin:
 
     async def a_get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions asynchronously.
+
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_getclientsessionstats
+
         :return: Dict of clients and session count
         :rtype: dict
         """
@@ -7691,6 +8041,7 @@ class KeycloakAdmin:
 
     async def a_get_client_management_permissions(self, client_id):
         """Get management permissions for a client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -7705,12 +8056,16 @@ class KeycloakAdmin:
 
     async def a_update_client_management_permissions(self, payload, client_id):
         """Update management permissions for a client asynchronously.
+
         ManagementPermissionReference
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_managementpermissionreference
+
         Payload example::
+
             payload={
                 "enabled": true
             }
+
         :param payload: ManagementPermissionReference
         :type payload: dict
         :param client_id: id in ClientRepresentation
@@ -7728,6 +8083,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_policy_scopes(self, client_id, policy_id):
         """Get scopes for a given policy asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -7748,6 +8104,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_policy_resources(self, client_id, policy_id):
         """Get resources for a given policy asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -7768,6 +8125,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_scope_permission(self, client_id, scope_id):
         """Get permissions for a given scope asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -7788,7 +8146,9 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_scope_permission(self, payload, client_id):
         """Create permissions for a authz scope asynchronously.
+
         Payload example::
+
             payload={
                 "name": "My Permission Name",
                 "type": "scope",
@@ -7798,6 +8158,7 @@ class KeycloakAdmin:
                 "scopes": [some_scope_id],
                 "policies": [some_policy_id],
             }
+
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
@@ -7815,7 +8176,9 @@ class KeycloakAdmin:
 
     async def a_update_client_authz_scope_permission(self, payload, client_id, scope_id):
         """Update permissions for a given scope asynchronously.
+
         Payload example::
+
             payload={
                 "id": scope_id,
                 "name": "My Permission Name",
@@ -7826,6 +8189,7 @@ class KeycloakAdmin:
                 "scopes": [some_scope_id],
                 "policies": [some_policy_id],
             }
+
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
@@ -7849,6 +8213,7 @@ class KeycloakAdmin:
 
     async def a_get_client_authz_client_policies(self, client_id):
         """Get policies for a given client asynchronously.
+
         :param client_id: id in ClientRepresentation
             https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
@@ -7863,7 +8228,9 @@ class KeycloakAdmin:
 
     async def a_create_client_authz_client_policy(self, payload, client_id):
         """Create a new policy for a given client asynchronously.
+
         Payload example::
+
             payload={
                 "type": "client",
                 "logic": "POSITIVE",
@@ -7871,6 +8238,7 @@ class KeycloakAdmin:
                 "name": "My Policy",
                 "clients": [other_client_id],
             }
+
         :param payload: No Document
         :type payload: dict
         :param client_id: id in ClientRepresentation
@@ -7890,6 +8258,7 @@ class KeycloakAdmin:
         self, client_id, group_id, brief_representation=True
     ):
         """Get the composite client roles of the given group for the given client asynchronously.
+
         :param client_id: id of the client.
         :type client_id: str
         :param group_id: id of the group.
@@ -7912,6 +8281,7 @@ class KeycloakAdmin:
 
     async def a_get_role_client_level_children(self, client_id, role_id):
         """Get the child roles async of which the given composite client role is composed of.
+
         :param client_id: id of the client.
         :type client_id: str
         :param role_id: id of the role.
@@ -7931,6 +8301,7 @@ class KeycloakAdmin:
 
     async def a_upload_certificate(self, client_id, certcont):
         """Upload a new certificate for the client asynchronously.
+
         :param client_id: id of the client.
         :type client_id: str
         :param certcont: the content of the certificate.
@@ -7957,6 +8328,7 @@ class KeycloakAdmin:
 
     async def a_get_required_action_by_alias(self, action_alias):
         """Get a required action by its alias asynchronously.
+
         :param action_alias: the alias of the required action.
         :type action_alias: str
         :return: the required action (RequiredActionProviderRepresentation).
@@ -7970,6 +8342,7 @@ class KeycloakAdmin:
 
     async def a_get_required_actions(self):
         """Get the required actions for the realms asynchronously.
+
         :return: the required actions (list of RequiredActionProviderRepresentation).
         :rtype: list
         """
@@ -7981,6 +8354,7 @@ class KeycloakAdmin:
 
     async def a_update_required_action(self, action_alias, payload):
         """Update a required action asynchronously.
+
         :param action_alias: the action alias.
         :type action_alias: str
         :param payload: the new required action (RequiredActionProviderRepresentation).
@@ -7998,6 +8372,7 @@ class KeycloakAdmin:
 
     async def a_get_bruteforce_detection_status(self, user_id):
         """Get bruteforce detection status for user asynchronously.
+
         :param user_id: User id
         :type user_id: str
         :return: Bruteforce status.
@@ -8011,6 +8386,7 @@ class KeycloakAdmin:
 
     async def a_clear_bruteforce_attempts_for_user(self, user_id):
         """Clear bruteforce attempts for user asynchronously.
+
         :param user_id: User id
         :type user_id: str
         :return: empty dictionary.
@@ -8024,6 +8400,7 @@ class KeycloakAdmin:
 
     async def a_clear_all_bruteforce_attempts(self):
         """Clear bruteforce attempts for all users in realm asynchronously.
+
         :return: empty dictionary.
         :rtype: dict
         """
@@ -8035,6 +8412,7 @@ class KeycloakAdmin:
 
     async def a_clear_keys_cache(self):
         """Clear keys cache asynchronously.
+
         :return: empty dictionary.
         :rtype: dict
         """
@@ -8046,6 +8424,7 @@ class KeycloakAdmin:
 
     async def a_clear_realm_cache(self):
         """Clear realm cache asynchronously.
+
         :return: empty dictionary.
         :rtype: dict
         """
@@ -8057,6 +8436,7 @@ class KeycloakAdmin:
 
     async def a_clear_user_cache(self):
         """Clear user cache asynchronously.
+
         :return: empty dictionary.
         :rtype: dict
         """
