@@ -4015,6 +4015,43 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
 
+    def update_client_authz_resource_permission(self, payload, client_id, resource_id):
+        """Update permissions for a given resource.
+
+        Payload example::
+
+            payload={
+                "id": resource_id,
+                "name": "My Permission Name",
+                "type": "resource",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "resources": [some_resource_id],
+                "scopes": [],
+                "policies": [some_policy_id],
+            }
+
+        :param payload: No Document
+        :type payload: dict
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param resource_id: No Document
+        :type resource_id: str
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "resource-id": resource_id,
+        }
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+
     def get_client_authz_client_policies(self, client_id):
         """Get policies for a given client.
 
@@ -4027,6 +4064,30 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
+    def get_client_authz_permission_associated_policies(self, client_id, policy_id):
+        """Get associated policies for a given client permission.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY_ASSOCIATED_POLICIES.format(
+                **params_path
+            )
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
@@ -8152,6 +8213,43 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
 
+    async def a_update_client_authz_resource_permission(self, payload, client_id, resource_id):
+        """Update permissions for a given resource asynchronously.
+
+        Payload example::
+
+            payload={
+                "id": resource_id,
+                "name": "My Permission Name",
+                "type": "resource",
+                "logic": "POSITIVE",
+                "decisionStrategy": "UNANIMOUS",
+                "resources": [some_resource_id],
+                "scopes": [],
+                "policies": [some_policy_id],
+            }
+
+        :param payload: No Document
+        :type payload: dict
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param resource_id: No Document
+        :type resource_id: str
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "resource-id": resource_id,
+        }
+        data_raw = await self.connection.a_raw_put(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_PERMISSION.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+
     async def a_get_client_authz_client_policies(self, client_id):
         """Get policies for a given client asynchronously.
 
@@ -8164,6 +8262,30 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+
+    async def a_get_client_authz_permission_associated_policies(self, client_id, policy_id):
+        """Get associated policies for a given client permission asynchronously.
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param policy_id: id in PolicyRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
+        :type policy_id: str
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy-id": policy_id,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_CLIENT_POLICY_ASSOCIATED_POLICIES.format(
+                **params_path
+            )
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
 
