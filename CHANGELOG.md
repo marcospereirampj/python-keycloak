@@ -1,3 +1,9 @@
+## v4.2.0 (2024-06-22)
+
+### Feat
+
+- functions for updating resource permissions and getting associated policies for a permission (#574)
+
 ## v4.1.0 (2024-06-06)
 
 ### Feat
