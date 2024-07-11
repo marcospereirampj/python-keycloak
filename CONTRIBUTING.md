@@ -86,7 +86,7 @@ pre-commit install --install-hooks -t pre-commit -t pre-push -t commit-msg
 
 1. Fork this repository, develop and test your changes
 2. Make sure that your changes do not decrease the test coverage
-3. Make sure you're commits follow the conventional commits
+3. Make sure your commits follow the conventional commits
 4. Submit a pull request
 
 ## How to release

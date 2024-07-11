@@ -119,7 +119,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.headers = {**self.headers, "Content-Type": "application/json"}
 
         super().__init__(
-            base_url=self.server_url, headers=self.headers, timeout=60, verify=self.verify
+            base_url=self.server_url, headers=self.headers, timeout=self.timeout, verify=self.verify
         )
 
     @property
