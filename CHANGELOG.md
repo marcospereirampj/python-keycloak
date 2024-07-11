@@ -1,3 +1,9 @@
+## v4.2.1 (2024-07-11)
+
+### Fix
+
+- passing timeout values to ConnectionManager (#578)
+
 ## v4.2.0 (2024-06-22)
 
 ### Feat
