@@ -307,7 +307,7 @@ class ConnectionManager(object):
         try:
             return await self.async_s.get(
                 urljoin(self.base_url, path),
-                params=kwargs,
+                params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -331,7 +331,7 @@ class ConnectionManager(object):
             return await self.async_s.request(
                 method="POST",
                 url=urljoin(self.base_url, path),
-                params=kwargs,
+                params=self._filter_query_params(kwargs),
                 data=data,
                 headers=self.headers,
                 timeout=self.timeout,
@@ -355,7 +355,7 @@ class ConnectionManager(object):
         try:
             return await self.async_s.put(
                 urljoin(self.base_url, path),
-                params=kwargs,
+                params=self._filter_query_params(kwargs),
                 data=data,
                 headers=self.headers,
                 timeout=self.timeout,
@@ -381,9 +381,23 @@ class ConnectionManager(object):
                 method="DELETE",
                 url=urljoin(self.base_url, path),
                 data=data or dict(),
-                params=kwargs,
+                params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+
+    @staticmethod
+    def _filter_query_params(query_params):
+        """Explicitly filter query params with None values for compatibility.
+
+        Httpx and requests differ in the way they handle query params with the value None,
+        requests does not include params with the value None while httpx includes them as-is.
+
+        :param query_params: the query params
+        :type query_params: dict
+        :returns: the filtered query params
+        :rtype: dict
+        """
+        return {k: v for k, v in query_params.items() if v is not None}
