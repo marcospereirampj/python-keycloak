@@ -1,3 +1,9 @@
+## v4.2.2 (2024-07-16)
+
+### Fix
+
+- correctly pass query params in a_send_update_account and a_send_verify_email (#581)
+
 ## v4.2.1 (2024-07-11)
 
 ### Fix
