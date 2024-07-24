@@ -70,6 +70,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         custom_headers=None,
         user_realm_name=None,
         timeout=60,
+        cert=None,
     ):
         """Init method.
 
@@ -99,6 +100,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type user_realm_name: str
         :param timeout: connection timeout in seconds
         :type timeout: int
+        :param cert: An SSL certificate used by the requested host to authenticate the client. Either a path to an SSL certificate file, or two-tuple of (certificate file, key file).
+        :type cert: Union[str,Tuple[str,str]]
         """
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.
@@ -117,12 +120,14 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.timeout = timeout
         self.custom_headers = custom_headers
         self.headers = {**self.headers, "Content-Type": "application/json"}
+        self.cert = cert
 
         super().__init__(
             base_url=self.server_url,
             headers=self.headers,
             timeout=self.timeout,
             verify=self.verify,
+            cert=cert,
         )
 
     @property
@@ -297,6 +302,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 client_secret_key=self.client_secret_key,
                 timeout=self.timeout,
                 custom_headers=self.custom_headers,
+                cert=self.cert,
             )
 
         return self._keycloak_openid
