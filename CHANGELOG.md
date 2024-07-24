@@ -1,3 +1,9 @@
+## v4.2.3 (2024-07-24)
+
+### Fix
+
+- use a_public_key() in a_decode_token() instead of public_key() (#582)
+
 ## v4.2.2 (2024-07-16)
 
 ### Fix
