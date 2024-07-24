@@ -1231,7 +1231,7 @@ class KeycloakOpenID:
             if "key" not in kwargs:
                 key = (
                     "-----BEGIN PUBLIC KEY-----\n"
-                    + self.public_key()
+                    + await self.a_public_key()
                     + "\n-----END PUBLIC KEY-----"
                 )
                 key = jwk.JWK.from_pem(key.encode("utf-8"))
