@@ -49,9 +49,13 @@ class ConnectionManager(object):
     :type verify: Union[bool,str]
     :param proxies: The proxies servers requests is sent by.
     :type proxies: dict
+    :param cert: An SSL certificate used by the requested host to authenticate the client.
+        Either a path to an SSL certificate file, or two-tuple of
+        (certificate file, key file).
+    :type cert: Union[str,Tuple[str,str]]
     """
 
-    def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None):
+    def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None, cert=None):
         """Init method.
 
         :param base_url: The server URL.
@@ -65,11 +69,16 @@ class ConnectionManager(object):
         :type verify: Union[bool,str]
         :param proxies: The proxies servers requests is sent by.
         :type proxies: dict
+        :param cert: An SSL certificate used by the requested host to authenticate the client.
+            Either a path to an SSL certificate file, or two-tuple of
+            (certificate file, key file).
+        :type cert: Union[str,Tuple[str,str]]
         """
         self.base_url = base_url
         self.headers = headers
         self.timeout = timeout
         self.verify = verify
+        self.cert = cert
         self._s = requests.Session()
         self._s.auth = lambda x: x  # don't let requests add auth headers
 
@@ -87,7 +96,7 @@ class ConnectionManager(object):
         if proxies:
             self._s.proxies.update(proxies)
 
-        self.async_s = httpx.AsyncClient(verify=verify, proxies=proxies)
+        self.async_s = httpx.AsyncClient(verify=verify, proxies=proxies, cert=cert)
         self.async_s.auth = None  # don't let requests add auth headers
         self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
 
@@ -139,6 +148,19 @@ class ConnectionManager(object):
     @verify.setter
     def verify(self, value):
         self._verify = value
+
+    @property
+    def cert(self):
+        """Return client certificates in use for request to the server.
+
+        :returns: Client certificate
+        :rtype: Union[str,Tuple[str,str]]
+        """
+        return self._cert
+
+    @cert.setter
+    def cert(self, value):
+        self._cert = value
 
     @property
     def headers(self):
@@ -213,6 +235,7 @@ class ConnectionManager(object):
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+                cert=self.cert,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
@@ -238,6 +261,7 @@ class ConnectionManager(object):
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+                cert=self.cert,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
@@ -263,6 +287,7 @@ class ConnectionManager(object):
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+                cert=self.cert,
             )
         except Exception as e:
             raise KeycloakConnectionError("Can't connect to server (%s)" % e)
@@ -288,6 +313,7 @@ class ConnectionManager(object):
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+                cert=self.cert,
             )
             return r
         except Exception as e:
