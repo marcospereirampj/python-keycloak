@@ -1,3 +1,9 @@
+## v4.3.0 (2024-08-01)
+
+### Feat
+
+- allow the use of client certificates in all requests (#584)
+
 ## v4.2.3 (2024-07-24)
 
 ### Fix
