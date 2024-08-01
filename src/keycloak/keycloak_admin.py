@@ -73,6 +73,10 @@ class KeycloakAdmin:
     :type user_realm_name: str
     :param timeout: connection timeout in seconds
     :type timeout: int
+    :param cert: An SSL certificate used by the requested host to authenticate the client.
+        Either a path to an SSL certificate file, or two-tuple of
+        (certificate file, key file).
+    :type cert: Union[str,Tuple[str,str]]
     :param connection: A KeycloakOpenIDConnection as an alternative to individual params.
     :type connection: KeycloakOpenIDConnection
     """
@@ -93,6 +97,7 @@ class KeycloakAdmin:
         custom_headers=None,
         user_realm_name=None,
         timeout=60,
+        cert=None,
         connection: Optional[KeycloakOpenIDConnection] = None,
     ):
         """Init method.
@@ -123,6 +128,9 @@ class KeycloakAdmin:
         :type user_realm_name: str
         :param timeout: connection timeout in seconds
         :type timeout: int
+        :param cert: An SSL certificate used by the requested host to authenticate the client.
+            Either a path to an SSL certificate file, or two-tuple of (certificate file, key file).
+        :type cert: Union[str,Tuple[str,str]]
         :param connection: An OpenID Connection as an alternative to individual params.
         :type connection: KeycloakOpenIDConnection
         """
@@ -139,6 +147,7 @@ class KeycloakAdmin:
             user_realm_name=user_realm_name,
             custom_headers=custom_headers,
             timeout=timeout,
+            cert=cert,
         )
 
     @property

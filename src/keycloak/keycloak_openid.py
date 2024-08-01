@@ -74,6 +74,9 @@ class KeycloakOpenID:
     :param custom_headers: dict of custom header to pass to each HTML request
     :param proxies: dict of proxies to sent the request by.
     :param timeout: connection timeout in seconds
+    :param cert: An SSL certificate used by the requested host to authenticate the client.
+        Either a path to an SSL certificate file, or two-tuple of
+        (certificate file, key file).
     """
 
     def __init__(
@@ -86,6 +89,7 @@ class KeycloakOpenID:
         custom_headers=None,
         proxies=None,
         timeout=60,
+        cert=None,
     ):
         """Init method.
 
@@ -106,13 +110,22 @@ class KeycloakOpenID:
         :type proxies: dict
         :param timeout: connection timeout in seconds
         :type timeout: int
+        :param cert: An SSL certificate used by the requested host to authenticate the client.
+            Either a path to an SSL certificate file, or two-tuple of
+            (certificate file, key file).
+        :type cert: Union[str,Tuple[str,str]]
         """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
         self.realm_name = realm_name
         headers = custom_headers if custom_headers is not None else dict()
         self.connection = ConnectionManager(
-            base_url=server_url, headers=headers, timeout=timeout, verify=verify, proxies=proxies
+            base_url=server_url,
+            headers=headers,
+            timeout=timeout,
+            verify=verify,
+            proxies=proxies,
+            cert=cert,
         )
 
         self.authorization = Authorization()
