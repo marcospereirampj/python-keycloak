@@ -109,7 +109,8 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert len(resource_set_list_ids) == 0
     # With matchingUri query option
     resource_set_list_ids = uma.resource_set_list_ids(
-        uri="/some_resources/resource", matchingUri=True)
+        uri="/some_resources/resource", matchingUri=True
+    )
     assert len(resource_set_list_ids) == 1
 
     # Test create the same resource set
