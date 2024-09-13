@@ -210,6 +210,7 @@ class KeycloakUMA:
         owner: str = "",
         resource_type: str = "",
         scope: str = "",
+        matchingUri: bool = False,
         first: int = 0,
         maximum: int = -1,
     ):
@@ -230,6 +231,8 @@ class KeycloakUMA:
         :type resource_type: str
         :param scope: query resource scope
         :type scope: str
+        :param matchingUri: enable URI matching
+        :type matchingUri: bool
         :param first: index of first matching resource to return
         :type first: int
         :param maximum: maximum number of resources to return (-1 for all)
@@ -250,6 +253,8 @@ class KeycloakUMA:
             query["type"] = resource_type
         if scope:
             query["scope"] = scope
+        if matchingUri:
+            query["matchingUri"] = "true"
         if first > 0:
             query["first"] = first
         if maximum >= 0:
@@ -544,6 +549,7 @@ class KeycloakUMA:
         owner: str = "",
         resource_type: str = "",
         scope: str = "",
+        matchingUri: bool = False,
         first: int = 0,
         maximum: int = -1,
     ):
@@ -565,6 +571,8 @@ class KeycloakUMA:
         :param scope: query resource scope
         :type scope: str
         :param first: index of first matching resource to return
+        :param matchingUri: enable URI matching
+        :type matchingUri: bool
         :type first: int
         :param maximum: maximum number of resources to return (-1 for all)
         :type maximum: int
@@ -584,6 +592,8 @@ class KeycloakUMA:
             query["type"] = resource_type
         if scope:
             query["scope"] = scope
+        if matchingUri:
+            query["matchingUri"] = "true"
         if first > 0:
             query["first"] = first
         if maximum >= 0:
