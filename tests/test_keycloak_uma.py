@@ -96,11 +96,22 @@ def test_uma_resource_sets(uma: KeycloakUMA):
         "name": "mytest",
         "scopes": ["test:read", "test:write"],
         "type": "urn:test",
+        "uris": ["/some_resources/*"],
     }
     created_resource = uma.resource_set_create(resource_to_create)
     assert created_resource
     assert created_resource["_id"], created_resource
     assert set(resource_to_create).issubset(set(created_resource)), created_resource
+
+    # Test getting resource with wildcard
+    # Without matchingUri query option
+    resource_set_list_ids = uma.resource_set_list_ids(uri="/some_resources/resource")
+    assert len(resource_set_list_ids) == 0
+    # With matchingUri query option
+    resource_set_list_ids = uma.resource_set_list_ids(
+        uri="/some_resources/resource", matchingUri=True
+    )
+    assert len(resource_set_list_ids) == 1
 
     # Test create the same resource set
     with pytest.raises(KeycloakPostError) as err:
@@ -382,11 +393,22 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
         "name": "mytest",
         "scopes": ["test:read", "test:write"],
         "type": "urn:test",
+        "uris": ["/some_resources/*"],
     }
     created_resource = await uma.a_resource_set_create(resource_to_create)
     assert created_resource
     assert created_resource["_id"], created_resource
     assert set(resource_to_create).issubset(set(created_resource)), created_resource
+
+    # Test getting resource with wildcard
+    # Without matchingUri query option
+    resource_set_list_ids = await uma.a_resource_set_list_ids(uri="/some_resources/resource")
+    assert len(resource_set_list_ids) == 0
+    # With matchingUri query option
+    resource_set_list_ids = await uma.a_resource_set_list_ids(
+        uri="/some_resources/resource", matchingUri=True
+    )
+    assert len(resource_set_list_ids) == 1
 
     # Test create the same resource set
     with pytest.raises(KeycloakPostError) as err:
