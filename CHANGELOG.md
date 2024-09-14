@@ -1,3 +1,9 @@
+## v4.4.0 (2024-09-14)
+
+### Feat
+
+- add matchingUri support for listing resources with wildcards (#592)
+
 ## v4.3.0 (2024-08-01)
 
 ### Feat
