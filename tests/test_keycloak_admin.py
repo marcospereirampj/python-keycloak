@@ -1934,6 +1934,22 @@ def test_client_roles(admin: KeycloakAdmin, client: str):
         "composite"
     ]
 
+    # Test removal of composite client roles
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.remove_composite_client_roles_from_role(
+            client_role_id=client, role_name="client-role-test-update", roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = admin.remove_composite_client_roles_from_role(
+        client_role_id=client,
+        role_name="client-role-test-update",
+        roles=[admin.get_realm_role(role_name="offline_access")],
+    )
+    assert res == dict()
+    assert not admin.get_client_role(client_id=client, role_name="client-role-test-update")[
+        "composite"
+    ]
+
     # Test delete of client role
     res = admin.delete_client_role(client_role_id=client, role_name="client-role-test-update")
     assert res == dict()
@@ -4986,6 +5002,22 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str):
     assert (await admin.a_get_client_role(client_id=client, role_name="client-role-test-update"))[
         "composite"
     ]
+
+    # Test removal of composite client roles
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_remove_composite_client_roles_from_role(
+            client_role_id=client, role_name="client-role-test-update", roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+    res = await admin.a_remove_composite_client_roles_from_role(
+        client_role_id=client,
+        role_name="client-role-test-update",
+        roles=[await admin.a_get_realm_role(role_name="offline_access")],
+    )
+    assert res == dict()
+    assert not (
+        await admin.a_get_client_role(client_id=client, role_name="client-role-test-update")
+    )["composite"]
 
     # Test delete of client role
     res = await admin.a_delete_client_role(
