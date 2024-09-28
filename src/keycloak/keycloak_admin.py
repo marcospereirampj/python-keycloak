@@ -2205,6 +2205,30 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
+    def remove_composite_client_roles_from_role(self, client_role_id, role_name, roles):
+        """Remove composite roles from a client role.
+
+        :param client_role_id: id of client (not client-id)
+        :type client_role_id: str
+        :param role_name: The name of the role
+        :type role_name: str
+        :param roles: roles list or role (use RoleRepresentation) to be removed
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_role_id,
+            "role-name": role_name,
+        }
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
     def update_client_role(self, client_id, role_name, payload):
         """Update a client role.
 
@@ -6394,6 +6418,30 @@ class KeycloakAdmin:
             data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    async def a_remove_composite_client_roles_from_role(self, client_role_id, role_name, roles):
+        """Remove composite roles from a client role asynchronously.
+
+        :param client_role_id: id of client (not client-id)
+        :type client_role_id: str
+        :param role_name: The name of the role
+        :type role_name: str
+        :param roles: roles list or role (use RoleRepresentation) to be removed
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_role_id,
+            "role-name": role_name,
+        }
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     async def a_update_client_role(self, client_id, role_name, payload):
         """Update a client role asynchronously.
