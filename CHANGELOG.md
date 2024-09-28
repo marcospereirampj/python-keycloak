@@ -1,3 +1,9 @@
+## v4.5.0 (2024-09-28)
+
+### Feat
+
+- add ability to remove composite client roles (#596)
+
 ## v4.4.0 (2024-09-14)
 
 ### Feat
