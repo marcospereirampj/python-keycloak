@@ -43,6 +43,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
     """
 
     _server_url = None
+    _grant_type = None
     _username = None
     _password = None
     _totp = None
@@ -59,6 +60,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
     def __init__(
         self,
         server_url,
+        grant_type=None,
         username=None,
         password=None,
         token=None,
@@ -76,6 +78,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         :param server_url: Keycloak server url
         :type server_url: str
+        :param grant_type: grant type for authn
+        :type grant_type: str
         :param username: admin username
         :type username: str
         :param password: admin password
@@ -110,6 +114,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.token_lifetime_fraction = 0.9
         self.headers = {}
         self.server_url = server_url
+        self.grant_type = grant_type
         self.username = username
         self.password = password
         self.token = token
@@ -123,6 +128,12 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.custom_headers = custom_headers
         self.headers = {**self.headers, "Content-Type": "application/json"}
         self.cert = cert
+
+        if not self.grant_type:
+            if username and password:
+                self.grant_type = "password"
+            elif client_secret_key:
+                self.grant_type = "client_credentials"
 
         super().__init__(
             base_url=self.server_url,
@@ -314,15 +325,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         The admin token is then set in the `token` attribute.
         """
-        grant_type = []
-        if self.username and self.password:
-            grant_type.append("password")
-        elif self.client_secret_key:
-            grant_type.append("client_credentials")
-
-        if grant_type:
+        if self.grant_type:
             self.token = self.keycloak_openid.token(
-                self.username, self.password, grant_type=grant_type, totp=self.totp
+                self.username, self.password, grant_type=self.grant_type, totp=self.totp
             )
         else:
             self.token = None
@@ -426,15 +431,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         The admin token is then set in the `token` attribute.
         """
-        grant_type = []
-        if self.username and self.password:
-            grant_type.append("password")
-        elif self.client_secret_key:
-            grant_type.append("client_credentials")
-
-        if grant_type:
+        if self.grant_type:
             self.token = await self.keycloak_openid.a_token(
-                self.username, self.password, grant_type=grant_type, totp=self.totp
+                self.username, self.password, grant_type=self.grant_type, totp=self.totp
             )
         else:
             self.token = None
