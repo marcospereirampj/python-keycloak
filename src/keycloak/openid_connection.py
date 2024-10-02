@@ -157,6 +157,19 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.base_url = value
 
     @property
+    def grant_type(self):
+        """Get grant type.
+
+        :returns: Grant type
+        :rtype: str
+        """
+        return self._grant_type
+
+    @grant_type.setter
+    def grant_type(self, value):
+        self._grant_type = value
+
+    @property
     def realm_name(self):
         """Get realm name.
 
