@@ -276,7 +276,7 @@ class KeycloakOpenID:
         self,
         username="",
         password="",
-        grant_type=["password"],
+        grant_type="password",
         code="",
         redirect_uri="",
         totp=None,
@@ -338,7 +338,7 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def refresh_token(self, refresh_token, grant_type=["refresh_token"]):
+    def refresh_token(self, refresh_token, grant_type="refresh_token"):
         """Refresh the user token.
 
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
@@ -409,7 +409,7 @@ class KeycloakOpenID:
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
-            "grant_type": ["urn:ietf:params:oauth:grant-type:token-exchange"],
+            "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
             "client_id": self.client_id,
             "subject_token": token,
             "subject_token_type": subject_token_type,
@@ -920,7 +920,7 @@ class KeycloakOpenID:
         self,
         username="",
         password="",
-        grant_type=["password"],
+        grant_type="password",
         code="",
         redirect_uri="",
         totp=None,
@@ -982,7 +982,7 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def a_refresh_token(self, refresh_token, grant_type=["refresh_token"]):
+    async def a_refresh_token(self, refresh_token, grant_type="refresh_token"):
         """Refresh the user token asynchronously.
 
         The token endpoint is used to obtain tokens. Tokens can either be obtained by
@@ -1053,7 +1053,7 @@ class KeycloakOpenID:
         """
         params_path = {"realm-name": self.realm_name}
         payload = {
-            "grant_type": ["urn:ietf:params:oauth:grant-type:token-exchange"],
+            "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
             "client_id": self.client_id,
             "subject_token": token,
             "subject_token_type": subject_token_type,

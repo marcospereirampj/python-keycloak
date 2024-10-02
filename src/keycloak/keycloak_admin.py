@@ -86,6 +86,7 @@ class KeycloakAdmin:
     def __init__(
         self,
         server_url=None,
+        grant_type=None,
         username=None,
         password=None,
         token=None,
@@ -104,6 +105,8 @@ class KeycloakAdmin:
 
         :param server_url: Keycloak server url
         :type server_url: str
+        :param grant_type: grant type for authn
+        :type grant_type: str
         :param username: admin username
         :type username: str
         :param password: admin password
@@ -136,6 +139,7 @@ class KeycloakAdmin:
         """
         self.connection = connection or KeycloakOpenIDConnection(
             server_url=server_url,
+            grant_type=grant_type,
             username=username,
             password=password,
             token=token,
