@@ -1,3 +1,9 @@
+## v4.5.1 (2024-10-02)
+
+### Fix
+
+- Set client_credentials as grant_type also when x509 certificate is given (#597)
+
 ## v4.5.0 (2024-09-28)
 
 ### Feat
