@@ -1,3 +1,9 @@
+## v4.6.0 (2024-10-04)
+
+### Feat
+
+- Add the max_retries parameter (#598)
+
 ## v4.5.1 (2024-10-02)
 
 ### Fix
