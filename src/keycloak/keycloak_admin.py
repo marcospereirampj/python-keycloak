@@ -4750,7 +4750,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name}
 
         if exist_ok:
-            exists = self.get_user_id(username=payload["username"])
+            exists = await self.a_get_user_id(username=payload["username"])
 
             if exists is not None:
                 return str(exists)
