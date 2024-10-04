@@ -822,7 +822,7 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def device(self):
+    def device(self, scope: str = ""):
         """Get device authorization grant.
 
         The device endpoint is used to obtain a user code verification and user authentication.
@@ -837,11 +837,12 @@ class KeycloakOpenID:
         https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
         https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
+        :param scope: Scope of authorization request, split with the blank space
         :returns: Device Authorization Response
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
-        payload = {"client_id": self.client_id}
+        payload = {"client_id": self.client_id, "scope": scope}
 
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
@@ -1464,7 +1465,7 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def a_device(self):
+    async def a_device(self, scope: str = ""):
         """Get device authorization grant asynchronously.
 
         The device endpoint is used to obtain a user code verification and user authentication.
@@ -1479,11 +1480,12 @@ class KeycloakOpenID:
         https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
         https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
+        :param scope: Scope of authorization request, split with the blank space
         :returns: Device Authorization Response
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
-        payload = {"client_id": self.client_id}
+        payload = {"client_id": self.client_id, "scope": scope}
 
         payload = self._add_secret_key(payload)
         data_raw = await self.connection.a_raw_post(URL_DEVICE.format(**params_path), data=payload)
