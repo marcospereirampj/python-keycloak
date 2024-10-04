@@ -73,6 +73,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         user_realm_name=None,
         timeout=60,
         cert=None,
+        max_retries=1,
     ):
         """Init method.
 
@@ -108,6 +109,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
             Either a path to an SSL certificate file, or two-tuple of
             (certificate file, key file).
         :type cert: Union[str,Tuple[str,str]]
+        :param max_retries: The total number of times to retry HTTP requests.
+        :type max_retries: int
         """
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.

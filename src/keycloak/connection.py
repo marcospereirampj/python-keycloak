@@ -53,9 +53,13 @@ class ConnectionManager(object):
         Either a path to an SSL certificate file, or two-tuple of
         (certificate file, key file).
     :type cert: Union[str,Tuple[str,str]]
+    :param max_retries: The total number of times to retry HTTP requests.
+    :type max_retries: int
     """
 
-    def __init__(self, base_url, headers={}, timeout=60, verify=True, proxies=None, cert=None):
+    def __init__(
+        self, base_url, headers={}, timeout=60, verify=True, proxies=None, cert=None, max_retries=1
+    ):
         """Init method.
 
         :param base_url: The server URL.
@@ -73,6 +77,8 @@ class ConnectionManager(object):
             Either a path to an SSL certificate file, or two-tuple of
             (certificate file, key file).
         :type cert: Union[str,Tuple[str,str]]
+        :param max_retries: The total number of times to retry HTTP requests.
+        :type max_retries: int
         """
         self.base_url = base_url
         self.headers = headers
@@ -85,7 +91,7 @@ class ConnectionManager(object):
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
         for protocol in ("https://", "http://"):
-            adapter = HTTPAdapter(max_retries=1)
+            adapter = HTTPAdapter(max_retries=max_retries)
             # adds POST to retry whitelist
             allowed_methods = set(adapter.max_retries.allowed_methods)
             allowed_methods.add("POST")
