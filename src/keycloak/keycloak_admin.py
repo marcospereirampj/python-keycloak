@@ -77,6 +77,8 @@ class KeycloakAdmin:
         Either a path to an SSL certificate file, or two-tuple of
         (certificate file, key file).
     :type cert: Union[str,Tuple[str,str]]
+    :param max_retries: The total number of times to retry HTTP requests.
+    :type max_retries: int
     :param connection: A KeycloakOpenIDConnection as an alternative to individual params.
     :type connection: KeycloakOpenIDConnection
     """
@@ -99,6 +101,7 @@ class KeycloakAdmin:
         user_realm_name=None,
         timeout=60,
         cert=None,
+        max_retries=1,
         connection: Optional[KeycloakOpenIDConnection] = None,
     ):
         """Init method.
@@ -134,6 +137,8 @@ class KeycloakAdmin:
         :param cert: An SSL certificate used by the requested host to authenticate the client.
             Either a path to an SSL certificate file, or two-tuple of (certificate file, key file).
         :type cert: Union[str,Tuple[str,str]]
+        :param max_retries: The total number of times to retry HTTP requests.
+        :type max_retries: int
         :param connection: An OpenID Connection as an alternative to individual params.
         :type connection: KeycloakOpenIDConnection
         """
@@ -152,6 +157,7 @@ class KeycloakAdmin:
             custom_headers=custom_headers,
             timeout=timeout,
             cert=cert,
+            max_retries=max_retries,
         )
 
     @property

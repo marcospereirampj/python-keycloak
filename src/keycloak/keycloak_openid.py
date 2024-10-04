@@ -77,6 +77,8 @@ class KeycloakOpenID:
     :param cert: An SSL certificate used by the requested host to authenticate the client.
         Either a path to an SSL certificate file, or two-tuple of
         (certificate file, key file).
+    :param max_retries: The total number of times to retry HTTP requests.
+    :type max_retries: int
     """
 
     def __init__(
@@ -90,6 +92,7 @@ class KeycloakOpenID:
         proxies=None,
         timeout=60,
         cert=None,
+        max_retries=1,
     ):
         """Init method.
 
@@ -114,6 +117,8 @@ class KeycloakOpenID:
             Either a path to an SSL certificate file, or two-tuple of
             (certificate file, key file).
         :type cert: Union[str,Tuple[str,str]]
+        :param max_retries: The total number of times to retry HTTP requests.
+        :type max_retries: int
         """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
@@ -126,6 +131,7 @@ class KeycloakOpenID:
             verify=verify,
             proxies=proxies,
             cert=cert,
+            max_retries=max_retries,
         )
 
         self.authorization = Authorization()
