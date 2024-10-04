@@ -838,6 +838,7 @@ class KeycloakOpenID:
         https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
         :param scope: Scope of authorization request, split with the blank space
+        :type scope: str
         :returns: Device Authorization Response
         :rtype: dict
         """
@@ -1481,6 +1482,7 @@ class KeycloakOpenID:
         https://github.com/keycloak/keycloak-community/blob/main/design/oauth2-device-authorization-grant.md#how-to-try-it
 
         :param scope: Scope of authorization request, split with the blank space
+        :type scope: str
         :returns: Device Authorization Response
         :rtype: dict
         """
