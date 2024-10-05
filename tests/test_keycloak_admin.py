@@ -1745,9 +1745,10 @@ def test_client_optional_client_scopes(admin: KeycloakAdmin, realm: str, client:
         payload={"name": "role-testing-client", "clientId": "role-testing-client"}
     )
     # Test get client optional scopes
-    # keycloak optional roles: microprofile-jwt, offline_access, address, phone
+    # keycloak optional roles: microprofile-jwt, offline_access, address, --> for versions < 26.0.0
+    # starting with Keycloak version 26.0.0 a new optional role is added: organization
     optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 4, optional_client_scopes
+    assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
     # Test add a client scope to client optional scopes
     optional_client_scope = "test-client-optional-scope"
@@ -1767,12 +1768,12 @@ def test_client_optional_client_scopes(admin: KeycloakAdmin, realm: str, client:
         client_id, new_client_scope_id, new_optional_client_scope_data
     )
     optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 5, optional_client_scopes
+    assert len(optional_client_scopes) in [5, 6], optional_client_scopes
 
     # Test remove a client optional scope
     admin.delete_client_optional_client_scope(client_id, new_client_scope_id)
     optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 4, optional_client_scopes
+    assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
 
 def test_client_roles(admin: KeycloakAdmin, client: str):
@@ -2242,7 +2243,8 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str):
 
     # Test flow executions
     res = admin.get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) == 8, res
+    assert len(res) in [8, 12], res
+
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_executions(flow_alias="bad")
     assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
@@ -2405,7 +2407,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
     # Test get client scopes
     res = admin.get_client_scopes()
     scope_names = {x["name"] for x in res}
-    assert len(res) in [10, 11]
+    assert len(res) in [10, 11, 13]
     assert "email" in scope_names
     assert "profile" in scope_names
     assert "offline_access" in scope_names
@@ -2496,7 +2498,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     # Test default default scopes
     res_defaults = admin.get_default_default_client_scopes()
-    assert len(res_defaults) in [6, 7]
+    assert len(res_defaults) in [6, 7, 8]
 
     with pytest.raises(KeycloakPutError) as err:
         admin.add_default_default_client_scope(scope_id="does-not-exist")
@@ -2504,7 +2506,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_add = admin.add_default_default_client_scope(scope_id=res)
     assert res_add == dict()
-    assert len(admin.get_default_default_client_scopes()) in [7, 8]
+    assert len(admin.get_default_default_client_scopes()) in [7, 8, 9]
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_default_default_client_scope(scope_id="does-not-exist")
@@ -2512,11 +2514,11 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_del = admin.delete_default_default_client_scope(scope_id=res)
     assert res_del == dict()
-    assert len(admin.get_default_default_client_scopes()) in [6, 7]
+    assert len(admin.get_default_default_client_scopes()) in [6, 7, 8]
 
     # Test default optional scopes
     res_defaults = admin.get_default_optional_client_scopes()
-    assert len(res_defaults) == 4
+    assert len(res_defaults) in [4, 5]
 
     with pytest.raises(KeycloakPutError) as err:
         admin.add_default_optional_client_scope(scope_id="does-not-exist")
@@ -2524,7 +2526,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_add = admin.add_default_optional_client_scope(scope_id=res)
     assert res_add == dict()
-    assert len(admin.get_default_optional_client_scopes()) == 5
+    assert len(admin.get_default_optional_client_scopes()) in [5, 6]
 
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_default_optional_client_scope(scope_id="does-not-exist")
@@ -2532,7 +2534,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_del = admin.delete_default_optional_client_scope(scope_id=res)
     assert res_del == dict()
-    assert len(admin.get_default_optional_client_scopes()) == 4
+    assert len(admin.get_default_optional_client_scopes()) in [4, 5]
 
     # Test client scope delete
     res_del = admin.delete_client_scope(client_scope_id=res)
@@ -4791,9 +4793,10 @@ async def test_a_client_optional_client_scopes(admin: KeycloakAdmin, realm: str,
         payload={"name": "role-testing-client", "clientId": "role-testing-client"}
     )
     # Test get client optional scopes
-    # keycloak optional roles: microprofile-jwt, offline_access, address, phone
+    # keycloak optional roles: microprofile-jwt, offline_access, address, --> for versions < 26.0.0
+    # starting with Keycloak version 26.0.0 a new optional role is added: organization
     optional_client_scopes = await admin.a_get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 4, optional_client_scopes
+    assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
     # Test add a client scope to client optional scopes
     optional_client_scope = "test-client-optional-scope"
@@ -4813,12 +4816,12 @@ async def test_a_client_optional_client_scopes(admin: KeycloakAdmin, realm: str,
         client_id, new_client_scope_id, new_optional_client_scope_data
     )
     optional_client_scopes = await admin.a_get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 5, optional_client_scopes
+    assert len(optional_client_scopes) in [5, 6], optional_client_scopes
 
     # Test remove a client optional scope
     await admin.a_delete_client_optional_client_scope(client_id, new_client_scope_id)
     optional_client_scopes = await admin.a_get_client_optional_client_scopes(client_id)
-    assert len(optional_client_scopes) == 4, optional_client_scopes
+    assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
 
 @pytest.mark.asyncio
@@ -5375,7 +5378,8 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str):
 
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) == 8, res
+    assert len(res) in [8, 12], res
+
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
     assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
@@ -5543,7 +5547,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
     # Test get client scopes
     res = await admin.a_get_client_scopes()
     scope_names = {x["name"] for x in res}
-    assert len(res) in [10, 11]
+    assert len(res) in [10, 11, 13]
     assert "email" in scope_names
     assert "profile" in scope_names
     assert "offline_access" in scope_names
@@ -5633,7 +5637,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
 
     # Test default default scopes
     res_defaults = await admin.a_get_default_default_client_scopes()
-    assert len(res_defaults) in [6, 7]
+    assert len(res_defaults) in [6, 7, 8]
 
     with pytest.raises(KeycloakPutError) as err:
         await admin.a_add_default_default_client_scope(scope_id="does-not-exist")
@@ -5641,7 +5645,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_add = await admin.a_add_default_default_client_scope(scope_id=res)
     assert res_add == dict()
-    assert len(admin.get_default_default_client_scopes()) in [7, 8]
+    assert len(admin.get_default_default_client_scopes()) in [7, 8, 9]
 
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_delete_default_default_client_scope(scope_id="does-not-exist")
@@ -5649,11 +5653,11 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_del = await admin.a_delete_default_default_client_scope(scope_id=res)
     assert res_del == dict()
-    assert len(admin.get_default_default_client_scopes()) in [6, 7]
+    assert len(admin.get_default_default_client_scopes()) in [6, 7, 8]
 
     # Test default optional scopes
     res_defaults = await admin.a_get_default_optional_client_scopes()
-    assert len(res_defaults) == 4
+    assert len(res_defaults) in [4, 5]
 
     with pytest.raises(KeycloakPutError) as err:
         await admin.a_add_default_optional_client_scope(scope_id="does-not-exist")
@@ -5661,7 +5665,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_add = await admin.a_add_default_optional_client_scope(scope_id=res)
     assert res_add == dict()
-    assert len(await admin.a_get_default_optional_client_scopes()) == 5
+    assert len(await admin.a_get_default_optional_client_scopes()) in [5, 6]
 
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_delete_default_optional_client_scope(scope_id="does-not-exist")
@@ -5669,7 +5673,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str):
 
     res_del = await admin.a_delete_default_optional_client_scope(scope_id=res)
     assert res_del == dict()
-    assert len(await admin.a_get_default_optional_client_scopes()) == 4
+    assert len(await admin.a_get_default_optional_client_scopes()) in [4, 5]
 
     # Test client scope delete
     res_del = await admin.a_delete_client_scope(client_scope_id=res)

@@ -27,11 +27,11 @@ in order to give our user base more time for smoother upgrades.
 
 Current list of supported Keycloak versions:
 
+- 26.X
 - 25.X
 - 24.X
 - 23.X
 - 22.X
-- 21.X
 
 ## Python version support
 
