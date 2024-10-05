@@ -5378,7 +5378,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str):
 
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) == [8, 12], res
+    assert len(res) in [8, 12], res
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
