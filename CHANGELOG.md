@@ -1,3 +1,9 @@
+## v4.6.1 (2024-10-05)
+
+### Fix
+
+- changed sync get user id to async get user in create user async function (#600)
+
 ## v4.6.0 (2024-10-04)
 
 ### Feat
