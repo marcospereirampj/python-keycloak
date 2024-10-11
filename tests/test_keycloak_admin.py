@@ -1683,6 +1683,93 @@ def test_client_scope_client_roles(admin: KeycloakAdmin, realm: str, client: str
     assert len(roles) == 0
 
 
+def test_client_scope_mapping_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client scope assignment of client roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client owning roles
+    :type client: str
+    """
+    CLIENT_ROLE_NAME = "some-client-role"
+
+    admin.change_current_realm(realm)
+
+    client_name = admin.get_client(client)["name"]
+
+    client_scope = {
+        "name": "test_client_scope",
+        "description": "Test Client Scope",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    client_scope_id = admin.create_client_scope(client_scope, skip_exists=False)
+
+    # Test get client roles
+    client_specific_roles = admin.get_client_specific_roles_of_client_scope(
+        client_scope_id, client
+    )
+    assert len(client_specific_roles) == 0, client_specific_roles
+    all_roles = admin.get_all_roles_of_client_scope(client_scope_id)
+    assert len(all_roles) == 0, all_roles
+
+    # create client role for test
+    client_role_name = admin.create_client_role(
+        client_role_id=client, payload={"name": CLIENT_ROLE_NAME}, skip_exists=True
+    )
+    assert client_role_name, client_role_name
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        admin.add_client_roles_to_client_scope(
+            client_scope_id=client_scope_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+
+    res = admin.add_client_roles_to_client_scope(
+        client_scope_id=client_scope_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name=CLIENT_ROLE_NAME)],
+    )
+    assert res == dict(), res
+
+    # Test when getting roles for the specific owner client
+    client_specific_roles = admin.get_client_specific_roles_of_client_scope(
+        client_scope_id=client_scope_id, client_roles_owner_id=client
+    )
+    assert len(client_specific_roles) == 1
+    client_role_names = [x["name"] for x in client_specific_roles]
+    assert CLIENT_ROLE_NAME in client_role_names, client_role_names
+
+    # Test when getting all roles for the client scope
+    all_roles = admin.get_all_roles_of_client_scope(client_scope_id=client_scope_id)
+    assert "clientMappings" in all_roles, all_roles
+    all_roles_clients = all_roles["clientMappings"]
+    assert client_name in all_roles_clients, all_roles_clients
+    mappings = all_roles_clients[client_name]["mappings"]
+    client_role_names = [x["name"] for x in mappings]
+    assert CLIENT_ROLE_NAME in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.remove_client_roles_of_client_scope(
+            client_scope_id=client_scope_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+
+    res = admin.remove_client_roles_of_client_scope(
+        client_scope_id=client_scope_id,
+        client_roles_owner_id=client,
+        roles=[admin.get_client_role(client_id=client, role_name=CLIENT_ROLE_NAME)],
+    )
+    assert res == dict(), res
+
+    all_roles = admin.get_all_roles_of_client_scope(client_scope_id=client_scope_id)
+    assert len(all_roles) == 0
+
+
 def test_client_default_client_scopes(admin: KeycloakAdmin, realm: str, client: str):
     """Test client assignment of default client scopes.
 
@@ -4727,6 +4814,95 @@ async def test_a_client_scope_client_roles(admin: KeycloakAdmin, realm: str, cli
         client_id=client_id, client_roles_owner_id=client
     )
     assert len(roles) == 0
+
+
+@pytest.mark.asyncio
+async def test_a_client_scope_mapping_client_roles(admin: KeycloakAdmin, realm: str, client: str):
+    """Test client scope assignment of client roles.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    :param client: Keycloak client owning roles
+    :type client: str
+    """
+    CLIENT_ROLE_NAME = "some-client-role"
+
+    await admin.a_change_current_realm(realm)
+
+    client_obj = await admin.a_get_client(client)
+    client_name = client_obj["name"]
+
+    client_scope = {
+        "name": "test_client_scope",
+        "description": "Test Client Scope",
+        "protocol": "openid-connect",
+        "attributes": {},
+    }
+    client_scope_id = await admin.a_create_client_scope(client_scope, skip_exists=False)
+
+    # Test get client roles
+    client_specific_roles = await admin.a_get_client_specific_roles_of_client_scope(
+        client_scope_id, client
+    )
+    assert len(client_specific_roles) == 0, client_specific_roles
+    all_roles = await admin.a_get_all_roles_of_client_scope(client_scope_id)
+    assert len(all_roles) == 0, all_roles
+
+    # create client role for test
+    client_role_name = await admin.a_create_client_role(
+        client_role_id=client, payload={"name": CLIENT_ROLE_NAME}, skip_exists=True
+    )
+    assert client_role_name, client_role_name
+
+    # Test client role assignment to other client
+    with pytest.raises(KeycloakPostError) as err:
+        await admin.a_add_client_roles_to_client_scope(
+            client_scope_id=client_scope_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+
+    res = await admin.a_add_client_roles_to_client_scope(
+        client_scope_id=client_scope_id,
+        client_roles_owner_id=client,
+        roles=[await admin.a_get_client_role(client_id=client, role_name=CLIENT_ROLE_NAME)],
+    )
+    assert res == dict(), res
+
+    # Test when getting roles for the specific owner client
+    client_specific_roles = await admin.a_get_client_specific_roles_of_client_scope(
+        client_scope_id=client_scope_id, client_roles_owner_id=client
+    )
+    assert len(client_specific_roles) == 1
+    client_role_names = [x["name"] for x in client_specific_roles]
+    assert CLIENT_ROLE_NAME in client_role_names, client_role_names
+
+    # Test when getting all roles for the client scope
+    all_roles = await admin.a_get_all_roles_of_client_scope(client_scope_id=client_scope_id)
+    assert "clientMappings" in all_roles, all_roles
+    all_roles_clients = all_roles["clientMappings"]
+    assert client_name in all_roles_clients, all_roles_clients
+    mappings = all_roles_clients[client_name]["mappings"]
+    client_role_names = [x["name"] for x in mappings]
+    assert CLIENT_ROLE_NAME in client_role_names, client_role_names
+
+    # Test remove realm role of client
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_remove_client_roles_of_client_scope(
+            client_scope_id=client_scope_id, client_roles_owner_id=client, roles=["bad"]
+        )
+    assert err.match(UNKOWN_ERROR_REGEX), err
+
+    res = await admin.a_remove_client_roles_of_client_scope(
+        client_scope_id=client_scope_id,
+        client_roles_owner_id=client,
+        roles=[await admin.a_get_client_role(client_id=client, role_name=CLIENT_ROLE_NAME)],
+    )
+    assert res == dict(), res
+
+    all_roles = await admin.a_get_all_roles_of_client_scope(client_scope_id=client_scope_id)
+    assert len(all_roles) == 0
 
 
 @pytest.mark.asyncio

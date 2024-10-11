@@ -2602,7 +2602,9 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def assign_client_roles_to_client_scope(self, client_id, client_roles_owner_id, roles):
-        """Assign client roles to a client's scope.
+        """Assign client roles to a client's dedicated scope.
+
+        To assign roles to a client scope, use add_client_roles_to_client_scope.
 
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
@@ -2626,7 +2628,9 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
     def delete_client_roles_of_client_scope(self, client_id, client_roles_owner_id, roles):
-        """Delete client roles of a client's scope.
+        """Delete client roles of a client's dedicated scope.
+
+        To delete roles from a client scope, use remove_client_roles_of_client_scope.
 
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
@@ -2650,7 +2654,9 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
     def get_client_roles_of_client_scope(self, client_id, client_roles_owner_id):
-        """Get all client roles for a client's scope.
+        """Get all client roles for a client's dedicated scope.
+
+        To get roles for a client scope, use get_client_specific_roles_of_client_scope.
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -3573,6 +3579,100 @@ class KeycloakAdmin:
             data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    def add_client_roles_to_client_scope(self, client_scope_id, client_roles_owner_id, roles):
+        """Assign client roles to a client scope.
+
+        To assign roles to a client's dedicated scope, use assign_client_roles_to_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :param roles: roles list or role (use RoleRepresentation, must include id and name)
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    def remove_client_roles_of_client_scope(self, client_scope_id, client_roles_owner_id, roles):
+        """Delete client roles of a client scope.
+
+        To delete roles from a client's dedicated scope, use delete_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :param roles: roles list or role (use RoleRepresentation, must include id and name)
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_client_specific_roles_of_client_scope(self, client_scope_id, client_roles_owner_id):
+        """Get client roles for a client scope, for a specific client.
+
+        To get roles for a client's dedicated scope, use get_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_all_roles_of_client_scope(self, client_scope_id):
+        """Get all client roles for a client scope.
+
+        To get roles for a client's dedicated scope,
+        use get_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_mappers_from_client(self, client_id):
         """List of all client mappers.
@@ -6816,7 +6916,9 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_assign_client_roles_to_client_scope(self, client_id, client_roles_owner_id, roles):
-        """Assign client roles to a client's scope asynchronously.
+        """Assign client roles to a client's dedicated scope asynchronously.
+
+        To assign roles to a client scope, use a_add_client_roles_to_client_scope.
 
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
@@ -6840,7 +6942,9 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
     async def a_delete_client_roles_of_client_scope(self, client_id, client_roles_owner_id, roles):
-        """Delete client roles of a client's scope asynchronously.
+        """Delete client roles of a client's dedicated scope asynchronously.
+
+        To remove roles from a client scope, use a_remove_client_roles_of_client_scope.
 
         :param client_id: id of client (not client-id) who is assigned the roles
         :type client_id: str
@@ -6865,6 +6969,8 @@ class KeycloakAdmin:
 
     async def a_get_client_roles_of_client_scope(self, client_id, client_roles_owner_id):
         """Get all client roles for a client's scope asynchronously.
+
+        To get roles from a client scope, use a_get_client_roles_of_client_scope.
 
         :param client_id: id of client (not client-id)
         :type client_id: str
@@ -7793,6 +7899,109 @@ class KeycloakAdmin:
             data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    async def a_add_client_roles_to_client_scope(
+        self, client_scope_id, client_roles_owner_id, roles
+    ):
+        """Assign client roles to a client scope asynchronously.
+
+        To assign roles to a client's dedicated scope, use
+        a_assign_client_roles_to_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :param roles: roles list or role (use RoleRepresentation, must include id and name)
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
+
+    async def a_remove_client_roles_of_client_scope(
+        self, client_scope_id, client_roles_owner_id, roles
+    ):
+        """Delete client roles of a client scope asynchronously.
+
+        To delete roles from a client's dedicated scope,
+        use a_delete_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :param roles: roles list or role (use RoleRepresentation, must include id and name)
+        :type roles: list
+        :return: Keycloak server response
+        :rtype: dict
+        """
+        payload = roles if isinstance(roles, list) else [roles]
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    async def a_get_client_specific_roles_of_client_scope(
+        self, client_scope_id, client_roles_owner_id
+    ):
+        """Get all client roles for a client scope asynchronously.
+
+        To get roles for a client's dedicated scope,
+        use a_get_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :param client_roles_owner_id: id of client (not client-id) who has the roles
+        :type client_roles_owner_id: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+            "client": client_roles_owner_id,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_all_roles_of_client_scope(self, client_scope_id):
+        """Get all client roles for a client scope.
+
+        To get roles for a client's dedicated scope,
+        use a_get_client_roles_of_client_scope.
+
+        :param client_scope_id: client scope id
+        :type client_scope_id: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "scope-id": client_scope_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_mappers_from_client(self, client_id):
         """List of all client mappers asynchronously.
