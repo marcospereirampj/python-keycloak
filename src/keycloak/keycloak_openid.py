@@ -266,7 +266,7 @@ class KeycloakOpenID:
         :type scope: str
         :param state: State will be returned to the redirect_uri
         :type state: str
-        :param nonce: Associates a Client session with an ID Token, and used to mitigate replay attacks
+        :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
         :type nonce: str
         :returns: Authorization URL Full Build
         :rtype: str
@@ -915,7 +915,7 @@ class KeycloakOpenID:
         :type scope: str
         :param state: State will be returned to the redirect_uri
         :type state: str
-        :param nonce: Associates a Client session with an ID Token, and used to mitigate replay attacks
+        :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
         :type nonce: str
         :returns: Authorization URL Full Build
         :rtype: str
