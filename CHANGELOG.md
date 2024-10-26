@@ -1,3 +1,9 @@
+## v4.6.3 (2024-10-26)
+
+### Fix
+
+- Add optional Nonce parameter to the authorization URL requests (#606)
+
 ## v4.6.2 (2024-10-05)
 
 ### Fix
