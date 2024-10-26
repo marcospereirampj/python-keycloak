@@ -257,7 +257,7 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_get(URL_WELL_KNOWN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def auth_url(self, redirect_uri, scope="email", state=""):
+    def auth_url(self, redirect_uri, scope="email", state="", nonce=""):
         """Get authorization URL endpoint.
 
         :param redirect_uri: Redirect url to receive oauth code
@@ -266,6 +266,8 @@ class KeycloakOpenID:
         :type scope: str
         :param state: State will be returned to the redirect_uri
         :type state: str
+        :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
+        :type nonce: str
         :returns: Authorization URL Full Build
         :rtype: str
         """
@@ -275,6 +277,7 @@ class KeycloakOpenID:
             "redirect-uri": redirect_uri,
             "scope": scope,
             "state": state,
+            "nonce": nonce,
         }
         return URL_AUTH.format(**params_path)
 
@@ -903,7 +906,7 @@ class KeycloakOpenID:
         data_raw = await self.connection.a_raw_get(URL_WELL_KNOWN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def a_auth_url(self, redirect_uri, scope="email", state=""):
+    async def a_auth_url(self, redirect_uri, scope="email", state="", nonce=""):
         """Get authorization URL endpoint asynchronously.
 
         :param redirect_uri: Redirect url to receive oauth code
@@ -912,6 +915,8 @@ class KeycloakOpenID:
         :type scope: str
         :param state: State will be returned to the redirect_uri
         :type state: str
+        :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
+        :type nonce: str
         :returns: Authorization URL Full Build
         :rtype: str
         """
@@ -921,6 +926,7 @@ class KeycloakOpenID:
             "redirect-uri": redirect_uri,
             "scope": scope,
             "state": state,
+            "nonce": nonce,
         }
         return URL_AUTH.format(**params_path)
 
