@@ -1,3 +1,9 @@
+## v4.7.0 (2024-11-03)
+
+### Feat
+
+- add client scope client-specific role mappings (#605)
+
 ## v4.6.3 (2024-10-26)
 
 ### Fix
