@@ -1406,7 +1406,7 @@ class KeycloakOpenID:
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         content_type = self.connection.headers.get("Content-Type")
         self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
         (
             self.connection.add_param_headers("Content-Type", content_type)
             if content_type
