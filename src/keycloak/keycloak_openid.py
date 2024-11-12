@@ -674,7 +674,7 @@ class KeycloakOpenID:
         return list(set(policies))
 
     def get_permissions(self, token, method_token_info="introspect", **kwargs):
-        """Get permission by user token .
+        """Get permission by user token.
 
         :param token: user token
         :type token: str
@@ -689,7 +689,7 @@ class KeycloakOpenID:
         """
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
-                "Keycloak settings not found. Load Authorization Keycloak settings ."
+                "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
         token_info = self._token_info(token, method_token_info, **kwargs)
