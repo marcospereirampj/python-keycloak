@@ -892,6 +892,25 @@ class KeycloakOpenID:
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
+    async def _a_token_info(self, token, method_token_info, **kwargs):
+        """Asynchronous getter for the token data.
+
+        :param token: Token
+        :type token: str
+        :param method_token_info: Token info method to use
+        :type method_token_info: str
+        :param kwargs: Additional keyword arguments passed to the decode_token method
+        :type kwargs: dict
+        :returns: Token info
+        :rtype: dict
+        """
+        if method_token_info == "introspect":
+            token_info = await self.a_introspect(token)
+        else:
+            token_info = await self.a_decode_token(token, **kwargs)
+
+        return token_info
+
     async def a_well_known(self):
         """Get the well_known object asynchronously.
 
@@ -1301,7 +1320,7 @@ class KeycloakOpenID:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self._token_info(token, method_token_info, **kwargs)
+        token_info = await self._a_token_info(token, method_token_info, **kwargs)
 
         if method_token_info == "introspect" and not token_info["active"]:
             raise KeycloakInvalidTokenError("Token expired or invalid.")
@@ -1339,7 +1358,7 @@ class KeycloakOpenID:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self._token_info(token, method_token_info, **kwargs)
+        token_info = await self._a_token_info(token, method_token_info, **kwargs)
 
         if method_token_info == "introspect" and not token_info["active"]:
             raise KeycloakInvalidTokenError("Token expired or invalid.")
