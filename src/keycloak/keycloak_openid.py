@@ -1397,7 +1397,7 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         payload = {
             "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
-            "permission": permission,
+            "permission": list(permission), # httpx does not handle sets correctly
             "response_mode": "permissions",
             "audience": self.client_id,
         }
