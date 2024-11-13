@@ -596,6 +596,11 @@ class KeycloakOpenID:
             full_jwt.token.objects["valid"] = True
             return json.loads(full_jwt.token.payload.decode("utf-8"))
 
+    @staticmethod
+    def _public_key_to_jwk(key: str) -> jwk.JWK:
+        key = "-----BEGIN PUBLIC KEY-----\n" + key + "\n-----END PUBLIC KEY-----"
+        return jwk.JWK.from_pem(key.encode("utf-8"))
+
     def decode_token(self, token, validate: bool = True, **kwargs):
         """Decode user token.
 
@@ -620,8 +625,7 @@ class KeycloakOpenID:
         """
         key = kwargs.pop("key", None)
         if validate and key is None:
-            key = "-----BEGIN PUBLIC KEY-----\n" + self.public_key() + "\n-----END PUBLIC KEY-----"
-            key = jwk.JWK.from_pem(key.encode("utf-8"))
+            key = self._public_key_to_jwk(self.public_key())
 
         return self._verify_token(token, key, **kwargs)
 
@@ -1257,12 +1261,7 @@ class KeycloakOpenID:
         """
         key = kwargs.pop("key", None)
         if validate and key is None:
-            key = (
-                "-----BEGIN PUBLIC KEY-----\n"
-                + await self.a_public_key()
-                + "\n-----END PUBLIC KEY-----"
-            )
-            key = jwk.JWK.from_pem(key.encode("utf-8"))
+            key = self._public_key_to_jwk(await self.a_public_key())
 
         return self._verify_token(token, key, **kwargs)
 
