@@ -1,3 +1,9 @@
+## v4.7.1 (2024-11-13)
+
+### Fix
+
+- make sure to not call sync IO functions inside async functions (#615)
+
 ## v4.7.0 (2024-11-03)
 
 ### Feat
