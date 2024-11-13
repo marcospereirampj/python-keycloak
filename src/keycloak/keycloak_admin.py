@@ -6199,7 +6199,7 @@ class KeycloakAdmin:
         :rtype: str
         """
         if skip_exists:
-            client_id = self.get_client_id(client_id=payload["clientId"])
+            client_id = await self.a_get_client_id(client_id=payload["clientId"])
 
             if client_id is not None:
                 return client_id
@@ -6369,7 +6369,7 @@ class KeycloakAdmin:
         """
         params_path = {
             "realm-name": self.connection.realm_name,
-            "role-id": self.get_default_realm_role_id(),
+            "role-id": await self.a_get_default_realm_role_id(),
         }
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES_REALM.format(**params_path)
@@ -6386,7 +6386,7 @@ class KeycloakAdmin:
         """
         params_path = {
             "realm-name": self.connection.realm_name,
-            "role-id": self.get_default_realm_role_id(),
+            "role-id": await self.a_get_default_realm_role_id(),
         }
         data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
@@ -6404,7 +6404,7 @@ class KeycloakAdmin:
         """
         params_path = {
             "realm-name": self.connection.realm_name,
-            "role-id": self.get_default_realm_role_id(),
+            "role-id": await self.a_get_default_realm_role_id(),
         }
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path),
@@ -7536,7 +7536,7 @@ class KeycloakAdmin:
         :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "provider-id": provider_id}
-        data_raw = self.connection.raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG_DESCRIPTION.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -7678,7 +7678,7 @@ class KeycloakAdmin:
         :rtype: str
         """
         if skip_exists:
-            exists = self.get_client_scope_by_name(client_scope_name=payload["name"])
+            exists = await self.a_get_client_scope_by_name(client_scope_name=payload["name"])
 
             if exists is not None:
                 return exists["id"]
@@ -8002,7 +8002,7 @@ class KeycloakAdmin:
             "realm-name": self.connection.realm_name,
             "scope-id": client_scope_id,
         }
-        data_raw = self.connection.raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)

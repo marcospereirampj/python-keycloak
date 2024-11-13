@@ -674,7 +674,7 @@ class KeycloakOpenID:
         return list(set(policies))
 
     def get_permissions(self, token, method_token_info="introspect", **kwargs):
-        """Get permission by user token .
+        """Get permission by user token.
 
         :param token: user token
         :type token: str
@@ -689,7 +689,7 @@ class KeycloakOpenID:
         """
         if not self.authorization.policies:
             raise KeycloakAuthorizationConfigError(
-                "Keycloak settings not found. Load Authorization Keycloak settings ."
+                "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
         token_info = self._token_info(token, method_token_info, **kwargs)
@@ -891,6 +891,25 @@ class KeycloakOpenID:
             else self.connection.del_param_headers("Content-Type")
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
+
+    async def _a_token_info(self, token, method_token_info, **kwargs):
+        """Asynchronous getter for the token data.
+
+        :param token: Token
+        :type token: str
+        :param method_token_info: Token info method to use
+        :type method_token_info: str
+        :param kwargs: Additional keyword arguments passed to the decode_token method
+        :type kwargs: dict
+        :returns: Token info
+        :rtype: dict
+        """
+        if method_token_info == "introspect":
+            token_info = await self.a_introspect(token)
+        else:
+            token_info = await self.a_decode_token(token, **kwargs)
+
+        return token_info
 
     async def a_well_known(self):
         """Get the well_known object asynchronously.
@@ -1301,7 +1320,7 @@ class KeycloakOpenID:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self._token_info(token, method_token_info, **kwargs)
+        token_info = await self._a_token_info(token, method_token_info, **kwargs)
 
         if method_token_info == "introspect" and not token_info["active"]:
             raise KeycloakInvalidTokenError("Token expired or invalid.")
@@ -1339,7 +1358,7 @@ class KeycloakOpenID:
                 "Keycloak settings not found. Load Authorization Keycloak settings."
             )
 
-        token_info = self._token_info(token, method_token_info, **kwargs)
+        token_info = await self._a_token_info(token, method_token_info, **kwargs)
 
         if method_token_info == "introspect" and not token_info["active"]:
             raise KeycloakInvalidTokenError("Token expired or invalid.")
@@ -1378,7 +1397,7 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         payload = {
             "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
-            "permission": permission,
+            "permission": list(permission),  # httpx does not handle `set` correctly
             "response_mode": "permissions",
             "audience": self.client_id,
         }
@@ -1387,7 +1406,7 @@ class KeycloakOpenID:
         self.connection.add_param_headers("Authorization", "Bearer " + token)
         content_type = self.connection.headers.get("Content-Type")
         self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
+        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
         (
             self.connection.add_param_headers("Content-Type", content_type)
             if content_type
