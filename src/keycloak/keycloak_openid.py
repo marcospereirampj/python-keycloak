@@ -581,7 +581,8 @@ class KeycloakOpenID:
             )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def _verify_token(self, token, key, **kwargs):
+    @staticmethod
+    def _verify_token(token, key, **kwargs):
         # keep the function free of IO
         # this way it can be used by `decode_token` and `a_decode_token`
         if key is not None:
