@@ -583,6 +583,14 @@ class KeycloakOpenID:
 
     @staticmethod
     def _verify_token(token, key: Union[jwk.JWK, jwk.JWKSet, None], **kwargs):
+        """Decode and optionally validate a token.
+
+        :param token: The token to verify
+        :param key: Which key should be used for validation.
+            If not provided, the validation is not performed and the token is implicitly valid.
+        :param kwargs: Additional keyword arguments for jwcrypto's JWT object
+        :returns: Decoded token
+        """
         # keep the function free of IO
         # this way it can be used by `decode_token` and `a_decode_token`
 
