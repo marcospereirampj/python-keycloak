@@ -623,8 +623,11 @@ class KeycloakOpenID:
         :rtype: dict
         """
         key = kwargs.pop("key", None)
-        if validate and key is None:
-            key = self.public_key()
+        if validate:
+            if key is None:
+                key = self.public_key()
+        else:
+            key = None
 
         return self._verify_token(token, key, **kwargs)
 
@@ -1259,8 +1262,11 @@ class KeycloakOpenID:
         :rtype: dict
         """
         key = kwargs.pop("key", None)
-        if validate and key is None:
-            key = await self.a_public_key()
+        if validate:
+            if key is None:
+                key = await self.a_public_key()
+        else:
+            key = None
 
         return self._verify_token(token, key, **kwargs)
 
