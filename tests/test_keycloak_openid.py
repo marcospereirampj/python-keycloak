@@ -319,8 +319,8 @@ def test_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
     assert decoded_refresh_token["typ"] == "Refresh", decoded_refresh_token
 
 
-def test_decode_token_validate(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
-    """Test decode token.
+def test_decode_token_invalid_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
+    """Test decode token with an invalid token.
 
     :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
     :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
@@ -817,8 +817,8 @@ async def test_a_decode_token(oid_with_credentials: Tuple[KeycloakOpenID, str, s
 
 
 @pytest.mark.asyncio
-async def test_a_decode_token_validate(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
-    """Test decode token asynchronously.
+async def test_a_decode_token_invalid_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
+    """Test decode token asynchronously an invalid token.
 
     :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
     :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
