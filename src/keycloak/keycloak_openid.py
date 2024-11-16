@@ -582,12 +582,9 @@ class KeycloakOpenID:
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     @staticmethod
-    def _verify_token(token, key: Union[str, jwk.JWK, jwk.JWKSet, None], **kwargs):
+    def _verify_token(token, key: Union[jwk.JWK, jwk.JWKSet, None], **kwargs):
         # keep the function free of IO
         # this way it can be used by `decode_token` and `a_decode_token`
-        if isinstance(key, str):
-            key = "-----BEGIN PUBLIC KEY-----\n" + key + "\n-----END PUBLIC KEY-----"
-            key = jwk.JWK.from_pem(key.encode("utf-8"))
 
         if key is not None:
             leeway = kwargs.pop("leeway", 60)
@@ -625,7 +622,12 @@ class KeycloakOpenID:
         key = kwargs.pop("key", None)
         if validate:
             if key is None:
-                key = self.public_key()
+                key = (
+                    "-----BEGIN PUBLIC KEY-----\n"
+                    + self.public_key()
+                    + "\n-----END PUBLIC KEY-----"
+                )
+                key = jwk.JWK.from_pem(key.encode("utf-8"))
         else:
             key = None
 
@@ -1264,7 +1266,12 @@ class KeycloakOpenID:
         key = kwargs.pop("key", None)
         if validate:
             if key is None:
-                key = await self.a_public_key()
+                key = (
+                    "-----BEGIN PUBLIC KEY-----\n"
+                    + await self.a_public_key()
+                    + "\n-----END PUBLIC KEY-----"
+                )
+                key = jwk.JWK.from_pem(key.encode("utf-8"))
         else:
             key = None
 
