@@ -586,9 +586,12 @@ class KeycloakOpenID:
         """Decode and optionally validate a token.
 
         :param token: The token to verify
+        :type token: str
         :param key: Which key should be used for validation.
             If not provided, the validation is not performed and the token is implicitly valid.
+        :type key: Union[jwk.JWK, jwk.JWKSet, None]
         :param kwargs: Additional keyword arguments for jwcrypto's JWT object
+        :type kwargs: dict
         :returns: Decoded token
         """
         # keep the function free of IO
