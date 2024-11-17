@@ -1,3 +1,9 @@
+## v4.7.2 (2024-11-17)
+
+### Fix
+
+- Feature parity for `a_decode_token` and `decode_token` (#616)
+
 ## v4.7.1 (2024-11-13)
 
 ### Fix
