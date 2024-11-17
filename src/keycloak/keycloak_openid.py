@@ -28,7 +28,7 @@ class to handle authentication and token manipulation.
 """
 
 import json
-from typing import Optional
+from typing import Optional, Union
 
 from jwcrypto import jwk, jwt
 
@@ -581,6 +581,33 @@ class KeycloakOpenID:
             )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
+    @staticmethod
+    def _verify_token(token, key: Union[jwk.JWK, jwk.JWKSet, None], **kwargs):
+        """Decode and optionally validate a token.
+
+        :param token: The token to verify
+        :type token: str
+        :param key: Which key should be used for validation.
+            If not provided, the validation is not performed and the token is implicitly valid.
+        :type key: Union[jwk.JWK, jwk.JWKSet, None]
+        :param kwargs: Additional keyword arguments for jwcrypto's JWT object
+        :type kwargs: dict
+        :returns: Decoded token
+        """
+        # keep the function free of IO
+        # this way it can be used by `decode_token` and `a_decode_token`
+
+        if key is not None:
+            leeway = kwargs.pop("leeway", 60)
+            full_jwt = jwt.JWT(jwt=token, **kwargs)
+            full_jwt.leeway = leeway
+            full_jwt.validate(key)
+            return jwt.json_decode(full_jwt.claims)
+        else:
+            full_jwt = jwt.JWT(jwt=token, **kwargs)
+            full_jwt.token.objects["valid"] = True
+            return json.loads(full_jwt.token.payload.decode("utf-8"))
+
     def decode_token(self, token, validate: bool = True, **kwargs):
         """Decode user token.
 
@@ -603,26 +630,19 @@ class KeycloakOpenID:
         :returns: Decoded token
         :rtype: dict
         """
+        key = kwargs.pop("key", None)
         if validate:
-            if "key" not in kwargs:
+            if key is None:
                 key = (
                     "-----BEGIN PUBLIC KEY-----\n"
                     + self.public_key()
                     + "\n-----END PUBLIC KEY-----"
                 )
                 key = jwk.JWK.from_pem(key.encode("utf-8"))
-                kwargs["key"] = key
-
-            key = kwargs.pop("key")
-            leeway = kwargs.pop("leeway", 60)
-            full_jwt = jwt.JWT(jwt=token, **kwargs)
-            full_jwt.leeway = leeway
-            full_jwt.validate(key)
-            return jwt.json_decode(full_jwt.claims)
         else:
-            full_jwt = jwt.JWT(jwt=token, **kwargs)
-            full_jwt.token.objects["valid"] = True
-            return json.loads(full_jwt.token.payload.decode("utf-8"))
+            key = None
+
+        return self._verify_token(token, key, **kwargs)
 
     def load_authorization_config(self, path):
         """Load Keycloak settings (authorization).
@@ -1273,22 +1293,19 @@ class KeycloakOpenID:
         :returns: Decoded token
         :rtype: dict
         """
+        key = kwargs.pop("key", None)
         if validate:
-            if "key" not in kwargs:
+            if key is None:
                 key = (
                     "-----BEGIN PUBLIC KEY-----\n"
                     + await self.a_public_key()
                     + "\n-----END PUBLIC KEY-----"
                 )
                 key = jwk.JWK.from_pem(key.encode("utf-8"))
-                kwargs["key"] = key
-
-            full_jwt = jwt.JWT(jwt=token, **kwargs)
-            return jwt.json_decode(full_jwt.claims)
         else:
-            full_jwt = jwt.JWT(jwt=token, **kwargs)
-            full_jwt.token.objects["valid"] = True
-            return json.loads(full_jwt.token.payload.decode("utf-8"))
+            key = None
+
+        return self._verify_token(token, key, **kwargs)
 
     async def a_load_authorization_config(self, path):
         """Load Keycloak settings (authorization) asynchronously.
