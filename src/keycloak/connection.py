@@ -100,7 +100,7 @@ class ConnectionManager(object):
             self._s.mount(protocol, adapter)
 
         if proxies:
-            self._s.mounts.update(proxies)
+            self._s.proxies.update(proxies)
 
         self.async_s = httpx.AsyncClient(verify=verify, mounts=proxies, cert=cert)
         self.async_s.auth = None  # don't let requests add auth headers
