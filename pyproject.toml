@@ -35,7 +35,7 @@ requests = ">=2.20.0"
 requests-toolbelt = ">=0.6.0"
 deprecation = ">=2.1.0"
 jwcrypto = ">=1.5.4"
-httpx = ">=0.23.2"
+httpx = ">=0.28.0"
 async-property = ">=0.2.2"
 
 [tool.poetry.group.docs.dependencies]
