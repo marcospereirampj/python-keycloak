@@ -298,7 +298,10 @@ class KeycloakAdmin:
             "export-groups-and-roles": export_groups_and_role,
         }
         data_raw = self.connection.raw_post(
-            urls_patterns.URL_ADMIN_REALM_EXPORT.format(**params_path), data=""
+            urls_patterns.URL_ADMIN_REALM_EXPORT.format(**params_path),
+            data="",
+            exportClients=export_clients,
+            exportGroupsAndRoles=export_groups_and_role,
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -1334,9 +1337,9 @@ class KeycloakAdmin:
         :return: client_id (uuid as string)
         :rtype: str
         """
-        params_path = {"realm-name": self.connection.realm_name, "client-id": client_id}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENTS_CLIENT_ID.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENTS.format(**params_path), clientId=client_id
         )
         data_response = raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1381,6 +1384,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -1453,7 +1457,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1513,6 +1517,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -1550,6 +1555,8 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
+            permission=False,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -1589,6 +1596,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -1605,7 +1613,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1625,6 +1633,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
@@ -1639,7 +1648,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1654,7 +1663,9 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path),
+            max=-1,
+            permission=False,
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -1971,19 +1982,15 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
-        url = urls_patterns.URL_ADMIN_REALM_ROLES
         params_path = {"realm-name": self.connection.realm_name}
         params = {"briefRepresentation": brief_representation}
+
+        if search_text is not None and search_text.strip() != "":
+            params["search"] = search_text
+
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), **params
         )
-
-        # set the search_text path param, if it is a valid string
-        if search_text is not None and search_text.strip() != "":
-            params_path["search-text"] = search_text
-            url = urls_patterns.URL_ADMIN_REALM_ROLES_SEARCH
-
-        data_raw = self.connection.raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_realm_role_groups(self, role_name, query=None, brief_representation=True):
@@ -3669,10 +3676,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: dict
         """
-        params_path = {
-            "realm-name": self.connection.realm_name,
-            "scope-id": client_scope_id,
-        }
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS.format(**params_path)
         )
@@ -4122,6 +4126,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
@@ -4584,7 +4589,10 @@ class KeycloakAdmin:
             "export-groups-and-roles": export_groups_and_role,
         }
         data_raw = await self.connection.a_raw_post(
-            urls_patterns.URL_ADMIN_REALM_EXPORT.format(**params_path), data=""
+            urls_patterns.URL_ADMIN_REALM_EXPORT.format(**params_path),
+            data="",
+            exportClients=export_clients,
+            exportGroupsAndRoles=export_groups_and_role,
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
@@ -5646,9 +5654,9 @@ class KeycloakAdmin:
         :return: client_id (uuid as string)
         :rtype: str
         """
-        params_path = {"realm-name": self.connection.realm_name, "client-id": client_id}
+        params_path = {"realm-name": self.connection.realm_name}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENTS_CLIENT_ID.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENTS.format(**params_path), clientId=client_id
         )
         data_response = raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -5693,6 +5701,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -5765,7 +5774,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCES.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -5825,6 +5834,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_ROLE_BASED_POLICY.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -5862,6 +5872,8 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
+            permission=False,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -5903,6 +5915,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_RESOURCE_BASED_PERMISSION.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
@@ -5919,7 +5932,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -5939,6 +5952,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SCOPES.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
@@ -5953,7 +5967,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_PERMISSIONS.format(**params_path), max=-1
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -5968,7 +5982,9 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path)
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_POLICIES.format(**params_path),
+            max=-1,
+            permission=False,
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -6287,19 +6303,15 @@ class KeycloakAdmin:
         :return: Keycloak server response (RoleRepresentation)
         :rtype: list
         """
-        url = urls_patterns.URL_ADMIN_REALM_ROLES
         params_path = {"realm-name": self.connection.realm_name}
         params = {"briefRepresentation": brief_representation}
+
+        if search_text is not None and search_text.strip() != "":
+            params["search"] = search_text
+
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES.format(**params_path), **params
         )
-
-        # set the search_text path param, if it is a valid string
-        if search_text is not None and search_text.strip() != "":
-            params_path["search-text"] = search_text
-            url = urls_patterns.URL_ADMIN_REALM_ROLES_SEARCH
-
-        data_raw = await self.connection.a_raw_get(url.format(**params_path), **params)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_realm_role_groups(self, role_name, query=None, brief_representation=True):
@@ -7998,10 +8010,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: dict
         """
-        params_path = {
-            "realm-name": self.connection.realm_name,
-            "scope-id": client_scope_id,
-        }
+        params_path = {"realm-name": self.connection.realm_name, "scope-id": client_scope_id}
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS.format(**params_path)
         )
@@ -8453,6 +8462,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_ADD_CLIENT_AUTHZ_SCOPE_PERMISSION.format(**params_path),
             data=json.dumps(payload),
+            max=-1,
         )
         return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 

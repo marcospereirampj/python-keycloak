@@ -4,12 +4,12 @@ version = "0.0.0"
 description = "python-keycloak is a Python package providing access to the Keycloak API."
 license = "MIT"
 readme = "README.md"
-keywords = [ "keycloak", "openid", "oidc" ]
+keywords = ["keycloak", "openid", "oidc"]
 authors = [
     "Marcos Pereira <marcospereira.mpj@gmail.com>",
-    "Richard Nemeth <ryshoooo@gmail.com>"
+    "Richard Nemeth <ryshoooo@gmail.com>",
 ]
-classifiers=[
+classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Development Status :: 3 - Alpha",
