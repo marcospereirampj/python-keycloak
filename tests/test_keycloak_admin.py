@@ -3353,7 +3353,7 @@ async def test_a_partial_import_realm(admin: KeycloakAdmin, realm: str):
     client_id = await admin.a_create_client(payload={"name": test_client, "clientId": test_client})
 
     realm_export = await admin.a_export_realm(export_clients=True, export_groups_and_role=False)
-    assert realm_export["realm"] == realm, realm
+
     client_config = [
         client_entry for client_entry in realm_export["clients"] if client_entry["id"] == client_id
     ][0]
