@@ -3966,7 +3966,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
-    def get_client_all_sessions(self, client_id):
+    def get_client_all_sessions(self, client_id, query=None):
         """Get sessions associated with the client.
 
         UserSessionRepresentation
@@ -3974,14 +3974,18 @@ class KeycloakAdmin:
 
         :param client_id: id of client
         :type client_id: str
+        :param query: Additional query parameters
+        :type query: dict
         :return: UserSessionRepresentation
         :rtype: list
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        url = urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions.
@@ -8300,7 +8304,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
-    async def a_get_client_all_sessions(self, client_id):
+    async def a_get_client_all_sessions(self, client_id, query=None):
         """Get sessions associated with the client asynchronously.
 
         UserSessionRepresentation
@@ -8308,14 +8312,18 @@ class KeycloakAdmin:
 
         :param client_id: id of client
         :type client_id: str
+        :param query: Additional query parameters
+        :type query: dict
         :return: UserSessionRepresentation
         :rtype: list
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        url = urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
 
     async def a_get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions asynchronously.
