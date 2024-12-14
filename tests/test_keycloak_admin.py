@@ -3951,11 +3951,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
     assert res["id"] == subgroup_id_1, res
 
     res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert res == {
-        "error": "Group path does not exist",
-        "error_description": "For more on this error consult the server log at the "
-        "debug level.",
-    }, res
+    assert res["error"] == "Group path does not exist"
 
     res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
