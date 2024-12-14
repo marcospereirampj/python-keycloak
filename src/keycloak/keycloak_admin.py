@@ -619,7 +619,7 @@ class KeycloakAdmin:
         users = self.get_users(query={"username": lower_user_name, "max": 1, "exact": True})
         return users[0]["id"] if len(users) == 1 else None
 
-    def get_user(self, user_id):
+    def get_user(self, user_id, user_profile_metadata=False):
         """Get representation of the user.
 
         UserRepresentation
@@ -627,10 +627,15 @@ class KeycloakAdmin:
 
         :param user_id: User id
         :type user_id: str
+        :param user_profile_metadata: Whether to include user profile metadata in the response
+        :type user_profile_metadata: bool
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
-        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_USER.format(**params_path),
+            userProfileMetadata=user_profile_metadata,
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_user_groups(self, user_id, query=None, brief_representation=True):
@@ -4922,7 +4927,7 @@ class KeycloakAdmin:
         )
         return users[0]["id"] if len(users) == 1 else None
 
-    async def a_get_user(self, user_id):
+    async def a_get_user(self, user_id, user_profile_metadata=False):
         """Get representation of the user asynchronously.
 
         UserRepresentation
@@ -4930,11 +4935,14 @@ class KeycloakAdmin:
 
         :param user_id: User id
         :type user_id: str
+        :param user_profile_metadata: whether to include user profile metadata in the response
+        :type user_profile_metadata: bool
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_USER.format(**params_path)
+            urls_patterns.URL_ADMIN_USER.format(**params_path),
+            userProfileMetadata=user_profile_metadata,
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
