@@ -845,9 +845,12 @@ def test_groups(admin: KeycloakAdmin, user: str):
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    with pytest.raises(KeycloakGetError) as err:
-        admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert err.match('404: b\'{"error":"Group path does not exist".*}\'')
+    res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
+    assert res == {
+        "error": "Group path does not exist",
+        "error_description": "For more on this error consult the server log at the "
+        "debug level.",
+    }, res
 
     res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
@@ -3947,9 +3950,12 @@ async def test_a_groups(admin: KeycloakAdmin, user: str):
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    with pytest.raises(KeycloakGetError) as err:
-        await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert err.match('404: b\'{"error":"Group path does not exist".*}\'')
+    res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
+    assert res == {
+        "error": "Group path does not exist",
+        "error_description": "For more on this error consult the server log at the "
+        "debug level.",
+    }, res
 
     res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res

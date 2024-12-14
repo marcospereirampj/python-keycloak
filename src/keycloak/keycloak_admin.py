@@ -1149,7 +1149,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
         )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return raise_error_from_response(data_raw, KeycloakGetError, [200, 404])
 
     def create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm.
@@ -5460,7 +5460,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
         )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return raise_error_from_response(data_raw, KeycloakGetError, [200, 404])
 
     async def a_create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm asynchronously.
