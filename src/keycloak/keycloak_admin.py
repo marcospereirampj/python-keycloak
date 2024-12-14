@@ -2129,9 +2129,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_client_role(self, client_id, role_name):
-        """Get client role id by name.
-
-        This is required for further actions with this role.
+        """Get client role by name.
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
@@ -2140,8 +2138,8 @@ class KeycloakAdmin:
         :type client_id: str
         :param role_name: role's name (not id!)
         :type role_name: str
-        :return: role_id
-        :rtype: str
+        :return: Role object
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.connection.realm_name,
@@ -6453,19 +6451,14 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_client_role(self, client_id, role_name):
-        """Get client role id by name asynchronously.
-
-        This is required for further actions with this role.
-
-        RoleRepresentation
-        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+        """Get client role by name asynchronously.
 
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param role_name: role's name (not id!)
         :type role_name: str
-        :return: role_id
-        :rtype: str
+        :return: Role object
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.connection.realm_name,
