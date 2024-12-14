@@ -803,13 +803,13 @@ class KeycloakOpenID:
             raise
 
         for resource_struct in granted:
-            resource = resource_struct["rsname"]
-            scopes = resource_struct.get("scopes", None)
-            if not scopes:
-                needed.discard(resource)
-                continue
-            for scope in scopes:  # pragma: no cover
-                needed.discard("{}#{}".format(resource, scope))
+            for resource in (resource_struct["rsname"], resource_struct["rsid"]):
+                scopes = resource_struct.get("scopes", None)
+                if not scopes:
+                    needed.discard(resource)
+                    continue
+                for scope in scopes:  # pragma: no cover
+                    needed.discard("{}#{}".format(resource, scope))
 
         return AuthStatus(
             is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
@@ -1469,13 +1469,13 @@ class KeycloakOpenID:
             raise
 
         for resource_struct in granted:
-            resource = resource_struct["rsname"]
-            scopes = resource_struct.get("scopes", None)
-            if not scopes:
-                needed.discard(resource)
-                continue
-            for scope in scopes:  # pragma: no cover
-                needed.discard("{}#{}".format(resource, scope))
+            for resource in (resource_struct["rsname"], resource_struct["rsid"]):
+                scopes = resource_struct.get("scopes", None)
+                if not scopes:
+                    needed.discard(resource)
+                    continue
+                for scope in scopes:  # pragma: no cover
+                    needed.discard("{}#{}".format(resource, scope))
 
         return AuthStatus(
             is_logged_in=True, is_authorized=len(needed) == 0, missing_permissions=needed
