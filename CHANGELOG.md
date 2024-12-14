@@ -1,3 +1,17 @@
+## v5.1.0 (2024-12-14)
+
+### Feat
+
+- get_client_all_sessions now supports pagination
+- uma extra payload
+- user profile metadata parameter for get_user method
+- uma extra payload
+
+### Fix
+
+- check uma permissions with resource ID as well
+- get group by path should not raise on 404
+
 ## v5.0.0 (2024-12-10)
 
 ## v4.7.3 (2024-11-29)
