@@ -619,7 +619,7 @@ class KeycloakAdmin:
         users = self.get_users(query={"username": lower_user_name, "max": 1, "exact": True})
         return users[0]["id"] if len(users) == 1 else None
 
-    def get_user(self, user_id):
+    def get_user(self, user_id, user_profile_metadata=False):
         """Get representation of the user.
 
         UserRepresentation
@@ -627,10 +627,15 @@ class KeycloakAdmin:
 
         :param user_id: User id
         :type user_id: str
+        :param user_profile_metadata: Whether to include user profile metadata in the response
+        :type user_profile_metadata: bool
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
-        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_USER.format(**params_path))
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_USER.format(**params_path),
+            userProfileMetadata=user_profile_metadata,
+        )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_user_groups(self, user_id, query=None, brief_representation=True):
@@ -1149,7 +1154,7 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
         )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return raise_error_from_response(data_raw, KeycloakGetError, [200, 404])
 
     def create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm.
@@ -2124,9 +2129,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_client_role(self, client_id, role_name):
-        """Get client role id by name.
-
-        This is required for further actions with this role.
+        """Get client role by name.
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
@@ -2135,8 +2138,8 @@ class KeycloakAdmin:
         :type client_id: str
         :param role_name: role's name (not id!)
         :type role_name: str
-        :return: role_id
-        :rtype: str
+        :return: Role object
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.connection.realm_name,
@@ -3963,7 +3966,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
-    def get_client_all_sessions(self, client_id):
+    def get_client_all_sessions(self, client_id, query=None):
         """Get sessions associated with the client.
 
         UserSessionRepresentation
@@ -3971,14 +3974,18 @@ class KeycloakAdmin:
 
         :param client_id: id of client
         :type client_id: str
+        :param query: Additional query parameters
+        :type query: dict
         :return: UserSessionRepresentation
         :rtype: list
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        url = urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions.
@@ -4922,7 +4929,7 @@ class KeycloakAdmin:
         )
         return users[0]["id"] if len(users) == 1 else None
 
-    async def a_get_user(self, user_id):
+    async def a_get_user(self, user_id, user_profile_metadata=False):
         """Get representation of the user asynchronously.
 
         UserRepresentation
@@ -4930,11 +4937,14 @@ class KeycloakAdmin:
 
         :param user_id: User id
         :type user_id: str
+        :param user_profile_metadata: whether to include user profile metadata in the response
+        :type user_profile_metadata: bool
         :return: UserRepresentation
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_USER.format(**params_path)
+            urls_patterns.URL_ADMIN_USER.format(**params_path),
+            userProfileMetadata=user_profile_metadata,
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -5460,7 +5470,7 @@ class KeycloakAdmin:
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path)
         )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        return raise_error_from_response(data_raw, KeycloakGetError, [200, 404])
 
     async def a_create_group(self, payload, parent=None, skip_exists=False):
         """Create a group in the Realm asynchronously.
@@ -6445,19 +6455,14 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_client_role(self, client_id, role_name):
-        """Get client role id by name asynchronously.
-
-        This is required for further actions with this role.
-
-        RoleRepresentation
-        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_rolerepresentation
+        """Get client role by name asynchronously.
 
         :param client_id: id of client (not client-id)
         :type client_id: str
         :param role_name: role's name (not id!)
         :type role_name: str
-        :return: role_id
-        :rtype: str
+        :return: Role object
+        :rtype: dict
         """
         params_path = {
             "realm-name": self.connection.realm_name,
@@ -8299,7 +8304,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
 
-    async def a_get_client_all_sessions(self, client_id):
+    async def a_get_client_all_sessions(self, client_id, query=None):
         """Get sessions associated with the client asynchronously.
 
         UserSessionRepresentation
@@ -8307,14 +8312,18 @@ class KeycloakAdmin:
 
         :param client_id: id of client
         :type client_id: str
+        :param query: Additional query parameters
+        :type query: dict
         :return: UserSessionRepresentation
         :rtype: list
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
-        data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
-        )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        url = urls_patterns.URL_ADMIN_CLIENT_ALL_SESSIONS.format(**params_path)
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
 
     async def a_get_client_sessions_stats(self):
         """Get current session count for all clients with active sessions asynchronously.

@@ -318,7 +318,7 @@ class KeycloakUMA:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def permissions_check(self, token, permissions: Iterable[UMAPermission]):
+    def permissions_check(self, token, permissions: Iterable[UMAPermission], **extra_payload):
         """Check UMA permissions by user token with requested permissions.
 
         The token endpoint is used to check UMA permissions from Keycloak. It can only be
@@ -330,6 +330,8 @@ class KeycloakUMA:
         :type token: str
         :param permissions: Iterable of uma permissions to validate the token against
         :type permissions: Iterable[UMAPermission]
+        :param extra_payload: extra payload data
+        :type extra_payload: dict
         :returns: Keycloak decision
         :rtype: boolean
         """
@@ -338,6 +340,7 @@ class KeycloakUMA:
             "permission": ",".join(str(permission) for permission in permissions),
             "response_mode": "decision",
             "audience": self.connection.client_id,
+            **extra_payload,
         }
 
         # Everyone always has the null set of permissions
@@ -657,7 +660,9 @@ class KeycloakUMA:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def a_permissions_check(self, token, permissions: Iterable[UMAPermission]):
+    async def a_permissions_check(
+        self, token, permissions: Iterable[UMAPermission], **extra_payload
+    ):
         """Check UMA permissions by user token with requested permissions  asynchronously.
 
         The token endpoint is used to check UMA permissions from Keycloak. It can only be
@@ -669,6 +674,8 @@ class KeycloakUMA:
         :type token: str
         :param permissions: Iterable of uma permissions to validate the token against
         :type permissions: Iterable[UMAPermission]
+        :param extra_payload: extra payload data
+        :type extra_payload: dict
         :returns: Keycloak decision
         :rtype: boolean
         """
@@ -677,6 +684,7 @@ class KeycloakUMA:
             "permission": ",".join(str(permission) for permission in permissions),
             "response_mode": "decision",
             "audience": self.connection.client_id,
+            **extra_payload,
         }
 
         # Everyone always has the null set of permissions
