@@ -731,7 +731,7 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    def uma_permissions(self, token, permissions=""):
+    def uma_permissions(self, token, permissions="", **extra_payload):
         """Get UMA permissions by user token with requested permissions.
 
         The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
@@ -743,6 +743,8 @@ class KeycloakOpenID:
         :type token: str
         :param permissions: list of uma permissions list(resource:scope) requested by the user
         :type permissions: str
+        :param extra_payload: Additional payload data
+        :type extra_payload: dict
         :returns: Keycloak server response
         :rtype: dict
         """
@@ -754,6 +756,7 @@ class KeycloakOpenID:
             "permission": permission,
             "response_mode": "permissions",
             "audience": self.client_id,
+            **extra_payload,
         }
 
         orig_bearer = self.connection.headers.get("Authorization")
@@ -1394,7 +1397,7 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    async def a_uma_permissions(self, token, permissions=""):
+    async def a_uma_permissions(self, token, permissions="", **extra_payload):
         """Get UMA permissions by user token with requested permissions asynchronously.
 
         The token endpoint is used to retrieve UMA permissions from Keycloak. It can only be
@@ -1406,6 +1409,8 @@ class KeycloakOpenID:
         :type token: str
         :param permissions: list of uma permissions list(resource:scope) requested by the user
         :type permissions: str
+        :param extra_payload: Additional payload data
+        :type extra_payload: dict
         :returns: Keycloak server response
         :rtype: dict
         """
@@ -1417,6 +1422,7 @@ class KeycloakOpenID:
             "permission": list(permission),  # httpx does not handle `set` correctly
             "response_mode": "permissions",
             "audience": self.client_id,
+            **extra_payload,
         }
 
         orig_bearer = self.connection.headers.get("Authorization")
