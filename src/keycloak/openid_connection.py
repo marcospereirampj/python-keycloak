@@ -389,6 +389,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_get(*args, **kwargs)
+        if r.status_code == 401:
+            self.refresh_token()
+            r = super().raw_get(*args, **kwargs)
+
         return r
 
     def raw_post(self, *args, **kwargs):
@@ -406,6 +410,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_post(*args, **kwargs)
+        if r.status_code == 401:
+            self.refresh_token()
+            r = super().raw_post(*args, **kwargs)
+
         return r
 
     def raw_put(self, *args, **kwargs):
@@ -423,6 +431,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_put(*args, **kwargs)
+        if r.status_code == 401:
+            self.refresh_token()
+            r = super().raw_put(*args, **kwargs)
+
         return r
 
     def raw_delete(self, *args, **kwargs):
@@ -440,6 +452,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_delete(*args, **kwargs)
+        if r.status_code == 401:
+            self.refresh_token()
+            r = super().raw_delete(*args, **kwargs)
+
         return r
 
     async def a_get_token(self):
@@ -496,6 +512,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_get(*args, **kwargs)
+        if r.status_code == 401:
+            await self.a_refresh_token()
+            r = await super().a_raw_get(*args, **kwargs)
+
         return r
 
     async def a_raw_post(self, *args, **kwargs):
@@ -513,6 +533,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_post(*args, **kwargs)
+        if r.status_code == 401:
+            await self.a_refresh_token()
+            r = await super().a_raw_post(*args, **kwargs)
+
         return r
 
     async def a_raw_put(self, *args, **kwargs):
@@ -530,6 +554,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_put(*args, **kwargs)
+        if r.status_code == 401:
+            await self.a_refresh_token()
+            r = await super().a_raw_put(*args, **kwargs)
+
         return r
 
     async def a_raw_delete(self, *args, **kwargs):
@@ -547,4 +575,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_delete(*args, **kwargs)
+        if r.status_code == 401:
+            await self.a_refresh_token()
+            r = await super().a_raw_delete(*args, **kwargs)
+
         return r
