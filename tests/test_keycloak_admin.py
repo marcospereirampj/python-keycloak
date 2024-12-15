@@ -2771,9 +2771,8 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
         "Content-Type": "application/json",
     }
 
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        admin.get_realm(realm_name=realm)
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized".*}\'')
+    res = admin.get_realm(realm_name=realm)
+    assert res["realm"] == realm
 
     # Freeze time to simulate the access token expiring
     with freezegun.freeze_time("2023-02-25 10:05:00"):
@@ -6008,9 +6007,8 @@ async def test_a_auto_refresh(admin_frozen: KeycloakAdmin, realm: str):
         "Content-Type": "application/json",
     }
 
-    with pytest.raises(KeycloakAuthenticationError) as err:
-        await admin.a_get_realm(realm_name=realm)
-    assert err.match('401: b\'{"error":"HTTP 401 Unauthorized".*}\'')
+    res = await admin.a_get_realm(realm_name=realm)
+    assert res["realm"] == realm
 
     # Freeze time to simulate the access token expiring
     with freezegun.freeze_time("2023-02-25 10:05:00"):
