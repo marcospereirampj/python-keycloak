@@ -3051,6 +3051,29 @@ class KeycloakAdmin:
             data_raw, KeycloakPostError, expected_codes=[201], skip_exists=skip_exists
         )
 
+    def update_authentication_flow(self, id, payload, skip_exists=False):
+        """Update exits authentication flow.
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
+        :param id
+        :type id: str
+        :param payload: AuthenticationFlowRepresentation
+        :type payload: dict
+        :param skip_exists: Do not raise an error if authentication flow already exists
+        :type skip_exists: bool
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: bytes
+        """
+        params_path = {"id": id, "realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_FLOW.format(**params_path), data=json.dumps(payload)
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPutError, expected_codes=[202], skip_exists=skip_exists
+        )
+
     def copy_authentication_flow(self, payload, flow_alias):
         """Copy existing authentication flow under a new name.
 
@@ -3174,6 +3197,36 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
 
+    def change_execution_priority(self, execution_id, diff):
+        """Raise or lower execution priority of diff time.
+
+        :param execution_id: id of execution to lower priority
+        :type execution_id: str
+        :param diff: Integer number, raise of diff time if positive lower of diff time if negative
+        :type diff: int
+        :raises KeycloakPostError: when post requests are failed
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        try:
+            if diff > 0:
+                for i in range(diff):
+                    _ = self.connection.raw_post(
+                        urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                            **params_path
+                        ),
+                        data="{}",
+                    )
+            elif diff < 0:
+                for i in range(-diff):
+                    _ = self.connection.raw_post(
+                        urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                            **params_path
+                        ),
+                        data="{}",
+                    )
+        except Exception as e:
+            raise KeycloakPostError(f"Unable to change execution priority {execution_id}") from e
+
     def create_authentication_flow_subflow(self, payload, flow_alias, skip_exists=False):
         """Create a new sub authentication flow for a given authentication flow.
 
@@ -3242,6 +3295,26 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_execution_config(self, execution_id, payload):
+        """Add autenticatorConfig to the execution.
+
+        AuthenticatorConfigRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfigrepresentation
+
+        :param execution_id: id of execution
+        :type execution_id: str
+        :param payload: config to add to the execution
+        :type payload: dir
+        :return: Response(json)
+        :rtype: dict
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path) + "/config",
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
 
     def update_authenticator_config(self, payload, config_id):
         """Update an authenticator configuration.
