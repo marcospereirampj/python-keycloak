@@ -16,5 +16,5 @@ def test_raise_error_from_response_from_dict():
 
     with pytest.raises(KeycloakOperationError):
         raise_error_from_response(
-            response=response, error=dict(), expected_codes=[200], skip_exists=False
+            response=response, error=dict(), expected_codes=[200], skip_exists=False,
         )

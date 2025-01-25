@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2017 Marcos Pereira <marcospereira.mpj@gmail.com>
 #
@@ -150,7 +149,7 @@ def test_build_permission_tuple_dict_str_list_str():
 def test_build_permission_tuple_dict_str_list_str2():
     """Test build permission param with mutliple-keyed dictionary."""
     assert build_permission_param(
-        {"res1": ["scope1", "scope2"], "res2": ["scope2", "scope3"]}
+        {"res1": ["scope1", "scope2"], "res2": ["scope2", "scope3"]},
     ) == {"res1#scope1", "res1#scope2", "res2#scope2", "res2#scope3"}
 
 
@@ -162,7 +161,7 @@ def test_build_permission_uma():
 def test_build_permission_uma_list():
     """Test build permission param with list of UMAs."""
     assert build_permission_param(
-        [Resource("res1")(Scope("scope1")), Resource("res1")(Scope("scope2"))]
+        [Resource("res1")(Scope("scope1")), Resource("res1")(Scope("scope2"))],
     ) == {"res1#scope1", "res1#scope2"}
 
 

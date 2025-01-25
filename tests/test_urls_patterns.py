@@ -31,7 +31,7 @@ def test_correctness_of_patterns():
     for url in urls:
         url_value = urls_patterns.__dict__[url]
         assert url_value not in seen_url_values, f"The url {url} has a duplicate value {url_value}"
-        assert (
-            url_value == url_value.strip()
-        ), f"The url {url} with value '{url_value}' has whitespace values"
+        assert url_value == url_value.strip(), (
+            f"The url {url} with value '{url_value}' has whitespace values"
+        )
         seen_url_values.append(url_value)

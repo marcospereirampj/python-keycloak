@@ -37,6 +37,7 @@ deprecation = ">=2.1.0"
 jwcrypto = ">=1.5.4"
 httpx = ">=0.23.2"
 async-property = ">=0.2.2"
+aiofiles = ">=24.1.0"
 
 [tool.poetry.group.docs.dependencies]
 alabaster = ">=0.7.0"
@@ -56,10 +57,6 @@ pytest-cov = ">=3.0.0"
 pytest-asyncio = ">=0.23.7"
 wheel = ">=0.38.4"
 pre-commit = ">=3.5.0"
-isort = ">=5.10.1"
-black = ">=22.3.0"
-flake8 = ">=7.0.0"
-flake8-docstrings = ">=1.6.0"
 commitizen = ">=2.28.0"
 cryptography = ">=42.0.0"
 codespell = ">=2.1.0"
@@ -67,6 +64,7 @@ darglint = ">=1.8.1"
 twine = ">=4.0.2"
 freezegun = ">=1.2.2"
 docutils = "<0.21"
+ruff = ">=0.9.3"
 
 [[tool.poetry.source]]
 name = "PyPI"
@@ -76,15 +74,23 @@ priority = "primary"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
+[tool.ruff]
 line-length = 99
 
-[tool.isort]
-line_length = 99
-profile = "black"
-
-[tool.darglint]
-enable = "DAR104"
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "BLE001",
+    "C901",
+    "D203",
+    "D212",
+    "FBT001",
+    "FBT002",
+    "N818",
+    "PLR0912",
+    "PLR0913",
+    "TRY003",
+]
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"

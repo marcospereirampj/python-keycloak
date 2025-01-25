@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -23,11 +22,14 @@
 
 """User-managed access permissions module."""
 
+from __future__ import annotations
+
 from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
 
 
 class UMAPermission:
-    """A class to conveniently assemble permissions.
+    """
+    A class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 
@@ -47,8 +49,14 @@ class UMAPermission:
     :type scope: str
     """
 
-    def __init__(self, permission=None, resource="", scope=""):
-        """Init method.
+    def __init__(
+        self,
+        permission: UMAPermission | None = None,
+        resource: str = "",
+        scope: str = "",
+    ) -> None:
+        """
+        Init method.
 
         :param permission: Permission
         :type permission: UMAPermission
@@ -63,16 +71,16 @@ class UMAPermission:
 
         if permission:
             if not isinstance(permission, UMAPermission):
-                raise PermissionDefinitionError(
-                    "can't determine if '{}' is a resource or scope".format(permission)
-                )
+                msg = f"can't determine if '{permission}' is a resource or scope"
+                raise PermissionDefinitionError(msg)
             if permission.resource:
                 self.resource = str(permission.resource)
             if permission.scope:
                 self.scope = str(permission.scope)
 
-    def __str__(self):
-        """Str method.
+    def __str__(self) -> str:
+        """
+        Str method.
 
         :returns: String representation
         :rtype: str
@@ -80,20 +88,22 @@ class UMAPermission:
         scope = self.scope
         if scope:
             scope = "#" + scope
-        return "{}{}".format(self.resource, scope)
+        return f"{self.resource}{scope}"
 
-    def __eq__(self, __o: object) -> bool:
-        """Eq method.
+    def __eq__(self, other: object) -> bool:
+        """
+        Eq method.
 
         :param __o: The other object
         :type __o: object
         :returns: Equality boolean
         :rtype: bool
         """
-        return str(self) == str(__o)
+        return str(self) == str(other)
 
     def __repr__(self) -> str:
-        """Repr method.
+        """
+        Repr method.
 
         :returns: The object representation
         :rtype: str
@@ -101,15 +111,22 @@ class UMAPermission:
         return self.__str__()
 
     def __hash__(self) -> int:
-        """Hash method.
+        """
+        Hash method.
 
         :returns: Hash of the object
         :rtype: int
         """
         return hash(str(self))
 
-    def __call__(self, permission=None, resource="", scope="") -> "UMAPermission":
-        """Call method.
+    def __call__(
+        self,
+        permission: UMAPermission | None = None,
+        resource: str = "",
+        scope: str = "",
+    ) -> UMAPermission:
+        """
+        Call method.
 
         :param permission: Permission
         :type permission: UMAPermission
@@ -131,9 +148,8 @@ class UMAPermission:
 
         if permission:
             if not isinstance(permission, UMAPermission):
-                raise PermissionDefinitionError(
-                    "can't determine if '{}' is a resource or scope".format(permission)
-                )
+                msg = f"can't determine if '{permission}' is a resource or scope"
+                raise PermissionDefinitionError(msg)
             if permission.resource:
                 result_resource = str(permission.resource)
             if permission.scope:
@@ -143,7 +159,8 @@ class UMAPermission:
 
 
 class Resource(UMAPermission):
-    """A UMAPermission Resource class to conveniently assemble permissions.
+    """
+    A UMAPermission Resource class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 
@@ -151,8 +168,9 @@ class Resource(UMAPermission):
     :type resource: str
     """
 
-    def __init__(self, resource):
-        """Init method.
+    def __init__(self, resource: Resource) -> None:
+        """
+        Init method.
 
         :param resource: Resource
         :type resource: str
@@ -161,7 +179,8 @@ class Resource(UMAPermission):
 
 
 class Scope(UMAPermission):
-    """A UMAPermission Scope class to conveniently assemble permissions.
+    """
+    A UMAPermission Scope class to conveniently assemble permissions.
 
     The class itself is callable, and will return the assembled permission.
 
@@ -169,8 +188,9 @@ class Scope(UMAPermission):
     :type scope: str
     """
 
-    def __init__(self, scope):
-        """Init method.
+    def __init__(self, scope: Scope) -> None:
+        """
+        Init method.
 
         :param scope: Scope
         :type scope: str
@@ -179,7 +199,8 @@ class Scope(UMAPermission):
 
 
 class AuthStatus:
-    """A class that represents the authorization/login status of a user associated with a token.
+    """
+    A class that represents the authorization/login status of a user associated with a token.
 
     This has to evaluate to True if and only if the user is properly authorized
     for the requested resource.
@@ -192,8 +213,9 @@ class AuthStatus:
     :type missing_permissions: set
     """
 
-    def __init__(self, is_logged_in, is_authorized, missing_permissions):
-        """Init method.
+    def __init__(self, is_logged_in: bool, is_authorized: bool, missing_permissions: set) -> None:
+        """
+        Init method.
 
         :param is_logged_in: Is logged in indicator
         :type is_logged_in: bool
@@ -206,16 +228,18 @@ class AuthStatus:
         self.is_authorized = is_authorized
         self.missing_permissions = missing_permissions
 
-    def __bool__(self):
-        """Bool method.
+    def __bool__(self) -> bool:
+        """
+        Bool method.
 
         :returns: Boolean representation
         :rtype: bool
         """
         return self.is_authorized
 
-    def __repr__(self):
-        """Repr method.
+    def __repr__(self) -> str:
+        """
+        Repr method.
 
         :returns: The object representation
         :rtype: str
@@ -228,8 +252,9 @@ class AuthStatus:
         )
 
 
-def build_permission_param(permissions):
-    """Transform permissions to a set, so they are usable for requests.
+def build_permission_param(permissions: str | list | dict) -> set:
+    """
+    Transform permissions to a set, so they are usable for requests.
 
     :param permissions: Permissions
     :type permissions: str | Iterable[str] | dict[str, str] | dict[str, Iterabble[str]]
@@ -240,9 +265,9 @@ def build_permission_param(permissions):
     if permissions is None or permissions == "":
         return set()
     if isinstance(permissions, str):
-        return set((permissions,))
+        return set(permissions)
     if isinstance(permissions, UMAPermission):
-        return set((str(permissions),))
+        return set(str(permissions))
 
     try:  # treat as dictionary of permissions
         result = set()
@@ -250,26 +275,26 @@ def build_permission_param(permissions):
             if scopes is None:
                 result.add(resource)
             elif isinstance(scopes, str):
-                result.add("{}#{}".format(resource, scopes))
+                result.add(f"{resource}#{scopes}")
             else:
                 try:
                     for scope in scopes:
                         if not isinstance(scope, str):
-                            raise KeycloakPermissionFormatError(
-                                "misbuilt permission {}".format(permissions)
-                            )
-                        result.add("{}#{}".format(resource, scope))
-                except TypeError:
-                    raise KeycloakPermissionFormatError(
-                        "misbuilt permission {}".format(permissions)
-                    )
-        return result
+                            msg = f"misbuilt permission {permissions}"
+                            raise KeycloakPermissionFormatError(msg)
+                        result.add(f"{resource}#{scope}")
+                except TypeError as e:
+                    msg = f"misbuilt permission {permissions}"
+                    raise KeycloakPermissionFormatError(msg) from e
     except AttributeError:
         pass
+    else:
+        return result
 
     result = set()
     for permission in permissions:
         if not isinstance(permission, (str, UMAPermission)):
-            raise KeycloakPermissionFormatError("misbuilt permission {}".format(permissions))
+            msg = f"misbuilt permission {permissions}"
+            raise KeycloakPermissionFormatError(msg)
         result.add(str(permission))
     return result

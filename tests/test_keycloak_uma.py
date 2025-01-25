@@ -109,7 +109,7 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert len(resource_set_list_ids) == 0
     # With matchingUri query option
     resource_set_list_ids = uma.resource_set_list_ids(
-        uri="/some_resources/resource", matchingUri=True
+        uri="/some_resources/resource", matchingUri=True,
     )
     assert len(resource_set_list_ids) == 1
 
@@ -119,8 +119,8 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert err.match(
         re.escape(
             '409: b\'{"error":"invalid_request","error_description":'
-            '"Resource with name [mytest] already exists."}\''
-        )
+            '"Resource with name [mytest] already exists."}\'',
+        ),
     )
 
     # Test get resource set
@@ -137,7 +137,7 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     # Test update resource set fail
     with pytest.raises(KeycloakPutError) as err:
         uma.resource_set_update(resource_id=created_resource["_id"], payload={"wrong": "payload"})
-    assert err.match('400: b\'{"error":"Unrecognized field')
+    assert err.match("Unrecognized field")
 
     # Test delete resource set
     res = uma.resource_set_delete(resource_id=created_resource["_id"])
@@ -215,7 +215,7 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     with pytest.raises(KeycloakDeleteError) as err:
         uma.policy_delete(policy_id)
     assert err.match(
-        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\''
+        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\'',
     )
 
     policies = uma.policy_query()
@@ -312,7 +312,7 @@ def test_uma_permission_ticket(uma: KeycloakUMA):
     response = uma.permission_ticket_create(permissions)
 
     rpt = uma.connection.keycloak_openid.token(
-        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"]
+        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"],
     )
     assert rpt
     assert "access_token" in rpt
@@ -406,7 +406,7 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     assert len(resource_set_list_ids) == 0
     # With matchingUri query option
     resource_set_list_ids = await uma.a_resource_set_list_ids(
-        uri="/some_resources/resource", matchingUri=True
+        uri="/some_resources/resource", matchingUri=True,
     )
     assert len(resource_set_list_ids) == 1
 
@@ -416,8 +416,8 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     assert err.match(
         re.escape(
             '409: b\'{"error":"invalid_request","error_description":'
-            '"Resource with name [mytest] already exists."}\''
-        )
+            '"Resource with name [mytest] already exists."}\'',
+        ),
     )
 
     # Test get resource set
@@ -434,7 +434,7 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     # Test update resource set fail
     with pytest.raises(KeycloakPutError) as err:
         uma.resource_set_update(resource_id=created_resource["_id"], payload={"wrong": "payload"})
-    assert err.match('400: b\'{"error":"Unrecognized field')
+    assert err.match("Unrecognized field")
 
     # Test delete resource set
     res = await uma.a_resource_set_delete(resource_id=created_resource["_id"])
@@ -513,7 +513,7 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     with pytest.raises(KeycloakDeleteError) as err:
         await uma.a_policy_delete(policy_id)
     assert err.match(
-        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\''
+        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\'',
     )
 
     policies = await uma.a_policy_query()
@@ -612,7 +612,7 @@ async def test_a_uma_permission_ticket(uma: KeycloakUMA):
     response = await uma.a_permission_ticket_create(permissions)
 
     rpt = await uma.connection.keycloak_openid.a_token(
-        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"]
+        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"],
     )
     assert rpt
     assert "access_token" in rpt

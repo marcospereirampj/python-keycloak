@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # python-keycloak documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug 15 11:02:59 2017.
@@ -169,7 +168,7 @@ latex_documents = [
         "python-keycloak Documentation",
         "Marcos Pereira",
         "manual",
-    )
+    ),
 ]
 
 
@@ -194,5 +193,5 @@ texinfo_documents = [
         "python-keycloak",
         "One line description of project.",
         "Miscellaneous",
-    )
+    ),
 ]

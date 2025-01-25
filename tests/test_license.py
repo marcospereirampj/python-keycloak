@@ -8,8 +8,8 @@ def test_license_present():
     for path, _, files in os.walk("src/keycloak"):
         for _file in files:
             if _file.endswith(".py"):
-                with open(os.path.join(path, _file), "r") as fp:
+                with open(os.path.join(path, _file)) as fp:
                     content = fp.read()
                 assert content.startswith(
-                    "# -*- coding: utf-8 -*-\n#\n# The MIT License (MIT)\n#\n#"
+                    "# -*- coding: utf-8 -*-\n#\n# The MIT License (MIT)\n#\n#",
                 )

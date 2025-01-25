@@ -177,7 +177,7 @@ def test_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 
 
 def test_exchange_token(
-    oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test the exchange token method.
 
@@ -198,7 +198,7 @@ def test_exchange_token(
             admin.get_client_role(
                 client_id=admin.get_client_id(client_id="realm-management"),
                 role_name="impersonation",
-            )
+            ),
         ],
     )
 
@@ -215,7 +215,7 @@ def test_exchange_token(
 
     # Exchange token with the new user
     new_token = oid.exchange_token(
-        token=token["access_token"], audience=oid.client_id, subject=username
+        token=token["access_token"], audience=oid.client_id, subject=username,
     )
     assert oid.userinfo(token=new_token["access_token"]) == {
         "email": f"{username}@test.test",
@@ -264,7 +264,7 @@ def test_public_key(oid: KeycloakOpenID):
 
 
 def test_entitlement(
-    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test entitlement.
 
@@ -277,7 +277,7 @@ def test_entitlement(
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
     resource_server_id = admin.get_client_authz_resources(
-        client_id=admin.get_client_id(oid.client_id)
+        client_id=admin.get_client_id(oid.client_id),
     )[0]["_id"]
 
     with pytest.raises(KeycloakDeprecationError):
@@ -295,7 +295,7 @@ def test_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 
     assert oid.introspect(token=token["access_token"])["active"]
     assert oid.introspect(
-        token=token["access_token"], rpt="some", token_type_hint="requesting_party_token"
+        token=token["access_token"], rpt="some", token_type_hint="requesting_party_token",
     ) == {"active": False}
 
     with pytest.raises(KeycloakRPTNotFound):
@@ -340,14 +340,14 @@ def test_decode_token_invalid_token(oid_with_credentials: Tuple[KeycloakOpenID, 
 
     with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
         decoded_invalid_access_token = oid.decode_token(
-            token=invalid_access_token, validate=True, key=key
+            token=invalid_access_token, validate=True, key=key,
         )
 
     decoded_invalid_access_token = oid.decode_token(token=invalid_access_token, validate=False)
     assert decoded_access_token == decoded_invalid_access_token
 
     decoded_invalid_access_token = oid.decode_token(
-        token=invalid_access_token, validate=False, key=key
+        token=invalid_access_token, validate=False, key=key,
     )
     assert decoded_access_token == decoded_invalid_access_token
 
@@ -368,7 +368,7 @@ def test_load_authorization_config(oid_with_credentials_authz: Tuple[KeycloakOpe
     assert isinstance(oid.authorization.policies["test-authz-rb-policy"].roles[0], Role)
     assert len(oid.authorization.policies["test-authz-rb-policy"].permissions) == 2
     assert isinstance(
-        oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission
+        oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission,
     )
 
 
@@ -430,8 +430,8 @@ def test_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
     policy.add_role(role="account/view-profile")
     policy.add_permission(
         permission=Permission(
-            name="test-perm", type="resource", logic="POSITIVE", decision_strategy="UNANIMOUS"
-        )
+            name="test-perm", type="resource", logic="POSITIVE", decision_strategy="UNANIMOUS",
+        ),
     )
     oid.authorization.policies["test"] = policy
     assert [
@@ -464,7 +464,7 @@ def test_uma_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, 
 
 
 def test_has_uma_access(
-    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test has UMA access.
 
@@ -497,8 +497,8 @@ def test_has_uma_access(
     assert (
         str(
             oid.has_uma_access(
-                token=admin.connection.token["access_token"], permissions="Default Resource"
-            )
+                token=admin.connection.token["access_token"], permissions="Default Resource",
+            ),
         )
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
         + "{'Default Resource'})"
@@ -666,7 +666,7 @@ async def test_a_token(oid_with_credentials: Tuple[KeycloakOpenID, str, str]):
 
 @pytest.mark.asyncio
 async def test_a_exchange_token(
-    oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test the exchange token method.
 
@@ -687,7 +687,7 @@ async def test_a_exchange_token(
             await admin.a_get_client_role(
                 client_id=admin.get_client_id(client_id="realm-management"),
                 role_name="impersonation",
-            )
+            ),
         ],
     )
 
@@ -704,7 +704,7 @@ async def test_a_exchange_token(
 
     # Exchange token with the new user
     new_token = oid.exchange_token(
-        token=token["access_token"], audience=oid.client_id, subject=username
+        token=token["access_token"], audience=oid.client_id, subject=username,
     )
     assert await oid.a_userinfo(token=new_token["access_token"]) == {
         "email": f"{username}@test.test",
@@ -757,7 +757,7 @@ async def test_a_public_key(oid: KeycloakOpenID):
 
 @pytest.mark.asyncio
 async def test_a_entitlement(
-    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test entitlement.
 
@@ -770,7 +770,7 @@ async def test_a_entitlement(
     oid, username, password = oid_with_credentials_authz
     token = await oid.a_token(username=username, password=password)
     resource_server_id = admin.get_client_authz_resources(
-        client_id=admin.get_client_id(oid.client_id)
+        client_id=admin.get_client_id(oid.client_id),
     )[0]["_id"]
 
     with pytest.raises(KeycloakDeprecationError):
@@ -789,12 +789,12 @@ async def test_a_introspect(oid_with_credentials: Tuple[KeycloakOpenID, str, str
 
     assert (await oid.a_introspect(token=token["access_token"]))["active"]
     assert await oid.a_introspect(
-        token=token["access_token"], rpt="some", token_type_hint="requesting_party_token"
+        token=token["access_token"], rpt="some", token_type_hint="requesting_party_token",
     ) == {"active": False}
 
     with pytest.raises(KeycloakRPTNotFound):
         await oid.a_introspect(
-            token=token["access_token"], token_type_hint="requesting_party_token"
+            token=token["access_token"], token_type_hint="requesting_party_token",
         )
 
 
@@ -835,28 +835,28 @@ async def test_a_decode_token_invalid_token(oid_with_credentials: Tuple[Keycloak
     invalid_access_token = access_token + "a"
     with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
         decoded_invalid_access_token = await oid.a_decode_token(
-            token=invalid_access_token, validate=True
+            token=invalid_access_token, validate=True,
         )
 
     with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
         decoded_invalid_access_token = await oid.a_decode_token(
-            token=invalid_access_token, validate=True, key=key
+            token=invalid_access_token, validate=True, key=key,
         )
 
     decoded_invalid_access_token = await oid.a_decode_token(
-        token=invalid_access_token, validate=False
+        token=invalid_access_token, validate=False,
     )
     assert decoded_access_token == decoded_invalid_access_token
 
     decoded_invalid_access_token = await oid.a_decode_token(
-        token=invalid_access_token, validate=False, key=key
+        token=invalid_access_token, validate=False, key=key,
     )
     assert decoded_access_token == decoded_invalid_access_token
 
 
 @pytest.mark.asyncio
 async def test_a_load_authorization_config(
-    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str],
 ):
     """Test load authorization config.
 
@@ -873,13 +873,13 @@ async def test_a_load_authorization_config(
     assert isinstance(oid.authorization.policies["test-authz-rb-policy"].roles[0], Role)
     assert len(oid.authorization.policies["test-authz-rb-policy"].permissions) == 2
     assert isinstance(
-        oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission
+        oid.authorization.policies["test-authz-rb-policy"].permissions[0], Permission,
     )
 
 
 @pytest.mark.asyncio
 async def test_a_has_uma_access(
-    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin
+    oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str], admin: KeycloakAdmin,
 ):
     """Test has UMA access.
 
@@ -898,7 +898,7 @@ async def test_a_has_uma_access(
     )
     assert (
         str(
-            await oid.a_has_uma_access(token=token["access_token"], permissions="Default Resource")
+            await oid.a_has_uma_access(token=token["access_token"], permissions="Default Resource"),
         )
         == "AuthStatus(is_authorized=True, is_logged_in=True, missing_permissions=set())"
     )
@@ -914,8 +914,8 @@ async def test_a_has_uma_access(
     assert (
         str(
             await oid.a_has_uma_access(
-                token=admin.connection.token["access_token"], permissions="Default Resource"
-            )
+                token=admin.connection.token["access_token"], permissions="Default Resource",
+            ),
         )
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
         + "{'Default Resource'})"
@@ -986,20 +986,20 @@ async def test_a_get_permissions(oid_with_credentials_authz: Tuple[KeycloakOpenI
     policy.add_role(role="account/view-profile")
     policy.add_permission(
         permission=Permission(
-            name="test-perm", type="resource", logic="POSITIVE", decision_strategy="UNANIMOUS"
-        )
+            name="test-perm", type="resource", logic="POSITIVE", decision_strategy="UNANIMOUS",
+        ),
     )
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
         for x in await oid.a_get_permissions(
-            token=token["access_token"], method_token_info="decode"
+            token=token["access_token"], method_token_info="decode",
         )
     ] == ["Permission: test-perm (resource)"]
     assert [
         repr(x)
         for x in await oid.a_get_permissions(
-            token=token["access_token"], method_token_info="decode"
+            token=token["access_token"], method_token_info="decode",
         )
     ] == ["<Permission: test-perm (resource)>"]
     oid.client_id = orig_client_id

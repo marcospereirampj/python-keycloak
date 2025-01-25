@@ -3,8 +3,9 @@
 import ipaddress
 import os
 import uuid
+from collections.abc import Generator
 from datetime import datetime, timedelta
-from typing import Generator, Tuple
+from typing import Tuple
 
 import freezegun
 import pytest
@@ -17,7 +18,7 @@ from cryptography.x509.oid import NameOID
 from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection, KeycloakUMA
 
 
-class KeycloakTestEnv(object):
+class KeycloakTestEnv:
     """Wrapper for test Keycloak connection configuration.
 
     :param host: Hostname
@@ -193,7 +194,7 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
             "enabled": True,
             "publicClient": True,
             "protocol": "openid-connect",
-        }
+        },
     )
     # Return OID
     yield KeycloakOpenID(
@@ -232,7 +233,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
             "protocol": "openid-connect",
             "secret": secret,
             "clientAuthenticatorType": "client-secret",
-        }
+        },
     )
     # Create user
     username = str(uuid.uuid4())
@@ -247,7 +248,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
             "emailVerified": True,
             "requiredActions": [],
             "credentials": [{"type": "password", "value": password, "temporary": False}],
-        }
+        },
     )
 
     yield (
@@ -295,7 +296,7 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
             "clientAuthenticatorType": "client-secret",
             "authorizationServicesEnabled": True,
             "serviceAccountsEnabled": True,
-        }
+        },
     )
     admin.create_client_authz_role_based_policy(
         client_id=client_id,
@@ -317,7 +318,7 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
             "lastName": "last",
             "requiredActions": [],
             "credentials": [{"type": "password", "value": password, "temporary": False}],
-        }
+        },
     )
 
     yield (
@@ -364,7 +365,7 @@ def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: Keycloa
             "secret": secret,
             "clientAuthenticatorType": "client-secret",
             "attributes": {"oauth2.device.authorization.grant.enabled": True},
-        }
+        },
     )
     # Create user
     username = str(uuid.uuid4())
@@ -379,7 +380,7 @@ def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: Keycloa
             "emailVerified": True,
             "requiredActions": [],
             "credentials": [{"type": "password", "value": password, "temporary": False}],
-        }
+        },
     )
 
     yield (
@@ -489,7 +490,10 @@ def client_role(admin: KeycloakAdmin, realm: str, client: str) -> Generator[str,
 
 @pytest.fixture
 def composite_client_role(
-    admin: KeycloakAdmin, realm: str, client: str, client_role: str
+    admin: KeycloakAdmin,
+    realm: str,
+    client: str,
+    client_role: str,
 ) -> Generator[str, None, None]:
     """Fixture for a new random composite client role.
 
@@ -526,7 +530,9 @@ def selfsigned_cert():
     # Generate our key
     if key is None:
         key = rsa.generate_private_key(
-            public_exponent=65537, key_size=2048, backend=default_backend()
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend(),
         )
 
     name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, hostname)])
@@ -585,7 +591,7 @@ def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
         client_secret_key=oid.client_secret_key,
         timeout=60,
     )
-    yield connection
+    return connection
 
 
 @pytest.fixture
@@ -599,4 +605,4 @@ def uma(oid_connection_with_authz: KeycloakOpenIDConnection):
     """
     connection = oid_connection_with_authz
     # Return UMA
-    yield KeycloakUMA(connection=connection)
+    return KeycloakUMA(connection=connection)
