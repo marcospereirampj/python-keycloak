@@ -86,11 +86,17 @@ ignore = [
     "D212",
     "FBT001",
     "FBT002",
+    "FBT003",
     "N818",
     "PLR0912",
     "PLR0913",
+    "PLR0915",
     "TRY003",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG001","PLR2004", "PT011", "S101", "SLF001"]
+"docs/*" = ["A001", "EXE001", "ERA001"]
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"

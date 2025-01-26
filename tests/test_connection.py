@@ -8,21 +8,22 @@ from keycloak.connection import ConnectionManager
 from keycloak.exceptions import KeycloakConnectionError
 
 
-def test_connection_proxy():
+def test_connection_proxy() -> None:
     """Test proxies of connection manager."""
     cm = ConnectionManager(
-        base_url="http://test.test", proxies={"http://test.test": "http://localhost:8080"},
+        base_url="http://test.test",
+        proxies={"http://test.test": "http://localhost:8080"},
     )
     assert cm._s.proxies == {"http://test.test": "http://localhost:8080"}
 
 
-def test_headers():
+def test_headers() -> None:
     """Test headers manipulation."""
     cm = ConnectionManager(base_url="http://test.test", headers={"H": "A"})
     assert cm.param_headers(key="H") == "A"
     assert cm.param_headers(key="A") is None
     cm.clean_headers()
-    assert cm.headers == dict()
+    assert cm.headers == {}
     cm.add_param_headers(key="H", value="B")
     assert cm.exist_param_headers(key="H")
     assert not cm.exist_param_headers(key="B")
@@ -30,7 +31,7 @@ def test_headers():
     assert not cm.exist_param_headers(key="H")
 
 
-def test_bad_connection():
+def test_bad_connection() -> None:
     """Test bad connection."""
     cm = ConnectionManager(base_url="http://not.real.domain")
     with pytest.raises(KeycloakConnectionError):
@@ -44,7 +45,7 @@ def test_bad_connection():
 
 
 @pytest.mark.asyncio
-async def a_test_bad_connection():
+async def a_test_bad_connection() -> None:
     """Test bad connection."""
     cm = ConnectionManager(base_url="http://not.real.domain")
     with pytest.raises(KeycloakConnectionError):
@@ -57,7 +58,7 @@ async def a_test_bad_connection():
         await cm.a_raw_put(path="bad", data={})
 
 
-def test_counter_part():
+def test_counter_part() -> None:
     """Test that each function has its async counter part."""
     con_methods = [
         func for func in dir(ConnectionManager) if callable(getattr(ConnectionManager, func))

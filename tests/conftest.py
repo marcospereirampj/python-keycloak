@@ -4,8 +4,7 @@ import ipaddress
 import os
 import uuid
 from collections.abc import Generator
-from datetime import datetime, timedelta
-from typing import Tuple
+from datetime import datetime, timedelta, timezone
 
 import freezegun
 import pytest
@@ -19,7 +18,8 @@ from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection, Ke
 
 
 class KeycloakTestEnv:
-    """Wrapper for test Keycloak connection configuration.
+    """
+    Wrapper for test Keycloak connection configuration.
 
     :param host: Hostname
     :type host: str
@@ -37,8 +37,9 @@ class KeycloakTestEnv:
         port: str = os.environ["KEYCLOAK_PORT"],
         username: str = os.environ["KEYCLOAK_ADMIN"],
         password: str = os.environ["KEYCLOAK_ADMIN_PASSWORD"],
-    ):
-        """Init method.
+    ) -> None:
+        """
+        Init method.
 
         :param host: Hostname
         :type host: str
@@ -49,87 +50,96 @@ class KeycloakTestEnv:
         :param password: Admin password
         :type password: str
         """
-        self.KEYCLOAK_HOST = host
-        self.KEYCLOAK_PORT = port
-        self.KEYCLOAK_ADMIN = username
-        self.KEYCLOAK_ADMIN_PASSWORD = password
+        self.keycloak_host = host
+        self.keycloak_port = port
+        self.keycloak_admin = username
+        self.keycloak_admin_password = password
 
     @property
-    def KEYCLOAK_HOST(self):
-        """Hostname getter.
+    def keycloak_host(self) -> str:
+        """
+        Hostname getter.
 
         :returns: Keycloak host
         :rtype: str
         """
-        return self._KEYCLOAK_HOST
+        return self._keycloak_host
 
-    @KEYCLOAK_HOST.setter
-    def KEYCLOAK_HOST(self, value: str):
-        """Hostname setter.
+    @keycloak_host.setter
+    def keycloak_host(self, value: str) -> None:
+        """
+        Hostname setter.
 
         :param value: Keycloak host
         :type value: str
         """
-        self._KEYCLOAK_HOST = value
+        self._keycloak_host = value
 
     @property
-    def KEYCLOAK_PORT(self):
-        """Port getter.
+    def keycloak_port(self) -> str:
+        """
+        Port getter.
 
         :returns: Keycloak port
         :rtype: str
         """
-        return self._KEYCLOAK_PORT
+        return self._keycloak_port
 
-    @KEYCLOAK_PORT.setter
-    def KEYCLOAK_PORT(self, value: str):
-        """Port setter.
+    @keycloak_port.setter
+    def keycloak_port(self, value: str) -> None:
+        """
+        Port setter.
 
         :param value: Keycloak port
         :type value: str
         """
-        self._KEYCLOAK_PORT = value
+        self._keycloak_port = value
 
     @property
-    def KEYCLOAK_ADMIN(self):
-        """Admin username getter.
+    def keycloak_admin(self) -> str:
+        """
+        Admin username getter.
 
         :returns: Admin username
         :rtype: str
         """
-        return self._KEYCLOAK_ADMIN
+        return self._keycloak_admin
 
-    @KEYCLOAK_ADMIN.setter
-    def KEYCLOAK_ADMIN(self, value: str):
-        """Admin username setter.
+    @keycloak_admin.setter
+    def keycloak_admin(self, value: str) -> None:
+        """
+        Admin username setter.
 
         :param value: Admin username
         :type value: str
         """
-        self._KEYCLOAK_ADMIN = value
+        self._keycloak_admin = value
 
     @property
-    def KEYCLOAK_ADMIN_PASSWORD(self):
-        """Admin password getter.
+    def keycloak_admin_password(self) -> str:
+        """
+        Admin password getter.
 
         :returns: Admin password
         :rtype: str
         """
-        return self._KEYCLOAK_ADMIN_PASSWORD
+        return self._keycloak_admin_password
 
-    @KEYCLOAK_ADMIN_PASSWORD.setter
-    def KEYCLOAK_ADMIN_PASSWORD(self, value: str):
-        """Admin password setter.
+    @keycloak_admin_password.setter
+    def keycloak_admin_password(self, value: str) -> None:
+        """
+        Admin password setter.
 
         :param value: Admin password
         :type value: str
         """
-        self._KEYCLOAK_ADMIN_PASSWORD = value
+        self._keycloak_admin_password = value
 
 
 @pytest.fixture
-def env():
-    """Fixture for getting the test environment configuration object.
+def env() -> KeycloakTestEnv:
+    """
+    Fixture for getting the test environment configuration object.
 
     :returns: Keycloak test environment object
     :rtype: KeycloakTestEnv
@@ -138,8 +148,9 @@ def env():
 
 
 @pytest.fixture
-def admin(env: KeycloakTestEnv):
-    """Fixture for initialized KeycloakAdmin class.
+def admin(env: KeycloakTestEnv) -> KeycloakAdmin:
+    """
+    Fixture for initialized KeycloakAdmin class.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -147,16 +158,17 @@ def admin(env: KeycloakTestEnv):
     :rtype: KeycloakAdmin
     """
     return KeycloakAdmin(
-        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-        username=env.KEYCLOAK_ADMIN,
-        password=env.KEYCLOAK_ADMIN_PASSWORD,
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        username=env.keycloak_admin,
+        password=env.keycloak_admin_password,
     )
 
 
 @pytest.fixture
 @freezegun.freeze_time("2023-02-25 10:00:00")
-def admin_frozen(env: KeycloakTestEnv):
-    """Fixture for initialized KeycloakAdmin class, with time frozen.
+def admin_frozen(env: KeycloakTestEnv) -> KeycloakAdmin:
+    """
+    Fixture for initialized KeycloakAdmin class, with time frozen.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -164,15 +176,20 @@ def admin_frozen(env: KeycloakTestEnv):
     :rtype: KeycloakAdmin
     """
     return KeycloakAdmin(
-        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
-        username=env.KEYCLOAK_ADMIN,
-        password=env.KEYCLOAK_ADMIN_PASSWORD,
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        username=env.keycloak_admin,
+        password=env.keycloak_admin_password,
     )
 
 
 @pytest.fixture
-def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
-    """Fixture for initialized KeycloakOpenID class.
+def oid(
+    env: KeycloakTestEnv,
+    realm: str,
+    admin: KeycloakAdmin,
+) -> Generator[KeycloakOpenID, None, None]:
+    """
+    Fixture for initialized KeycloakOpenID class.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -198,7 +215,7 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
     )
     # Return OID
     yield KeycloakOpenID(
-        server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         realm_name=realm,
         client_id=client,
     )
@@ -207,8 +224,13 @@ def oid(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
 
 
 @pytest.fixture
-def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
-    """Fixture for an initialized KeycloakOpenID class and a random user credentials.
+def oid_with_credentials(
+    env: KeycloakTestEnv,
+    realm: str,
+    admin: KeycloakAdmin,
+) -> Generator[tuple[KeycloakOpenID, str, str], None, None]:
+    """
+    Fixture for an initialized KeycloakOpenID class and a random user credentials.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -253,7 +275,7 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
@@ -268,8 +290,13 @@ def oid_with_credentials(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin)
 
 
 @pytest.fixture
-def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
-    """Fixture for an initialized KeycloakOpenID class and a random user credentials.
+def oid_with_credentials_authz(
+    env: KeycloakTestEnv,
+    realm: str,
+    admin: KeycloakAdmin,
+) -> Generator[tuple[KeycloakOpenID, str, str], None, None]:
+    """
+    Fixture for an initialized KeycloakOpenID class and a random user credentials.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -323,7 +350,7 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
@@ -338,8 +365,13 @@ def oid_with_credentials_authz(env: KeycloakTestEnv, realm: str, admin: Keycloak
 
 
 @pytest.fixture
-def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: KeycloakAdmin):
-    """Fixture for an initialized KeycloakOpenID class and a random user credentials.
+def oid_with_credentials_device(
+    env: KeycloakTestEnv,
+    realm: str,
+    admin: KeycloakAdmin,
+) -> Generator[tuple[KeycloakOpenID, str, str], None, None]:
+    """
+    Fixture for an initialized KeycloakOpenID class and a random user credentials.
 
     :param env: Keycloak test environment
     :type env: KeycloakTestEnv
@@ -385,7 +417,7 @@ def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: Keycloa
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.KEYCLOAK_HOST}:{env.KEYCLOAK_PORT}",
+            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
@@ -401,7 +433,8 @@ def oid_with_credentials_device(env: KeycloakTestEnv, realm: str, admin: Keycloa
 
 @pytest.fixture
 def realm(admin: KeycloakAdmin) -> Generator[str, None, None]:
-    """Fixture for a new random realm.
+    """
+    Fixture for a new random realm.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -416,7 +449,8 @@ def realm(admin: KeycloakAdmin) -> Generator[str, None, None]:
 
 @pytest.fixture
 def user(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
-    """Fixture for a new random user.
+    """
+    Fixture for a new random user.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -434,7 +468,8 @@ def user(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
 
 @pytest.fixture
 def group(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
-    """Fixture for a new random group.
+    """
+    Fixture for a new random group.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -452,7 +487,8 @@ def group(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
 
 @pytest.fixture
 def client(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
-    """Fixture for a new random client.
+    """
+    Fixture for a new random client.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -470,7 +506,8 @@ def client(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
 
 @pytest.fixture
 def client_role(admin: KeycloakAdmin, realm: str, client: str) -> Generator[str, None, None]:
-    """Fixture for a new random client role.
+    """
+    Fixture for a new random client role.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -495,7 +532,8 @@ def composite_client_role(
     client: str,
     client_role: str,
 ) -> Generator[str, None, None]:
-    """Fixture for a new random composite client role.
+    """
+    Fixture for a new random composite client role.
 
     :param admin: Keycloak admin
     :type admin: KeycloakAdmin
@@ -518,8 +556,9 @@ def composite_client_role(
 
 
 @pytest.fixture
-def selfsigned_cert():
-    """Generate self signed certificate for a hostname, and optional IP addresses.
+def selfsigned_cert() -> tuple[str, str]:
+    """
+    Generate self signed certificate for a hostname, and optional IP addresses.
 
     :returns: Selfsigned certificate
     :rtype: Tuple[str, str]
@@ -551,7 +590,7 @@ def selfsigned_cert():
 
     # path_len=0 means this cert can only sign itself, not other certs.
     basic_contraints = x509.BasicConstraints(ca=True, path_length=0)
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     cert = (
         x509.CertificateBuilder()
         .subject_name(name)
@@ -575,8 +614,11 @@ def selfsigned_cert():
 
 
 @pytest.fixture
-def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]):
-    """Fixture for initialized KeycloakUMA class.
+def oid_connection_with_authz(
+    oid_with_credentials_authz: tuple[KeycloakOpenID, str, str],
+) -> KeycloakOpenIDConnection:
+    """
+    Fixture for initialized KeycloakUMA class.
 
     :param oid_with_credentials_authz: Keycloak OpenID client with pre-configured user credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
@@ -584,19 +626,19 @@ def oid_connection_with_authz(oid_with_credentials_authz: Tuple[KeycloakOpenID, 
     :rtype: KeycloakOpenIDConnection
     """
     oid, _, _ = oid_with_credentials_authz
-    connection = KeycloakOpenIDConnection(
+    return KeycloakOpenIDConnection(
         server_url=oid.connection.base_url,
         realm_name=oid.realm_name,
         client_id=oid.client_id,
         client_secret_key=oid.client_secret_key,
         timeout=60,
     )
-    return connection
 
 
 @pytest.fixture
-def uma(oid_connection_with_authz: KeycloakOpenIDConnection):
-    """Fixture for initialized KeycloakUMA class.
+def uma(oid_connection_with_authz: KeycloakOpenIDConnection) -> KeycloakUMA:
+    """
+    Fixture for initialized KeycloakUMA class.
 
     :param oid_connection_with_authz: Keycloak open id connection with pre-configured authz client
     :type oid_connection_with_authz: KeycloakOpenIDConnection

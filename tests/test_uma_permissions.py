@@ -30,7 +30,7 @@ from keycloak.uma_permissions import (
 )
 
 
-def test_uma_permission_obj():
+def test_uma_permission_obj() -> None:
     """Test generic UMA permission."""
     with pytest.raises(PermissionDefinitionError):
         UMAPermission(permission="bad")
@@ -49,35 +49,35 @@ def test_uma_permission_obj():
     assert {p1, p1} != {p2, p2}
 
 
-def test_resource_with_scope_obj():
+def test_resource_with_scope_obj() -> None:
     """Test resource with scope."""
     r = Resource("Resource1")
     s = Scope("Scope1")
     assert r(s) == "Resource1#Scope1"
 
 
-def test_scope_with_resource_obj():
+def test_scope_with_resource_obj() -> None:
     """Test scope with resource."""
     r = Resource("Resource1")
     s = Scope("Scope1")
     assert s(r) == "Resource1#Scope1"
 
 
-def test_resource_scope_str():
+def test_resource_scope_str() -> None:
     """Test resource scope as string."""
     r = Resource("Resource1")
     s = "Scope1"
     assert r(scope=s) == "Resource1#Scope1"
 
 
-def test_scope_resource_str():
+def test_scope_resource_str() -> None:
     """Test scope resource as string."""
     r = "Resource1"
     s = Scope("Scope1")
     assert s(resource=r) == "Resource1#Scope1"
 
 
-def test_resource_scope_list():
+def test_resource_scope_list() -> None:
     """Test resource scope as list."""
     r = Resource("Resource1")
     s = ["Scope1"]
@@ -86,126 +86,126 @@ def test_resource_scope_list():
     assert err.match(re.escape("can't determine if '['Scope1']' is a resource or scope"))
 
 
-def test_build_permission_none():
+def test_build_permission_none() -> None:
     """Test build permission param with None."""
     assert build_permission_param(None) == set()
 
 
-def test_build_permission_empty_str():
+def test_build_permission_empty_str() -> None:
     """Test build permission param with an empty string."""
     assert build_permission_param("") == set()
 
 
-def test_build_permission_empty_list():
+def test_build_permission_empty_list() -> None:
     """Test build permission param with an empty list."""
     assert build_permission_param([]) == set()
 
 
-def test_build_permission_empty_tuple():
+def test_build_permission_empty_tuple() -> None:
     """Test build permission param with an empty tuple."""
     assert build_permission_param(()) == set()
 
 
-def test_build_permission_empty_set():
+def test_build_permission_empty_set() -> None:
     """Test build permission param with an empty set."""
     assert build_permission_param(set()) == set()
 
 
-def test_build_permission_empty_dict():
+def test_build_permission_empty_dict() -> None:
     """Test build permission param with an empty dict."""
     assert build_permission_param({}) == set()
 
 
-def test_build_permission_str():
+def test_build_permission_str() -> None:
     """Test build permission param as string."""
     assert build_permission_param("resource1") == {"resource1"}
 
 
-def test_build_permission_list_str():
+def test_build_permission_list_str() -> None:
     """Test build permission param with list of strings."""
     assert build_permission_param(["res1#scope1", "res1#scope2"]) == {"res1#scope1", "res1#scope2"}
 
 
-def test_build_permission_tuple_str():
+def test_build_permission_tuple_str() -> None:
     """Test build permission param with tuple of strings."""
     assert build_permission_param(("res1#scope1", "res1#scope2")) == {"res1#scope1", "res1#scope2"}
 
 
-def test_build_permission_set_str():
+def test_build_permission_set_str() -> None:
     """Test build permission param with set of strings."""
     assert build_permission_param({"res1#scope1", "res1#scope2"}) == {"res1#scope1", "res1#scope2"}
 
 
-def test_build_permission_tuple_dict_str_str():
+def test_build_permission_tuple_dict_str_str() -> None:
     """Test build permission param with dictionary."""
     assert build_permission_param({"res1": "scope1"}) == {"res1#scope1"}
 
 
-def test_build_permission_tuple_dict_str_list_str():
+def test_build_permission_tuple_dict_str_list_str() -> None:
     """Test build permission param with dictionary of list."""
     assert build_permission_param({"res1": ["scope1", "scope2"]}) == {"res1#scope1", "res1#scope2"}
 
 
-def test_build_permission_tuple_dict_str_list_str2():
+def test_build_permission_tuple_dict_str_list_str2() -> None:
     """Test build permission param with mutliple-keyed dictionary."""
     assert build_permission_param(
         {"res1": ["scope1", "scope2"], "res2": ["scope2", "scope3"]},
     ) == {"res1#scope1", "res1#scope2", "res2#scope2", "res2#scope3"}
 
 
-def test_build_permission_uma():
+def test_build_permission_uma() -> None:
     """Test build permission param with UMA."""
     assert build_permission_param(Resource("res1")(Scope("scope1"))) == {"res1#scope1"}
 
 
-def test_build_permission_uma_list():
+def test_build_permission_uma_list() -> None:
     """Test build permission param with list of UMAs."""
     assert build_permission_param(
         [Resource("res1")(Scope("scope1")), Resource("res1")(Scope("scope2"))],
     ) == {"res1#scope1", "res1#scope2"}
 
 
-def test_build_permission_misbuilt_dict_str_list_list_str():
+def test_build_permission_misbuilt_dict_str_list_list_str() -> None:
     """Test bad build of permission param from dictionary."""
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param({"res1": [["scope1", "scope2"]]})
     assert err.match(re.escape("misbuilt permission {'res1': [['scope1', 'scope2']]}"))
 
 
-def test_build_permission_misbuilt_list_list_str():
+def test_build_permission_misbuilt_list_list_str() -> None:
     """Test bad build of permission param from list."""
     with pytest.raises(KeycloakPermissionFormatError) as err:
-        print(build_permission_param([["scope1", "scope2"]]))
+        build_permission_param([["scope1", "scope2"]])
     assert err.match(re.escape("misbuilt permission [['scope1', 'scope2']]"))
 
 
-def test_build_permission_misbuilt_list_set_str():
+def test_build_permission_misbuilt_list_set_str() -> None:
     """Test bad build of permission param from set."""
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param([{"scope1", "scope2"}])
     assert err.match("misbuilt permission.*")
 
 
-def test_build_permission_misbuilt_set_set_str():
+def test_build_permission_misbuilt_set_set_str() -> None:
     """Test bad build of permission param from list of set."""
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param([{"scope1"}])
     assert err.match(re.escape("misbuilt permission [{'scope1'}]"))
 
 
-def test_build_permission_misbuilt_dict_non_iterable():
+def test_build_permission_misbuilt_dict_non_iterable() -> None:
     """Test bad build of permission param from non-iterable."""
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param({"res1": 5})
     assert err.match(re.escape("misbuilt permission {'res1': 5}"))
 
 
-def test_auth_status_bool():
+def test_auth_status_bool() -> None:
     """Test bool method of AuthStatus."""
     assert not bool(AuthStatus(is_logged_in=True, is_authorized=False, missing_permissions=""))
     assert bool(AuthStatus(is_logged_in=True, is_authorized=True, missing_permissions=""))
 
 
-def test_build_permission_without_scopes():
+def test_build_permission_without_scopes() -> None:
     """Test build permission param with scopes."""
     assert build_permission_param(permissions={"Resource": None}) == {"Resource"}
