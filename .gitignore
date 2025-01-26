@@ -109,5 +109,6 @@ s3air-authz-config.json
 .vscode
 _build
 .ruff_cache
+.DS_Store
 
 test.py
