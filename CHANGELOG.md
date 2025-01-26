@@ -1,3 +1,9 @@
+## v5.1.2 (2025-01-26)
+
+### Fix
+
+- small bugs, use ruff as linter, added annotations
+
 ## v5.1.1 (2024-12-15)
 
 ### Fix
