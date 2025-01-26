@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -27,7 +26,7 @@
 URL_REALM = "realms/{realm-name}"
 URL_WELL_KNOWN_BASE = "realms/{realm-name}/.well-known"
 URL_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/openid-configuration"
-URL_TOKEN = "realms/{realm-name}/protocol/openid-connect/token"
+URL_TOKEN = "realms/{realm-name}/protocol/openid-connect/token"  # noqa: S105
 URL_USERINFO = "realms/{realm-name}/protocol/openid-connect/userinfo"
 URL_LOGOUT = "realms/{realm-name}/protocol/openid-connect/logout"
 URL_CERTS = "realms/{realm-name}/protocol/openid-connect/certs"
@@ -49,7 +48,7 @@ URL_ADMIN_USER = "admin/realms/{realm-name}/users/{id}"
 URL_ADMIN_USER_CONSENTS = "admin/realms/{realm-name}/users/{id}/consents"
 URL_ADMIN_SEND_UPDATE_ACCOUNT = "admin/realms/{realm-name}/users/{id}/execute-actions-email"
 URL_ADMIN_SEND_VERIFY_EMAIL = "admin/realms/{realm-name}/users/{id}/send-verify-email"
-URL_ADMIN_RESET_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"
+URL_ADMIN_RESET_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"  # noqa: S105
 URL_ADMIN_GET_SESSIONS = "admin/realms/{realm-name}/users/{id}/sessions"
 URL_ADMIN_USER_ALL_ROLES = "admin/realms/{realm-name}/users/{id}/role-mappings"
 URL_ADMIN_USER_CLIENT_ROLES = (

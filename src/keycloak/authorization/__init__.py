@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -32,19 +31,21 @@ from .role import Role
 
 
 class Authorization:
-    """Keycloak Authorization (policies, roles, scopes and resources).
+    """
+    Keycloak Authorization (policies, roles, scopes and resources).
 
     https://keycloak.gitbooks.io/documentation/authorization_services/index.html
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Init method."""
         self.policies = {}
 
     @property
-    def policies(self):
-        """Get policies.
+    def policies(self) -> dict:
+        """
+        Get policies.
 
         :returns: Policies
         :rtype: dict
@@ -52,11 +53,12 @@ class Authorization:
         return self._policies
 
     @policies.setter
-    def policies(self, value):
+    def policies(self, value: dict) -> None:
         self._policies = value
 
-    def load_config(self, data):
-        """Load policies, roles and permissions (scope/resources).
+    def load_config(self, data: dict) -> None:
+        """
+        Load policies, roles and permissions (scope/resources).
 
         :param data: keycloak authorization data (dict)
         :type data: dict

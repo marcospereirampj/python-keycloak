@@ -7,7 +7,7 @@ import pytest
 from keycloak.exceptions import KeycloakOperationError, raise_error_from_response
 
 
-def test_raise_error_from_response_from_dict():
+def test_raise_error_from_response_from_dict() -> None:
     """Test raise error from response using a dictionary."""
     response = Mock()
     response.json.return_value = {"key": "value"}
@@ -16,5 +16,8 @@ def test_raise_error_from_response_from_dict():
 
     with pytest.raises(KeycloakOperationError):
         raise_error_from_response(
-            response=response, error=dict(), expected_codes=[200], skip_exists=False
+            response=response,
+            error={},
+            expected_codes=[200],
+            skip_exists=False,
         )

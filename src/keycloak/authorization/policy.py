@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -23,11 +22,12 @@
 
 """Keycloak authorization Policy module."""
 
-from ..exceptions import KeycloakAuthorizationConfigError
+from keycloak.exceptions import KeycloakAuthorizationConfigError
 
 
 class Policy:
-    """Base policy class.
+    """
+    Base policy class.
 
     A policy defines the conditions that must be satisfied to grant access to an object.
     Unlike permissions, you do not specify the object being protected but rather the conditions
@@ -50,8 +50,9 @@ class Policy:
 
     """
 
-    def __init__(self, name, type, logic, decision_strategy):
-        """Init method.
+    def __init__(self, name: str, type: str, logic: str, decision_strategy: str) -> None:  # noqa: A002
+        """
+        Init method.
 
         :param name: Name
         :type name: str
@@ -69,25 +70,28 @@ class Policy:
         self.roles = []
         self.permissions = []
 
-    def __repr__(self):
-        """Repr method.
+    def __repr__(self) -> str:
+        """
+        Repr method.
 
         :returns: Class representation
         :rtype: str
         """
-        return "<Policy: %s (%s)>" % (self.name, self.type)
+        return f"<Policy: {self.name} ({self.type})>"
 
-    def __str__(self):
-        """Str method.
+    def __str__(self) -> str:
+        """
+        Str method.
 
         :returns: Class string representation
         :rtype: str
         """
-        return "Policy: %s (%s)" % (self.name, self.type)
+        return f"Policy: {self.name} ({self.type})"
 
     @property
-    def name(self):
-        """Get name.
+    def name(self) -> str:
+        """
+        Get name.
 
         :returns: Name
         :rtype: str
@@ -95,12 +99,13 @@ class Policy:
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self._name = value
 
     @property
-    def type(self):
-        """Get type.
+    def type(self) -> str:
+        """
+        Get type.
 
         :returns: Type
         :rtype: str
@@ -108,12 +113,13 @@ class Policy:
         return self._type
 
     @type.setter
-    def type(self, value):
+    def type(self, value: str) -> None:
         self._type = value
 
     @property
-    def logic(self):
-        """Get logic.
+    def logic(self) -> str:
+        """
+        Get logic.
 
         :returns: Logic
         :rtype: str
@@ -121,12 +127,13 @@ class Policy:
         return self._logic
 
     @logic.setter
-    def logic(self, value):
+    def logic(self, value: str) -> None:
         self._logic = value
 
     @property
-    def decision_strategy(self):
-        """Get decision strategy.
+    def decision_strategy(self) -> str:
+        """
+        Get decision strategy.
 
         :returns: Decision strategy
         :rtype: str
@@ -134,12 +141,13 @@ class Policy:
         return self._decision_strategy
 
     @decision_strategy.setter
-    def decision_strategy(self, value):
+    def decision_strategy(self, value: str) -> None:
         self._decision_strategy = value
 
     @property
-    def roles(self):
-        """Get roles.
+    def roles(self) -> list:
+        """
+        Get roles.
 
         :returns: Roles
         :rtype: list
@@ -147,12 +155,13 @@ class Policy:
         return self._roles
 
     @roles.setter
-    def roles(self, value):
+    def roles(self, value: list) -> None:
         self._roles = value
 
     @property
-    def permissions(self):
-        """Get permissions.
+    def permissions(self) -> list:
+        """
+        Get permissions.
 
         :returns: Permissions
         :rtype: list
@@ -160,24 +169,25 @@ class Policy:
         return self._permissions
 
     @permissions.setter
-    def permissions(self, value):
+    def permissions(self, value: list) -> None:
         self._permissions = value
 
-    def add_role(self, role):
-        """Add keycloak role in policy.
+    def add_role(self, role: dict) -> None:
+        """
+        Add keycloak role in policy.
 
         :param role: Keycloak role
         :type role: keycloak.authorization.Role
         :raises KeycloakAuthorizationConfigError: In case of misconfigured policy type
         """
         if self.type != "role":
-            raise KeycloakAuthorizationConfigError(
-                "Can't add role. Policy type is different of role"
-            )
+            error_msg = "Can't add role. Policy type is different of role"
+            raise KeycloakAuthorizationConfigError(error_msg)
         self._roles.append(role)
 
-    def add_permission(self, permission):
-        """Add keycloak permission in policy.
+    def add_permission(self, permission: dict) -> None:
+        """
+        Add keycloak permission in policy.
 
         :param permission: Keycloak permission
         :type permission: keycloak.authorization.Permission

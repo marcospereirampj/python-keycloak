@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -46,8 +45,8 @@ from .keycloak_uma import KeycloakUMA
 from .openid_connection import KeycloakOpenIDConnection
 
 __all__ = [
-    "__version__",
     "ConnectionManager",
+    "KeycloakAdmin",
     "KeycloakAuthenticationError",
     "KeycloakAuthorizationConfigError",
     "KeycloakConnectionError",
@@ -56,13 +55,13 @@ __all__ = [
     "KeycloakError",
     "KeycloakGetError",
     "KeycloakInvalidTokenError",
+    "KeycloakOpenID",
+    "KeycloakOpenIDConnection",
     "KeycloakOperationError",
     "KeycloakPostError",
     "KeycloakPutError",
     "KeycloakRPTNotFound",
     "KeycloakSecretNotFound",
-    "KeycloakAdmin",
-    "KeycloakOpenID",
-    "KeycloakOpenIDConnection",
     "KeycloakUMA",
+    "__version__",
 ]

@@ -6,7 +6,7 @@ from keycloak.authorization import Permission, Policy, Role
 from keycloak.exceptions import KeycloakAuthorizationConfigError
 
 
-def test_authorization_objects():
+def test_authorization_objects() -> None:
     """Test authorization objects."""
     # Test permission
     p = Permission(name="test", type="test", logic="test", decision_strategy="test")
@@ -39,5 +39,10 @@ def test_authorization_objects():
     assert r.name == "test"
     assert not r.required
     assert r.get_name() == "test"
-    assert r == r
+    assert r == r  # noqa: PLR0124
     assert r == "test"
+
+    with pytest.raises(NotImplementedError) as err:
+        assert r == 1
+
+    assert str(err.value) == "Cannot compare Role with <class 'int'>"

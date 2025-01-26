@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -23,6 +22,8 @@
 
 """Connection manager module."""
 
+from __future__ import annotations
+
 try:
     from urllib.parse import urljoin
 except ImportError:  # pragma: no cover
@@ -30,13 +31,16 @@ except ImportError:  # pragma: no cover
 
 import httpx
 import requests
+from httpx import Response as AsyncResponse
+from requests import Response
 from requests.adapters import HTTPAdapter
 
 from .exceptions import KeycloakConnectionError
 
 
-class ConnectionManager(object):
-    """Represents a simple server connection.
+class ConnectionManager:
+    """
+    Represents a simple server connection.
 
     :param base_url: The server URL.
     :type base_url: str
@@ -58,9 +62,17 @@ class ConnectionManager(object):
     """
 
     def __init__(
-        self, base_url, headers={}, timeout=60, verify=True, proxies=None, cert=None, max_retries=1
-    ):
-        """Init method.
+        self,
+        base_url: str,
+        headers: dict | None = None,
+        timeout: int = 60,
+        verify: bool = True,
+        proxies: dict | None = None,
+        cert: str | tuple | None = None,
+        max_retries: int = 1,
+    ) -> None:
+        """
+        Init method.
 
         :param base_url: The server URL.
         :type base_url: str
@@ -106,19 +118,20 @@ class ConnectionManager(object):
         self.async_s.auth = None  # don't let requests add auth headers
         self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         """Close the async connection on delete."""
         if hasattr(self, "_s"):
             await self.async_s.aclose()
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Del method."""
         if hasattr(self, "_s"):
             self._s.close()
 
     @property
-    def base_url(self):
-        """Return base url in use for requests to the server.
+    def base_url(self) -> str:
+        """
+        Return base url in use for requests to the server.
 
         :returns: Base URL
         :rtype: str
@@ -126,12 +139,13 @@ class ConnectionManager(object):
         return self._base_url
 
     @base_url.setter
-    def base_url(self, value):
+    def base_url(self, value: str) -> None:
         self._base_url = value
 
     @property
-    def timeout(self):
-        """Return timeout in use for request to the server.
+    def timeout(self) -> int:
+        """
+        Return timeout in use for request to the server.
 
         :returns: Timeout
         :rtype: int
@@ -139,12 +153,13 @@ class ConnectionManager(object):
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value):
+    def timeout(self, value: int) -> None:
         self._timeout = value
 
     @property
-    def verify(self):
-        """Return verify in use for request to the server.
+    def verify(self) -> bool:
+        """
+        Return verify in use for request to the server.
 
         :returns: Verify indicator
         :rtype: bool
@@ -152,12 +167,13 @@ class ConnectionManager(object):
         return self._verify
 
     @verify.setter
-    def verify(self, value):
+    def verify(self, value: bool) -> None:
         self._verify = value
 
     @property
-    def cert(self):
-        """Return client certificates in use for request to the server.
+    def cert(self) -> str | tuple:
+        """
+        Return client certificates in use for request to the server.
 
         :returns: Client certificate
         :rtype: Union[str,Tuple[str,str]]
@@ -165,12 +181,13 @@ class ConnectionManager(object):
         return self._cert
 
     @cert.setter
-    def cert(self, value):
+    def cert(self, value: str | tuple) -> None:
         self._cert = value
 
     @property
-    def headers(self):
-        """Return header request to the server.
+    def headers(self) -> dict:
+        """
+        Return header request to the server.
 
         :returns: Request headers
         :rtype: dict
@@ -178,11 +195,12 @@ class ConnectionManager(object):
         return self._headers
 
     @headers.setter
-    def headers(self, value):
-        self._headers = value
+    def headers(self, value: dict) -> None:
+        self._headers = value or {}
 
-    def param_headers(self, key):
-        """Return a specific header parameter.
+    def param_headers(self, key: str) -> str | None:
+        """
+        Return a specific header parameter.
 
         :param key: Header parameters key.
         :type key: str
@@ -191,12 +209,13 @@ class ConnectionManager(object):
         """
         return self.headers.get(key)
 
-    def clean_headers(self):
+    def clean_headers(self) -> None:
         """Clear header parameters."""
         self.headers = {}
 
-    def exist_param_headers(self, key):
-        """Check if the parameter exists in the header.
+    def exist_param_headers(self, key: str) -> bool:
+        """
+        Check if the parameter exists in the header.
 
         :param key: Header parameters key.
         :type key: str
@@ -205,8 +224,9 @@ class ConnectionManager(object):
         """
         return self.param_headers(key) is not None
 
-    def add_param_headers(self, key, value):
-        """Add a single parameter inside the header.
+    def add_param_headers(self, key: str, value: str) -> None:
+        """
+        Add a single parameter inside the header.
 
         :param key: Header parameters key.
         :type key: str
@@ -215,16 +235,18 @@ class ConnectionManager(object):
         """
         self.headers[key] = value
 
-    def del_param_headers(self, key):
-        """Remove a specific parameter.
+    def del_param_headers(self, key: str) -> None:
+        """
+        Remove a specific parameter.
 
         :param key: Key of the header parameters.
         :type key: str
         """
         self.headers.pop(key, None)
 
-    def raw_get(self, path, **kwargs):
-        """Submit get request to the path.
+    def raw_get(self, path: str, **kwargs: dict) -> Response:
+        """
+        Submit get request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -244,10 +266,12 @@ class ConnectionManager(object):
                 cert=self.cert,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    def raw_post(self, path, data, **kwargs):
-        """Submit post request to the path.
+    def raw_post(self, path: str, data: dict, **kwargs: dict) -> Response:
+        """
+        Submit post request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -270,10 +294,12 @@ class ConnectionManager(object):
                 cert=self.cert,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    def raw_put(self, path, data, **kwargs):
-        """Submit put request to the path.
+    def raw_put(self, path: str, data: dict, **kwargs: dict) -> Response:
+        """
+        Submit put request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -296,10 +322,12 @@ class ConnectionManager(object):
                 cert=self.cert,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    def raw_delete(self, path, data=None, **kwargs):
-        """Submit delete request to the path.
+    def raw_delete(self, path: str, data: dict | None = None, **kwargs: dict) -> Response:
+        """
+        Submit delete request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -312,21 +340,22 @@ class ConnectionManager(object):
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
         try:
-            r = self._s.delete(
+            return self._s.delete(
                 urljoin(self.base_url, path),
                 params=kwargs,
-                data=data or dict(),
+                data=data or {},
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
                 cert=self.cert,
             )
-            return r
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_get(self, path, **kwargs):
-        """Submit get request to the path.
+    async def a_raw_get(self, path: str, **kwargs: dict) -> AsyncResponse:
+        """
+        Submit get request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -344,10 +373,12 @@ class ConnectionManager(object):
                 timeout=self.timeout,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_post(self, path, data, **kwargs):
-        """Submit post request to the path.
+    async def a_raw_post(self, path: str, data: dict, **kwargs: dict) -> AsyncResponse:
+        """
+        Submit post request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -369,10 +400,12 @@ class ConnectionManager(object):
                 timeout=self.timeout,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_put(self, path, data, **kwargs):
-        """Submit put request to the path.
+    async def a_raw_put(self, path: str, data: dict, **kwargs: dict) -> AsyncResponse:
+        """
+        Submit put request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -393,10 +426,17 @@ class ConnectionManager(object):
                 timeout=self.timeout,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_delete(self, path, data=None, **kwargs):
-        """Submit delete request to the path.
+    async def a_raw_delete(
+        self,
+        path: str,
+        data: dict | None = None,
+        **kwargs: dict,
+    ) -> AsyncResponse:
+        """
+        Submit delete request to the path.
 
         :param path: Path for request.
         :type path: str
@@ -412,17 +452,19 @@ class ConnectionManager(object):
             return await self.async_s.request(
                 method="DELETE",
                 url=urljoin(self.base_url, path),
-                data=data or dict(),
+                data=data or {},
                 params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
             )
         except Exception as e:
-            raise KeycloakConnectionError("Can't connect to server (%s)" % e)
+            msg = "Can't connect to server"
+            raise KeycloakConnectionError(msg) from e
 
     @staticmethod
-    def _filter_query_params(query_params):
-        """Explicitly filter query params with None values for compatibility.
+    def _filter_query_params(query_params: dict) -> dict:
+        """
+        Explicitly filter query params with None values for compatibility.
 
         Httpx and requests differ in the way they handle query params with the value None,
         requests does not include params with the value None while httpx includes them as-is.

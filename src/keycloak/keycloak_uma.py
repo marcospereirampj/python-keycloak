@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -21,38 +20,51 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Keycloak UMA module.
+"""
+Keycloak UMA module.
 
 The module contains a UMA compatible client for keycloak:
 https://docs.kantarainitiative.org/uma/wg/rec-oauth-uma-federated-authz-2.0.html
 """
+
+from __future__ import annotations
+
 import json
-from typing import Iterable
+from typing import TYPE_CHECKING
 from urllib.parse import quote_plus
 
 from async_property import async_property
 
 from .connection import ConnectionManager
 from .exceptions import (
+    HTTP_CREATED,
+    HTTP_NO_CONTENT,
+    HTTP_OK,
     KeycloakDeleteError,
     KeycloakGetError,
     KeycloakPostError,
     KeycloakPutError,
     raise_error_from_response,
 )
-from .openid_connection import KeycloakOpenIDConnection
-from .uma_permissions import UMAPermission
 from .urls_patterns import URL_UMA_WELL_KNOWN
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from .openid_connection import KeycloakOpenIDConnection
+    from .uma_permissions import UMAPermission
 
 
 class KeycloakUMA:
-    """Keycloak UMA client.
+    """
+    Keycloak UMA client.
 
     :param connection: OpenID connection manager
     """
 
-    def __init__(self, connection: KeycloakOpenIDConnection):
-        """Init method.
+    def __init__(self, connection: KeycloakOpenIDConnection) -> None:
+        """
+        Init method.
 
         :param connection: OpenID connection manager
         :type connection: KeycloakOpenIDConnection
@@ -60,14 +72,15 @@ class KeycloakUMA:
         self.connection = connection
         self._well_known = None
 
-    def _fetch_well_known(self):
+    def _fetch_well_known(self) -> dict:
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(URL_UMA_WELL_KNOWN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     @staticmethod
-    def format_url(url, **kwargs):
-        """Substitute url path parameters.
+    def format_url(url: str, **kwargs: dict) -> str:
+        """
+        Substitute url path parameters.
 
         Given a parameterized url string, returns the string after url encoding and substituting
         the given params. For example,
@@ -84,8 +97,9 @@ class KeycloakUMA:
         return url.format(**{k: quote_plus(v) for k, v in kwargs.items()})
 
     @staticmethod
-    async def a_format_url(url, **kwargs):
-        """Substitute url path parameters.
+    async def a_format_url(url: str, **kwargs: dict) -> str:
+        """
+        Substitute url path parameters.
 
         Given a parameterized url string, returns the string after url encoding and substituting
         the given params. For example,
@@ -102,8 +116,9 @@ class KeycloakUMA:
         return url.format(**{k: quote_plus(v) for k, v in kwargs.items()})
 
     @property
-    def uma_well_known(self):
-        """Get the well_known UMA2 config.
+    def uma_well_known(self) -> dict:
+        """
+        Get the well_known UMA2 config.
 
         :returns: It lists endpoints and other configuration options relevant
         :rtype: dict
@@ -111,21 +126,25 @@ class KeycloakUMA:
         # per instance cache
         if not self._well_known:
             self._well_known = self._fetch_well_known()
+
         return self._well_known
 
     @async_property
-    async def a_uma_well_known(self):
-        """Get the well_known UMA2 config async.
+    async def a_uma_well_known(self) -> dict:
+        """
+        Get the well_known UMA2 config async.
 
         :returns: It lists endpoints and other configuration options relevant
         :rtype: dict
         """
         if not self._well_known:
             self._well_known = await self.a__fetch_well_known()
+
         return self._well_known
 
-    def resource_set_create(self, payload):
-        """Create a resource set.
+    def resource_set_create(self, payload: dict) -> dict | bytes:
+        """
+        Create a resource set.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#rfc.section.2.2.1
@@ -139,12 +158,18 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = self.connection.raw_post(
-            self.uma_well_known["resource_registration_endpoint"], data=json.dumps(payload)
+            self.uma_well_known["resource_registration_endpoint"],
+            data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
 
-    def resource_set_update(self, resource_id, payload):
-        """Update a resource set.
+    def resource_set_update(self, resource_id: str, payload: dict) -> bytes:
+        """
+        Update a resource set.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#update-resource-set
@@ -157,16 +182,22 @@ class KeycloakUMA:
         :param payload: ResourceRepresentation
         :type payload: dict
         :return: Response dict (empty)
-        :rtype: dict
+        :rtype: bytes
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            self.uma_well_known["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = self.connection.raw_put(url, data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
-    def resource_set_read(self, resource_id):
-        """Read a resource set.
+    def resource_set_read(self, resource_id: str) -> dict:
+        """
+        Read a resource set.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#read-resource-set
@@ -180,13 +211,15 @@ class KeycloakUMA:
         :rtype: dict
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            self.uma_well_known["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = self.connection.raw_get(url)
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
-    def resource_set_delete(self, resource_id):
-        """Delete a resource set.
+    def resource_set_delete(self, resource_id: str) -> bytes:
+        """
+        Delete a resource set.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#delete-resource-set
@@ -197,10 +230,15 @@ class KeycloakUMA:
         :rtype: dict
         """
         url = self.format_url(
-            self.uma_well_known["resource_registration_endpoint"] + "/{id}", id=resource_id
+            self.uma_well_known["resource_registration_endpoint"] + "/{id}",
+            id=resource_id,
         )
         data_raw = self.connection.raw_delete(url)
-        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     def resource_set_list_ids(
         self,
@@ -210,11 +248,12 @@ class KeycloakUMA:
         owner: str = "",
         resource_type: str = "",
         scope: str = "",
-        matchingUri: bool = False,
+        matchingUri: bool = False,  # noqa: N803
         first: int = 0,
         maximum: int = -1,
-    ):
-        """Query for list of resource set ids.
+    ) -> list:
+        """
+        Query for list of resource set ids.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -240,7 +279,7 @@ class KeycloakUMA:
         :return: List of ids
         :rtype: List[str]
         """
-        query = dict()
+        query = {}
         if name:
             query["name"] = name
             if exact_name:
@@ -261,12 +300,14 @@ class KeycloakUMA:
             query["max"] = maximum
 
         data_raw = self.connection.raw_get(
-            self.uma_well_known["resource_registration_endpoint"], **query
+            self.uma_well_known["resource_registration_endpoint"],
+            **query,
         )
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
-    def resource_set_list(self):
-        """List all resource sets.
+    def resource_set_list(self) -> list:
+        """
+        List all resource sets.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -281,8 +322,9 @@ class KeycloakUMA:
             resource = self.resource_set_read(resource_id)
             yield resource
 
-    def permission_ticket_create(self, permissions: Iterable[UMAPermission]):
-        """Create a permission ticket.
+    def permission_ticket_create(self, permissions: Iterable[UMAPermission]) -> dict:
+        """
+        Create a permission ticket.
 
         :param permissions: Iterable of uma permissions to validate the token against
         :type permissions: Iterable[UMAPermission]
@@ -290,19 +332,23 @@ class KeycloakUMA:
         :rtype: boolean
         :raises KeycloakPostError: In case permission resource not found
         """
-        resources = dict()
+        resources = {}
         for permission in permissions:
             resource_id = getattr(permission, "resource_id", None)
 
             if resource_id is None:
                 resource_ids = self.resource_set_list_ids(
-                    exact_name=True, name=permission.resource, first=0, maximum=1
+                    exact_name=True,
+                    name=permission.resource,
+                    first=0,
+                    maximum=1,
                 )
 
                 if not resource_ids:
-                    raise KeycloakPostError("Invalid resource specified")
+                    msg = "Invalid resource specified"
+                    raise KeycloakPostError(msg)
 
-                setattr(permission, "resource_id", resource_ids[0])
+                permission.resource_id = resource_ids[0]
 
             resources.setdefault(resource_id, set())
             if permission.scope:
@@ -314,12 +360,19 @@ class KeycloakUMA:
         ]
 
         data_raw = self.connection.raw_post(
-            self.uma_well_known["permission_endpoint"], data=json.dumps(payload)
+            self.uma_well_known["permission_endpoint"],
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def permissions_check(self, token, permissions: Iterable[UMAPermission], **extra_payload):
-        """Check UMA permissions by user token with requested permissions.
+    def permissions_check(
+        self,
+        token: str,
+        permissions: Iterable[UMAPermission],
+        **extra_payload: dict,
+    ) -> bool:
+        """
+        Check UMA permissions by user token with requested permissions.
 
         The token endpoint is used to check UMA permissions from Keycloak. It can only be
         invoked by confidential clients.
@@ -358,8 +411,9 @@ class KeycloakUMA:
             return False
         return data.get("result", False)
 
-    def policy_resource_create(self, resource_id, payload):
-        """Create permission policy for resource.
+    def policy_resource_create(self, resource_id: str, payload: dict) -> dict:
+        """
+        Create permission policy for resource.
 
         Supports name, description, scopes, roles, groups, clients
 
@@ -373,12 +427,14 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = self.connection.raw_post(
-            self.uma_well_known["policy_endpoint"] + f"/{resource_id}", data=json.dumps(payload)
+            self.uma_well_known["policy_endpoint"] + f"/{resource_id}",
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def policy_update(self, policy_id, payload):
-        """Update permission policy.
+    def policy_update(self, policy_id: str, payload: dict) -> dict:
+        """
+        Update permission policy.
 
         https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -391,12 +447,14 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = self.connection.raw_put(
-            self.uma_well_known["policy_endpoint"] + f"/{policy_id}", data=json.dumps(payload)
+            self.uma_well_known["policy_endpoint"] + f"/{policy_id}",
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
-    def policy_delete(self, policy_id):
-        """Delete permission policy.
+    def policy_delete(self, policy_id: str) -> dict:
+        """
+        Delete permission policy.
 
         https://www.keycloak.org/docs/latest/authorization_services/#removing-a-permission
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -407,7 +465,7 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = self.connection.raw_delete(
-            self.uma_well_known["policy_endpoint"] + f"/{policy_id}"
+            self.uma_well_known["policy_endpoint"] + f"/{policy_id}",
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError)
 
@@ -418,8 +476,9 @@ class KeycloakUMA:
         scope: str = "",
         first: int = 0,
         maximum: int = -1,
-    ):
-        """Query permission policies.
+    ) -> list:
+        """
+        Query permission policies.
 
         https://www.keycloak.org/docs/latest/authorization_services/#querying-permission
 
@@ -437,7 +496,7 @@ class KeycloakUMA:
         :return: List of ids
         :rtype: List[str]
         """
-        query = dict()
+        query = {}
         if name:
             query["name"] = name
         if resource:
@@ -452,8 +511,9 @@ class KeycloakUMA:
         data_raw = self.connection.raw_get(self.uma_well_known["policy_endpoint"], **query)
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def a__fetch_well_known(self):
-        """Get the well_known UMA2 config async.
+    async def a__fetch_well_known(self) -> dict:
+        """
+        Get the well_known UMA2 config async.
 
         :returns: It lists endpoints and other configuration options relevant
         :rtype: dict
@@ -462,8 +522,9 @@ class KeycloakUMA:
         data_raw = await self.connection.a_raw_get(URL_UMA_WELL_KNOWN.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def a_resource_set_create(self, payload):
-        """Create a resource set  asynchronously.
+    async def a_resource_set_create(self, payload: dict) -> dict:
+        """
+        Create a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#rfc.section.2.2.1
@@ -480,10 +541,15 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["resource_registration_endpoint"],
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
 
-    async def a_resource_set_update(self, resource_id, payload):
-        """Update a resource set  asynchronously.
+    async def a_resource_set_update(self, resource_id: str, payload: dict) -> bytes:
+        """
+        Update a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#update-resource-set
@@ -496,17 +562,22 @@ class KeycloakUMA:
         :param payload: ResourceRepresentation
         :type payload: dict
         :return: Response dict (empty)
-        :rtype: dict
+        :rtype: bytes
         """
         url = self.format_url(
             (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_put(url, data=json.dumps(payload))
-        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
-    async def a_resource_set_read(self, resource_id):
-        """Read a resource set  asynchronously.
+    async def a_resource_set_read(self, resource_id: str) -> dict:
+        """
+        Read a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#read-resource-set
@@ -524,10 +595,11 @@ class KeycloakUMA:
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_get(url)
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
-    async def a_resource_set_delete(self, resource_id):
-        """Delete a resource set  asynchronously.
+    async def a_resource_set_delete(self, resource_id: str) -> bytes:
+        """
+        Delete a resource set  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#delete-resource-set
@@ -535,14 +607,18 @@ class KeycloakUMA:
         :param resource_id: id of the resource
         :type resource_id: str
         :return: Response dict (empty)
-        :rtype: dict
+        :rtype: bytes
         """
         url = self.format_url(
             (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_delete(url)
-        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     async def a_resource_set_list_ids(
         self,
@@ -552,11 +628,12 @@ class KeycloakUMA:
         owner: str = "",
         resource_type: str = "",
         scope: str = "",
-        matchingUri: bool = False,
+        matchingUri: bool = False,  # noqa: N803
         first: int = 0,
         maximum: int = -1,
-    ):
-        """Query for list of resource set ids  asynchronously.
+    ) -> list:
+        """
+        Query for list of resource set ids  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -582,7 +659,7 @@ class KeycloakUMA:
         :return: List of ids
         :rtype: List[str]
         """
-        query = dict()
+        query = {}
         if name:
             query["name"] = name
             if exact_name:
@@ -603,12 +680,14 @@ class KeycloakUMA:
             query["max"] = maximum
 
         data_raw = await self.connection.a_raw_get(
-            (await self.a_uma_well_known)["resource_registration_endpoint"], **query
+            (await self.a_uma_well_known)["resource_registration_endpoint"],
+            **query,
         )
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[200])
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
-    async def a_resource_set_list(self):
-        """List all resource sets  asynchronously.
+    async def a_resource_set_list(self) -> list:
+        """
+        List all resource sets  asynchronously.
 
         Spec
         https://docs.kantarainitiative.org/uma/rec-oauth-resource-reg-v1_0_1.html#list-resource-sets
@@ -623,8 +702,9 @@ class KeycloakUMA:
             resource = await self.a_resource_set_read(resource_id)
             yield resource
 
-    async def a_permission_ticket_create(self, permissions: Iterable[UMAPermission]):
-        """Create a permission ticket  asynchronously.
+    async def a_permission_ticket_create(self, permissions: Iterable[UMAPermission]) -> bool:
+        """
+        Create a permission ticket  asynchronously.
 
         :param permissions: Iterable of uma permissions to validate the token against
         :type permissions: Iterable[UMAPermission]
@@ -632,19 +712,23 @@ class KeycloakUMA:
         :rtype: boolean
         :raises KeycloakPostError: In case permission resource not found
         """
-        resources = dict()
+        resources = {}
         for permission in permissions:
             resource_id = getattr(permission, "resource_id", None)
 
             if resource_id is None:
                 resource_ids = await self.a_resource_set_list_ids(
-                    exact_name=True, name=permission.resource, first=0, maximum=1
+                    exact_name=True,
+                    name=permission.resource,
+                    first=0,
+                    maximum=1,
                 )
 
                 if not resource_ids:
-                    raise KeycloakPostError("Invalid resource specified")
+                    msg = "Invalid resource specified"
+                    raise KeycloakPostError(msg)
 
-                setattr(permission, "resource_id", resource_ids[0])
+                permission.resource_id = resource_ids[0]
 
             resources.setdefault(resource_id, set())
             if permission.scope:
@@ -656,14 +740,19 @@ class KeycloakUMA:
         ]
 
         data_raw = await self.connection.a_raw_post(
-            (await self.a_uma_well_known)["permission_endpoint"], data=json.dumps(payload)
+            (await self.a_uma_well_known)["permission_endpoint"],
+            data=json.dumps(payload),
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
     async def a_permissions_check(
-        self, token, permissions: Iterable[UMAPermission], **extra_payload
-    ):
-        """Check UMA permissions by user token with requested permissions  asynchronously.
+        self,
+        token: str,
+        permissions: Iterable[UMAPermission],
+        **extra_payload: dict,
+    ) -> bool:
+        """
+        Check UMA permissions by user token with requested permissions  asynchronously.
 
         The token endpoint is used to check UMA permissions from Keycloak. It can only be
         invoked by confidential clients.
@@ -696,7 +785,8 @@ class KeycloakUMA:
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await connection.a_raw_post(
-            (await self.a_uma_well_known)["token_endpoint"], data=payload
+            (await self.a_uma_well_known)["token_endpoint"],
+            data=payload,
         )
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)
@@ -704,8 +794,9 @@ class KeycloakUMA:
             return False
         return data.get("result", False)
 
-    async def a_policy_resource_create(self, resource_id, payload):
-        """Create permission policy for resource  asynchronously.
+    async def a_policy_resource_create(self, resource_id: str, payload: dict) -> dict:
+        """
+        Create permission policy for resource  asynchronously.
 
         Supports name, description, scopes, roles, groups, clients
 
@@ -724,8 +815,9 @@ class KeycloakUMA:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def a_policy_update(self, policy_id, payload):
-        """Update permission policy  asynchronously.
+    async def a_policy_update(self, policy_id: str, payload: dict) -> dict:
+        """
+        Update permission policy  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#associating-a-permission-with-a-resource
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -743,8 +835,9 @@ class KeycloakUMA:
         )
         return raise_error_from_response(data_raw, KeycloakPutError)
 
-    async def a_policy_delete(self, policy_id):
-        """Delete permission policy  asynchronously.
+    async def a_policy_delete(self, policy_id: str) -> dict:
+        """
+        Delete permission policy  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#removing-a-permission
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_policyrepresentation
@@ -755,7 +848,7 @@ class KeycloakUMA:
         :rtype: dict
         """
         data_raw = await self.connection.a_raw_delete(
-            (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}"
+            (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}",
         )
         return raise_error_from_response(data_raw, KeycloakDeleteError)
 
@@ -766,8 +859,9 @@ class KeycloakUMA:
         scope: str = "",
         first: int = 0,
         maximum: int = -1,
-    ):
-        """Query permission policies  asynchronously.
+    ) -> list:
+        """
+        Query permission policies  asynchronously.
 
         https://www.keycloak.org/docs/latest/authorization_services/#querying-permission
 
@@ -785,7 +879,7 @@ class KeycloakUMA:
         :return: List of ids
         :rtype: List[str]
         """
-        query = dict()
+        query = {}
         if name:
             query["name"] = name
         if resource:
@@ -798,6 +892,7 @@ class KeycloakUMA:
             query["max"] = maximum
 
         data_raw = await self.connection.a_raw_get(
-            (await self.a_uma_well_known)["policy_endpoint"], **query
+            (await self.a_uma_well_known)["policy_endpoint"],
+            **query,
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
