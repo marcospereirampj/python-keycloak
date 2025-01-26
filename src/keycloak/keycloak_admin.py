@@ -628,7 +628,7 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
-    def create_user(self, payload: str, exist_ok: bool = False) -> str:
+    def create_user(self, payload: dict, exist_ok: bool = False) -> str:
         """
         Create a new user.
 
@@ -6415,9 +6415,9 @@ class KeycloakAdmin:
 
     async def a_create_group(
         self,
-        payload: dict | None,
+        payload: dict,
         parent: str | None = None,
-        skip_exists: bool | None = False,
+        skip_exists: bool = False,
     ) -> str | None:
         """
         Create a group in the Realm asynchronously.

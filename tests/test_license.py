@@ -12,5 +12,5 @@ def test_license_present() -> None:
                 with pathlib.Path(pathlib.Path(path) / _file).open("r") as fp:
                     content = fp.read()
                 assert content.startswith(
-                    "# -*- coding: utf-8 -*-\n#\n# The MIT License (MIT)\n#\n#",
+                    "#\n# The MIT License (MIT)\n#\n#",
                 )

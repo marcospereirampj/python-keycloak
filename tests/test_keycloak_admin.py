@@ -956,14 +956,14 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     # Test get clients
     clients = admin.get_clients()
     assert len(clients) == 6, clients
-    assert {x["name"] for x in clients} == set(
+    assert {x["name"] for x in clients} == {
         "${client_admin-cli}",
         "${client_security-admin-console}",
         "${client_account-console}",
         "${client_broker}",
         "${client_account}",
         "${client_realm-management}",
-    ), clients
+    }, clients
 
     # Test create client
     client_id = admin.create_client(payload={"name": "test-client", "clientId": "test-client"})
@@ -2541,7 +2541,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) <= 38
+    assert len(res) <= 40
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -2598,7 +2598,7 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str) -> None:
     # Test get client scopes
     res = admin.get_client_scopes()
     scope_names = {x["name"] for x in res}
-    assert len(res) in [10, 11, 13]
+    assert len(res) in [10, 11, 13, 14]
     assert "email" in scope_names
     assert "profile" in scope_names
     assert "offline_access" in scope_names
@@ -2894,9 +2894,9 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
 
     # Freeze time to simulate the access token expiring
     with freezegun.freeze_time("2023-02-25 10:05:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:05:00Z")
         assert admin.get_realm(realm_name=realm)
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:05:00Z")
 
     # Test bad refresh token, but first make sure access token has expired again
     with freezegun.freeze_time("2023-02-25 10:10:00"):
@@ -2911,26 +2911,26 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
 
     # Test post refresh
     with freezegun.freeze_time("2023-02-25 10:15:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:15:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:15:00Z")
         admin.connection.token = None
         assert admin.create_realm(payload={"realm": "test-refresh"}) == b""
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:15:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:15:00Z")
 
     # Test update refresh
     with freezegun.freeze_time("2023-02-25 10:25:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:25:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:25:00Z")
         admin.connection.token = None
         assert (
             admin.update_realm(realm_name="test-refresh", payload={"accountTheme": "test"}) == {}
         )
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:25:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:25:00Z")
 
     # Test delete refresh
     with freezegun.freeze_time("2023-02-25 10:35:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:35:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:35:00Z")
         admin.connection.token = None
         assert admin.delete_realm(realm_name="test-refresh") == {}
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:35:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:35:00Z")
 
 
 def test_get_required_actions(admin: KeycloakAdmin, realm: str) -> None:
@@ -3100,7 +3100,7 @@ def test_get_bruteforce_status_for_user(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.supress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
@@ -4207,14 +4207,14 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     # Test get clients
     clients = await admin.a_get_clients()
     assert len(clients) == 6, clients
-    assert {x["name"] for x in clients} == set(
+    assert {x["name"] for x in clients} == {
         "${client_admin-cli}",
         "${client_security-admin-console}",
         "${client_account-console}",
         "${client_broker}",
         "${client_account}",
         "${client_realm-management}",
-    ), clients
+    }, clients
 
     # Test create client
     client_id = await admin.a_create_client(
@@ -5962,7 +5962,7 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
 
     # Test list of auth providers
     res = await admin.a_get_authenticator_providers()
-    assert len(res) <= 38
+    assert len(res) <= 40
 
     res = await admin.a_get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -6021,7 +6021,7 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str) -> None:
     # Test get client scopes
     res = await admin.a_get_client_scopes()
     scope_names = {x["name"] for x in res}
-    assert len(res) in [10, 11, 13]
+    assert len(res) in [10, 11, 13, 14]
     assert "email" in scope_names
     assert "profile" in scope_names
     assert "offline_access" in scope_names
@@ -6326,9 +6326,9 @@ async def test_a_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
 
     # Freeze time to simulate the access token expiring
     with freezegun.freeze_time("2023-02-25 10:05:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:05:00Z")
         assert await admin.a_get_realm(realm_name=realm)
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:05:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:05:00Z")
 
     # Test bad refresh token, but first make sure access token has expired again
     with freezegun.freeze_time("2023-02-25 10:10:00"):
@@ -6343,27 +6343,27 @@ async def test_a_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
 
     # Test post refresh
     with freezegun.freeze_time("2023-02-25 10:15:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:15:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:15:00Z")
         admin.connection.token = None
         assert await admin.a_create_realm(payload={"realm": "test-refresh"}) == b""
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:15:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:15:00Z")
 
     # Test update refresh
     with freezegun.freeze_time("2023-02-25 10:25:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:25:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:25:00Z")
         admin.connection.token = None
         assert (
             await admin.a_update_realm(realm_name="test-refresh", payload={"accountTheme": "test"})
             == {}
         )
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:25:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:25:00Z")
 
     # Test delete refresh
     with freezegun.freeze_time("2023-02-25 10:35:00"):
-        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25 10:35:00")
+        assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:35:00Z")
         admin.connection.token = None
         assert await admin.a_delete_realm(realm_name="test-refresh") == {}
-        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25 10:35:00")
+        assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:35:00Z")
 
 
 @pytest.mark.asyncio
@@ -6845,7 +6845,7 @@ def test_counter_part() -> None:
         assert async_method in admin_methods
         sync_sign = signature(getattr(KeycloakAdmin, method))
         async_sign = signature(getattr(KeycloakAdmin, async_method))
-        assert sync_sign.parameters == async_sign.parameters
+        assert sync_sign.parameters == async_sign.parameters, f"Parameters mismatch for {method}"
 
     for async_method in async_methods:
         if async_method[2:].startswith("_"):

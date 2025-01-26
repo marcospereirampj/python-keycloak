@@ -22,6 +22,8 @@
 
 """The authorization Role module."""
 
+from __future__ import annotations
+
 
 class Role:
     """
@@ -59,7 +61,7 @@ class Role:
         """
         return self.name
 
-    def __eq__(self, other: str) -> bool:
+    def __eq__(self, other: str | Role) -> bool:
         """
         Eq method.
 
@@ -71,4 +73,8 @@ class Role:
         if isinstance(other, str):
             return self.name == other
 
-        raise NotImplementedError
+        if isinstance(other, Role):
+            return self.name == other.name
+
+        msg = f"Cannot compare Role with {type(other)}"
+        raise NotImplementedError(msg)

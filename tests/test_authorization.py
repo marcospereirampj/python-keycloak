@@ -41,3 +41,8 @@ def test_authorization_objects() -> None:
     assert r.get_name() == "test"
     assert r == r  # noqa: PLR0124
     assert r == "test"
+
+    with pytest.raises(NotImplementedError) as err:
+        assert r == 1
+
+    assert str(err.value) == "Cannot compare Role with <class 'int'>"

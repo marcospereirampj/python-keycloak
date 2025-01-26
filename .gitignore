@@ -108,6 +108,6 @@ main2.py
 s3air-authz-config.json
 .vscode
 _build
-
+.ruff_cache
 
 test.py
