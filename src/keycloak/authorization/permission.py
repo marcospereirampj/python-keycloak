@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -25,7 +24,8 @@
 
 
 class Permission:
-    """Base permission class.
+    """
+    Base permission class.
 
     Consider this simple and very common permission:
 
@@ -56,8 +56,9 @@ class Permission:
 
     """
 
-    def __init__(self, name, type, logic, decision_strategy):
-        """Init method.
+    def __init__(self, name: str, type: str, logic: str, decision_strategy: str) -> None:  # noqa: A002
+        """
+        Init method.
 
         :param name: Name
         :type name: str
@@ -75,25 +76,28 @@ class Permission:
         self.resources = []
         self.scopes = []
 
-    def __repr__(self):
-        """Repr method.
+    def __repr__(self) -> str:
+        """
+        Repr method.
 
         :returns: Class representation
         :rtype: str
         """
-        return "<Permission: %s (%s)>" % (self.name, self.type)
+        return f"<Permission: {self.name} ({self.type})>"
 
-    def __str__(self):
-        """Str method.
+    def __str__(self) -> str:
+        """
+        Str method.
 
         :returns: Class string representation
         :rtype: str
         """
-        return "Permission: %s (%s)" % (self.name, self.type)
+        return f"Permission: {self.name} ({self.type})"
 
     @property
-    def name(self):
-        """Get name.
+    def name(self) -> str:
+        """
+        Get name.
 
         :returns: name
         :rtype: str
@@ -101,12 +105,13 @@ class Permission:
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self._name = value
 
     @property
-    def type(self):
-        """Get type.
+    def type(self) -> str:
+        """
+        Get type.
 
         :returns: type
         :rtype: str
@@ -114,12 +119,13 @@ class Permission:
         return self._type
 
     @type.setter
-    def type(self, value):
+    def type(self, value: str) -> None:
         self._type = value
 
     @property
-    def logic(self):
-        """Get logic.
+    def logic(self) -> str:
+        """
+        Get logic.
 
         :returns: Logic
         :rtype: str
@@ -127,12 +133,13 @@ class Permission:
         return self._logic
 
     @logic.setter
-    def logic(self, value):
+    def logic(self, value: str) -> str:
         self._logic = value
 
     @property
-    def decision_strategy(self):
-        """Get decision strategy.
+    def decision_strategy(self) -> str:
+        """
+        Get decision strategy.
 
         :returns: Decision strategy
         :rtype: str
@@ -140,12 +147,13 @@ class Permission:
         return self._decision_strategy
 
     @decision_strategy.setter
-    def decision_strategy(self, value):
+    def decision_strategy(self, value: str) -> None:
         self._decision_strategy = value
 
     @property
-    def resources(self):
-        """Get resources.
+    def resources(self) -> list:
+        """
+        Get resources.
 
         :returns: Resources
         :rtype: list
@@ -153,12 +161,13 @@ class Permission:
         return self._resources
 
     @resources.setter
-    def resources(self, value):
+    def resources(self, value: list) -> None:
         self._resources = value
 
     @property
-    def scopes(self):
-        """Get scopes.
+    def scopes(self) -> list:
+        """
+        Get scopes.
 
         :returns: Scopes
         :rtype: list
@@ -166,5 +175,5 @@ class Permission:
         return self._scopes
 
     @scopes.setter
-    def scopes(self, value):
+    def scopes(self, value: list) -> None:
         self._scopes = value

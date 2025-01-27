@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -23,11 +22,32 @@
 
 """Keycloak custom exceptions module."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import requests
+
+if TYPE_CHECKING:
+    from httpx import Response as AsyncResponse
+
+from requests import Response
+
+HTTP_OK = 200
+HTTP_CREATED = 201
+HTTP_ACCEPTED = 202
+HTTP_NO_CONTENT = 204
+HTTP_BAD_REQUEST = 400
+HTTP_UNAUTHORIZED = 401
+HTTP_FORBIDDEN = 403
+HTTP_NOT_FOUND = 404
+HTTP_NOT_ALLOWED = 405
+HTTP_CONFLICT = 409
 
 
 class KeycloakError(Exception):
-    """Base class for custom Keycloak errors.
+    """
+    Base class for custom Keycloak errors.
 
     :param error_message: The error message
     :type error_message: str
@@ -35,8 +55,14 @@ class KeycloakError(Exception):
     :type response_code: int
     """
 
-    def __init__(self, error_message="", response_code=None, response_body=None):
-        """Init method.
+    def __init__(
+        self,
+        error_message: str = "",
+        response_code: int | None = None,
+        response_body: bytes | None = None,
+    ) -> None:
+        """
+        Init method.
 
         :param error_message: The error message
         :type error_message: str
@@ -51,104 +77,82 @@ class KeycloakError(Exception):
         self.response_body = response_body
         self.error_message = error_message
 
-    def __str__(self):
-        """Str method.
+    def __str__(self) -> str:
+        """
+        Str method.
 
         :returns: String representation of the object
         :rtype: str
         """
         if self.response_code is not None:
-            return "{0}: {1}".format(self.response_code, self.error_message)
-        else:
-            return "{0}".format(self.error_message)
+            return f"{self.response_code}: {self.error_message}"
+        return f"{self.error_message}"
 
 
 class KeycloakAuthenticationError(KeycloakError):
     """Keycloak authentication error exception."""
 
-    pass
-
 
 class KeycloakConnectionError(KeycloakError):
     """Keycloak connection error exception."""
-
-    pass
 
 
 class KeycloakOperationError(KeycloakError):
     """Keycloak operation error exception."""
 
-    pass
-
 
 class KeycloakDeprecationError(KeycloakError):
     """Keycloak deprecation error exception."""
-
-    pass
 
 
 class KeycloakGetError(KeycloakOperationError):
     """Keycloak request get error exception."""
 
-    pass
-
 
 class KeycloakPostError(KeycloakOperationError):
     """Keycloak request post error exception."""
-
-    pass
 
 
 class KeycloakPutError(KeycloakOperationError):
     """Keycloak request put error exception."""
 
-    pass
-
 
 class KeycloakDeleteError(KeycloakOperationError):
     """Keycloak request delete error exception."""
-
-    pass
 
 
 class KeycloakSecretNotFound(KeycloakOperationError):
     """Keycloak secret not found exception."""
 
-    pass
-
 
 class KeycloakRPTNotFound(KeycloakOperationError):
     """Keycloak RPT not found exception."""
-
-    pass
 
 
 class KeycloakAuthorizationConfigError(KeycloakOperationError):
     """Keycloak authorization config exception."""
 
-    pass
-
 
 class KeycloakInvalidTokenError(KeycloakOperationError):
     """Keycloak invalid token exception."""
-
-    pass
 
 
 class KeycloakPermissionFormatError(KeycloakOperationError):
     """Keycloak permission format exception."""
 
-    pass
-
 
 class PermissionDefinitionError(Exception):
     """Keycloak permission definition exception."""
 
-    pass
 
-
-def raise_error_from_response(response, error, expected_codes=None, skip_exists=False):
-    """Raise an exception for the response.
+def raise_error_from_response(
+    response: Response | AsyncResponse,
+    error: dict | Exception,
+    expected_codes: list[int] | None = None,
+    skip_exists: bool = False,
+) -> bytes | dict | list:
+    """
+    Raise an exception for the response.
 
     :param response: The response object
     :type response: Response
@@ -162,9 +166,9 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
     :returns: Content of the response message
     :type: bytes or dict
     :raises KeycloakError: In case of unexpected status codes
-    """  # noqa: DAR401,DAR402
+    """
     if expected_codes is None:
-        expected_codes = [200, 201, 204]
+        expected_codes = [HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT]
 
     if response.status_code in expected_codes:
         if response.status_code == requests.codes.no_content:
@@ -175,7 +179,7 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
         except ValueError:
             return response.content
 
-    if skip_exists and response.status_code == 409:
+    if skip_exists and response.status_code == HTTP_CONFLICT:
         return {"msg": "Already exists"}
 
     try:
@@ -185,10 +189,11 @@ def raise_error_from_response(response, error, expected_codes=None, skip_exists=
 
     if isinstance(error, dict):
         error = error.get(response.status_code, KeycloakOperationError)
-    else:
-        if response.status_code == 401:
-            error = KeycloakAuthenticationError
+    elif response.status_code == HTTP_UNAUTHORIZED:
+        error = KeycloakAuthenticationError
 
     raise error(
-        error_message=message, response_code=response.status_code, response_body=response.content
+        error_message=message,
+        response_code=response.status_code,
+        response_body=response.content,
     )

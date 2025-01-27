@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -21,22 +20,31 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Keycloak OpenID Connection Manager module.
+"""
+Keycloak OpenID Connection Manager module.
 
 The module contains mainly the implementation of KeycloakOpenIDConnection class.
 This is an extension of the ConnectionManager class, and handles the automatic refresh
 of openid tokens when required.
 """
 
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from httpx import Response as AsyncResponse
+    from requests import Response
 
 from .connection import ConnectionManager
-from .exceptions import KeycloakPostError
+from .exceptions import HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED, KeycloakPostError
 from .keycloak_openid import KeycloakOpenID
 
 
 class KeycloakOpenIDConnection(ConnectionManager):
-    """A class to help with OpenID connections which can auto refresh tokens.
+    """
+    A class to help with OpenID connections which can auto refresh tokens.
 
     :param object: _description_
     :type object: _type_
@@ -59,23 +67,24 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
     def __init__(
         self,
-        server_url,
-        grant_type=None,
-        username=None,
-        password=None,
-        token=None,
-        totp=None,
-        realm_name="master",
-        client_id="admin-cli",
-        verify=True,
-        client_secret_key=None,
-        custom_headers=None,
-        user_realm_name=None,
-        timeout=60,
-        cert=None,
-        max_retries=1,
-    ):
-        """Init method.
+        server_url: str,
+        grant_type: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+        token: str | None = None,
+        totp: str | None = None,
+        realm_name: str = "master",
+        client_id: str = "admin-cli",
+        verify: str | bool = True,
+        client_secret_key: str | None = None,
+        custom_headers: dict | None = None,
+        user_realm_name: str | None = None,
+        timeout: int | None = 60,
+        cert: str | tuple | None = None,
+        max_retries: int = 1,
+    ) -> None:
+        """
+        Init method.
 
         :param server_url: Keycloak server url
         :type server_url: str
@@ -144,11 +153,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
             timeout=self.timeout,
             verify=self.verify,
             cert=cert,
+            max_retries=max_retries,
         )
 
     @property
-    def server_url(self):
-        """Get server url.
+    def server_url(self) -> str:
+        """
+        Get server url.
 
         :returns: Keycloak server url
         :rtype: str
@@ -156,12 +167,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self.base_url
 
     @server_url.setter
-    def server_url(self, value):
+    def server_url(self, value: str) -> None:
         self.base_url = value
 
     @property
-    def grant_type(self):
-        """Get grant type.
+    def grant_type(self) -> str:
+        """
+        Get grant type.
 
         :returns: Grant type
         :rtype: str
@@ -169,12 +181,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._grant_type
 
     @grant_type.setter
-    def grant_type(self, value):
+    def grant_type(self, value: str) -> None:
         self._grant_type = value
 
     @property
-    def realm_name(self):
-        """Get realm name.
+    def realm_name(self) -> str:
+        """
+        Get realm name.
 
         :returns: Realm name
         :rtype: str
@@ -182,12 +195,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._realm_name
 
     @realm_name.setter
-    def realm_name(self, value):
+    def realm_name(self, value: str) -> None:
         self._realm_name = value
 
     @property
-    def client_id(self):
-        """Get client id.
+    def client_id(self) -> str:
+        """
+        Get client id.
 
         :returns: Client id
         :rtype: str
@@ -195,12 +209,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._client_id
 
     @client_id.setter
-    def client_id(self, value):
+    def client_id(self, value: str) -> None:
         self._client_id = value
 
     @property
-    def client_secret_key(self):
-        """Get client secret key.
+    def client_secret_key(self) -> str:
+        """
+        Get client secret key.
 
         :returns: Client secret key
         :rtype: str
@@ -208,12 +223,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._client_secret_key
 
     @client_secret_key.setter
-    def client_secret_key(self, value):
+    def client_secret_key(self, value: str) -> None:
         self._client_secret_key = value
 
     @property
-    def username(self):
-        """Get username.
+    def username(self) -> str:
+        """
+        Get username.
 
         :returns: Admin username
         :rtype: str
@@ -221,12 +237,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._username
 
     @username.setter
-    def username(self, value):
+    def username(self, value: str) -> None:
         self._username = value
 
     @property
-    def password(self):
-        """Get password.
+    def password(self) -> str:
+        """
+        Get password.
 
         :returns: Admin password
         :rtype: str
@@ -234,12 +251,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._password
 
     @password.setter
-    def password(self, value):
+    def password(self, value: str) -> None:
         self._password = value
 
     @property
-    def totp(self):
-        """Get totp.
+    def totp(self) -> str:
+        """
+        Get totp.
 
         :returns: TOTP
         :rtype: str
@@ -247,12 +265,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._totp
 
     @totp.setter
-    def totp(self, value):
+    def totp(self, value: str) -> None:
         self._totp = value
 
     @property
-    def token(self):
-        """Get token.
+    def token(self) -> dict:
+        """
+        Get token.
 
         :returns: Access and refresh token
         :rtype: dict
@@ -260,17 +279,18 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._token
 
     @token.setter
-    def token(self, value):
+    def token(self, value: dict) -> None:
         self._token = value
-        self._expires_at = datetime.now() + timedelta(
-            seconds=int(self.token_lifetime_fraction * self.token["expires_in"] if value else 0)
+        self._expires_at = datetime.now(tz=timezone.utc) + timedelta(
+            seconds=int(self.token_lifetime_fraction * self.token["expires_in"] if value else 0),
         )
         if value is not None:
             self.add_param_headers("Authorization", "Bearer " + value.get("access_token"))
 
     @property
-    def expires_at(self):
-        """Get token expiry time.
+    def expires_at(self) -> datetime:
+        """
+        Get token expiry time.
 
         :returns: Datetime at which the current token will expire
         :rtype: datetime
@@ -278,8 +298,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._expires_at
 
     @property
-    def user_realm_name(self):
-        """Get user realm name.
+    def user_realm_name(self) -> str:
+        """
+        Get user realm name.
 
         :returns: User realm name
         :rtype: str
@@ -287,12 +308,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._user_realm_name
 
     @user_realm_name.setter
-    def user_realm_name(self, value):
+    def user_realm_name(self, value: str) -> None:
         self._user_realm_name = value
 
     @property
-    def custom_headers(self):
-        """Get custom headers.
+    def custom_headers(self) -> dict:
+        """
+        Get custom headers.
 
         :returns: Custom headers
         :rtype: dict
@@ -300,7 +322,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._custom_headers
 
     @custom_headers.setter
-    def custom_headers(self, value):
+    def custom_headers(self, value: dict) -> None:
         self._custom_headers = value
         if self.custom_headers is not None:
             # merge custom headers to main headers
@@ -308,7 +330,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
     @property
     def keycloak_openid(self) -> KeycloakOpenID:
-        """Get the KeycloakOpenID object.
+        """
+        Get the KeycloakOpenID object.
 
         The KeycloakOpenID is used to refresh tokens
 
@@ -321,7 +344,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
             elif self.realm_name:
                 token_realm_name = self.realm_name
             else:
-                token_realm_name = "master"
+                token_realm_name = "master"  # noqa: S105
 
             self._keycloak_openid = KeycloakOpenID(
                 server_url=self.server_url,
@@ -336,20 +359,25 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return self._keycloak_openid
 
-    def get_token(self):
-        """Get admin token.
+    def get_token(self) -> None:
+        """
+        Get admin token.
 
         The admin token is then set in the `token` attribute.
         """
         if self.grant_type:
             self.token = self.keycloak_openid.token(
-                self.username, self.password, grant_type=self.grant_type, totp=self.totp
+                self.username,
+                self.password,
+                grant_type=self.grant_type,
+                totp=self.totp,
             )
         else:
             self.token = None
 
-    def refresh_token(self):
-        """Refresh the token.
+    def refresh_token(self) -> None:
+        """
+        Refresh the token.
 
         :raises KeycloakPostError: In case the refresh token request failed.
         """
@@ -365,17 +393,20 @@ class KeycloakOpenIDConnection(ConnectionManager):
                     b"Token is not active",
                     b"Session not active",
                 ]
-                if e.response_code == 400 and any(err in e.response_body for err in list_errors):
+                if e.response_code == HTTP_BAD_REQUEST and any(
+                    err in e.response_body for err in list_errors
+                ):
                     self.get_token()
                 else:
                     raise
 
-    def _refresh_if_required(self):
-        if datetime.now() >= self.expires_at:
+    def _refresh_if_required(self) -> None:
+        if datetime.now(tz=timezone.utc) >= self.expires_at:
             self.refresh_token()
 
-    def raw_get(self, *args, **kwargs):
-        """Call connection.raw_get.
+    def raw_get(self, *args: list, **kwargs: dict) -> Response:
+        """
+        Call connection.raw_get.
 
         If auto_refresh is set for *get* and *access_token* is expired, it will refresh the token
         and try *get* once more.
@@ -389,14 +420,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_get(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             self.refresh_token()
             r = super().raw_get(*args, **kwargs)
 
         return r
 
-    def raw_post(self, *args, **kwargs):
-        """Call connection.raw_post.
+    def raw_post(self, *args: list, **kwargs: dict) -> Response:
+        """
+        Call connection.raw_post.
 
         If auto_refresh is set for *post* and *access_token* is expired, it will refresh the token
         and try *post* once more.
@@ -410,14 +442,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_post(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             self.refresh_token()
             r = super().raw_post(*args, **kwargs)
 
         return r
 
-    def raw_put(self, *args, **kwargs):
-        """Call connection.raw_put.
+    def raw_put(self, *args: list, **kwargs: dict) -> Response:
+        """
+        Call connection.raw_put.
 
         If auto_refresh is set for *put* and *access_token* is expired, it will refresh the token
         and try *put* once more.
@@ -431,14 +464,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_put(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             self.refresh_token()
             r = super().raw_put(*args, **kwargs)
 
         return r
 
-    def raw_delete(self, *args, **kwargs):
-        """Call connection.raw_delete.
+    def raw_delete(self, *args: list, **kwargs: dict) -> Response:
+        """
+        Call connection.raw_delete.
 
         If auto_refresh is set for *delete* and *access_token* is expired,
         it will refresh the token and try *delete* once more.
@@ -452,26 +486,31 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         self._refresh_if_required()
         r = super().raw_delete(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             self.refresh_token()
             r = super().raw_delete(*args, **kwargs)
 
         return r
 
-    async def a_get_token(self):
-        """Get admin token.
+    async def a_get_token(self) -> None:
+        """
+        Get admin token.
 
         The admin token is then set in the `token` attribute.
         """
         if self.grant_type:
             self.token = await self.keycloak_openid.a_token(
-                self.username, self.password, grant_type=self.grant_type, totp=self.totp
+                self.username,
+                self.password,
+                grant_type=self.grant_type,
+                totp=self.totp,
             )
         else:
             self.token = None
 
-    async def a_refresh_token(self):
-        """Refresh the token.
+    async def a_refresh_token(self) -> None:
+        """
+        Refresh the token.
 
         :raises KeycloakPostError: In case the refresh token request failed.
         """
@@ -487,18 +526,21 @@ class KeycloakOpenIDConnection(ConnectionManager):
                     b"Token is not active",
                     b"Session not active",
                 ]
-                if e.response_code == 400 and any(err in e.response_body for err in list_errors):
+                if e.response_code == HTTP_BAD_REQUEST and any(
+                    err in e.response_body for err in list_errors
+                ):
                     await self.a_get_token()
                 else:
                     raise
 
-    async def a__refresh_if_required(self):
+    async def a__refresh_if_required(self) -> None:
         """Refresh the token if it is expired."""
-        if datetime.now() >= self.expires_at:
+        if datetime.now(tz=timezone.utc) >= self.expires_at:
             await self.a_refresh_token()
 
-    async def a_raw_get(self, *args, **kwargs):
-        """Call connection.raw_get.
+    async def a_raw_get(self, *args: list, **kwargs: dict) -> AsyncResponse:
+        """
+        Call connection.raw_get.
 
         If auto_refresh is set for *get* and *access_token* is expired, it will refresh the token
         and try *get* once more.
@@ -512,14 +554,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_get(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             await self.a_refresh_token()
             r = await super().a_raw_get(*args, **kwargs)
 
         return r
 
-    async def a_raw_post(self, *args, **kwargs):
-        """Call connection.raw_post.
+    async def a_raw_post(self, *args: list, **kwargs: dict) -> AsyncResponse:
+        """
+        Call connection.raw_post.
 
         If auto_refresh is set for *post* and *access_token* is expired, it will refresh the token
         and try *post* once more.
@@ -533,14 +576,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_post(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             await self.a_refresh_token()
             r = await super().a_raw_post(*args, **kwargs)
 
         return r
 
-    async def a_raw_put(self, *args, **kwargs):
-        """Call connection.raw_put.
+    async def a_raw_put(self, *args: list, **kwargs: dict) -> AsyncResponse:
+        """
+        Call connection.raw_put.
 
         If auto_refresh is set for *put* and *access_token* is expired, it will refresh the token
         and try *put* once more.
@@ -554,14 +598,15 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_put(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             await self.a_refresh_token()
             r = await super().a_raw_put(*args, **kwargs)
 
         return r
 
-    async def a_raw_delete(self, *args, **kwargs):
-        """Call connection.raw_delete.
+    async def a_raw_delete(self, *args: list, **kwargs: dict) -> AsyncResponse:
+        """
+        Call connection.raw_delete.
 
         If auto_refresh is set for *delete* and *access_token* is expired,
         it will refresh the token and try *delete* once more.
@@ -575,7 +620,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         """
         await self.a__refresh_if_required()
         r = await super().a_raw_delete(*args, **kwargs)
-        if r.status_code == 401:
+        if r.status_code == HTTP_UNAUTHORIZED:
             await self.a_refresh_token()
             r = await super().a_raw_delete(*args, **kwargs)
 

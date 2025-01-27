@@ -15,8 +15,9 @@ from keycloak.exceptions import (
 from keycloak.uma_permissions import UMAPermission
 
 
-def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnection):
-    """Test KeycloakUMA's init method.
+def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnection) -> None:
+    """
+    Test KeycloakUMA's init method.
 
     :param oid_connection_with_authz: Keycloak OpenID connection manager with preconfigured authz
     :type oid_connection_with_authz: KeycloakOpenIDConnection
@@ -32,21 +33,23 @@ def test_keycloak_uma_init(oid_connection_with_authz: KeycloakOpenIDConnection):
     assert uma._well_known is not None
 
 
-def test_uma_well_known(uma: KeycloakUMA):
-    """Test the well_known method.
+def test_uma_well_known(uma: KeycloakUMA) -> None:
+    """
+    Test the well_known method.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
     """
     res = uma.uma_well_known
     assert res is not None
-    assert res != dict()
+    assert res != {}
     for key in ["resource_registration_endpoint"]:
         assert key in res
 
 
-def test_uma_resource_sets(uma: KeycloakUMA):
-    """Test resource sets.
+def test_uma_resource_sets(uma: KeycloakUMA) -> None:
+    """
+    Test resource sets.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -109,7 +112,8 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert len(resource_set_list_ids) == 0
     # With matchingUri query option
     resource_set_list_ids = uma.resource_set_list_ids(
-        uri="/some_resources/resource", matchingUri=True
+        uri="/some_resources/resource",
+        matchingUri=True,
     )
     assert len(resource_set_list_ids) == 1
 
@@ -119,8 +123,8 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert err.match(
         re.escape(
             '409: b\'{"error":"invalid_request","error_description":'
-            '"Resource with name [mytest] already exists."}\''
-        )
+            '"Resource with name [mytest] already exists."}\'',
+        ),
     )
 
     # Test get resource set
@@ -130,18 +134,18 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     # Test update resource set
     latest_resource["name"] = "New Resource Name"
     res = uma.resource_set_update(created_resource["_id"], latest_resource)
-    assert res == dict(), res
+    assert res == {}, res
     updated_resource = uma.resource_set_read(created_resource["_id"])
     assert updated_resource["name"] == "New Resource Name"
 
     # Test update resource set fail
     with pytest.raises(KeycloakPutError) as err:
         uma.resource_set_update(resource_id=created_resource["_id"], payload={"wrong": "payload"})
-    assert err.match('400: b\'{"error":"Unrecognized field')
+    assert err.match("Unrecognized field")
 
     # Test delete resource set
     res = uma.resource_set_delete(resource_id=created_resource["_id"])
-    assert res == dict(), res
+    assert res == {}, res
     with pytest.raises(KeycloakGetError) as err:
         uma.resource_set_read(created_resource["_id"])
     err.match("404: b''")
@@ -152,8 +156,9 @@ def test_uma_resource_sets(uma: KeycloakUMA):
     assert err.match("404: b''")
 
 
-def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
-    """Test policies.
+def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
+    """
+    Test policies.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -215,7 +220,8 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     with pytest.raises(KeycloakDeleteError) as err:
         uma.policy_delete(policy_id)
     assert err.match(
-        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\''
+        '404: b\'{"error":"invalid_request","error_description":'
+        '"Policy with .* does not exist"}\'',
     )
 
     policies = uma.policy_query()
@@ -251,8 +257,9 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     admin.delete_group(group_id)
 
 
-def test_uma_access(uma: KeycloakUMA):
-    """Test permission access checks.
+def test_uma_access(uma: KeycloakUMA) -> None:
+    """
+    Test permission access checks.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -274,7 +281,7 @@ def test_uma_access(uma: KeycloakUMA):
     uma.policy_resource_create(resource_id=resource["_id"], payload=policy_to_create)
 
     token = uma.connection.token
-    permissions = list()
+    permissions = []
     assert uma.permissions_check(token["access_token"], permissions)
 
     permissions.append(UMAPermission(resource=resource_to_create["name"]))
@@ -285,8 +292,9 @@ def test_uma_access(uma: KeycloakUMA):
     uma.resource_set_delete(resource["_id"])
 
 
-def test_uma_permission_ticket(uma: KeycloakUMA):
-    """Test permission ticket generation.
+def test_uma_permission_ticket(uma: KeycloakUMA) -> None:
+    """
+    Test permission ticket generation.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -312,7 +320,8 @@ def test_uma_permission_ticket(uma: KeycloakUMA):
     response = uma.permission_ticket_create(permissions)
 
     rpt = uma.connection.keycloak_openid.token(
-        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"]
+        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket",
+        ticket=response["ticket"],
     )
     assert rpt
     assert "access_token" in rpt
@@ -328,22 +337,24 @@ def test_uma_permission_ticket(uma: KeycloakUMA):
 
 
 @pytest.mark.asyncio
-async def test_a_uma_well_known(uma: KeycloakUMA):
-    """Test the well_known method.
+async def test_a_uma_well_known(uma: KeycloakUMA) -> None:
+    """
+    Test the well_known method.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
     """
     res = uma.uma_well_known
     assert res is not None
-    assert res != dict()
+    assert res != {}
     for key in ["resource_registration_endpoint"]:
         assert key in res
 
 
 @pytest.mark.asyncio
-async def test_a_uma_resource_sets(uma: KeycloakUMA):
-    """Test resource sets.
+async def test_a_uma_resource_sets(uma: KeycloakUMA) -> None:
+    """
+    Test resource sets.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -406,7 +417,8 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     assert len(resource_set_list_ids) == 0
     # With matchingUri query option
     resource_set_list_ids = await uma.a_resource_set_list_ids(
-        uri="/some_resources/resource", matchingUri=True
+        uri="/some_resources/resource",
+        matchingUri=True,
     )
     assert len(resource_set_list_ids) == 1
 
@@ -416,8 +428,8 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     assert err.match(
         re.escape(
             '409: b\'{"error":"invalid_request","error_description":'
-            '"Resource with name [mytest] already exists."}\''
-        )
+            '"Resource with name [mytest] already exists."}\'',
+        ),
     )
 
     # Test get resource set
@@ -427,18 +439,18 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
     # Test update resource set
     latest_resource["name"] = "New Resource Name"
     res = await uma.a_resource_set_update(created_resource["_id"], latest_resource)
-    assert res == dict(), res
+    assert res == {}, res
     updated_resource = await uma.a_resource_set_read(created_resource["_id"])
     assert updated_resource["name"] == "New Resource Name"
 
     # Test update resource set fail
     with pytest.raises(KeycloakPutError) as err:
         uma.resource_set_update(resource_id=created_resource["_id"], payload={"wrong": "payload"})
-    assert err.match('400: b\'{"error":"Unrecognized field')
+    assert err.match("Unrecognized field")
 
     # Test delete resource set
     res = await uma.a_resource_set_delete(resource_id=created_resource["_id"])
-    assert res == dict(), res
+    assert res == {}, res
     with pytest.raises(KeycloakGetError) as err:
         await uma.a_resource_set_read(created_resource["_id"])
     err.match("404: b''")
@@ -450,8 +462,9 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA):
 
 
 @pytest.mark.asyncio
-async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
-    """Test policies.
+async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
+    """
+    Test policies.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -513,7 +526,8 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
     with pytest.raises(KeycloakDeleteError) as err:
         await uma.a_policy_delete(policy_id)
     assert err.match(
-        '404: b\'{"error":"invalid_request","error_description":"Policy with .* does not exist"}\''
+        '404: b\'{"error":"invalid_request","error_description":'
+        '"Policy with .* does not exist"}\'',
     )
 
     policies = await uma.a_policy_query()
@@ -550,8 +564,9 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin):
 
 
 @pytest.mark.asyncio
-async def test_a_uma_access(uma: KeycloakUMA):
-    """Test permission access checks.
+async def test_a_uma_access(uma: KeycloakUMA) -> None:
+    """
+    Test permission access checks.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -573,7 +588,7 @@ async def test_a_uma_access(uma: KeycloakUMA):
     await uma.a_policy_resource_create(resource_id=resource["_id"], payload=policy_to_create)
 
     token = uma.connection.token
-    permissions = list()
+    permissions = []
     assert await uma.a_permissions_check(token["access_token"], permissions)
 
     permissions.append(UMAPermission(resource=resource_to_create["name"]))
@@ -585,8 +600,9 @@ async def test_a_uma_access(uma: KeycloakUMA):
 
 
 @pytest.mark.asyncio
-async def test_a_uma_permission_ticket(uma: KeycloakUMA):
-    """Test permission ticket generation.
+async def test_a_uma_permission_ticket(uma: KeycloakUMA) -> None:
+    """
+    Test permission ticket generation.
 
     :param uma: Keycloak UMA client
     :type uma: KeycloakUMA
@@ -612,7 +628,8 @@ async def test_a_uma_permission_ticket(uma: KeycloakUMA):
     response = await uma.a_permission_ticket_create(permissions)
 
     rpt = await uma.connection.keycloak_openid.a_token(
-        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket", ticket=response["ticket"]
+        grant_type="urn:ietf:params:oauth:grant-type:uma-ticket",
+        ticket=response["ticket"],
     )
     assert rpt
     assert "access_token" in rpt
@@ -624,7 +641,7 @@ async def test_a_uma_permission_ticket(uma: KeycloakUMA):
     await uma.a_resource_set_delete(resource["_id"])
 
 
-def test_counter_part():
+def test_counter_part() -> None:
     """Test that each function has its async counter part."""
     uma_methods = [func for func in dir(KeycloakUMA) if callable(getattr(KeycloakUMA, func))]
     sync_methods = [

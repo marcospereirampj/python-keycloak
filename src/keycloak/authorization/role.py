@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # The MIT License (MIT)
 #
@@ -23,9 +22,12 @@
 
 """The authorization Role module."""
 
+from __future__ import annotations
+
 
 class Role:
-    """Authorization Role base class.
+    """
+    Authorization Role base class.
 
     Roles identify a type or category of user. Admin, user,
     manager, and employee are all typical roles that may exist in an organization.
@@ -38,8 +40,9 @@ class Role:
     :type required: bool
     """
 
-    def __init__(self, name, required=False):
-        """Init method.
+    def __init__(self, name: str, required: bool = False) -> None:
+        """
+        Init method.
 
         :param name: Name
         :type name: str
@@ -49,22 +52,29 @@ class Role:
         self.name = name
         self.required = required
 
-    def get_name(self):
-        """Get name.
+    def get_name(self) -> str:
+        """
+        Get name.
 
         :returns: Name
         :rtype: str
         """
         return self.name
 
-    def __eq__(self, other):
-        """Eq method.
+    def __eq__(self, other: str | Role) -> bool:
+        """
+        Eq method.
 
         :param other: The other object
         :type other: str
         :returns: Equality bool
-        :rtype: bool | NotImplemented
+        :rtype: bool
         """
         if isinstance(other, str):
             return self.name == other
-        return NotImplemented
+
+        if isinstance(other, Role):
+            return self.name == other.name
+
+        msg = f"Cannot compare Role with {type(other)}"
+        raise NotImplementedError(msg)
