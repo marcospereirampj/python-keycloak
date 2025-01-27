@@ -3614,7 +3614,7 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_FLOW.format(**params_path), data=json.dumps(payload),
         )
         return raise_error_from_response(
-            data_raw, KeycloakPutError, expected_codes=[202],
+            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED],
         )
 
     def copy_authentication_flow(self, payload: dict, flow_alias: str) -> bytes:
@@ -3903,7 +3903,7 @@ class KeycloakAdmin:
         """
         params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
-            urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path) + "/config",
+            urls_patterns.URL_ADMIN_FLOWS_EXECUTION_CONFIG.format(**params_path),
             data=json.dumps(payload),
         )
         return raise_error_from_response(
@@ -10588,5 +10588,5 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_FLOW.format(**params_path), data=json.dumps(payload),
         )
         return raise_error_from_response(
-            data_raw, KeycloakPutError, expected_codes=[202],
+            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED],
         )
