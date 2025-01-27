@@ -204,6 +204,28 @@ def test_realms(admin: KeycloakAdmin) -> None:
     assert "master" in realm_names, realm_names
     assert "test" in realm_names, realm_names
 
+
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"],
+    ) >= Version("24"):
+        # Get users profile, add an attribute
+        user_profile = admin.get_realm_users_profile()
+        assert "attributes" in user_profile
+
+        new_attribute = {
+            "name": "surname",
+            "displayName": "",
+            "validations": {},
+            "annotations": {},
+            "permissions": {"view": [], "edit": ["admin"]},
+            "multivalued": False,
+        }
+        user_profile["attributes"].append(new_attribute)
+
+        res = admin.update_realm_users_profile(user_profile)
+        # Check for new attribute in result
+        assert "surname" in [x["name"] for x in res["attributes"]]
+
     # Delete the realm
     res = admin.delete_realm(realm_name="test")
     assert res == {}, res
@@ -3426,6 +3448,29 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     assert len(realms) == 2, realms
     assert "master" in realm_names, realm_names
     assert "test" in realm_names, realm_names
+
+    # Get users profile, add an attribute and check
+    user_profile = await admin.a_get_realm_users_profile()
+    assert "attributes" in user_profile
+
+
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"],
+    ) >= Version("24"):
+        new_attribute = {
+            "name": "nickname",
+            "displayName": "",
+            "validations": {},
+            "annotations": {},
+            "permissions": {"view": [], "edit": ["admin"]},
+            "multivalued": False,
+        }
+
+        user_profile["attributes"].append(new_attribute)
+
+        res = await admin.a_update_realm_users_profile(user_profile)
+        # Check for new attribute in result
+        assert "nickname" in [x["name"] for x in res["attributes"]]
 
     # Delete the realm
     res = await admin.a_delete_realm(realm_name="test")

@@ -153,6 +153,7 @@ URL_ADMIN_CLIENT_SCOPE_ROLE_MAPPINGS_CLIENT = (
 URL_ADMIN_REALM_ROLES = "admin/realms/{realm-name}/roles"
 URL_ADMIN_REALM_ROLES_MEMBERS = URL_ADMIN_REALM_ROLES + "/{role-name}/users"
 URL_ADMIN_REALM_ROLES_GROUPS = URL_ADMIN_REALM_ROLES + "/{role-name}/groups"
+URL_ADMIN_REALM_USER_PROFILE = "admin/realms/{realm-name}/users/profile"
 URL_ADMIN_REALMS = "admin/realms"
 URL_ADMIN_REALM = "admin/realms/{realm-name}"
 URL_ADMIN_IDPS = "admin/realms/{realm-name}/identity-provider/instances"

@@ -2297,6 +2297,24 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
+    def get_realm_users_profile(self) -> dict:
+        """
+        Get list of attributes and group for given realm.
+
+        Related documentation:
+        https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#_get_adminrealmsrealmusersprofile
+
+        Return https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#UPConfig
+        :returns: UPConfig
+
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_REALM_USER_PROFILE.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+
     def get_realm_roles(self, brief_representation: bool = True, search_text: str = "") -> list:
         """
         Get all roles for the realm or client.
@@ -2909,6 +2927,26 @@ class KeycloakAdmin:
             data_raw,
             KeycloakPutError,
             expected_codes=[HTTP_NO_CONTENT],
+        )
+
+    def update_realm_users_profile(self, payload: dict) -> dict:
+        """
+        Update realm users profile for the current realm.
+
+        :param up_config: List of attributes, groups, unmamagedAttributePolicy
+
+        Related documentation:
+        https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#UPConfig
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_REALM_USER_PROFILE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_OK],
         )
 
     def delete_realm_role(self, role_name: str) -> bytes:
@@ -5490,6 +5528,26 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
+    async def a_update_realm_users_profile(self, payload: dict) -> dict:
+        """
+        Update realm users profile for the current realm.
+
+        :param up_config: List of attributes, groups, unmamagedAttributePolicy
+
+        Related documentation:
+        https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#UPConfig
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = await self.connection.a_raw_put(
+            urls_patterns.URL_ADMIN_REALM_USER_PROFILE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_OK],
+        )
+
     async def a_delete_realm(self, realm_name: str) -> bytes:
         """
         Delete a realm asynchronously.
@@ -7388,6 +7446,24 @@ class KeycloakAdmin:
         }
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT_INSTALLATION_PROVIDER.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+
+    async def a_get_realm_users_profile(self) -> dict:
+        """
+        Get list of attributes and group for given realm.
+
+        Related documentation:
+        https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#_get_adminrealmsrealmusersprofile
+
+        Return https://www.keycloak.org/docs-api/26.0.0/rest-api/index.html#UPConfig
+        :returns: UPConfig
+
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_REALM_USER_PROFILE.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
 
