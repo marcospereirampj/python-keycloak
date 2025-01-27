@@ -3779,25 +3779,32 @@ class KeycloakAdmin:
         :raises KeycloakPostError: when post requests are failed
         """
         params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
-        try:
-            if diff > 0:
-                for _i in range(diff):
-                    _ = self.connection.raw_post(
-                        urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
-                            **params_path,
-                        ),
-                        data="{}",
-                    )
-            elif diff < 0:
-                for _i in range(-diff):
-                    _ = self.connection.raw_post(
-                        urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
-                            **params_path,
-                        ),
-                        data="{}",
-                    )
-        except Exception as err:
-            raise KeycloakPostError from err
+        if diff > 0:
+            for _ in range(diff):
+                data_raw = self.connection.raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+        elif diff < 0:
+            for _ in range(-diff):
+                data_raw = self.connection.raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
 
     def create_authentication_flow_subflow(
         self,
@@ -3899,7 +3906,11 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path) + "/config",
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+            )
 
     def update_authenticator_config(self, payload: dict, config_id: str) -> bytes:
         """
@@ -10492,7 +10503,6 @@ class KeycloakAdmin:
             KeycloakPostError,
             expected_codes=[HTTP_NO_CONTENT],
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[204])
 
     async def a_change_execution_priority(self, execution_id: str, diff: int) -> None:
         """
@@ -10505,25 +10515,32 @@ class KeycloakAdmin:
         :raises KeycloakPostError: when post requests are failed
         """
         params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
-        try:
-            if diff > 0:
-                for _i in range(diff):
-                    _ = self.connection.a_raw_post(
-                        urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
-                            **params_path,
-                        ),
-                        data="{}",
-                    )
-            elif diff < 0:
-                for _i in range(-diff):
-                    _ = self.connection.a_raw_post(
-                        urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
-                            **params_path,
-                        ),
-                        data="{}",
-                    )
-        except Exception as err:
-            raise KeycloakPostError from err
+        if diff > 0:
+            for _ in range(diff):
+                data_raw = self.connection.a_raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+        elif diff < 0:
+            for _ in range(-diff):
+                data_raw = self.connection.a_raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
 
     async def a_create_execution_config(self, execution_id: str, payload: dict) -> bytes:
         """
@@ -10541,10 +10558,14 @@ class KeycloakAdmin:
         """
         params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
         data_raw = self.connection.a_raw_post(
-            urls_patterns.URL_ADMIN_FLOWS_EXECUTION.format(**params_path) + "/config",
+            urls_patterns.URL_ADMIN_FLOWS_EXECUTION_CONFIG.format(**params_path),
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[201])
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
 
     async def a_update_authentication_flow(self, flow_id: str, payload: dict) -> bytes:
         """

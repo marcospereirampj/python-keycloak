@@ -235,3 +235,5 @@ URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = (
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = (
     "realms/{realm-name}/authentication/executions/{id}/lower-priority"
 )
+
+URL_ADMIN_FLOWS_EXECUTION_CONFIG = URL_ADMIN_FLOWS_EXECUTION + "{id}/config"
