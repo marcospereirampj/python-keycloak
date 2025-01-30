@@ -1,3 +1,9 @@
+## v5.2.0 (2025-01-30)
+
+### Feat
+
+- Add functions to get/update realm users profile (#634)
+
 ## v5.1.2 (2025-01-26)
 
 ### Fix
