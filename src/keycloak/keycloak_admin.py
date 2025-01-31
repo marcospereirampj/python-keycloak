@@ -3652,7 +3652,7 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_FLOW.format(**params_path), data=json.dumps(payload),
         )
         return raise_error_from_response(
-            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED],
+            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED, HTTP_NO_CONTENT],
         )
 
     def copy_authentication_flow(self, payload: dict, flow_alias: str) -> bytes:
@@ -10664,5 +10664,5 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_FLOW.format(**params_path), data=json.dumps(payload),
         )
         return raise_error_from_response(
-            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED],
+            data_raw, KeycloakPutError, expected_codes=[HTTP_ACCEPTED, HTTP_NO_CONTENT],
         )

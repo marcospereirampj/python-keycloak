@@ -231,10 +231,10 @@ URL_ADMIN_CLEAR_USER_CACHE = URL_ADMIN_REALM + "/clear-user-cache"
 URL_UMA_WELL_KNOWN = URL_WELL_KNOWN_BASE + "/uma2-configuration"
 
 URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = (
-    "realms/{realm-name}/authentication/executions/{id}/raise-priority"
+    "admin/realms/{realm-name}/authentication/executions/{id}/raise-priority"
 )
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = (
-    "realms/{realm-name}/authentication/executions/{id}/lower-priority"
+    "admin/realms/{realm-name}/authentication/executions/{id}/lower-priority"
 )
 
-URL_ADMIN_FLOWS_EXECUTION_CONFIG = URL_ADMIN_FLOWS_EXECUTION + "{id}/config"
+URL_ADMIN_FLOWS_EXECUTION_CONFIG = URL_ADMIN_FLOWS_EXECUTION + "/config"
