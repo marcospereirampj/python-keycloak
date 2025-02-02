@@ -1,3 +1,9 @@
+## v5.3.0 (2025-02-02)
+
+### Feat
+
+- more authentication flows and executions methods
+
 ## v5.2.0 (2025-01-30)
 
 ### Feat
