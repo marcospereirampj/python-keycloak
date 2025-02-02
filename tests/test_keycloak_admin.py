@@ -204,7 +204,6 @@ def test_realms(admin: KeycloakAdmin) -> None:
     assert "master" in realm_names, realm_names
     assert "test" in realm_names, realm_names
 
-
     if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
         os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"],
     ) >= Version("24"):
@@ -2449,6 +2448,17 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         skip_exists=True,
     ) == {"msg": "Already exists"}
 
+    # Update
+    res = admin.get_authentication_flows()
+    browser_flow_id = next(x for x in res if x["alias"] == "browser")["id"]
+    flow = admin.get_authentication_flow_for_id(flow_id=browser_flow_id)
+    del flow["authenticationExecutions"]
+    del flow["id"]
+    flow["description"] = "test description"
+    res = admin.update_authentication_flow(flow_id=browser_flow_id, payload=flow)
+    res = admin.get_authentication_flow_for_id(flow_id=browser_flow_id)
+    assert res["description"] == "test description"
+
     # Test flow executions
     res = admin.get_authentication_flow_executions(flow_alias="browser")
     assert len(res) in [8, 12], res
@@ -2550,6 +2560,37 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     )
 
 
+def test_auth_flow_execution_priority(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test execution priority.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+    _ = admin.create_authentication_flow(
+        payload={"alias": "test-create", "providerId": "basic-flow"},
+    )
+    _ = admin.create_authentication_flow_execution(
+        payload={"provider": "auth-cookie"},
+        flow_alias="test-create",
+    )
+    _ = admin.create_authentication_flow_execution(
+        payload={"provider": "auth-cookie"},
+        flow_alias="test-create",
+    )
+    executions = admin.get_authentication_flow_executions(flow_alias="test-create")
+    priority_list = [ex["id"] for ex in executions]
+    _ = admin.change_execution_priority(priority_list[1], 1)
+    new_executions = admin.get_authentication_flow_executions(flow_alias="test-create")
+    assert executions != new_executions
+    _ = admin.change_execution_priority(priority_list[1], -1)
+    new_executions = admin.get_authentication_flow_executions(flow_alias="test-create")
+    assert executions == new_executions
+
+
 def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
     """
     Test authentication configs.
@@ -2572,10 +2613,23 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
         "properties": [],
         "providerId": "auth-cookie",
     }
-
     # Test authenticator config
-    # Currently unable to find a sustainable way to fetch the config id,
-    # therefore testing only failures
+    executions = admin.get_authentication_flow_executions(flow_alias="browser")
+    execution = next(ex for ex in executions if ex["configurable"])
+    _ = admin.create_execution_config(
+        execution["id"],
+        {
+            "alias": "test.provisioning.property",
+            "config": {"test.provisioning.property": "value2"},
+        },
+    )
+    executions = admin.get_authentication_flow_executions(flow_alias="browser")
+    execution_config_id = next(ex for ex in executions if ex.get("id") == execution["id"])[
+        "authenticationConfig"
+    ]
+    res = admin.get_authenticator_config(config_id=execution_config_id)
+    assert res["config"]["test.provisioning.property"] == "value2"
+
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authenticator_config(config_id="bad")
     assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
@@ -3452,7 +3506,6 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     # Get users profile, add an attribute and check
     user_profile = await admin.a_get_realm_users_profile()
     assert "attributes" in user_profile
-
 
     if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] == "latest" or Version(
         os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"],
@@ -5889,6 +5942,17 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         skip_exists=True,
     ) == {"msg": "Already exists"}
 
+    # Update
+    res = await admin.a_get_authentication_flows()
+    browser_flow_id = next(x for x in res if x["alias"] == "browser")["id"]
+    flow = await admin.a_get_authentication_flow_for_id(flow_id=browser_flow_id)
+    del flow["authenticationExecutions"]
+    del flow["id"]
+    flow["description"] = "test description"
+    res = await admin.a_update_authentication_flow(flow_id=browser_flow_id, payload=flow)
+    res = await admin.a_get_authentication_flow_for_id(flow_id=browser_flow_id)
+    assert res["description"] == "test description"
+
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
     assert len(res) in [8, 12], res
@@ -5994,6 +6058,38 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
 
 @pytest.mark.asyncio
+async def test_a_auth_flow_execution_priority(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test execution priority.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    await admin.a_change_current_realm(realm)
+    _ = await admin.a_create_authentication_flow(
+        payload={"alias": "test-create", "providerId": "basic-flow"},
+    )
+    _ = await admin.a_create_authentication_flow_execution(
+        payload={"provider": "auth-cookie"},
+        flow_alias="test-create",
+    )
+    _ = await admin.a_create_authentication_flow_execution(
+        payload={"provider": "auth-cookie"},
+        flow_alias="test-create",
+    )
+    executions = await admin.a_get_authentication_flow_executions(flow_alias="test-create")
+    priority_list = [ex["id"] for ex in executions]
+    _ = await admin.a_change_execution_priority(priority_list[1], 1)
+    new_executions = await admin.a_get_authentication_flow_executions(flow_alias="test-create")
+    assert executions != new_executions
+    _ = await admin.a_change_execution_priority(priority_list[1], -1)
+    new_executions = await admin.a_get_authentication_flow_executions(flow_alias="test-create")
+    assert executions == new_executions
+
+
+@pytest.mark.asyncio
 async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
     """
     Test authentication configs.
@@ -6016,6 +6112,23 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
         "properties": [],
         "providerId": "auth-cookie",
     }
+
+    # Test authenticator config
+    executions = await admin.a_get_authentication_flow_executions(flow_alias="browser")
+    execution = next(ex for ex in executions if ex["configurable"])
+    _ = await admin.a_create_execution_config(
+        execution["id"],
+        {
+            "alias": "test.provisioning.property",
+            "config": {"test.provisioning.property": "value2"},
+        },
+    )
+    executions = await admin.a_get_authentication_flow_executions(flow_alias="browser")
+    execution_config_id = next(ex for ex in executions if ex.get("id") == execution["id"])[
+        "authenticationConfig"
+    ]
+    res = await admin.a_get_authenticator_config(config_id=execution_config_id)
+    assert res["config"]["test.provisioning.property"] == "value2"
 
     # Test authenticator config
     # Currently unable to find a sustainable way to fetch the config id,

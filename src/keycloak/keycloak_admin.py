@@ -3631,6 +3631,31 @@ class KeycloakAdmin:
             skip_exists=skip_exists,
         )
 
+    def update_authentication_flow(self, flow_id: str, payload: dict) -> bytes:
+        """
+        Update an authentication flow.
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
+        :param flow_id: The id of the flow
+        :type flow_id: str
+        :param payload: AuthenticationFlowRepresentation
+        :type payload: dict
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"id": flow_id, "realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_FLOW.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_ACCEPTED, HTTP_NO_CONTENT],
+        )
+
     def copy_authentication_flow(self, payload: dict, flow_alias: str) -> bytes:
         """
         Copy existing authentication flow under a new name.
@@ -3782,6 +3807,45 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
+    def change_execution_priority(self, execution_id: str, diff: int) -> None:
+        """
+        Raise or lower execution priority of diff time.
+
+        :param execution_id: The ID of the execution
+        :type execution_id: str
+        :param diff: The difference in priority, positive to raise, negative to lower, the value
+            is the number of times
+        :type diff: int
+        :raises KeycloakPostError: when post requests are failed
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        if diff > 0:
+            for _ in range(diff):
+                data_raw = self.connection.raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+        elif diff < 0:
+            for _ in range(-diff):
+                data_raw = self.connection.raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+
     def create_authentication_flow_subflow(
         self,
         payload: dict,
@@ -3862,6 +3926,31 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_AUTHENTICATOR_CONFIG.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_execution_config(self, execution_id: str, payload: dict) -> bytes:
+        """
+        Update execution with new configuration.
+
+        AuthenticatorConfigRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfigrepresentation
+
+        :param execution_id: The ID of the execution
+        :type execution_id: str
+        :param payload: Configuration to add to the execution
+        :type payload: dir
+        :return: Response(json)
+        :rtype: dict
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_FLOWS_EXECUTION_CONFIG.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
 
     def update_authenticator_config(self, payload: dict, config_id: str) -> bytes:
         """
@@ -10491,4 +10580,93 @@ class KeycloakAdmin:
             data_raw,
             KeycloakPostError,
             expected_codes=[HTTP_NO_CONTENT],
+        )
+
+    async def a_change_execution_priority(self, execution_id: str, diff: int) -> None:
+        """
+        Raise or lower execution priority of diff time.
+
+        :param execution_id: The ID of the execution
+        :type execution_id: str
+        :param diff: The difference in priority, positive to raise, negative to lower, the value
+            is the number of times
+        :type diff: int
+        :raises KeycloakPostError: when post requests are failed
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        if diff > 0:
+            for _ in range(diff):
+                data_raw = await self.connection.a_raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+        elif diff < 0:
+            for _ in range(-diff):
+                data_raw = await self.connection.a_raw_post(
+                    urls_patterns.URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                        **params_path,
+                    ),
+                    data="{}",
+                )
+                raise_error_from_response(
+                    data_raw,
+                    KeycloakPostError,
+                    expected_codes=[HTTP_NO_CONTENT],
+                )
+
+    async def a_create_execution_config(self, execution_id: str, payload: dict) -> bytes:
+        """
+        Update execution with new configuration.
+
+        AuthenticatorConfigRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticatorconfigrepresentation
+
+        :param execution_id: The ID of the execution
+        :type execution_id: str
+        :param payload: Configuration to add to the execution
+        :type payload: dir
+        :return: Response(json)
+        :rtype: dict
+        """
+        params_path = {"id": execution_id, "realm-name": self.connection.realm_name}
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_FLOWS_EXECUTION_CONFIG.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
+
+    async def a_update_authentication_flow(self, flow_id: str, payload: dict) -> bytes:
+        """
+        Update an authentication flow.
+
+        AuthenticationFlowRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_authenticationflowrepresentation
+
+        :param flow_id: The id of the flow
+        :type flow_id: str
+        :param payload: AuthenticationFlowRepresentation
+        :type payload: dict
+        :return: Keycloak server response
+        :rtype: bytes
+        """
+        params_path = {"id": flow_id, "realm-name": self.connection.realm_name}
+        data_raw = await self.connection.a_raw_put(
+            urls_patterns.URL_ADMIN_FLOW.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPutError,
+            expected_codes=[HTTP_ACCEPTED, HTTP_NO_CONTENT],
         )
