@@ -21,6 +21,7 @@ classifiers = [
 packages = [
     { include = "keycloak", from = "src/" },
     { include = "keycloak/**/*.py", from = "src/" },
+    { include = "keycloak/py.typed", from = "src/" },
 ]
 include = ["LICENSE", "CHANGELOG.md", "CONTRIBUTING.md"]
 
