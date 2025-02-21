@@ -870,7 +870,7 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
-    def get_credentials(self, user_id: str) -> dict:
+    def get_credentials(self, user_id: str) -> list:
         """
         Get user credentials.
 
@@ -882,7 +882,7 @@ class KeycloakAdmin:
         :param: user_id: user id
         :type user_id: str
         :returns: Keycloak server response (CredentialRepresentation)
-        :rtype: dict
+        :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
@@ -6104,7 +6104,7 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
-    async def a_get_credentials(self, user_id: str) -> dict:
+    async def a_get_credentials(self, user_id: str) -> list:
         """
         Get user credentials asynchronously.
 
@@ -6116,7 +6116,7 @@ class KeycloakAdmin:
         :param: user_id: user id
         :type user_id: str
         :returns: Keycloak server response (CredentialRepresentation)
-        :rtype: dict
+        :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = await self.connection.a_raw_get(
