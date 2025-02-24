@@ -427,6 +427,138 @@ class KeycloakAdmin:
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+   
+
+    def get_organizations(self) -> list | bytes:
+        """
+        Fetch all organizations in the realm.
+
+        :return: List of organizations
+        :rtype: list | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name} 
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_organization(self, organization_id: str) -> dict | bytes:
+        """
+        Fetch details of a specific organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Organization details
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id}
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_organization(self, payload: dict) -> dict | bytes:
+        """
+        Create a new organization.
+
+        :param payload: Dictionary containing organization details
+        :type payload: dict 
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+
+        print(payload)
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_CREATED],
+        )
+
+        return raise_error_from_response(data_raw, KeycloakPostError)
+
+    def update_organization(self, organization_id: str, payload: dict) -> dict | bytes:
+        """
+        Update an existing organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param payload: Dictionary with updated organization details
+        :type payload: dict
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[204])
+
+    def delete_organization(self, organization_id: str) -> dict | bytes:
+        """
+        Delete an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id}
+        data_raw = self.connection.raw_delete(urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    def get_organization_members(self, organization_id: str) -> list | bytes:
+        """
+        Fetch all users in an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: List of users in the organization
+        :rtype: list | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id}
+        data_raw = self.connection.raw_get(urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_user_to_organization(self, organization_id: str, user_id: str) -> dict | bytes:
+        """
+        Add a user to an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param user_id: ID of the user to be added
+        :type user_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATION_ADD_MEMBER_BY_ID.format(**params_path),
+            data=user_id
+            )
+        return raise_error_from_response(data_raw, KeycloakPutError, expected_codes=[201])
+
+    def remove_user_from_organization(self, organization_id: str, user_id: str) -> dict | bytes:
+        """
+        Remove a user from an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param user_id: ID of the user to be removed
+        :type user_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {"realm-name": self.connection.realm_name, "organization_id": organization_id, "user_id": user_id}
+
+        url = urls_patterns.URL_ADMIN_ORGANIZATION_DEL_MEMBER_BY_ID.format(**params_path)
+        print (url); 
+        data_raw = self.connection.raw_delete(url)
+        return raise_error_from_response(data_raw, KeycloakDeleteError, expected_codes=[204])
+
+    
 
     def get_users(self, query: dict | None = None) -> list:
         """
