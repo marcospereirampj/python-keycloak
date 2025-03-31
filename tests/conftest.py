@@ -448,6 +448,24 @@ def realm(admin: KeycloakAdmin) -> Generator[str, None, None]:
 
 
 @pytest.fixture
+def realm_org(admin: KeycloakAdmin) -> Generator[str, None, None]:
+    """
+    Fixture for a new random realm with Organizations enabled.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :yields: Keycloak realm
+    :rtype: str
+    """
+    realm_name = str(uuid.uuid4())
+    admin.create_realm(
+        payload={"realm": realm_name, "enabled": True, "organizationsEnabled": True},
+    )
+    yield realm_name
+    admin.delete_realm(realm_name=realm_name)
+
+
+@pytest.fixture
 def user(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
     """
     Fixture for a new random user.

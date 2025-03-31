@@ -5383,6 +5383,129 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
+    def get_organizations(self, query: dict | None = None) -> list:
+        """
+        Get organizations.
+
+        :param query: Query parameters (optional)
+        :type query: dict
+        :return: organizations list
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+        query = query or {}
+        url = urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
+    def get_organization(self, organization_id: str) -> dict:
+        """
+        Get representation of the organization.
+
+        :param organization_id: Organization id
+        :type organization_id: str
+        :return: OrganizationRepresentation
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "org-id": organization_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS_SINGLE.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_organization(self, payload: dict) -> str:
+        """
+        Create a new organization.
+
+        :param payload: OrganizationRepresentation
+        :type payload: dict
+        :return: Organization id
+        :rtype: str
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        _last_slash_idx = data_raw.headers["Location"].rindex("/")
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]
+
+    def update_organization(self, organization_id: str, payload: dict) -> dict:
+        """
+        Update the organization.
+
+        :param organization_id: Organization id
+        :type organization_id: str
+        :param payload: OrganizationRepresentation
+        :type payload: dict
+        :return: Http response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "org-id": organization_id}
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS_SINGLE.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPutError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    def delete_organization(self, organization_id: str) -> dict:
+        """
+        Delete the organization.
+
+        :param organization_id: Organization id
+        :type organization_id: str
+        :return: Http response
+        :rtype: dict
+        """
+        params_path = {"realm-name": self.connection.realm_name, "org-id": organization_id}
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS_SINGLE.format(**params_path)
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakDeleteError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    def get_organizations_identity_providers(self, organization_id: str) -> list:
+        """
+        Get identity providers for the organization.
+
+        :param organization_id: Organization id
+        :type organization_id: str
+        :return: Identity providers list
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "org-id": organization_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS_IDP.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_identity_provider_to_organization(self, organization_id: str, payload: dict) -> str:
+        """
+        Create a new identity provider for the organization.
+
+        :param organization_id: Organization id
+        :type organization_id: str
+        :param payload: Identity provider representation
+        :type payload: dict
+        :return: Identity provider id
+        :rtype: str
+        """
+        params_path = {"realm-name": self.connection.realm_name, "org-id": organization_id}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS_IDP.format(**params_path),
+            data=json.dumps(payload),
+        )
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        _last_slash_idx = data_raw.headers["Location"].rindex("/")
+        return data_raw.headers["Location"][_last_slash_idx + 1 :]
+
     # async functions start
     async def a___fetch_all(self, url: str, query: dict | None = None) -> list:
         """

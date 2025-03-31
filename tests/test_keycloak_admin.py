@@ -2821,6 +2821,59 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str) -> None:
     assert err.match(NO_CLIENT_SCOPE_REGEX)
 
 
+def test_organizations(admin: KeycloakAdmin, realm_org: str) -> None:
+    """
+    Test organizations.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm_org)
+
+    res = admin.get_organizations()
+    assert len(res) == 0
+
+    # Create
+    org_id = admin.create_organization(
+        payload={
+            "name": "test-org",
+            "enabled": True,
+            "domains": [{"name": "test.com", "verified": True}],
+        }
+    )
+    res = admin.get_organizations(query={"max": 2})
+    assert len(res) == 1
+    res = admin.get_organization(organization_id=org_id)
+    assert res["name"] == "test-org"
+
+    # Update
+    res["enabled"] = False
+    res["name"] = "test-org-update"
+    res = admin.update_organization(organization_id=org_id, payload=res)
+    assert res == {}
+    res = admin.get_organization(organization_id=org_id)
+    assert res["name"] == "test-org-update"
+    assert not res["enabled"]
+
+    # Get IdPs
+    res = admin.get_organizations_identity_providers(organization_id=org_id)
+    assert res == []
+
+    # Create IdP
+    res = admin.create_idp(payload={"alias": "test-idp", "providerId": "oidc"})
+    res = admin.add_identity_provider_to_organization(
+        organization_id=org_id, payload={"alias": "test-idp"}
+    )
+    assert res == ""
+
+    # Delete
+    res = admin.delete_organization(organization_id=org_id)
+    assert res == {}
+    assert len(admin.get_organizations()) == 0
+
+
 def test_components(admin: KeycloakAdmin, realm: str) -> None:
     """
     Test components.
