@@ -466,9 +466,9 @@ class KeycloakAdmin:
         url = urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path)
 
         if "first" in query or "max" in query:
-            return self.a___fetch_paginated(url, query)
+            return await self.a___fetch_paginated(url, query)
 
-        return self.a___fetch_all(url, query)
+        return await self.a___fetch_all(url, query)
 
     def get_organization(self, organization_id: str) -> dict:
         """
@@ -510,7 +510,7 @@ class KeycloakAdmin:
             "realm-name": self.connection.realm_name,
             "organization_id": organization_id,
         }
-        data_raw = self.connection.a_raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
         )
 
@@ -559,7 +559,7 @@ class KeycloakAdmin:
         """
         params_path = {"realm-name": self.connection.realm_name}
 
-        data_raw = self.connection.a_raw_post(
+        data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path),
             data=json.dumps(payload),
         )
@@ -616,7 +616,7 @@ class KeycloakAdmin:
             "organization_id": organization_id,
         }
 
-        data_raw = self.connection.a_raw_put(
+        data_raw = await self.connection.a_raw_put(
             urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path),
             data=json.dumps(payload),
         )
@@ -660,7 +660,7 @@ class KeycloakAdmin:
             "organization_id": organization_id,
         }
 
-        data_raw = self.connection.a_raw_delete(
+        data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
         )
 
@@ -707,7 +707,7 @@ class KeycloakAdmin:
             "organization_id": organization_id,
         }
 
-        data_raw = self.connection.a_raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -751,7 +751,7 @@ class KeycloakAdmin:
             "organization_id": organization_id,
         }
 
-        data_raw = self.connection.a_raw_post(
+        data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path), data=idp_alias
         )
         return raise_error_from_response(
@@ -796,7 +796,7 @@ class KeycloakAdmin:
             "idp_alias": idp_alias,
         }
 
-        data_raw = self.connection.a_raw_delete(
+        data_raw = await self.connection.a_raw_delete(
             urls_patterns.URL_ADMIN_ORGANIZATION_IDP_BY_ALIAS.format(**params_path)
         )
 
@@ -837,7 +837,7 @@ class KeycloakAdmin:
         :rtype: list
         """
         params_path = {"realm-name": self.connection.realm_name, "user_id": user_id}
-        data_raw = self.connection.a_raw_get(
+        data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_USER_ORGANIZATIONS.format(**params_path)
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -898,9 +898,9 @@ class KeycloakAdmin:
 
         url = urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path)
         if "first" in query or "max" in query:
-            return self.a___fetch_paginated(url, query)
+            return await self.a___fetch_paginated(url, query)
 
-        return self.a___fetch_all(url, query)
+        return await self.a___fetch_all(url, query)
 
     def organization_user_add(self, user_id: str, organization_id: str) -> dict | bytes:
         """
@@ -941,7 +941,7 @@ class KeycloakAdmin:
             "organization_id": organization_id,
         }
 
-        data_raw = self.connection.a_raw_post(
+        data_raw = await self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path), data=user_id
         )
         return raise_error_from_response(
@@ -991,7 +991,7 @@ class KeycloakAdmin:
         }
 
         url = urls_patterns.URL_ADMIN_ORGANIZATION_DEL_MEMBER_BY_ID.format(**params_path)
-        data_raw = self.connection.a_raw_delete(url)
+        data_raw = await self.connection.a_raw_delete(url)
         return raise_error_from_response(
             data_raw,
             KeycloakDeleteError,
