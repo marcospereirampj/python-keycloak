@@ -921,7 +921,9 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_post(
             urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path), data=user_id
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED]
+        )
 
     async def a_organization_user_add(self, user_id: str, organization_id: str) -> dict | bytes:
         """
@@ -942,7 +944,9 @@ class KeycloakAdmin:
         data_raw = self.connection.a_raw_post(
             urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path), data=user_id
         )
-        return raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED]
+        )
 
     def organization_user_remove(self, user_id: str, organization_id: str) -> dict | bytes:
         """
