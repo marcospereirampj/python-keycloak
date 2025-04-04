@@ -338,6 +338,11 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     :param realm: Keycloak realm
     :type realm: str
     """
+    # Organizations was only release in KeyCloak 26, so disable these checks
+    # for older KeyCloak releases
+    if Version(os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]) < Version("26"):
+        return
+
     admin.change_current_realm(realm)
     admin.update_realm(realm_name=realm, payload={"organizationsEnabled": True})
 
@@ -3739,6 +3744,11 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     :param realm: Keycloak realm
     :type realm: str
     """
+    # Organizations was only release in KeyCloak 26, so disable these checks
+    # for older KeyCloak releases
+    if Version(os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]) < Version("26"):
+        return
+
     await admin.a_change_current_realm(realm)
     await admin.a_update_realm(realm_name=realm, payload={"organizationsEnabled": True})
 
