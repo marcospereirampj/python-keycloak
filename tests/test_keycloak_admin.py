@@ -3751,7 +3751,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     if  os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] != "latest" and Version(
         os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
     ) < Version("26"):
-
+        return
+    
     await admin.a_change_current_realm(realm)
     await admin.a_update_realm(realm_name=realm, payload={"organizationsEnabled": True})
 
