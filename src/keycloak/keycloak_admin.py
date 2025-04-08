@@ -428,6 +428,576 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
+    def get_organizations(self, query: dict | None = None) -> list:
+        """
+        Fetch all organizations.
+
+        Returns a list of organizations, filtered according to query parameters
+
+        OrganizationRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :return: List of organizations
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name}
+        url = urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
+    async def a_get_organizations(self, query: dict | None = None) -> list:
+        """
+        Fetch all organizations asynchronously.
+
+        Returns a list of organizations, filtered according to query parameters
+
+        OrganizationRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :return: List of organizations
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name}
+        url = urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
+
+    def get_organization(self, organization_id: str) -> dict:
+        """
+        Get representation of the organization.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+
+        :return: Organization details
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
+        )
+
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_organization(self, organization_id: str) -> dict:
+        """
+        Get representation of the organization asynchronously.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+
+        :return: Organization details
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
+        )
+
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def create_organization(self, payload: dict) -> str | None:
+        """
+        Create a new organization.
+
+        Organization name and alias must be unique.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param payload: Dictionary containing organization details
+        :type payload: dict
+        :return: org_id
+        :rtype: str
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        try:
+            _last_slash_idx = data_raw.headers["Location"].rindex("/")
+            return data_raw.headers["Location"][_last_slash_idx + 1 :]
+        except KeyError:
+            return None
+
+    async def a_create_organization(self, payload: dict) -> str | None:
+        """
+        Create a new organization asynchronously.
+
+        Organization name and alias must be unique.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param payload: Dictionary containing organization details
+        :type payload: dict
+        :return: org_id
+        :rtype: str
+        """
+        params_path = {"realm-name": self.connection.realm_name}
+
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATIONS.format(**params_path),
+            data=json.dumps(payload),
+        )
+        raise_error_from_response(data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED])
+        try:
+            _last_slash_idx = data_raw.headers["Location"].rindex("/")
+            return data_raw.headers["Location"][_last_slash_idx + 1 :]
+        except KeyError:
+            return None
+
+    def update_organization(self, organization_id: str, payload: dict) -> dict | bytes:
+        """
+        Update an existing organization.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param payload: Dictionary with updated organization details
+        :type payload: dict
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = self.connection.raw_put(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPutError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    async def a_update_organization(self, organization_id: str, payload: dict) -> dict | bytes:
+        """
+        Update an existing organization asynchronously.
+
+        OrganizationRepresentation:
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param payload: Dictionary with updated organization details
+        :type payload: dict
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = await self.connection.a_raw_put(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path),
+            data=json.dumps(payload),
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPutError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    def delete_organization(self, organization_id: str) -> dict | bytes:
+        """
+        Delete an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
+        )
+
+        return raise_error_from_response(
+            data_raw, KeycloakDeleteError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    async def a_delete_organization(self, organization_id: str) -> dict | bytes:
+        """
+        Delete an organization asynchronously.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_ORGANIZATION_BY_ID.format(**params_path)
+        )
+
+        return raise_error_from_response(
+            data_raw, KeycloakDeleteError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    def get_organization_idps(self, organization_id: str) -> list:
+        """
+        Get IDPs by organization id.
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#IdentityProviderRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: List of IDPs in the organization
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_organization_idps(self, organization_id: str) -> list:
+        """
+        Get IDPs by organization id asynchronously.
+
+        IdentityProviderRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#IdentityProviderRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: List of IDPs in the organization
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def organization_idp_add(self, organization_id: str, idp_alias: str) -> dict | bytes:
+        """
+        Add an IDP to an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param idp_alias: Alias of the IDP
+        :type idp_alias: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path), data=idp_alias
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    async def a_organization_idp_add(self, organization_id: str, idp_alias: str) -> dict | bytes:
+        """
+        Add an IDP to an organization asynchronously.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param idp_alias: Alias of the IDP
+        :type idp_alias: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDPS.format(**params_path), data=idp_alias
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_NO_CONTENT]
+        )
+
+    def organization_idp_remove(self, organization_id: str, idp_alias: str) -> dict | bytes:
+        """
+        Remove an IDP from an organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+            "idp_alias": idp_alias,
+        }
+
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDP_BY_ALIAS.format(**params_path)
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
+    async def a_organization_idp_remove(
+        self, organization_id: str, idp_alias: str
+    ) -> dict | bytes:
+        """
+        Remove an IDP from an organization asynchronously.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+            "idp_alias": idp_alias,
+        }
+
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_ORGANIZATION_IDP_BY_ALIAS.format(**params_path)
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
+    def get_user_organizations(self, user_id: str) -> list:
+        """
+        Get organizations by user id.
+
+        OrganizationRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param user_id: ID of the user
+        :type user_id: str
+        :return: List of organizations the user is member of
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "user_id": user_id}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_USER_ORGANIZATIONS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_user_organizations(self, user_id: str) -> list:
+        """
+        Get organizations by user id asynchronously.
+
+        OrganizationRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#OrganizationRepresentation
+
+        :param user_id: ID of the user
+        :type user_id: str
+        :return: List of organizations the user is member of
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "user_id": user_id}
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_USER_ORGANIZATIONS.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_organization_members(self, organization_id: str, query: dict | None = None) -> list:
+        """
+        Get members by organization id.
+
+        Returns organization members, filtered according to query parameters
+
+        MemberRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#MemberRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param query: Additional query parameters
+            (see https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#_organizations)
+        :type query: dict
+        :return: List of users in the organization
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        url = urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path)
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
+    async def a_get_organization_members(
+        self, organization_id: str, query: dict | None = None
+    ) -> list:
+        """
+        Get members by organization id asynchronously.
+
+        Returns organization members, filtered according to query parameters
+
+        MemberRepresentation
+        https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#MemberRepresentation
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :param query: Additional query parameters
+            (see https://www.keycloak.org/docs-api/26.1.4/rest-api/index.html#_organizations)
+        :type query: dict
+        :return: List of users in the organization
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        url = urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path)
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
+
+    def organization_user_add(self, user_id: str, organization_id: str) -> dict | bytes:
+        """
+        Add a user to an organization.
+
+        :param user_id: ID of the user to be added
+        :type user_id: str
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path), data=user_id
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED]
+        )
+
+    async def a_organization_user_add(self, user_id: str, organization_id: str) -> dict | bytes:
+        """
+        Add a user to an organization asynchronously.
+
+        :param user_id: ID of the user to be added
+        :type user_id: str
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS.format(**params_path), data=user_id
+        )
+        return raise_error_from_response(
+            data_raw, KeycloakPostError, expected_codes=[HTTP_CREATED]
+        )
+
+    def organization_user_remove(self, user_id: str, organization_id: str) -> dict | bytes:
+        """
+        Remove a user from an organization.
+
+        :param user_id: ID of the user to be removed
+        :type user_id: str
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+            "user_id": user_id,
+        }
+
+        url = urls_patterns.URL_ADMIN_ORGANIZATION_DEL_MEMBER_BY_ID.format(**params_path)
+        data_raw = self.connection.raw_delete(url)
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
+    async def a_organization_user_remove(self, user_id: str, organization_id: str) -> dict | bytes:
+        """
+        Remove a user from an organization asynchronously.
+
+        :param user_id: ID of the user to be removed
+        :type user_id: str
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Response from Keycloak
+        :rtype: dict | bytes
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+            "user_id": user_id,
+        }
+
+        url = urls_patterns.URL_ADMIN_ORGANIZATION_DEL_MEMBER_BY_ID.format(**params_path)
+        data_raw = await self.connection.a_raw_delete(url)
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
     def get_users(self, query: dict | None = None) -> list:
         """
         Get all users.

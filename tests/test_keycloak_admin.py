@@ -329,6 +329,110 @@ def test_partial_import_realm(admin: KeycloakAdmin, realm: str) -> None:
     assert res["overwritten"] == 3
 
 
+def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test organizations.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    # Organizations was only release in KeyCloak 26, so disable these checks
+    # for older KeyCloak releases
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] != "latest" and Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    ) < Version("26"):
+        return
+
+    admin.change_current_realm(realm)
+    admin.update_realm(realm_name=realm, payload={"organizationsEnabled": True})
+
+    org_payload = {"name": "test-org01", "alias": "test-org01", "domains": [{"name": "org1.com"}]}
+    org_id = admin.create_organization(payload=org_payload)
+    assert org_id is not None, org_id
+
+    org = admin.get_organization(org_id)
+    assert org["name"] == "test-org01", org["name"]
+    assert org["alias"] == "test-org01", org["alias"]
+    assert org["domains"][0]["name"] == "org1.com", org["domains"][0]["name"]
+
+    orgs = admin.get_organizations()
+    assert len(orgs) == 1, orgs
+    assert orgs[0]["name"] == "test-org01", orgs[0]["name"]
+
+    user_id = admin.create_user(payload={"username": "test", "email": "test@test.test"})
+    admin.organization_user_add(user_id, org_id)
+
+    users = admin.get_organization_members(org_id)
+    assert len(users) == 1, users
+    assert users[0]["id"] == user_id, users[0]["id"]
+
+    user_orgs = admin.get_user_organizations(user_id)
+    assert len(user_orgs) == 1, user_orgs
+    assert user_orgs[0]["name"] == "test-org01", user_orgs[0]["name"]
+
+    admin.organization_user_remove(user_id, org_id)
+    users = admin.get_organization_members(org_id)
+    assert len(users) == 0, users
+
+    for i in range(admin.PAGE_SIZE + 50):
+        user_id = admin.create_user(
+            payload={"username": f"test-user{i:02d}", "email": f"test-user{i:02d}@test.test"}
+        )
+
+        admin.organization_user_add(user_id, org_id)
+
+    users = admin.get_organization_members(org_id)
+    assert len(users) == admin.PAGE_SIZE + 50, users
+
+    users = admin.get_organization_members(org_id, query={"first": 100, "max": -1, "search": ""})
+    assert len(users) == 50, len(users)
+
+    users = admin.get_organization_members(org_id, query={"max": 20, "first": -1, "search": ""})
+    assert len(users) == 20, len(users)
+
+    _ = admin.create_idp(
+        payload={
+            "providerId": "github",
+            "alias": "github",
+            "config": {"clientId": "test-client-id", "clientSecret": "test-client-secret"},
+        }
+    )
+
+    admin.organization_idp_add(org_id, "github")
+
+    idps = admin.get_organization_idps(org_id)
+    assert len(idps) == 1, idps
+    assert idps[0]["alias"] == "github", idps[0]["alias"]
+
+    admin.organization_idp_remove(org_id, "github")
+    idps = admin.get_organization_idps(org_id)
+    assert len(idps) == 0, idps
+
+    admin.delete_organization(org_id)
+    orgs = admin.get_organizations()
+    assert len(orgs) == 0, orgs
+
+    for i in range(admin.PAGE_SIZE + 50):
+        admin.create_organization(
+            payload={
+                "name": f"test-org{i:02d}",
+                "alias": f"org{i:02d}",
+                "domains": [{"name": f"org{i:02d}.com"}],
+            }
+        )
+
+    orgs = admin.get_organizations()
+    assert len(orgs) == admin.PAGE_SIZE + 50, len(orgs)
+
+    orgs = admin.get_organizations(query={"first": 100, "max": -1, "search": ""})
+    assert len(orgs) == 50, len(orgs)
+
+    orgs = admin.get_organizations(query={"first": -1, "max": 20, "search": ""})
+    assert len(orgs) == 20, len(orgs)
+
+
 def test_users(admin: KeycloakAdmin, realm: str) -> None:
     """
     Test users.
@@ -3630,6 +3734,115 @@ async def test_a_partial_import_realm(admin: KeycloakAdmin, realm: str) -> None:
     payload["ifResourceExists"] = "OVERWRITE"
     res = await admin.a_partial_import_realm(realm_name=realm, payload=payload)
     assert res["overwritten"] == 3
+
+
+@pytest.mark.asyncio
+async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test organizations.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    # Organizations was only release in KeyCloak 26, so disable these checks
+    # for older KeyCloak releases
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] != "latest" and Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"]
+    ) < Version("26"):
+        return
+
+    await admin.a_change_current_realm(realm)
+    await admin.a_update_realm(realm_name=realm, payload={"organizationsEnabled": True})
+
+    org_payload = {"name": "test-org01", "alias": "test-org01", "domains": [{"name": "org1.com"}]}
+    org_id = await admin.a_create_organization(payload=org_payload)
+    assert org_id is not None, org_id
+
+    org = await admin.a_get_organization(org_id)
+    assert org["name"] == "test-org01", org["name"]
+    assert org["alias"] == "test-org01", org["alias"]
+    assert org["domains"][0]["name"] == "org1.com", org["domains"][0]["name"]
+
+    orgs = await admin.a_get_organizations()
+    assert len(orgs) == 1, orgs
+    assert orgs[0]["name"] == "test-org01", orgs[0]["name"]
+
+    user_id = await admin.a_create_user(payload={"username": "test", "email": "test@test.test"})
+    await admin.a_organization_user_add(user_id, org_id)
+
+    users = await admin.a_get_organization_members(org_id)
+    assert len(users) == 1, users
+    assert users[0]["id"] == user_id, users[0]["id"]
+
+    user_orgs = await admin.a_get_user_organizations(user_id)
+    assert len(user_orgs) == 1, user_orgs
+    assert user_orgs[0]["name"] == "test-org01", user_orgs[0]["name"]
+
+    await admin.a_organization_user_remove(user_id, org_id)
+    users = await admin.a_get_organization_members(org_id)
+    assert len(users) == 0, users
+
+    for i in range(admin.PAGE_SIZE + 50):
+        user_id = await admin.a_create_user(
+            payload={"username": f"test-user{i:02d}", "email": f"test-user{i:02d}@test.test"}
+        )
+
+        await admin.a_organization_user_add(user_id, org_id)
+
+    users = await admin.a_get_organization_members(org_id)
+    assert len(users) == admin.PAGE_SIZE + 50, users
+
+    users = await admin.a_get_organization_members(
+        org_id, query={"first": 100, "max": -1, "search": ""}
+    )
+    assert len(users) == 50, len(users)
+
+    users = await admin.a_get_organization_members(
+        org_id, query={"max": 20, "first": -1, "search": ""}
+    )
+    assert len(users) == 20, len(users)
+
+    _ = await admin.a_create_idp(
+        payload={
+            "providerId": "github",
+            "alias": "github",
+            "config": {"clientId": "test-client-id", "clientSecret": "test-client-secret"},
+        }
+    )
+
+    await admin.a_organization_idp_add(org_id, "github")
+
+    idps = await admin.a_get_organization_idps(org_id)
+    assert len(idps) == 1, idps
+    assert idps[0]["alias"] == "github", idps[0]["alias"]
+
+    await admin.a_organization_idp_remove(org_id, "github")
+    idps = await admin.a_get_organization_idps(org_id)
+    assert len(idps) == 0, idps
+
+    await admin.a_delete_organization(org_id)
+    orgs = await admin.a_get_organizations()
+    assert len(orgs) == 0, orgs
+
+    for i in range(admin.PAGE_SIZE + 50):
+        await admin.a_create_organization(
+            payload={
+                "name": f"test-org{i:02d}",
+                "alias": f"org{i:02d}",
+                "domains": [{"name": f"org{i:02d}.com"}],
+            }
+        )
+
+    orgs = await admin.a_get_organizations()
+    assert len(orgs) == admin.PAGE_SIZE + 50, len(orgs)
+
+    orgs = await admin.a_get_organizations(query={"first": 100, "max": -1, "search": ""})
+    assert len(orgs) == 50, len(orgs)
+
+    orgs = await admin.a_get_organizations(query={"first": -1, "max": 20, "search": ""})
+    assert len(orgs) == 20, len(orgs)
 
 
 @pytest.mark.asyncio
