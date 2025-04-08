@@ -1,3 +1,9 @@
+## v5.4.0 (2025-04-08)
+
+### Feat
+
+- adds support for keycloak organizations (#642)
+
 ## v5.3.1 (2025-02-03)
 
 ### Fix
