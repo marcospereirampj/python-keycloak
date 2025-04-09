@@ -46,6 +46,7 @@ URL_ADMIN_USERS = "admin/realms/{realm-name}/users"
 URL_ADMIN_USERS_COUNT = "admin/realms/{realm-name}/users/count"
 URL_ADMIN_USER = "admin/realms/{realm-name}/users/{id}"
 URL_ADMIN_USER_CONSENTS = "admin/realms/{realm-name}/users/{id}/consents"
+URL_ADMIN_USER_CONSENT = URL_ADMIN_USER_CONSENTS + "/{client-id}"
 URL_ADMIN_SEND_UPDATE_ACCOUNT = "admin/realms/{realm-name}/users/{id}/execute-actions-email"
 URL_ADMIN_SEND_VERIFY_EMAIL = "admin/realms/{realm-name}/users/{id}/send-verify-email"
 URL_ADMIN_RESET_PASSWORD = "admin/realms/{realm-name}/users/{id}/reset-password"  # noqa: S105
