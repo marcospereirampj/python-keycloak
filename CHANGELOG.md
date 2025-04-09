@@ -1,3 +1,9 @@
+## v5.5.0 (2025-04-09)
+
+### Feat
+
+- implement client for revoking consents/offline access, with async and improved testing (#644)
+
 ## v5.4.0 (2025-04-08)
 
 ### Feat
