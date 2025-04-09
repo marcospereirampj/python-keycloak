@@ -1524,6 +1524,30 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def revoke_consent(self, user_id: str, client_id: str) -> dict | bytes:
+        """
+        Revoke consent and offline tokens for particular client from user.
+
+        :param user_id: User id
+        :type user_id: str
+        :param client_id: Client id
+        :type client_id: str
+
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "client-id": client_id,
+        }
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_USER_CONSENT.format(**params_path),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
     def get_user_social_logins(self, user_id: str) -> list:
         """
         Get user social logins.
@@ -6742,7 +6766,7 @@ class KeycloakAdmin:
 
     async def a_user_consents(self, user_id: str) -> list:
         """
-        Get consents granted asynchronously by the user.
+        Asynchronously get consents granted by the user.
 
         UserConsentRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_userconsentrepresentation
@@ -6757,6 +6781,30 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_USER_CONSENTS.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_revoke_consent(self, user_id: str, client_id: str) -> dict | bytes:
+        """
+        Asynchronously revoke consent and offline tokens for particular client from user.
+
+        :param user_id: User id
+        :type user_id: str
+        :param client_id: Client id
+        :type client_id: str
+
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": user_id,
+            "client-id": client_id,
+        }
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_USER_CONSENT.format(**params_path),
+        )
+        return raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     async def a_get_user_social_logins(self, user_id: str) -> list:
         """

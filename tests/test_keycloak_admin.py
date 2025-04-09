@@ -31,6 +31,7 @@ from tests.conftest import KeycloakTestEnv
 
 CLIENT_NOT_FOUND_REGEX = '404: b\'{"error":"Client not found".*}\''
 CLIENT_SCOPE_NOT_FOUND_REGEX = '404: b\'{"error":"Client scope not found".*}\''
+CONSENT_NOT_FOUND_REGEX = '404: b\'{"error":"Consent nor offline token not found".*}\''
 COULD_NOT_FIND_ROLE_REGEX = '404: b\'{"error":"Could not find role".*}\''
 COULD_NOT_FIND_ROLE_WITH_ID_REGEX = '404: b\'{"error":"Could not find role with id".*}\''
 HTTP_404_REGEX = '404: b\'{"error":"HTTP 404 Not Found".*}\''
@@ -3546,6 +3547,57 @@ def test_refresh_token(admin: KeycloakAdmin) -> None:
     assert admin.connection.token is not None
     admin.user_logout(admin.get_user_id(admin.connection.username))
     admin.connection.refresh_token()
+
+
+def test_consents(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """
+    Test getting and revoking offline access via the consents API.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    oid, username, password = oid_with_credentials
+
+    # Use offline access as ersatz consent
+    offline_token = oid.token(username, password, scope="offline_access")
+    decoded_access_token = oid.decode_token(token=offline_token["access_token"])
+    user_id = decoded_access_token["sub"]
+
+    # Test get consents/offline access
+    res = admin.user_consents(user_id=user_id)
+    assert len(res) == 1, res
+    assert "additionalGrants" in res[0], res[0]
+    assert res[0]["additionalGrants"][0].get("key") == "Offline Token", res[0]
+
+    # Test get consents fail
+    with pytest.raises(KeycloakGetError) as err:
+        admin.user_consents(user_id="non-existent-id")
+    assert err.match(USER_NOT_FOUND_REGEX)
+
+    # Test revoke fails
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.revoke_consent(user_id="non-existent-id", client_id=oid.client_id)
+    assert err.match(USER_NOT_FOUND_REGEX)
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.revoke_consent(user_id=user_id, client_id="non-existent-client")
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
+
+    # Test revoke offline access
+    res = admin.revoke_consent(user_id=user_id, client_id=oid.client_id)
+    assert res == {}, res
+
+    res = admin.user_consents(user_id=user_id)
+    assert len(res) == 0, res
+
+    # Test re-revoke fails
+    with pytest.raises(KeycloakDeleteError) as err:
+        admin.revoke_consent(user_id=user_id, client_id=oid.client_id)
+    assert err.match(CONSENT_NOT_FOUND_REGEX)
 
 
 # async function start
@@ -7197,6 +7249,58 @@ async def test_a_refresh_token(admin: KeycloakAdmin) -> None:
     assert admin.connection.token is not None
     await admin.a_user_logout(await admin.a_get_user_id(admin.connection.username))
     admin.connection.refresh_token()
+
+
+@pytest.mark.asyncio
+async def test_a_consents(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """
+    Test getting and revoking offline access via the consents API.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    oid, username, password = oid_with_credentials
+
+    # Use offline access as ersatz consent
+    offline_token = await oid.a_token(username, password, scope="offline_access")
+    decoded_access_token = await oid.a_decode_token(token=offline_token["access_token"])
+    user_id = decoded_access_token["sub"]
+
+    # Test get consents/offline access
+    res = await admin.a_user_consents(user_id=user_id)
+    assert len(res) == 1, res
+    assert "additionalGrants" in res[0], res[0]
+    assert res[0]["additionalGrants"][0].get("key") == "Offline Token", res[0]
+
+    # Test get consents fail
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_user_consents(user_id="non-existent-id")
+    assert err.match(USER_NOT_FOUND_REGEX)
+
+    # Test revoke fails
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_revoke_consent(user_id="non-existent-id", client_id=oid.client_id)
+    assert err.match(USER_NOT_FOUND_REGEX)
+
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_revoke_consent(user_id=user_id, client_id="non-existent-client")
+    assert err.match(CLIENT_NOT_FOUND_REGEX)
+
+    # Test revoke offline access
+    res = await admin.a_revoke_consent(user_id=user_id, client_id=oid.client_id)
+    assert res == {}, res
+
+    res = await admin.a_user_consents(user_id=user_id)
+    assert len(res) == 0, res
+
+    # Test re-revoke fails
+    with pytest.raises(KeycloakDeleteError) as err:
+        await admin.a_revoke_consent(user_id=user_id, client_id=oid.client_id)
+    assert err.match(CONSENT_NOT_FOUND_REGEX)
 
 
 def test_counter_part() -> None:
