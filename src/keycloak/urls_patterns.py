@@ -62,9 +62,7 @@ URL_ADMIN_USER_REALM_ROLES_AVAILABLE = (
 URL_ADMIN_USER_REALM_ROLES_COMPOSITE = (
     "admin/realms/{realm-name}/users/{id}/role-mappings/realm/composite"
 )
-URL_ADMIN_GROUP_ALL_ROLES = (
-    "admin/realms/{realm-name}/groups/{id}/role-mappings"
-)
+URL_ADMIN_GROUP_ALL_ROLES = "admin/realms/{realm-name}/groups/{id}/role-mappings"
 URL_ADMIN_GROUPS_REALM_ROLES = "admin/realms/{realm-name}/groups/{id}/role-mappings/realm"
 URL_ADMIN_GROUPS_CLIENT_ROLES = (
     "admin/realms/{realm-name}/groups/{id}/role-mappings/clients/{client-id}"
