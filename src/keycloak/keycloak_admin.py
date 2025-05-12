@@ -4007,8 +4007,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         params = {"briefRepresentation": brief_representation}
         data_raw = self.connection.raw_get(
-            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path),
-            **params
+            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path), **params
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
@@ -9298,9 +9297,7 @@ class KeycloakAdmin:
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     async def a_get_all_roles_of_group(
-            self,
-            group_id: str,
-            brief_representation: bool = True
+        self, group_id: str, brief_representation: bool = True
     ) -> dict:
         """
         Get all roles of a group asynchronously.
@@ -9315,8 +9312,7 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         params = {"briefRepresentation": brief_representation}
         data_raw = await self.connection.a_raw_get(
-            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path),
-            **params
+            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path), **params
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
