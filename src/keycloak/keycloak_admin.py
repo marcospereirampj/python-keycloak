@@ -9297,7 +9297,11 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    async def a_get_all_roles_of_group(self, group_id: str, brief_representation: bool = True) -> dict:
+    async def a_get_all_roles_of_group(
+            self,
+            group_id: str,
+            brief_representation: bool = True
+    ) -> dict:
         """
         Get all roles of a group asynchronously.
 
