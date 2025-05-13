@@ -59,6 +59,8 @@ class ConnectionManager:
     :type cert: Union[str,Tuple[str,str]]
     :param max_retries: The total number of times to retry HTTP requests.
     :type max_retries: int
+    :param pool_maxsize: The maximum number of connections to save in the pool.
+    :type pool_maxsize: int
     """
 
     def __init__(
@@ -70,6 +72,7 @@ class ConnectionManager:
         proxies: dict | None = None,
         cert: str | tuple | None = None,
         max_retries: int = 1,
+        pool_maxsize: int | None = None,
     ) -> None:
         """
         Init method.
@@ -91,19 +94,25 @@ class ConnectionManager:
         :type cert: Union[str,Tuple[str,str]]
         :param max_retries: The total number of times to retry HTTP requests.
         :type max_retries: int
+        :param pool_maxsize: The maximum number of connections to save in the pool.
+        :type pool_maxsize: int
         """
         self.base_url = base_url
         self.headers = headers
         self.timeout = timeout
         self.verify = verify
         self.cert = cert
+        self.pool_maxsize = pool_maxsize
         self._s = requests.Session()
         self._s.auth = lambda x: x  # don't let requests add auth headers
 
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
         for protocol in ("https://", "http://"):
-            adapter = HTTPAdapter(max_retries=max_retries)
+            adapter_kwargs = {"max_retries": max_retries}
+            if pool_maxsize is not None:
+                adapter_kwargs["pool_maxsize"] = pool_maxsize
+            adapter = HTTPAdapter(**adapter_kwargs)
             # adds POST to retry whitelist
             allowed_methods = set(adapter.max_retries.allowed_methods)
             allowed_methods.add("POST")
@@ -183,6 +192,20 @@ class ConnectionManager:
     @cert.setter
     def cert(self, value: str | tuple) -> None:
         self._cert = value
+
+    @property
+    def pool_maxsize(self) -> int | None:
+        """
+        Return the maximum number of connections to save in the pool.
+
+        :returns: Pool maxsize
+        :rtype: int or None
+        """
+        return self._pool_maxsize
+
+    @pool_maxsize.setter
+    def pool_maxsize(self, value: int | None) -> None:
+        self._pool_maxsize = value
 
     @property
     def headers(self) -> dict:

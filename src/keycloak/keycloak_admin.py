@@ -87,6 +87,8 @@ class KeycloakAdmin:
     :type max_retries: int
     :param connection: A KeycloakOpenIDConnection as an alternative to individual params.
     :type connection: KeycloakOpenIDConnection
+    :param pool_maxsize: The maximum number of connections to save in the pool.
+    :type pool_maxsize: int
     """
 
     PAGE_SIZE = 100
@@ -109,6 +111,7 @@ class KeycloakAdmin:
         cert: str | tuple | None = None,
         max_retries: int = 1,
         connection: KeycloakOpenIDConnection | None = None,
+        pool_maxsize: int | None = None,
     ) -> None:
         """
         Init method.
@@ -148,6 +151,8 @@ class KeycloakAdmin:
         :type max_retries: int
         :param connection: An OpenID Connection as an alternative to individual params.
         :type connection: KeycloakOpenIDConnection
+        :param pool_maxsize: The maximum number of connections to save in the pool.
+        :type pool_maxsize: int
         """
         self.connection = connection or KeycloakOpenIDConnection(
             server_url=server_url,
@@ -165,6 +170,7 @@ class KeycloakAdmin:
             timeout=timeout,
             cert=cert,
             max_retries=max_retries,
+            pool_maxsize=pool_maxsize,
         )
 
     @property
