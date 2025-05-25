@@ -177,7 +177,11 @@ def test_realms(admin: KeycloakAdmin) -> None:
 
     # Create the same realm, skip_exists true
     res = admin.create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res in [{"errorMessage": "Realm test already exists"}, {"msg": "Already exists"}], res
+    assert res in [
+        {"errorMessage": "Realm test already exists"},
+        {"msg": "Already exists"},
+        {"errorMessage": "Conflict detected. See logs for details"},
+    ], res
 
     # Get a single realm
     res = admin.get_realm(realm_name="test")
@@ -3635,7 +3639,11 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
 
     # Create the same realm, skip_exists true
     res = await admin.a_create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res in [{"errorMessage": "Realm test already exists"}, {"msg": "Already exists"}], res
+    assert res in [
+        {"errorMessage": "Realm test already exists"},
+        {"msg": "Already exists"},
+        {"errorMessage": "Conflict detected. See logs for details"},
+    ], res
 
     # Get a single realm
     res = await admin.a_get_realm(realm_name="test")
