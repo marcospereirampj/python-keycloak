@@ -36,6 +36,7 @@ from . import urls_patterns
 from .exceptions import (
     HTTP_ACCEPTED,
     HTTP_BAD_REQUEST,
+    HTTP_CONFLICT,
     HTTP_CREATED,
     HTTP_NO_CONTENT,
     HTTP_NOT_FOUND,
@@ -379,8 +380,8 @@ class KeycloakAdmin:
         return raise_error_from_response(
             data_raw,
             KeycloakPostError,
-            expected_codes=[HTTP_CREATED],
-            skip_exists=skip_exists,
+            expected_codes=[HTTP_CREATED]
+            + ([HTTP_BAD_REQUEST, HTTP_CONFLICT] if skip_exists else []),
         )
 
     def update_realm(self, realm_name: str, payload: dict) -> dict | bytes:
@@ -6179,8 +6180,8 @@ class KeycloakAdmin:
         return raise_error_from_response(
             data_raw,
             KeycloakPostError,
-            expected_codes=[HTTP_CREATED],
-            skip_exists=skip_exists,
+            expected_codes=[HTTP_CREATED]
+            + ([HTTP_BAD_REQUEST, HTTP_CONFLICT] if skip_exists else []),
         )
 
     async def a_update_realm(self, realm_name: str, payload: dict) -> dict:
