@@ -15,7 +15,12 @@ function keycloak_stop() {
 function keycloak_start() {
     echo "Starting keycloak docker container"
     PWD=$(pwd)
-    docker run -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" -v $PWD/tests/providers:/opt/keycloak/providers "${KEYCLOAK_DOCKER_IMAGE}" start-dev --features="admin-fine-grained-authz:v1,token-exchange:v1"
+    if [[ "$KEYCLOAK_DOCKER_IMAGE_TAG" == "22.0" || "$KEYCLOAK_DOCKER_IMAGE_TAG" == "23.0" ]]; then
+        KEYCLOAK_FEATURES="admin-fine-grained-authz,token-exchange"
+    else
+        KEYCLOAK_FEATURES="admin-fine-grained-authz:v1,token-exchange:v1"
+    fi
+    docker run -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" -v $PWD/tests/providers:/opt/keycloak/providers "${KEYCLOAK_DOCKER_IMAGE}" start-dev --features="${KEYCLOAK_FEATURES}"
     SECONDS=0
     until curl --silent --output /dev/null localhost:$KEYCLOAK_PORT; do
       sleep 5;

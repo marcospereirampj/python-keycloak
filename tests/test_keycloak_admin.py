@@ -169,11 +169,15 @@ def test_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, should fail
     with pytest.raises(KeycloakPostError) as err:
         res = admin.create_realm(payload={"realm": "test"})
-    assert err.match('400: b\'{"errorMessage":"Realm test already exists"}\'')
+
+    assert (
+        b"Realm test already exists" in err.value.error_message
+        or b"Conflict detected" in err.value.error_message
+    )
 
     # Create the same realm, skip_exists true
     res = admin.create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res == {"errorMessage": "Realm test already exists"}, res
+    assert res in [{"errorMessage": "Realm test already exists"}, {"msg": "Already exists"}], res
 
     # Get a single realm
     res = admin.get_realm(realm_name="test")
@@ -3623,11 +3627,15 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, should fail
     with pytest.raises(KeycloakPostError) as err:
         res = await admin.a_create_realm(payload={"realm": "test"})
-    assert err.match('400: b\'{"errorMessage":"Realm test already exists"}\'')
+
+    assert (
+        b"Realm test already exists" in err.value.error_message
+        or b"Conflict detected" in err.value.error_message
+    )
 
     # Create the same realm, skip_exists true
     res = await admin.a_create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res == {"errorMessage": "Realm test already exists"}, res
+    assert res in [{"errorMessage": "Realm test already exists"}, {"msg": "Already exists"}], res
 
     # Get a single realm
     res = await admin.a_get_realm(realm_name="test")
