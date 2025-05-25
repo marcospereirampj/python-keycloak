@@ -15,7 +15,8 @@ Configure admin client
                 username='example-admin',
                 password='secret',
                 realm_name="master",
-                user_realm_name="only_if_other_realm_than_master")
+                user_realm_name="only_if_other_realm_than_master",
+                pool_maxsize=20)
 
 
 Configure admin client with connection
@@ -34,6 +35,7 @@ Configure admin client with connection
                             user_realm_name="only_if_other_realm_than_master",
                             client_id="my_client",
                             client_secret_key="client-secret",
+                            pool_maxsize=25,
                             verify=True)
 
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
