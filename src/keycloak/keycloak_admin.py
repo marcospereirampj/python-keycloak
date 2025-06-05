@@ -5197,7 +5197,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    def get_client_secrets(self, client_id: str) -> list:
+    def get_client_secrets(self, client_id: str) -> dict:
         """
         Get representation of the client secrets.
 
@@ -5206,7 +5206,7 @@ class KeycloakAdmin:
         :param client_id:  id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
-        :rtype: list
+        :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = self.connection.raw_get(
@@ -10418,7 +10418,7 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakPostError)
 
-    async def a_get_client_secrets(self, client_id: str) -> list:
+    async def a_get_client_secrets(self, client_id: str) -> dict:
         """
         Get representation of the client secrets asynchronously.
 
@@ -10427,7 +10427,7 @@ class KeycloakAdmin:
         :param client_id:  id of client (not client-id)
         :type client_id: str
         :return: Keycloak server response (ClientRepresentation)
-        :rtype: list
+        :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": client_id}
         data_raw = await self.connection.a_raw_get(
