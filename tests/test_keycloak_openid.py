@@ -35,6 +35,7 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         realm_name="master",
         client_id="admin-cli",
+        pool_maxsize=5,
     )
 
     assert oid.client_id == "admin-cli"
@@ -42,6 +43,14 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
     assert oid.realm_name == "master"
     assert isinstance(oid.connection, ConnectionManager)
     assert isinstance(oid.authorization, Authorization)
+    assert oid.connection.pool_maxsize == 5
+
+    oid_default = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id="admin-cli",
+    )
+    assert oid_default.connection.pool_maxsize is None
 
 
 def test_well_known(oid: KeycloakOpenID) -> None:
@@ -576,6 +585,7 @@ async def test_a_well_known(oid: KeycloakOpenID) -> None:
     res = await oid.a_well_known()
     assert res is not None
     assert res != {}
+    assert oid.connection.pool_maxsize == 5
     for key in [
         "acr_values_supported",
         "authorization_encryption_alg_values_supported",

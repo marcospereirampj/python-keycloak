@@ -87,7 +87,8 @@ class KeycloakOpenID:
         Either a path to an SSL certificate file, or two-tuple of
         (certificate file, key file).
     :param max_retries: The total number of times to retry HTTP requests.
-    :type max_retries: int
+    :param pool_maxsize: The maximum number of connections to save in the pool.
+    :type pool_maxsize: int
     """
 
     def __init__(
@@ -102,6 +103,7 @@ class KeycloakOpenID:
         timeout: int = 60,
         cert: str | tuple | None = None,
         max_retries: int = 1,
+        pool_maxsize: int | None = None,
     ) -> None:
         """
         Init method.
@@ -129,6 +131,8 @@ class KeycloakOpenID:
         :type cert: Union[str,Tuple[str,str]]
         :param max_retries: The total number of times to retry HTTP requests.
         :type max_retries: int
+        :param pool_maxsize: The maximum number of connections to save in the pool.
+        :type pool_maxsize: int
         """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
@@ -142,6 +146,7 @@ class KeycloakOpenID:
             proxies=proxies,
             cert=cert,
             max_retries=max_retries,
+            pool_maxsize=pool_maxsize,
         )
 
         self.authorization = Authorization()
