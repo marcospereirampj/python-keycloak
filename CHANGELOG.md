@@ -1,3 +1,9 @@
+## v5.6.0 (2025-06-22)
+
+### Feat
+
+- add pagination support to get realm roles (#659)
+
 ## v5.5.1 (2025-05-25)
 
 ### Fix
