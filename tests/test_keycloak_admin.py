@@ -1662,6 +1662,31 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
 
+def test_realm_roles_pagination(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test realm roles pagination.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    for ind in range(admin.PAGE_SIZE + 50 - 3):
+        role_name = f"role_{ind:03}"
+        admin.create_realm_role(payload={"name": role_name})
+
+    roles = admin.get_realm_roles()
+    assert len(roles) == admin.PAGE_SIZE + 50, len(roles)
+
+    roles = admin.get_realm_roles(query={"first": 100, "max": 20})
+    assert len(roles) == 20, len(roles)
+
+    roles = admin.get_realm_roles(query={"first": 120, "max": 50})
+    assert len(roles) == 30, len(roles)
+
+
 @pytest.mark.parametrize(
     ("testcase", "arg_brief_repr", "includes_attributes"),
     [
@@ -5192,6 +5217,32 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_delete_realm_role(role_name=composite_role)
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
+
+
+@pytest.mark.asyncio
+async def test_a_realm_roles_pagination(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test realm roles pagination.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    for ind in range(admin.PAGE_SIZE + 50 - 3):
+        role_name = f"role_{ind:03}"
+        admin.create_realm_role(payload={"name": role_name})
+
+    roles = await admin.a_get_realm_roles()
+    assert len(roles) == admin.PAGE_SIZE + 50, len(roles)
+
+    roles = await admin.a_get_realm_roles(query={"first": 100, "max": 20})
+    assert len(roles) == 20, len(roles)
+
+    roles = await admin.a_get_realm_roles(query={"first": 120, "max": 50})
+    assert len(roles) == 30, len(roles)
 
 
 @pytest.mark.asyncio
