@@ -3640,11 +3640,10 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-
         params_path = {
             "realm-name": self.connection.realm_name,
             "id": client_id,
-            "role-name": role_name
+            "role-name": role_name,
         }
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
@@ -8927,11 +8926,10 @@ class KeycloakAdmin:
         :return: Keycloak server response (array RoleRepresentation)
         :rtype: list
         """
-
         params_path = {
             "realm-name": self.connection.realm_name,
             "id": client_id,
-            "role-name": role_name
+            "role-name": role_name,
         }
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
