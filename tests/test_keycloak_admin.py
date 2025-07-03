@@ -2246,8 +2246,8 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
 
     # Test get composite client roles of role before adding
     res = admin.get_composite_client_roles_of_role(
-        client_id=client,
-        role_name="client-role-test-update")
+        client_id=client, role_name="client-role-test-update"
+    )
     assert len(res) == 0
 
     # Test add composite client roles to role
@@ -2270,14 +2270,11 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
 
     # Test get composite client roles of role after adding
     res = admin.get_composite_client_roles_of_role(
-        client_id=client,
-        role_name="client-role-test-update")
+        client_id=client, role_name="client-role-test-update"
+    )
     assert len(res) == 1
     with pytest.raises(KeycloakGetError) as err:
-        admin.get_composite_client_roles_of_role(
-            client_id=client,
-            role_name="bad"
-        )
+        admin.get_composite_client_roles_of_role(client_id=client, role_name="bad")
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test removal of composite client roles
@@ -5872,8 +5869,8 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
 
     # Test get composite client roles of role before adding
     res = await admin.a_get_composite_client_roles_of_role(
-        client_id=client,
-        role_name="client-role-test-update")
+        client_id=client, role_name="client-role-test-update"
+    )
     assert len(res) == 0
 
     # Test add composite client roles to role
@@ -5896,8 +5893,8 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
 
     # Test get composite client roles of role after adding
     res = await admin.a_get_composite_client_roles_of_role(
-        client_id=client,
-        role_name="client-role-test-update")
+        client_id=client, role_name="client-role-test-update"
+    )
     assert len(res) == 1
 
     # Test removal of composite client roles
