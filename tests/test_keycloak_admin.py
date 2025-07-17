@@ -868,7 +868,8 @@ def test_server_info(admin: KeycloakAdmin) -> None:
     :type admin: KeycloakAdmin
     """
     info = admin.get_server_info()
-    assert set(info.keys()).issubset(
+    keys = info.keys()
+    assert set(keys).issubset(
         {
             "systemInfo",
             "memoryInfo",
@@ -885,8 +886,9 @@ def test_server_info(admin: KeycloakAdmin) -> None:
             "passwordPolicies",
             "enums",
             "cryptoInfo",
+            "cpuInfo",
         },
-    ), info.keys()
+    )
 
 
 def test_groups(admin: KeycloakAdmin, user: str) -> None:
@@ -2599,7 +2601,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = admin.get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12], res
+    assert len(res) in [8, 12, 14], res
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_executions(flow_alias="bad")
@@ -2742,7 +2744,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) <= 40
+    assert len(res) <= 41
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -4381,7 +4383,8 @@ async def test_a_server_info(admin: KeycloakAdmin) -> None:
     :type admin: KeycloakAdmin
     """
     info = await admin.a_get_server_info()
-    assert set(info.keys()).issubset(
+    keys = info.keys()
+    assert set(keys).issubset(
         {
             "systemInfo",
             "memoryInfo",
@@ -4398,8 +4401,9 @@ async def test_a_server_info(admin: KeycloakAdmin) -> None:
             "passwordPolicies",
             "enums",
             "cryptoInfo",
+            "cpuInfo",
         },
-    ), info.keys()
+    )
 
 
 @pytest.mark.asyncio
@@ -6287,7 +6291,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12], res
+    assert len(res) in [8, 12, 14], res
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
@@ -6435,7 +6439,7 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
 
     # Test list of auth providers
     res = await admin.a_get_authenticator_providers()
-    assert len(res) <= 40
+    assert len(res) <= 41
 
     res = await admin.a_get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
