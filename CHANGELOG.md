@@ -1,3 +1,9 @@
+## v5.7.0 (2025-07-17)
+
+### Feat
+
+- add `get_composite_client_roles_of_role` (#660)
+
 ## v5.6.1 (2025-07-17)
 
 ### Fix
