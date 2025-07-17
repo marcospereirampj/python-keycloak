@@ -78,3 +78,12 @@ class Role:
 
         msg = f"Cannot compare Role with {type(other)}"
         raise NotImplementedError(msg)
+
+    def __hash__(self) -> int:
+        """
+        Hash method.
+
+        :returns: Hash value
+        :rtype: int
+        """
+        return hash(f"{self.name}-{self.required}")
