@@ -20,7 +20,7 @@ function keycloak_start() {
     else
         KEYCLOAK_FEATURES="admin-fine-grained-authz:v1,token-exchange:v1"
     fi
-    docker run -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" -v $PWD/tests/providers:/opt/keycloak/providers "${KEYCLOAK_DOCKER_IMAGE}" start-dev --features="${KEYCLOAK_FEATURES}"
+    docker run --rm -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" -v $PWD/tests/providers:/opt/keycloak/providers "${KEYCLOAK_DOCKER_IMAGE}" start-dev --features="${KEYCLOAK_FEATURES}"
     SECONDS=0
     until curl --silent --output /dev/null localhost:$KEYCLOAK_PORT; do
       sleep 5;

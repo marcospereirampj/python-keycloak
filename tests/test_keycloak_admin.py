@@ -2246,7 +2246,13 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     )
     assert res == {}
 
-    # Test composite client roles
+    # Test get composite client roles of role before adding
+    res = admin.get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 0
+
+    # Test add composite client roles to role
     with pytest.raises(KeycloakPostError) as err:
         admin.add_composite_client_roles_to_role(
             client_role_id=client,
@@ -2263,6 +2269,15 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert admin.get_client_role(client_id=client, role_name="client-role-test-update")[
         "composite"
     ]
+
+    # Test get composite client roles of role after adding
+    res = admin.get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 1
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_composite_client_roles_of_role(client_id=client, role_name="bad")
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test removal of composite client roles
     with pytest.raises(KeycloakDeleteError) as err:
@@ -5856,7 +5871,13 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     )
     assert res == {}
 
-    # Test composite client roles
+    # Test get composite client roles of role before adding
+    res = await admin.a_get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 0
+
+    # Test add composite client roles to role
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_add_composite_client_roles_to_role(
             client_role_id=client,
@@ -5873,6 +5894,12 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert (await admin.a_get_client_role(client_id=client, role_name="client-role-test-update"))[
         "composite"
     ]
+
+    # Test get composite client roles of role after adding
+    res = await admin.a_get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 1
 
     # Test removal of composite client roles
     with pytest.raises(KeycloakDeleteError) as err:

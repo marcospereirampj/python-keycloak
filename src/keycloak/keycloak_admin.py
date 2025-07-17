@@ -3629,6 +3629,27 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_composite_client_roles_of_role(self, client_id: str, role_name: str) -> list:
+        """
+        Get composite roles of the client role.
+
+        :param client_id: The id of the client
+        :type client_id: str
+        :param role_name: The name of the role
+        :type role_name: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "role-name": role_name,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def assign_realm_roles_to_client_scope(self, client_id: str, roles: str | list) -> bytes:
         """
         Assign realm roles to a client's scope.
@@ -8891,6 +8912,27 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.connection.realm_name, "role-name": role_name}
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_REALM_ROLES_COMPOSITE_REALM_ROLE.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_composite_client_roles_of_role(self, client_id: str, role_name: str) -> list:
+        """
+        Get composite roles of the client role.
+
+        :param client_id: The id of the client
+        :type client_id: str
+        :param role_name: The name of the role
+        :type role_name: str
+        :return: Keycloak server response (array RoleRepresentation)
+        :rtype: list
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "role-name": role_name,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_ROLES_COMPOSITE_CLIENT_ROLE.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
