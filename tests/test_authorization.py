@@ -40,6 +40,7 @@ def test_authorization_objects() -> None:
     assert not r.required
     assert r.get_name() == "test"
     assert r == r  # noqa: PLR0124
+    assert hash(r) == hash("test-False")
     assert r == "test"
 
     with pytest.raises(NotImplementedError) as err:
