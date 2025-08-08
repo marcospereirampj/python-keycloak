@@ -4049,14 +4049,14 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
-    def get_all_roles_of_user(self, user_id: str) -> list:
+    def get_all_roles_of_user(self, user_id: str) -> dict:
         """
         Get all level roles for a user.
 
         :param user_id: id of user
         :type user_id: str
-        :return: Keycloak server response (array RoleRepresentation)
-        :rtype: list
+        :return: Keycloak server response (MappingsRepresentation)
+        :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = self.connection.raw_get(
@@ -9361,14 +9361,14 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
-    async def a_get_all_roles_of_user(self, user_id: str) -> list:
+    async def a_get_all_roles_of_user(self, user_id: str) -> dict:
         """
         Get all level roles for a user asynchronously.
 
         :param user_id: id of user
         :type user_id: str
-        :return: Keycloak server response (array RoleRepresentation)
-        :rtype: list
+        :return: Keycloak server response (MappingsRepresentation)
+        :rtype: dict
         """
         params_path = {"realm-name": self.connection.realm_name, "id": user_id}
         data_raw = await self.connection.a_raw_get(
