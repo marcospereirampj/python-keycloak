@@ -1,3 +1,9 @@
+## v5.8.0 (2025-08-19)
+
+### Feat
+
+- implement endpoints returning the number of members in an organization (#665)
+
 ## v5.7.0 (2025-07-17)
 
 ### Feat
