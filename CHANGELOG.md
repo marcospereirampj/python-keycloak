@@ -1,3 +1,9 @@
+## v5.8.1 (2025-08-19)
+
+### Fix
+
+- prevent all httpx deprecation warnings (#666)
+
 ## v5.8.0 (2025-08-19)
 
 ### Feat
