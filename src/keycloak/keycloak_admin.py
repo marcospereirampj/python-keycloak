@@ -903,6 +903,42 @@ class KeycloakAdmin:
 
         return await self.a___fetch_all(url, query)
 
+    def get_organization_members_count(self, organization_id: str) -> int:
+        """
+        Get the number of members in the organization.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Number of members in the organization
+        :rtype: int
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS_COUNT.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+
+    async def a_get_organization_members_count(self, organization_id: str) -> int:
+        """
+        Get the number of members in the organization asynchronously.
+
+        :param organization_id: ID of the organization
+        :type organization_id: str
+        :return: Number of members in the organization
+        :rtype: int
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "organization_id": organization_id,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_ORGANIZATION_MEMBERS_COUNT.format(**params_path)
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+
     def organization_user_add(self, user_id: str, organization_id: str) -> dict | bytes:
         """
         Add a user to an organization.

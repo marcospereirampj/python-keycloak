@@ -376,6 +376,8 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     users = admin.get_organization_members(org_id)
     assert len(users) == 1, users
     assert users[0]["id"] == user_id, users[0]["id"]
+    num_users = admin.get_organization_members_count(org_id)
+    assert num_users == 1, num_users
 
     user_orgs = admin.get_user_organizations(user_id)
     assert len(user_orgs) == 1, user_orgs
@@ -384,6 +386,8 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     admin.organization_user_remove(user_id, org_id)
     users = admin.get_organization_members(org_id)
     assert len(users) == 0, users
+    num_users = admin.get_organization_members_count(org_id)
+    assert num_users == 0, num_users
 
     for i in range(admin.PAGE_SIZE + 50):
         user_id = admin.create_user(
@@ -3885,6 +3889,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 1, users
     assert users[0]["id"] == user_id, users[0]["id"]
+    num_users = await admin.a_get_organization_members_count(org_id)
+    assert num_users == 1, num_users
 
     user_orgs = await admin.a_get_user_organizations(user_id)
     assert len(user_orgs) == 1, user_orgs
@@ -3893,6 +3899,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     await admin.a_organization_user_remove(user_id, org_id)
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 0, users
+    num_users = await admin.a_get_organization_members_count(org_id)
+    assert num_users == 0, num_users
 
     for i in range(admin.PAGE_SIZE + 50):
         user_id = await admin.a_create_user(
