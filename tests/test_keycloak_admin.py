@@ -6156,7 +6156,7 @@ async def test_a_email_query_param_handling(admin: KeycloakAdmin, user: str) -> 
 
     mock_put.assert_awaited_once_with(
         ANY,
-        data='["UPDATE_PASSWORD"]',
+        content='["UPDATE_PASSWORD"]',
         params={"client_id": "update-account-client-id", "redirect_uri": "https://example.com"},
         headers=ANY,
         timeout=60,
