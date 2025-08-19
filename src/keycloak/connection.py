@@ -395,7 +395,7 @@ class ConnectionManager:
                 method="POST",
                 url=urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
-                data=data,
+                **self._prepare_httpx_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -421,7 +421,7 @@ class ConnectionManager:
             return await self.async_s.put(
                 urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
-                data=data,
+                **self._prepare_httpx_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -452,7 +452,7 @@ class ConnectionManager:
             return await self.async_s.request(
                 method="DELETE",
                 url=urljoin(self.base_url, path),
-                data=data or {},
+                **self._prepare_httpx_request_content(data or {}),
                 params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
@@ -460,6 +460,23 @@ class ConnectionManager:
         except Exception as e:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
+
+    @staticmethod
+    def _prepare_httpx_request_content(data: dict | str | None) -> dict:
+        """
+        Create the correct request content kwarg to `httpx.AsyncClient.request()`.
+
+        See https://www.python-httpx.org/compatibility/#request-content
+
+        :param data: the request content
+        :type data: dict | str | None
+        :returns: A dict mapping the correct kwarg to the request content
+        :rtype: dict
+        """
+        if isinstance(data, str):
+            # Note: this could also accept bytes, Iterable[bytes], or AsyncIterable[bytes]
+            return {"content": data}
+        return {"data": data}
 
     @staticmethod
     def _filter_query_params(query_params: dict) -> dict:
