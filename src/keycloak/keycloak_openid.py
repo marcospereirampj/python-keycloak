@@ -790,7 +790,7 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    def uma_permissions(self, token: str, permissions: str = "", **extra_payload: dict) -> dict:
+    def uma_permissions(self, token: str, permissions: str = "", **extra_payload: dict) -> list:
         """
         Get UMA permissions by user token with requested permissions.
 
@@ -806,7 +806,7 @@ class KeycloakOpenID:
         :param extra_payload: Additional payload data
         :type extra_payload: dict
         :returns: Keycloak server response
-        :rtype: dict
+        :rtype: list
         """
         permission = build_permission_param(permissions)
 
@@ -1516,7 +1516,7 @@ class KeycloakOpenID:
         token: str,
         permissions: str = "",
         **extra_payload: dict,
-    ) -> dict:
+    ) -> list:
         """
         Get UMA permissions by user token with requested permissions asynchronously.
 
@@ -1532,7 +1532,7 @@ class KeycloakOpenID:
         :param extra_payload: Additional payload data
         :type extra_payload: dict
         :returns: Keycloak server response
-        :rtype: dict
+        :rtype: list
         """
         permission = build_permission_param(permissions)
 
