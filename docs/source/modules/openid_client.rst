@@ -145,3 +145,35 @@ Get auth status for a specific resource and scope by token
 
     token = keycloak_openid.token("user", "password")
     auth_status = keycloak_openid.has_uma_access(token['access_token'], "Resource#Scope")
+
+PKCE Authorization Flow Example
+----------------------------------------------
+
+.. code-block:: python
+
+    from keycloak import KeycloakOpenID
+    from keycloak.pkce_utils import generate_code_verifier, generate_code_challenge
+
+    # Configure client
+    keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
+                                     client_id="example_client",
+                                     realm_name="example_realm")
+
+    # Generate PKCE values
+    code_verifier = generate_code_verifier()
+    code_challenge, code_challenge_method = generate_code_challenge(code_verifier)
+
+    # Get Code With Oauth Authorization Request (PKCE)
+    auth_url = keycloak_openid.auth_url(
+        redirect_uri="your_call_back_url",
+        scope="email",
+        state="your_state_info",
+        code_challenge=code_challenge,
+        code_challenge_method=code_challenge_method)
+
+    # Get Access Token With Code (PKCE)
+    access_token = keycloak_openid.token(
+        grant_type='authorization_code',
+        code='the_code_you_get_from_auth_url_callback',
+        redirect_uri="your_call_back_url",
+        code_verifier=code_verifier)
