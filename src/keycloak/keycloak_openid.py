@@ -282,8 +282,8 @@ class KeycloakOpenID:
         scope: str = "email",
         state: str = "",
         nonce: str = "",
-        code_challenge: str = None,
-        code_challenge_method: str = None,
+        code_challenge: str | None = None,
+        code_challenge_method: str | None = None,
     ) -> str:
         """
         Get authorization URL endpoint.
@@ -327,7 +327,7 @@ class KeycloakOpenID:
         redirect_uri: str = "",
         totp: int | None = None,
         scope: str = "openid",
-        code_verifier: str = None,
+        code_verifier: str | None = None,
         **extra: dict,
     ) -> dict:
         """
@@ -1044,8 +1044,8 @@ class KeycloakOpenID:
         scope: str = "email",
         state: str = "",
         nonce: str = "",
-        code_challenge: str = None,
-        code_challenge_method: str = None,
+        code_challenge: str | None = None,
+        code_challenge_method: str | None = None,
     ) -> str:
         """
         Get authorization URL endpoint asynchronously.
@@ -1089,7 +1089,7 @@ class KeycloakOpenID:
         redirect_uri: str = "",
         totp: int | None = None,
         scope: str = "openid",
-        code_verifier: str = None,
+        code_verifier: str | None = None,
         **extra: dict,
     ) -> dict:
         """

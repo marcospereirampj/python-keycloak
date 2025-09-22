@@ -1,13 +1,13 @@
+"""Tests for PKCE flow: code verifier and code challenge handling."""
+
 from unittest import mock
 
 from keycloak import KeycloakOpenID
 from keycloak.pkce_utils import generate_code_challenge, generate_code_verifier
 
 
-def test_pkce_auth_url_and_token(env):
-    """
-    Test PKCE flow: auth_url includes code_challenge, token includes code_verifier.
-    """
+def test_pkce_auth_url_and_token(env: object) -> None:
+    """Test PKCE flow: auth_url includes code_challenge, token includes code_verifier."""
     oid = KeycloakOpenID(
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         realm_name="master",
@@ -27,11 +27,15 @@ def test_pkce_auth_url_and_token(env):
 
     # Simulate token exchange with PKCE
     # This part would require a real code from Keycloak, so we mock the response
-    with mock.patch.object(oid, "token", return_value={
-        "access_token": mock.ANY,
-        "refresh_token": mock.ANY,
-        "token_type": "Bearer",
-    }) as mocked_token:
+    with mock.patch.object(
+        oid,
+        "token",
+        return_value={
+            "access_token": mock.ANY,
+            "refresh_token": mock.ANY,
+            "token_type": "Bearer",
+        },
+    ) as mocked_token:
         token = oid.token(
             grant_type="authorization_code",
             code="dummy_code",
@@ -46,4 +50,4 @@ def test_pkce_auth_url_and_token(env):
         )
         assert "access_token" in token
         assert "refresh_token" in token
-        assert token["token_type"] == "Bearer"
+    assert token["token_type"] == "Bearer"  # noqa: S105
