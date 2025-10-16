@@ -1011,8 +1011,10 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert res["error"] == "Group path does not exist"
+    # See https://github.com/marcospereirampj/python-keycloak/issues/675
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/does-not-exist")
+    assert err.match('404: b\'{"error":"Group path does not exist".*}\'')
 
     res = admin.get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
