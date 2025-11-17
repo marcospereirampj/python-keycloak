@@ -3475,6 +3475,26 @@ class KeycloakAdmin:
             expected_codes=[HTTP_NO_CONTENT],
         )
 
+    def get_role_composites_by_id(self, role_id: str, query: dict | None = None) -> list:
+        """
+        Get all composite roles by role id.
+
+        :param role_id: id of role
+        :type role_id: str
+        :param query: Query parameters (optional). Supported keys: 'first', 'max', 'search'
+        :type query: dict
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        url = urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
+
     def create_realm_role(self, payload: dict, skip_exists: bool = False) -> str:
         """
         Create a new role for the realm or client.
@@ -8772,6 +8792,26 @@ class KeycloakAdmin:
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+
+    async def a_get_role_composites_by_id(self, role_id: str, query: dict | None = None) -> list:
+        """
+        Get all composite roles by role id asynchronously.
+
+        :param role_id: id of role
+        :type role_id: str
+        :param query: Query parameters (optional). Supported keys: 'first', 'max', 'search'
+        :type query: dict
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        url = urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
 
     async def a_create_realm_role(self, payload: dict, skip_exists: bool = False) -> str:
         """
