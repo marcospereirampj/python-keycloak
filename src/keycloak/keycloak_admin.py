@@ -1671,7 +1671,7 @@ class KeycloakAdmin:
     def send_update_account(
         self,
         user_id: str,
-        payload: dict,
+        payload: list,
         client_id: str | None = None,
         lifespan: int | None = None,
         redirect_uri: str | None = None,
@@ -6955,7 +6955,7 @@ class KeycloakAdmin:
     async def a_send_update_account(
         self,
         user_id: str,
-        payload: dict,
+        payload: list,
         client_id: str | None = None,
         lifespan: int | None = None,
         redirect_uri: str | None = None,
