@@ -1432,6 +1432,31 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
         UNKOWN_ERROR_REGEX,
     )
 
+    # Test import authz
+    authz_config = admin.get_client_authz_settings(client_id=auth_client_id)
+
+    authz_config["resources"] = [{"name": "test-import-resource"}]
+    authz_config["policies"] = [
+        {
+            "name": "test-import-policy",
+            "type": "time",
+            "config": {"hourEnd": "18", "hour": "9"},
+        }
+    ]
+    admin.import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    exported = admin.get_client_authz_settings(client_id=auth_client_id)
+    assert len([
+        resource
+        for resource in exported["resources"]
+        if resource["name"] == "test-import-resource"]
+    ) == 1
+
+    assert len([
+        resource
+        for resource in exported["policies"]
+        if resource["name"] == "test-import-policy"]
+    ) == 1
+
     # Test delete client
     res = admin.delete_client(client_id=auth_client_id)
     assert res == {}, res
@@ -4997,6 +5022,31 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert ('b\'{"error":"Service account not enabled for the client' in str(err)) or err.match(
         UNKOWN_ERROR_REGEX,
     )
+
+    # Test async import authz
+    authz_config = await admin.a_get_client_authz_settings(client_id=auth_client_id)
+
+    authz_config["resources"] = [{"name": "test-import-resource"}]
+    authz_config["policies"] = [
+        {
+            "name": "test-import-policy",
+            "type": "time",
+            "config": {"hourEnd": "18", "hour": "9"},
+        }
+    ]
+    await admin.a_import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    exported = await admin.a_get_client_authz_settings(client_id=auth_client_id)
+    assert len([
+        resource
+        for resource in exported["resources"]
+        if resource["name"] == "test-import-resource"]
+    ) == 1
+
+    assert len([
+        resource
+        for resource in exported["policies"]
+        if resource["name"] == "test-import-policy"]
+    ) == 1
 
     # Test delete client
     res = await admin.a_delete_client(client_id=auth_client_id)

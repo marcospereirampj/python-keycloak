@@ -2210,6 +2210,33 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def import_client_authz_config(self, client_id: str, payload: dict) -> dict:
+        """
+        Import client authorization configuration.
+
+        ResourceServerRepresentation
+        https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: ResourceServerRepresentation
+        :type payload: dict
+
+        :return: None
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+
     def create_client_authz_resource(
         self,
         client_id: str,
@@ -7500,6 +7527,33 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_import_client_authz_config(self, client_id: str, payload: dict) -> dict:
+        """
+        Import client authorization configuration asynchronously.
+
+        ResourceServerRepresentation
+        https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
+
+        :param client_id: id in ClientRepresentation
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: ResourceServerRepresentation
+        :type payload: dict
+
+        :return: None
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     async def a_create_client_authz_resource(
         self,
