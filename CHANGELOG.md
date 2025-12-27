@@ -1,3 +1,9 @@
+## v5.10.0 (2025-12-27)
+
+### Feat
+
+- add get_role_composites_by_id method (#680)
+
 ## v5.9.0 (2025-12-27)
 
 ### Feat
