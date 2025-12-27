@@ -1,9 +1,11 @@
 """Tests for PKCE flow: code verifier and code challenge handling."""
 
+import os
 import re
 import urllib.parse
 
 import requests
+from packaging.version import Version
 
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from keycloak.pkce_utils import generate_code_challenge, generate_code_verifier
@@ -11,6 +13,11 @@ from keycloak.pkce_utils import generate_code_challenge, generate_code_verifier
 
 def test_pkce_auth_url_and_token(env: object, admin: KeycloakAdmin) -> None:
     """Test PKCE flow: auth_url includes code_challenge, token includes code_verifier."""
+    if os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"] != "latest" and Version(
+        os.environ["KEYCLOAK_DOCKER_IMAGE_TAG"],
+    ) <= Version("22"):
+        return
+
     client_representation = {
         "clientId": "pkce-test",
         "enabled": True,
@@ -64,3 +71,7 @@ def test_pkce_auth_url_and_token(env: object, admin: KeycloakAdmin) -> None:
     )
     info = oid.userinfo(access_token["access_token"])
     assert info["preferred_username"] == env.keycloak_admin
+
+    # Cleanup
+    client_id = admin.get_client_id("pkce-test")
+    admin.delete_client(client_id)
