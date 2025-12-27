@@ -287,6 +287,8 @@ class KeycloakOpenID:
         scope: str = "email",
         state: str = "",
         nonce: str = "",
+        code_challenge: str | None = None,
+        code_challenge_method: str | None = None,
     ) -> str:
         """
         Get authorization URL endpoint.
@@ -299,6 +301,10 @@ class KeycloakOpenID:
         :type state: str
         :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
         :type nonce: str
+        :param code_challenge: PKCE code challenge
+        :type code_challenge: str
+        :param code_challenge_method: PKCE code challenge method
+        :type code_challenge_method: str
         :returns: Authorization URL Full Build
         :rtype: str
         """
@@ -310,7 +316,12 @@ class KeycloakOpenID:
             "state": state,
             "nonce": nonce,
         }
-        return URL_AUTH.format(**params_path)
+        url = URL_AUTH.format(**params_path)
+        if code_challenge:
+            url += f"&code_challenge={code_challenge}"
+        if code_challenge_method:
+            url += f"&code_challenge_method={code_challenge_method}"
+        return url
 
     def token(
         self,
@@ -321,6 +332,7 @@ class KeycloakOpenID:
         redirect_uri: str = "",
         totp: int | None = None,
         scope: str = "openid",
+        code_verifier: str | None = None,
         **extra: dict,
     ) -> dict:
         """
@@ -347,6 +359,8 @@ class KeycloakOpenID:
         :type totp: int
         :param scope: Scope, defaults to openid
         :type scope: str
+        :param code_verifier: PKCE code verifier
+        :type code_verifier: str
         :param extra: Additional extra arguments
         :type extra: dict
         :returns: Keycloak token
@@ -362,6 +376,8 @@ class KeycloakOpenID:
             "redirect_uri": redirect_uri,
             "scope": scope,
         }
+        if code_verifier:
+            payload["code_verifier"] = code_verifier
         if extra:
             payload.update(extra)
 
@@ -1033,6 +1049,8 @@ class KeycloakOpenID:
         scope: str = "email",
         state: str = "",
         nonce: str = "",
+        code_challenge: str | None = None,
+        code_challenge_method: str | None = None,
     ) -> str:
         """
         Get authorization URL endpoint asynchronously.
@@ -1045,6 +1063,10 @@ class KeycloakOpenID:
         :type state: str
         :param nonce: Associates a Client session with an ID Token to mitigate replay attacks
         :type nonce: str
+        :param code_challenge: PKCE code challenge
+        :type code_challenge: str
+        :param code_challenge_method: PKCE code challenge method
+        :type code_challenge_method: str
         :returns: Authorization URL Full Build
         :rtype: str
         """
@@ -1056,7 +1078,12 @@ class KeycloakOpenID:
             "state": state,
             "nonce": nonce,
         }
-        return URL_AUTH.format(**params_path)
+        url = URL_AUTH.format(**params_path)
+        if code_challenge:
+            url += f"&code_challenge={code_challenge}"
+        if code_challenge_method:
+            url += f"&code_challenge_method={code_challenge_method}"
+        return url
 
     async def a_token(
         self,
@@ -1067,6 +1094,7 @@ class KeycloakOpenID:
         redirect_uri: str = "",
         totp: int | None = None,
         scope: str = "openid",
+        code_verifier: str | None = None,
         **extra: dict,
     ) -> dict:
         """
@@ -1093,6 +1121,8 @@ class KeycloakOpenID:
         :type totp: int
         :param scope: Scope, defaults to openid
         :type scope: str
+        :param code_verifier: PKCE code verifier
+        :type code_verifier: str
         :param extra: Additional extra arguments
         :type extra: dict
         :returns: Keycloak token
@@ -1108,6 +1138,8 @@ class KeycloakOpenID:
             "redirect_uri": redirect_uri,
             "scope": scope,
         }
+        if code_verifier:
+            payload["code_verifier"] = code_verifier
         if extra:
             payload.update(extra)
 
