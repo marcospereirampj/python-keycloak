@@ -1,3 +1,9 @@
+## v5.11.0 (2025-12-27)
+
+### Feat
+
+- implement authz import request (#685)
+
 ## v5.10.0 (2025-12-27)
 
 ### Feat
