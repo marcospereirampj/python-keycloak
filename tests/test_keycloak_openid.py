@@ -383,7 +383,7 @@ def test_load_authorization_config(
         server with client credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
     """
-    oid, username, password = oid_with_credentials_authz
+    oid, _, _ = oid_with_credentials_authz
 
     oid.load_authorization_config(path="tests/data/authz_settings.json")
     assert "test-authz-rb-policy" in oid.authorization.policies
@@ -927,7 +927,7 @@ async def test_a_load_authorization_config(
         server with client credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
     """
-    oid, username, password = oid_with_credentials_authz
+    oid, _, _ = oid_with_credentials_authz
 
     await oid.a_load_authorization_config(path="tests/data/authz_settings.json")
     assert "test-authz-rb-policy" in oid.authorization.policies

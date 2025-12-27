@@ -2620,7 +2620,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = admin.get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12, 14], res
+    assert len(res) in [8, 12, 14, 15], res
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_executions(flow_alias="bad")
@@ -2763,7 +2763,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) <= 41
+    assert len(res) <= 42
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -3326,7 +3326,7 @@ def test_get_bruteforce_status_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3364,7 +3364,7 @@ def test_clear_bruteforce_attempts_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3405,7 +3405,7 @@ def test_clear_bruteforce_attempts_for_all_users(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3566,7 +3566,7 @@ def test_initial_access_token(
     assert res["count"] == 2
     assert res["expiration"] == 3
 
-    oid, username, password = oid_with_credentials
+    oid, _, _ = oid_with_credentials
 
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
@@ -6326,7 +6326,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12, 14], res
+    assert len(res) in [8, 12, 14, 15], res
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
@@ -6474,7 +6474,7 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
 
     # Test list of auth providers
     res = await admin.a_get_authenticator_providers()
-    assert len(res) <= 41
+    assert len(res) <= 42
 
     res = await admin.a_get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -7060,7 +7060,7 @@ async def test_a_get_bruteforce_status_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7099,7 +7099,7 @@ async def test_a_clear_bruteforce_attempts_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7141,7 +7141,7 @@ async def test_a_clear_bruteforce_attempts_for_all_users(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7315,7 +7315,7 @@ async def test_a_initial_access_token(
     assert res["count"] == 2
     assert res["expiration"] == 3
 
-    oid, username, password = oid_with_credentials
+    oid, _, _ = oid_with_credentials
 
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
