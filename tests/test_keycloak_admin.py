@@ -57,6 +57,7 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
+        pool_maxsize=5,
     )
     assert admin.connection.server_url == f"http://{env.keycloak_host}:{env.keycloak_port}", (
         admin.connection.server_url
@@ -72,6 +73,7 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     assert admin.connection.token is None, admin.connection.token
     assert admin.connection.user_realm_name is None, admin.connection.user_realm_name
     assert admin.connection.custom_headers is None, admin.connection.custom_headers
+    assert admin.connection.pool_maxsize == 5, admin.connection.pool_maxsize
 
     admin = KeycloakAdmin(
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
