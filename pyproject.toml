@@ -65,10 +65,7 @@ twine = ">=4.0.2"
 freezegun = ">=1.2.2"
 docutils = "<0.21"
 ruff = ">=0.9.3"
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
+backports-asyncio-runner = { "version" = ">=1.2.0", "python" = ">=3.9,<3.11" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

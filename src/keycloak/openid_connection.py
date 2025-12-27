@@ -82,6 +82,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         timeout: int | None = 60,
         cert: str | tuple | None = None,
         max_retries: int = 1,
+        pool_maxsize: int | None = None,
     ) -> None:
         """
         Init method.
@@ -120,6 +121,8 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type cert: Union[str,Tuple[str,str]]
         :param max_retries: The total number of times to retry HTTP requests.
         :type max_retries: int
+        :param pool_maxsize: The maximum number of connections to save in the pool.
+        :type pool_maxsize: int
         """
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.
@@ -154,6 +157,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
             verify=self.verify,
             cert=cert,
             max_retries=max_retries,
+            pool_maxsize=pool_maxsize,
         )
 
     @property

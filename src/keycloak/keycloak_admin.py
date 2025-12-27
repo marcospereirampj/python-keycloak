@@ -88,6 +88,8 @@ class KeycloakAdmin:
     :type max_retries: int
     :param connection: A KeycloakOpenIDConnection as an alternative to individual params.
     :type connection: KeycloakOpenIDConnection
+    :param pool_maxsize: The maximum number of connections to save in the pool.
+    :type pool_maxsize: int
     """
 
     PAGE_SIZE = 100
@@ -110,6 +112,7 @@ class KeycloakAdmin:
         cert: str | tuple | None = None,
         max_retries: int = 1,
         connection: KeycloakOpenIDConnection | None = None,
+        pool_maxsize: int | None = None,
     ) -> None:
         """
         Init method.
@@ -149,6 +152,8 @@ class KeycloakAdmin:
         :type max_retries: int
         :param connection: An OpenID Connection as an alternative to individual params.
         :type connection: KeycloakOpenIDConnection
+        :param pool_maxsize: The maximum number of connections to save in the pool.
+        :type pool_maxsize: int
         """
         self.connection = connection or KeycloakOpenIDConnection(
             server_url=server_url,
@@ -166,6 +171,7 @@ class KeycloakAdmin:
             timeout=timeout,
             cert=cert,
             max_retries=max_retries,
+            pool_maxsize=pool_maxsize,
         )
 
     @property
@@ -1671,7 +1677,7 @@ class KeycloakAdmin:
     def send_update_account(
         self,
         user_id: str,
-        payload: dict,
+        payload: list,
         client_id: str | None = None,
         lifespan: int | None = None,
         redirect_uri: str | None = None,
@@ -2209,6 +2215,33 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def import_client_authz_config(self, client_id: str, payload: dict) -> dict:
+        """
+        Import client authorization configuration.
+
+        ResourceServerRepresentation
+        https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: ResourceServerRepresentation
+        :type payload: dict
+
+        :return: None
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = self.connection.raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     def create_client_authz_resource(
         self,
@@ -3474,6 +3507,26 @@ class KeycloakAdmin:
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+
+    def get_role_composites_by_id(self, role_id: str, query: dict | None = None) -> list:
+        """
+        Get all composite roles by role id.
+
+        :param role_id: id of role
+        :type role_id: str
+        :param query: Query parameters (optional). Supported keys: 'first', 'max', 'search'
+        :type query: dict
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        url = urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return self.__fetch_paginated(url, query)
+
+        return self.__fetch_all(url, query)
 
     def create_realm_role(self, payload: dict, skip_exists: bool = False) -> str:
         """
@@ -6955,7 +7008,7 @@ class KeycloakAdmin:
     async def a_send_update_account(
         self,
         user_id: str,
-        payload: dict,
+        payload: list,
         client_id: str | None = None,
         lifespan: int | None = None,
         redirect_uri: str | None = None,
@@ -7500,6 +7553,33 @@ class KeycloakAdmin:
             urls_patterns.URL_ADMIN_CLIENT_AUTHZ_SETTINGS.format(**params_path),
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_import_client_authz_config(self, client_id: str, payload: dict) -> dict:
+        """
+        Import client authorization configuration asynchronously.
+
+        ResourceServerRepresentation
+        https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
+
+        :param client_id: id in ClientRepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+        :type client_id: str
+        :param payload: ResourceServerRepresentation
+        :type payload: dict
+
+        :return: None
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": client_id}
+        data_raw = await self.connection.a_raw_post(
+            urls_patterns.URL_ADMIN_CLIENT_AUTHZ_IMPORT.format(**params_path),
+            data=json.dumps(payload),
+        )
+
+        return raise_error_from_response(
+            data_raw,
+            KeycloakPostError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
 
     async def a_create_client_authz_resource(
         self,
@@ -8772,6 +8852,26 @@ class KeycloakAdmin:
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+
+    async def a_get_role_composites_by_id(self, role_id: str, query: dict | None = None) -> list:
+        """
+        Get all composite roles by role id asynchronously.
+
+        :param role_id: id of role
+        :type role_id: str
+        :param query: Query parameters (optional). Supported keys: 'first', 'max', 'search'
+        :type query: dict
+        :return: Keycloak server response (RoleRepresentation)
+        :rtype: list
+        """
+        query = query or {}
+        params_path = {"realm-name": self.connection.realm_name, "role-id": role_id}
+        url = urls_patterns.URL_ADMIN_REALM_ROLE_COMPOSITES.format(**params_path)
+
+        if "first" in query or "max" in query:
+            return await self.a___fetch_paginated(url, query)
+
+        return await self.a___fetch_all(url, query)
 
     async def a_create_realm_role(self, payload: dict, skip_exists: bool = False) -> str:
         """

@@ -16,7 +16,8 @@ Configure client OpenID
     keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
                                      client_id="example_client",
                                      realm_name="example_realm",
-                                     client_secret_key="secret")
+                                     client_secret_key="secret",
+                                     pool_maxsize=15)  # Example: Set connection pool size
 
 
 Get .well_know

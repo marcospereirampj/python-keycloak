@@ -35,6 +35,7 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         realm_name="master",
         client_id="admin-cli",
+        pool_maxsize=5,
     )
 
     assert oid.client_id == "admin-cli"
@@ -42,6 +43,14 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
     assert oid.realm_name == "master"
     assert isinstance(oid.connection, ConnectionManager)
     assert isinstance(oid.authorization, Authorization)
+    assert oid.connection.pool_maxsize == 5
+
+    oid_default = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id="admin-cli",
+    )
+    assert oid_default.connection.pool_maxsize is None
 
 
 def test_well_known(oid: KeycloakOpenID) -> None:
@@ -383,7 +392,7 @@ def test_load_authorization_config(
         server with client credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
     """
-    oid, username, password = oid_with_credentials_authz
+    oid, _, _ = oid_with_credentials_authz
 
     oid.load_authorization_config(path="tests/data/authz_settings.json")
     assert "test-authz-rb-policy" in oid.authorization.policies
@@ -927,7 +936,7 @@ async def test_a_load_authorization_config(
         server with client credentials
     :type oid_with_credentials_authz: Tuple[KeycloakOpenID, str, str]
     """
-    oid, username, password = oid_with_credentials_authz
+    oid, _, _ = oid_with_credentials_authz
 
     await oid.a_load_authorization_config(path="tests/data/authz_settings.json")
     assert "test-authz-rb-policy" in oid.authorization.policies
