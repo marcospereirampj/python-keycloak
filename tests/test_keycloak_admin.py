@@ -184,11 +184,19 @@ def test_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, should fail
     with pytest.raises(KeycloakPostError) as err:
         res = admin.create_realm(payload={"realm": "test"})
-    assert err.match('409: b\'{"errorMessage":"Conflict detected. See logs for details"}\'')
+
+    assert (
+        b"Realm test already exists" in err.value.error_message
+        or b"Conflict detected" in err.value.error_message
+    )
 
     # Create the same realm, skip_exists true
     res = admin.create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res == {"msg": "Already exists"}, res
+    assert res in [
+        {"errorMessage": "Realm test already exists"},
+        {"msg": "Already exists"},
+        {"errorMessage": "Conflict detected. See logs for details"},
+    ], res
 
     # Get a single realm
     res = admin.get_realm(realm_name="test")
@@ -383,6 +391,8 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     users = admin.get_organization_members(org_id)
     assert len(users) == 1, users
     assert users[0]["id"] == user_id, users[0]["id"]
+    num_users = admin.get_organization_members_count(org_id)
+    assert num_users == 1, num_users
 
     user_orgs = admin.get_user_organizations(user_id)
     assert len(user_orgs) == 1, user_orgs
@@ -391,6 +401,8 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     admin.organization_user_remove(user_id, org_id)
     users = admin.get_organization_members(org_id)
     assert len(users) == 0, users
+    num_users = admin.get_organization_members_count(org_id)
+    assert num_users == 0, num_users
 
     for i in range(admin.PAGE_SIZE + 50):
         user_id = admin.create_user(
@@ -875,7 +887,8 @@ def test_server_info(admin: KeycloakAdmin) -> None:
     :type admin: KeycloakAdmin
     """
     info = admin.get_server_info()
-    assert set(info.keys()).issubset(
+    keys = info.keys()
+    assert set(keys).issubset(
         {
             "systemInfo",
             "memoryInfo",
@@ -892,8 +905,9 @@ def test_server_info(admin: KeycloakAdmin) -> None:
             "passwordPolicies",
             "enums",
             "cryptoInfo",
+            "cpuInfo",
         },
-    ), info.keys()
+    )
 
 
 def test_groups(admin: KeycloakAdmin, user: str) -> None:
@@ -1669,6 +1683,31 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
 
+def test_realm_roles_pagination(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test realm roles pagination.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    for ind in range(admin.PAGE_SIZE + 50 - 3):
+        role_name = f"role_{ind:03}"
+        admin.create_realm_role(payload={"name": role_name})
+
+    roles = admin.get_realm_roles()
+    assert len(roles) == admin.PAGE_SIZE + 50, len(roles)
+
+    roles = admin.get_realm_roles(query={"first": 100, "max": 20})
+    assert len(roles) == 20, len(roles)
+
+    roles = admin.get_realm_roles(query={"first": 120, "max": 50})
+    assert len(roles) == 30, len(roles)
+
+
 @pytest.mark.parametrize(
     ("testcase", "arg_brief_repr", "includes_attributes"),
     [
@@ -2226,7 +2265,13 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     )
     assert res == {}
 
-    # Test composite client roles
+    # Test get composite client roles of role before adding
+    res = admin.get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 0
+
+    # Test add composite client roles to role
     with pytest.raises(KeycloakPostError) as err:
         admin.add_composite_client_roles_to_role(
             client_role_id=client,
@@ -2243,6 +2288,15 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert admin.get_client_role(client_id=client, role_name="client-role-test-update")[
         "composite"
     ]
+
+    # Test get composite client roles of role after adding
+    res = admin.get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 1
+    with pytest.raises(KeycloakGetError) as err:
+        admin.get_composite_client_roles_of_role(client_id=client, role_name="bad")
+    assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     # Test removal of composite client roles
     with pytest.raises(KeycloakDeleteError) as err:
@@ -2581,7 +2635,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = admin.get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12], res
+    assert len(res) in [8, 12, 14, 15], res
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_executions(flow_alias="bad")
@@ -2724,7 +2778,7 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test list of auth providers
     res = admin.get_authenticator_providers()
-    assert len(res) <= 40
+    assert len(res) <= 42
 
     res = admin.get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -3287,7 +3341,7 @@ def test_get_bruteforce_status_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3325,7 +3379,7 @@ def test_clear_bruteforce_attempts_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3366,7 +3420,7 @@ def test_clear_bruteforce_attempts_for_all_users(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     admin.change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -3527,7 +3581,7 @@ def test_initial_access_token(
     assert res["count"] == 2
     assert res["expiration"] == 3
 
-    oid, username, password = oid_with_credentials
+    oid, _, _ = oid_with_credentials
 
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())
@@ -3639,11 +3693,19 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, should fail
     with pytest.raises(KeycloakPostError) as err:
         res = await admin.a_create_realm(payload={"realm": "test"})
-    assert err.match('409: b\'{"errorMessage":"Conflict detected. See logs for details"}\'')
+
+    assert (
+        b"Realm test already exists" in err.value.error_message
+        or b"Conflict detected" in err.value.error_message
+    )
 
     # Create the same realm, skip_exists true
     res = await admin.a_create_realm(payload={"realm": "test"}, skip_exists=True)
-    assert res == {"msg": "Already exists"}, res
+    assert res in [
+        {"errorMessage": "Realm test already exists"},
+        {"msg": "Already exists"},
+        {"errorMessage": "Conflict detected. See logs for details"},
+    ], res
 
     # Get a single realm
     res = await admin.a_get_realm(realm_name="test")
@@ -3843,6 +3905,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 1, users
     assert users[0]["id"] == user_id, users[0]["id"]
+    num_users = await admin.a_get_organization_members_count(org_id)
+    assert num_users == 1, num_users
 
     user_orgs = await admin.a_get_user_organizations(user_id)
     assert len(user_orgs) == 1, user_orgs
@@ -3851,6 +3915,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     await admin.a_organization_user_remove(user_id, org_id)
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 0, users
+    num_users = await admin.a_get_organization_members_count(org_id)
+    assert num_users == 0, num_users
 
     for i in range(admin.PAGE_SIZE + 50):
         user_id = await admin.a_create_user(
@@ -4356,7 +4422,8 @@ async def test_a_server_info(admin: KeycloakAdmin) -> None:
     :type admin: KeycloakAdmin
     """
     info = await admin.a_get_server_info()
-    assert set(info.keys()).issubset(
+    keys = info.keys()
+    assert set(keys).issubset(
         {
             "systemInfo",
             "memoryInfo",
@@ -4373,8 +4440,9 @@ async def test_a_server_info(admin: KeycloakAdmin) -> None:
             "passwordPolicies",
             "enums",
             "cryptoInfo",
+            "cpuInfo",
         },
-    ), info.keys()
+    )
 
 
 @pytest.mark.asyncio
@@ -5195,6 +5263,32 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
 
 
 @pytest.mark.asyncio
+async def test_a_realm_roles_pagination(admin: KeycloakAdmin, realm: str) -> None:
+    """
+    Test realm roles pagination.
+
+    :param admin: Keycloak admin
+    :type admin: KeycloakAdmin
+    :param realm: Keycloak realm
+    :type realm: str
+    """
+    admin.change_current_realm(realm)
+
+    for ind in range(admin.PAGE_SIZE + 50 - 3):
+        role_name = f"role_{ind:03}"
+        admin.create_realm_role(payload={"name": role_name})
+
+    roles = await admin.a_get_realm_roles()
+    assert len(roles) == admin.PAGE_SIZE + 50, len(roles)
+
+    roles = await admin.a_get_realm_roles(query={"first": 100, "max": 20})
+    assert len(roles) == 20, len(roles)
+
+    roles = await admin.a_get_realm_roles(query={"first": 120, "max": 50})
+    assert len(roles) == 30, len(roles)
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("testcase", "arg_brief_repr", "includes_attributes"),
     [
@@ -5801,7 +5895,13 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     )
     assert res == {}
 
-    # Test composite client roles
+    # Test get composite client roles of role before adding
+    res = await admin.a_get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 0
+
+    # Test add composite client roles to role
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_add_composite_client_roles_to_role(
             client_role_id=client,
@@ -5818,6 +5918,12 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert (await admin.a_get_client_role(client_id=client, role_name="client-role-test-update"))[
         "composite"
     ]
+
+    # Test get composite client roles of role after adding
+    res = await admin.a_get_composite_client_roles_of_role(
+        client_id=client, role_name="client-role-test-update"
+    )
+    assert len(res) == 1
 
     # Test removal of composite client roles
     with pytest.raises(KeycloakDeleteError) as err:
@@ -6066,7 +6172,7 @@ async def test_a_email_query_param_handling(admin: KeycloakAdmin, user: str) -> 
 
     mock_put.assert_awaited_once_with(
         ANY,
-        data='["UPDATE_PASSWORD"]',
+        content='["UPDATE_PASSWORD"]',
         params={"client_id": "update-account-client-id", "redirect_uri": "https://example.com"},
         headers=ANY,
         timeout=60,
@@ -6236,7 +6342,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test flow executions
     res = await admin.a_get_authentication_flow_executions(flow_alias="browser")
-    assert len(res) in [8, 12], res
+    assert len(res) in [8, 12, 14, 15], res
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
@@ -6384,7 +6490,7 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
 
     # Test list of auth providers
     res = await admin.a_get_authenticator_providers()
-    assert len(res) <= 40
+    assert len(res) <= 42
 
     res = await admin.a_get_authenticator_provider_config_description(provider_id="auth-cookie")
     assert res == {
@@ -6970,7 +7076,7 @@ async def test_a_get_bruteforce_status_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7009,7 +7115,7 @@ async def test_a_clear_bruteforce_attempts_for_user(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7051,7 +7157,7 @@ async def test_a_clear_bruteforce_attempts_for_all_users(
     :param realm: Keycloak realm
     :type realm: str
     """
-    oid, username, password = oid_with_credentials
+    oid, username, _ = oid_with_credentials
     await admin.a_change_current_realm(realm)
 
     # Turn on bruteforce protection
@@ -7225,7 +7331,7 @@ async def test_a_initial_access_token(
     assert res["count"] == 2
     assert res["expiration"] == 3
 
-    oid, username, password = oid_with_credentials
+    oid, _, _ = oid_with_credentials
 
     client = str(uuid.uuid4())
     secret = str(uuid.uuid4())

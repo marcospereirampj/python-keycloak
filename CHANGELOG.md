@@ -1,3 +1,39 @@
+## v5.8.1 (2025-08-19)
+
+### Fix
+
+- prevent all httpx deprecation warnings (#666)
+
+## v5.8.0 (2025-08-19)
+
+### Feat
+
+- implement endpoints returning the number of members in an organization (#665)
+
+## v5.7.0 (2025-07-17)
+
+### Feat
+
+- add `get_composite_client_roles_of_role` (#660)
+
+## v5.6.1 (2025-07-17)
+
+### Fix
+
+- fix tests (#661)
+
+## v5.6.0 (2025-06-22)
+
+### Feat
+
+- add pagination support to get realm roles (#659)
+
+## v5.5.1 (2025-05-25)
+
+### Fix
+
+- fix/latest version (#654)
+
 ## v5.5.0 (2025-04-09)
 
 ### Feat
