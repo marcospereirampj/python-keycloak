@@ -1,3 +1,9 @@
+## v5.9.0 (2025-12-27)
+
+### Feat
+
+- add pool_maxsize parameter to connection managers (#651)
+
 ## v5.8.1 (2025-08-19)
 
 ### Fix
