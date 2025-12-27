@@ -2224,7 +2224,7 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
 
         :param client_id: id in ClientRepresentation
-        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: ResourceServerRepresentation
         :type payload: dict
@@ -7562,7 +7562,7 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/latest/rest-api/index.html#ResourceServerRepresentation
 
         :param client_id: id in ClientRepresentation
-        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
+            https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_clientrepresentation
         :type client_id: str
         :param payload: ResourceServerRepresentation
         :type payload: dict
