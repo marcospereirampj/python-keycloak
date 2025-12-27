@@ -161,7 +161,6 @@ def admin(env: KeycloakTestEnv) -> KeycloakAdmin:
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
-        pool_maxsize=5,
     )
 
 
@@ -180,7 +179,6 @@ def admin_frozen(env: KeycloakTestEnv) -> KeycloakAdmin:
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
-        pool_maxsize=5,
     )
 
 
@@ -220,7 +218,6 @@ def oid(
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         realm_name=realm,
         client_id=client,
-        pool_maxsize=5,
     )
     # Cleanup
     admin.delete_client(client_id=client_id)
@@ -282,7 +279,6 @@ def oid_with_credentials(
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
-            pool_maxsize=5,
         ),
         username,
         password,
@@ -358,7 +354,6 @@ def oid_with_credentials_authz(
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
-            pool_maxsize=5,
         ),
         username,
         password,
@@ -426,7 +421,6 @@ def oid_with_credentials_device(
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
-            pool_maxsize=5,
         ),
         username,
         password,

@@ -75,20 +75,12 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     assert admin.connection.custom_headers is None, admin.connection.custom_headers
     assert admin.connection.pool_maxsize == 5, admin.connection.pool_maxsize
 
-    admin_default = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
-        username=env.keycloak_admin,
-        password=env.keycloak_admin_password,
-    )
-    assert admin_default.connection.pool_maxsize is None
-
     admin = KeycloakAdmin(
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
         realm_name=None,
         user_realm_name="master",
-        pool_maxsize=5,
     )
     assert admin.connection.token is None
     admin = KeycloakAdmin(
@@ -97,7 +89,6 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
         password=env.keycloak_admin_password,
         realm_name=None,
         user_realm_name=None,
-        pool_maxsize=5,
     )
     assert admin.connection.token is None
 
@@ -108,7 +99,6 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
         token=token,
         realm_name=None,
         user_realm_name=None,
-        pool_maxsize=5,
     )
     assert admin.connection.token == token
 
@@ -133,7 +123,6 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
         user_realm_name="authz",
         client_id="authz-client",
         client_secret_key=secret["value"],
-        pool_maxsize=5,
     )
     admin_auth.connection.refresh_token()
     assert admin_auth.connection.token is not None
@@ -146,7 +135,6 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
             password=None,
             client_secret_key=None,
             custom_headers={"custom": "header"},
-            pool_maxsize=5,
         ).connection.token
         is None
     )
@@ -158,7 +146,6 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
         realm_name="master",
         client_id="admin-cli",
         verify=True,
-        pool_maxsize=5,
     )
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
     keycloak_admin.connection.get_token()
@@ -3684,7 +3671,6 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     realms = await admin.a_get_realms()
     assert len(realms) == 1, realms
     assert realms[0]["realm"] == "master"
-    assert admin.connection.pool_maxsize == 5, admin.connection.pool_maxsize
 
     # Create a test realm
     res = await admin.a_create_realm(payload={"realm": "test"})

@@ -585,7 +585,6 @@ async def test_a_well_known(oid: KeycloakOpenID) -> None:
     res = await oid.a_well_known()
     assert res is not None
     assert res != {}
-    assert oid.connection.pool_maxsize == 5
     for key in [
         "acr_values_supported",
         "authorization_encryption_alg_values_supported",

@@ -123,7 +123,15 @@ class ConnectionManager:
         if proxies:
             self._s.proxies.update(proxies)
 
-        self.async_s = httpx.AsyncClient(verify=verify, mounts=proxies, cert=cert)
+        self.async_s = httpx.AsyncClient(
+            verify=verify,
+            mounts=proxies,
+            cert=cert,
+            limits=httpx.Limits(
+                max_connections=100 if pool_maxsize is None else pool_maxsize,
+                max_keepalive_connections=20,
+            ),
+        )
         self.async_s.auth = None  # don't let requests add auth headers
         self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
 
