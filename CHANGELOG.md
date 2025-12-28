@@ -1,3 +1,9 @@
+## v6.0.0 (2025-12-28)
+
+### BREAKING CHANGE
+
+- changes the behavior of get_group_by_path to raise an exception in case the path is not found, which is now the definitive new behavior
+
 ## v5.12.0 (2025-12-27)
 
 ### Feat
