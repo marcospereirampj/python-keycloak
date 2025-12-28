@@ -39,7 +39,6 @@ from .exceptions import (
     HTTP_CONFLICT,
     HTTP_CREATED,
     HTTP_NO_CONTENT,
-    HTTP_NOT_FOUND,
     HTTP_OK,
     KeycloakDeleteError,
     KeycloakGetError,
@@ -1948,6 +1947,8 @@ class KeycloakAdmin:
 
         Returns full group details for a group defined by path
 
+        Raises an `KeycloakGetError` if the group was not found.
+
         GroupRepresentation
         https://www.keycloak.org/docs-api/24.0.2/rest-api/#_grouprepresentation
 
@@ -1960,7 +1961,11 @@ class KeycloakAdmin:
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path),
         )
-        return raise_error_from_response(data_raw, KeycloakGetError, [HTTP_OK, HTTP_NOT_FOUND])
+        # PR https://github.com/marcospereirampj/python-keycloak/pull/627
+        # added `HTTP_NOT_FOUND` to the `expected_codes` argument.
+        # This change has since been reverted, see:
+        # https://github.com/marcospereirampj/python-keycloak/issues/675
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_group(
         self,
