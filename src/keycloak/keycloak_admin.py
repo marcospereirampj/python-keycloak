@@ -4114,6 +4114,24 @@ class KeycloakAdmin:
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
+    def get_all_roles_of_group(self, group_id: str, brief_representation: bool = True) -> dict:
+        """
+        Get all roles of a group.
+
+        :param group_id: id of the group
+        :type group_id: str
+        :param brief_representation: whether to omit role attributes in the response
+        :type brief_representation: bool
+        :return: Keycloak server response
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
+        params = {"briefRepresentation": brief_representation}
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path), **params
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
     def delete_group_client_roles(self, group_id: str, client_id: str, roles: str | list) -> bytes:
         """
         Delete client roles of a group.
@@ -9465,6 +9483,26 @@ class KeycloakAdmin:
         }
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_GROUPS_CLIENT_ROLES.format(**params_path),
+        )
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    async def a_get_all_roles_of_group(
+        self, group_id: str, brief_representation: bool = True
+    ) -> dict:
+        """
+        Get all roles of a group asynchronously.
+
+        :param group_id: id of the group
+        :type group_id: str
+        :param brief_representation: whether to omit role attributes in the response
+        :type brief_representation: bool
+        :return: Keycloak server response
+        :rtype: list
+        """
+        params_path = {"realm-name": self.connection.realm_name, "id": group_id}
+        params = {"briefRepresentation": brief_representation}
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_GROUP_ALL_ROLES.format(**params_path), **params
         )
         return raise_error_from_response(data_raw, KeycloakGetError)
 
