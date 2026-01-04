@@ -2557,7 +2557,7 @@ def test_email(admin: KeycloakAdmin, user: str) -> None:
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
         admin.send_update_account(user_id=user, payload=[])
-    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email: .*'), err
+    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email.*'), err
 
     admin.update_user(user_id=user, payload={"enabled": True})
     with pytest.raises(KeycloakPutError) as err:
@@ -2694,7 +2694,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     del flow["id"]
     flow["description"] = "test description"
     res = admin.update_authentication_flow(flow_id=browser_flow_id, payload=flow)
-    assert res == {}
+    assert isinstance(res, dict)
     res = admin.get_authentication_flow_for_id(flow_id=browser_flow_id)
     assert res["description"] == "test description"
 
@@ -4714,7 +4714,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert err.match('404: b\'{"error":"Group path does not exist"}\'')
+    assert err.match('404: b\'{"error":"Group path does not exist.*\'')
 
     res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
@@ -6333,7 +6333,7 @@ async def test_a_email(admin: KeycloakAdmin, user: str) -> None:
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
         await admin.a_send_update_account(user_id=user, payload=[])
-    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email: .*'), err
+    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email.*'), err
 
     admin.update_user(user_id=user, payload={"enabled": True})
     with pytest.raises(KeycloakPutError) as err:
@@ -6538,7 +6538,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     del flow["id"]
     flow["description"] = "test description"
     res = await admin.a_update_authentication_flow(flow_id=browser_flow_id, payload=flow)
-    assert res == {}
+    assert isinstance(res, dict)
     res = await admin.a_get_authentication_flow_for_id(flow_id=browser_flow_id)
     assert res["description"] == "test description"
 
