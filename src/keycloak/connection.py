@@ -104,7 +104,9 @@ class ConnectionManager:
         self.headers = headers
         self.timeout = timeout
         self.verify = verify
+        self.proxies = proxies
         self.cert = cert
+        self.max_retries = max_retries
         self.pool_maxsize = pool_maxsize
         self._s = requests.Session()
         self._s.auth = lambda x: x  # don't let requests add auth headers
@@ -194,6 +196,20 @@ class ConnectionManager:
         self._verify = value
 
     @property
+    def proxies(self) -> dict | None:
+        """
+        Return proxies in use for request to the server.
+
+        :returns: Proxies
+        :rtype: dict | None
+        """
+        return self._proxies
+
+    @proxies.setter
+    def proxies(self, value: dict | None) -> None:
+        self._proxies = value
+
+    @property
     def cert(self) -> str | tuple | None:
         """
         Return client certificates in use for request to the server.
@@ -206,6 +222,20 @@ class ConnectionManager:
     @cert.setter
     def cert(self, value: str | tuple | None) -> None:
         self._cert = value
+
+    @property
+    def max_retries(self) -> int:
+        """
+        Return maximum number of retries in use for requests to the server.
+
+        :returns: Maximum number of retries
+        :rtype: int
+        """
+        return self._max_retries
+
+    @max_retries.setter
+    def max_retries(self, value: int) -> None:
+        self._max_retries = value
 
     @property
     def pool_maxsize(self) -> int | None:

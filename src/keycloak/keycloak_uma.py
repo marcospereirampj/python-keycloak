@@ -461,7 +461,15 @@ class KeycloakUMA:
             )
             raise AttributeError(msg)
 
-        connection = ConnectionManager(self.connection.base_url)
+        connection = ConnectionManager(
+            base_url=self.connection.base_url,
+            timeout=self.connection.timeout,
+            verify=self.connection.verify,
+            proxies=self.connection.proxies,
+            cert=self.connection.cert,
+            max_retries=self.connection.max_retries,
+            pool_maxsize=self.connection.pool_maxsize,
+        )
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = connection.raw_post(self.uma_well_known["token_endpoint"], data=payload)
@@ -946,7 +954,15 @@ class KeycloakUMA:
             )
             raise AttributeError(msg)
 
-        connection = ConnectionManager(self.connection.base_url)
+        connection = ConnectionManager(
+            base_url=self.connection.base_url,
+            timeout=self.connection.timeout,
+            verify=self.connection.verify,
+            proxies=self.connection.proxies,
+            cert=self.connection.cert,
+            max_retries=self.connection.max_retries,
+            pool_maxsize=self.connection.pool_maxsize,
+        )
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await connection.a_raw_post(
