@@ -140,7 +140,6 @@ class ConnectionManager:
             ),
         )
         self.async_s.auth = None  # pyright: ignore[reportAttributeAccessIssue]
-        self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)  # pyright: ignore[reportAttributeAccessIssue]
 
     async def aclose(self) -> None:
         """Close the async connection on delete."""
