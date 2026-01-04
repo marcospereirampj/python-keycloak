@@ -323,7 +323,7 @@ class ConnectionManager:
         :param path: Path for request.
         :type path: str
         :param data: Payload for request.
-        :type data: dict
+        :type data: dict | str | MultipartEncoder
         :param kwargs: Additional arguments
         :type kwargs: dict
         :returns: Response the request.
@@ -347,14 +347,14 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_put(self, path: str, data: dict | str, **kwargs: Any) -> Response:  # noqa: ANN401
+    def raw_put(self, path: str, data: dict | str | MultipartEncoder, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Submit put request to the path.
 
         :param path: Path for request.
         :type path: str
         :param data: Payload for request.
-        :type data: dict
+        :type data: dict | str | MultipartEncoder
         :param kwargs: Additional arguments
         :type kwargs: dict
         :returns: Response the request.
@@ -450,7 +450,7 @@ class ConnectionManager:
         :param path: Path for request.
         :type path: str
         :param data: Payload for request.
-        :type data: dict
+        :type data: dict | str | MultipartEncoder
         :param kwargs: Additional arguments
         :type kwargs: dict
         :returns: Response the request.
@@ -474,14 +474,19 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_put(self, path: str, data: dict | str, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
+    async def a_raw_put(
+        self,
+        path: str,
+        data: dict | str | MultipartEncoder,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> AsyncResponse:
         """
         Submit put request to the path.
 
         :param path: Path for request.
         :type path: str
         :param data: Payload for request.
-        :type data: dict
+        :type data: dict | str | MultipartEncoder
         :param kwargs: Additional arguments
         :type kwargs: dict
         :returns: Response the request.
@@ -548,7 +553,7 @@ class ConnectionManager:
         See https://www.python-httpx.org/compatibility/#request-content
 
         :param data: the request content
-        :type data: dict | str | None
+        :type data: dict | str | None | MultipartEncoder
         :returns: A dict mapping the correct kwarg to the request content
         :rtype: dict
         """
