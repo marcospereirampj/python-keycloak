@@ -1701,7 +1701,7 @@ class KeycloakAdmin:
 
         return res
 
-    def disable_user(self, user_id: str) -> dict | bytes:
+    def disable_user(self, user_id: str) -> dict:
         """
         Disable the user from the realm. Disabled users can not log in.
 
@@ -1709,11 +1709,11 @@ class KeycloakAdmin:
         :type user_id: str
 
         :return: Http response
-        :rtype: bytes
+        :rtype: dict
         """
         return self.update_user(user_id=user_id, payload={"enabled": False})
 
-    def enable_user(self, user_id: str) -> dict | bytes:
+    def enable_user(self, user_id: str) -> dict:
         """
         Enable the user from the realm.
 
@@ -1721,7 +1721,7 @@ class KeycloakAdmin:
         :type user_id: str
 
         :return: Http response
-        :rtype: bytes
+        :rtype: dict
         """
         return self.update_user(user_id=user_id, payload={"enabled": True})
 
@@ -2228,11 +2228,14 @@ class KeycloakAdmin:
                 group["subGroups"] = self.get_group_children(
                     group_id=group.get("id"),
                     full_hierarchy=full_hierarchy,
+                    query=query,
                 )
 
         return groups
 
-    def get_group(self, group_id: str, full_hierarchy: bool = False) -> dict:
+    def get_group(
+        self, group_id: str, full_hierarchy: bool = False, query: dict | None = None
+    ) -> dict:
         """
         Get group by id.
 
@@ -2246,9 +2249,12 @@ class KeycloakAdmin:
         :param full_hierarchy: If True, return all of the nested children groups, otherwise only
             the first level children are returned
         :type full_hierarchy: bool
+        :param query: Additional query parameters passed into the subgroup fetch requests
+        :type query: dict | None
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         response = self.connection.raw_get(urls_patterns.URL_ADMIN_GROUP.format(**params_path))
 
@@ -2259,8 +2265,7 @@ class KeycloakAdmin:
         group = response.json()
         if group.get("subGroupCount"):
             group["subGroups"] = self.get_group_children(
-                group.get("id"),
-                full_hierarchy=full_hierarchy,
+                group.get("id"), full_hierarchy=full_hierarchy, query=query
             )
 
         return group
@@ -2334,6 +2339,7 @@ class KeycloakAdmin:
                 group["subGroups"] = self.get_group_children(
                     group_id=group.get("id"),
                     full_hierarchy=full_hierarchy,
+                    query=query,
                 )
 
         return res
@@ -5397,7 +5403,7 @@ class KeycloakAdmin:
 
         return res
 
-    def create_authentication_flow(self, payload: dict, skip_exists: bool = False) -> bytes | dict:
+    def create_authentication_flow(self, payload: dict, skip_exists: bool = False) -> bytes:
         """
         Create a new authentication flow.
 
@@ -5409,7 +5415,7 @@ class KeycloakAdmin:
         :param skip_exists: Do not raise an error if authentication flow already exists
         :type skip_exists: bool
         :return: Keycloak server response (RoleRepresentation)
-        :rtype: bytes | dict
+        :rtype: bytes
         """
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_post(
@@ -9087,13 +9093,14 @@ class KeycloakAdmin:
         for group in groups:
             if group.get("subGroupCount"):
                 group["subGroups"] = await self.a_get_group_children(
-                    group_id=group.get("id"),
-                    full_hierarchy=full_hierarchy,
+                    group_id=group.get("id"), full_hierarchy=full_hierarchy, query=query
                 )
 
         return groups
 
-    async def a_get_group(self, group_id: str, full_hierarchy: bool = False) -> dict:
+    async def a_get_group(
+        self, group_id: str, full_hierarchy: bool = False, query: dict | None = None
+    ) -> dict:
         """
         Get group by id asynchronously.
 
@@ -9107,9 +9114,12 @@ class KeycloakAdmin:
         :param full_hierarchy: If True, return all of the nested children groups, otherwise only
             the first level children are returned
         :type full_hierarchy: bool
+        :param query: Additional query parameters to pass into the subgroups fetch requests.
+        :type query: dict | None
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
+        query = query or {}
         params_path = {"realm-name": self.connection.realm_name, "id": group_id}
         response = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_GROUP.format(**params_path),
@@ -9122,8 +9132,7 @@ class KeycloakAdmin:
         group = response.json()
         if group.get("subGroupCount"):
             group["subGroups"] = await self.a_get_group_children(
-                group.get("id"),
-                full_hierarchy=full_hierarchy,
+                group.get("id"), full_hierarchy=full_hierarchy, query=query
             )
 
         return group
@@ -9193,8 +9202,7 @@ class KeycloakAdmin:
         for group in res:
             if group.get("subGroupCount"):
                 group["subGroups"] = await self.a_get_group_children(
-                    group_id=group.get("id"),
-                    full_hierarchy=full_hierarchy,
+                    group_id=group.get("id"), full_hierarchy=full_hierarchy, query=query
                 )
 
         return res
