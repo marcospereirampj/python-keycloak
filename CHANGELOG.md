@@ -1,3 +1,18 @@
+## v7.0.0 (2026-01-04)
+
+### BREAKING CHANGE
+
+- this change introduces a very strong typing across the library. From now on, we demand that each method returns a single type and converts the results into the specified return type, otherwise it raises a TypeError exception. This should resolve any type checking linter errors within the library as well.
+
+### Fix
+
+- updated lockfile
+- pass along the default connection manager configuration into uma
+- dont override transport for httpx
+- pass query params in get groups
+- removed async property as a dependency
+- strong and consistent typing across the library
+
 ## v6.0.0 (2025-12-28)
 
 ### BREAKING CHANGE
