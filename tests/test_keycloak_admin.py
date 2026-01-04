@@ -2,6 +2,7 @@
 
 import contextlib
 import copy
+import json
 import os
 import uuid
 from inspect import iscoroutinefunction, signature
@@ -117,7 +118,9 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
             "publicClient": False,
         },
     )
-    secret = admin.generate_client_secrets(client_id=admin.get_client_id("authz-client"))
+    client_id = admin.get_client_id("authz-client")
+    assert client_id is not None
+    secret = admin.generate_client_secrets(client_id=client_id)
     admin_auth = KeycloakAdmin(
         server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
         user_realm_name="authz",
@@ -172,6 +175,7 @@ def test_realms(admin: KeycloakAdmin) -> None:
     with pytest.raises(KeycloakPostError) as err:
         res = admin.create_realm(payload={"realm": "test"})
 
+    assert isinstance(err.value.error_message, bytes)
     assert (
         b"Realm test already exists" in err.value.error_message
         or b"Conflict detected" in err.value.error_message
@@ -180,9 +184,9 @@ def test_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, skip_exists true
     res = admin.create_realm(payload={"realm": "test"}, skip_exists=True)
     assert res in [
-        {"errorMessage": "Realm test already exists"},
-        {"msg": "Already exists"},
-        {"errorMessage": "Conflict detected. See logs for details"},
+        json.dumps({"errorMessage": "Realm test already exists"}).encode(),
+        json.dumps({"msg": "Already exists"}).encode(),
+        json.dumps({"errorMessage": "Conflict detected. See logs for details"}).encode(),
     ], res
 
     # Get a single realm
@@ -280,7 +284,7 @@ def test_import_export_realms(admin: KeycloakAdmin, realm: str) -> None:
     assert realm_export != {}, realm_export
 
     admin.delete_realm(realm_name=realm)
-    admin.realm_name = "master"
+    admin.change_current_realm("master")
     res = admin.import_realm(payload=realm_export)
     assert res == b"", res
 
@@ -368,12 +372,19 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     assert org["alias"] == "test-org01", org["alias"]
     assert org["domains"][0]["name"] == "org1.com", org["domains"][0]["name"]
 
+    org["name"] = "test-org01-u"
+    org_update_res = admin.update_organization(org_id, payload=org)
+    assert org_update_res == {}
+    org["name"] = "test-org01"
+    admin.update_organization(org_id, payload=org)
+
     orgs = admin.get_organizations()
     assert len(orgs) == 1, orgs
     assert orgs[0]["name"] == "test-org01", orgs[0]["name"]
 
     user_id = admin.create_user(payload={"username": "test", "email": "test@test.test"})
-    admin.organization_user_add(user_id, org_id)
+    org_user_add_res = admin.organization_user_add(user_id, org_id)
+    assert org_user_add_res == b""
 
     users = admin.get_organization_members(org_id)
     assert len(users) == 1, users
@@ -385,7 +396,8 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     assert len(user_orgs) == 1, user_orgs
     assert user_orgs[0]["name"] == "test-org01", user_orgs[0]["name"]
 
-    admin.organization_user_remove(user_id, org_id)
+    org_user_remove_res = admin.organization_user_remove(user_id, org_id)
+    assert org_user_remove_res == {}
     users = admin.get_organization_members(org_id)
     assert len(users) == 0, users
     num_users = admin.get_organization_members_count(org_id)
@@ -415,17 +427,20 @@ def test_organizations(admin: KeycloakAdmin, realm: str) -> None:
         }
     )
 
-    admin.organization_idp_add(org_id, "github")
+    idp_add_res = admin.organization_idp_add(org_id, "github")
+    assert idp_add_res == {}
 
     idps = admin.get_organization_idps(org_id)
     assert len(idps) == 1, idps
     assert idps[0]["alias"] == "github", idps[0]["alias"]
 
-    admin.organization_idp_remove(org_id, "github")
+    idp_remove_res = admin.organization_idp_remove(org_id, "github")
+    assert idp_remove_res == {}
     idps = admin.get_organization_idps(org_id)
     assert len(idps) == 0, idps
 
-    admin.delete_organization(org_id)
+    delete_org_res = admin.delete_organization(org_id)
+    assert delete_org_res == {}
     orgs = admin.get_organizations()
     assert len(orgs) == 0, orgs
 
@@ -673,6 +688,7 @@ def test_user_groups_pagination(admin: KeycloakAdmin, realm: str) -> None:
     for ind in range(admin.PAGE_SIZE + 50):
         group_name = f"group_{ind}"
         group_id = admin.create_group(payload={"name": group_name})
+        assert group_id is not None
         admin.group_user_add(user_id=user_id, group_id=group_id)
 
     groups = admin.get_user_groups(user_id=user_id)
@@ -954,6 +970,7 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
     assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
 
     # Test get group
+    assert subgroup_id_1 is not None
     res = admin.get_group(group_id=subgroup_id_1)
     assert res["id"] == subgroup_id_1, res
     assert res["name"] == "subgroup-1"
@@ -969,6 +986,7 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
     main_group = admin.get_group(group_id=group_id)
 
     # Test nested searches
+    assert subgroup_id_2 is not None
     subgroup_2 = admin.get_group(group_id=subgroup_id_2)
     res = admin.get_subgroups(group=subgroup_2, path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
@@ -979,6 +997,7 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
         group=admin.get_group(group_id=group_id, full_hierarchy=True),
         path="/main-group/subgroup-2/subsubgroup-1",
     )
+    assert isinstance(res, dict)
     assert res["id"] == subsubgroup_id_1
 
     # Test nested search from all groups
@@ -1060,7 +1079,7 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
     res = admin.group_set_permissions(group_id=subgroup_id_2, enabled=False)
     assert not res["enabled"], res
     with pytest.raises(KeycloakPutError) as err:
-        admin.group_set_permissions(group_id=subgroup_id_2, enabled="blah")
+        admin.group_set_permissions(group_id=subgroup_id_2, enabled="blah")  # pyright: ignore[reportArgumentType]
     assert err.match(UNKOWN_ERROR_REGEX), err
 
     # Test update group
@@ -1076,6 +1095,7 @@ def test_groups(admin: KeycloakAdmin, user: str) -> None:
     # Test delete
     res = admin.delete_group(group_id=group_id)
     assert res == {}, res
+    assert main_group_id_2 is not None
     res = admin.delete_group(group_id=main_group_id_2)
     assert res == {}, res
     assert len(admin.get_groups()) == 0
@@ -1248,11 +1268,12 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert res["name"] == "temp-resource", res
     temp_resource_id: str = res["_id"]
     # Test update authz resources
-    admin.update_client_authz_resource(
+    cz_res = admin.update_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
         payload={"name": "temp-updated-resource"},
     )
+    assert cz_res == {}
     res = admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
     assert res["name"] == "temp-updated-resource", res
     with pytest.raises(KeycloakPutError) as err:
@@ -1262,7 +1283,10 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
             payload={"name": "temp-updated-resource"},
         )
     assert err.match("404: b''"), err
-    admin.delete_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
+    cz_res = admin.delete_client_authz_resource(
+        client_id=auth_client_id, resource_id=temp_resource_id
+    )
+    assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
     assert err.match("404: b''")
@@ -1304,7 +1328,8 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     )
     res2 = admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
     assert res["id"] == res2["id"]
-    admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    cz_res = admin.delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
     assert err.match("404: b''")
@@ -1387,6 +1412,7 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
             "policies": [role_based_policy_id],
         },
     )
+    assert res == b""
 
     # Test getting associated policies for a permission
     associated_policies = admin.get_client_authz_permission_associated_policies(
@@ -1447,7 +1473,8 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
             "config": {"hourEnd": "18", "hour": "9"},
         }
     ]
-    admin.import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    cz_res = admin.import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    assert cz_res == {}
     exported = admin.get_client_authz_settings(client_id=auth_client_id)
     assert (
         len(
@@ -1496,23 +1523,22 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
         admin.get_client_secrets(client_id="does-not-exist")
     assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
-    secrets = admin.get_client_secrets(
-        client_id=admin.get_client_id(client_id="test-confidential"),
-    )
+    client_id = admin.get_client_id(client_id="test-confidential")
+    assert client_id is not None
+    secrets = admin.get_client_secrets(client_id=client_id)
     assert secrets == {"type": "secret", "value": "test-secret"}
 
     with pytest.raises(KeycloakPostError) as err:
         admin.generate_client_secrets(client_id="does-not-exist")
     assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
-    res = admin.generate_client_secrets(
-        client_id=admin.get_client_id(client_id="test-confidential"),
-    )
+    client_id = admin.get_client_id(client_id="test-confidential")
+    assert client_id is not None
+    res = admin.generate_client_secrets(client_id=client_id)
     assert res
-    assert (
-        admin.get_client_secrets(client_id=admin.get_client_id(client_id="test-confidential"))
-        == res
-    )
+    client_id = admin.get_client_id(client_id="test-confidential")
+    assert client_id is not None
+    assert admin.get_client_secrets(client_id=client_id) == res
 
 
 def test_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
@@ -1619,6 +1645,7 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test realm role group assignment
     group_id = admin.create_group(payload={"name": "test-group"})
+    assert group_id is not None
     with pytest.raises(KeycloakPostError) as err:
         admin.assign_group_realm_roles(group_id=group_id, roles=["bad"])
     assert err.match(UNKOWN_ERROR_REGEX), err
@@ -2075,16 +2102,18 @@ def test_client_default_client_scopes(admin: KeycloakAdmin, realm: str, client: 
         "client": client_id,
         "clientScopeId": new_client_scope_id,
     }
-    admin.add_client_default_client_scope(
+    dcs_res = admin.add_client_default_client_scope(
         client_id,
         new_client_scope_id,
         new_default_client_scope_data,
     )
+    assert dcs_res == {}
     default_client_scopes = admin.get_client_default_client_scopes(client_id)
     assert len(default_client_scopes) in [6, 7], default_client_scopes
 
     # Test remove a client default scope
-    admin.delete_client_default_client_scope(client_id, new_client_scope_id)
+    dcs_res = admin.delete_client_default_client_scope(client_id, new_client_scope_id)
+    assert dcs_res == {}
     default_client_scopes = admin.get_client_default_client_scopes(client_id)
     assert len(default_client_scopes) in [5, 6], default_client_scopes
 
@@ -2125,16 +2154,18 @@ def test_client_optional_client_scopes(admin: KeycloakAdmin, realm: str, client:
         "client": client_id,
         "clientScopeId": new_client_scope_id,
     }
-    admin.add_client_optional_client_scope(
+    ocs_res = admin.add_client_optional_client_scope(
         client_id,
         new_client_scope_id,
         new_optional_client_scope_data,
     )
+    assert ocs_res == {}
     optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
     assert len(optional_client_scopes) in [5, 6], optional_client_scopes
 
     # Test remove a client optional scope
-    admin.delete_client_optional_client_scope(client_id, new_client_scope_id)
+    ocs_res = admin.delete_client_optional_client_scope(client_id, new_client_scope_id)
+    assert ocs_res == {}
     optional_client_scopes = admin.get_client_optional_client_scopes(client_id)
     assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
@@ -2243,11 +2274,12 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_client_roles_of_user(user_id=user_id, client_id=client, roles=["bad"])
     assert err.match(UNKOWN_ERROR_REGEX), err
-    admin.delete_client_roles_of_user(
+    dcr_res = admin.delete_client_roles_of_user(
         user_id=user_id,
         client_id=client,
         roles=[admin.get_client_role(client_id=client, role_name="client-role-test-update")],
     )
+    assert dcr_res == {}
     assert len(admin.get_client_roles_of_user(user_id=user_id, client_id=client)) == 0
 
     # Test groups and client roles
@@ -2258,6 +2290,7 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     group_id = admin.create_group(payload={"name": "test-group"})
+    assert group_id is not None
     res = admin.get_group_client_roles(group_id=group_id, client_id=client)
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
@@ -2409,10 +2442,11 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None:
         pytest.fail("Missing realm management client")
 
     # Enable permissions on the Superset client
-    admin.update_client_management_permissions(
+    update_res = admin.update_client_management_permissions(
         payload={"enabled": True},
         client_id=target_client_id,
     )
+    assert isinstance(update_res, dict)
 
     # Fetch various IDs and strings needed when creating the permission
     token_exchange_permission_id = admin.get_client_management_permissions(
@@ -2466,7 +2500,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None:
         client_id=realm_management_id,
         scope_id=token_exchange_permission_id,
     )["name"]
-    admin.update_client_authz_scope_permission(
+    per_update_res = admin.update_client_authz_scope_permission(
         payload={
             "id": token_exchange_permission_id,
             "name": permission_name,
@@ -2480,9 +2514,10 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None:
         client_id=realm_management_id,
         scope_id=token_exchange_permission_id,
     )
+    assert per_update_res == b""
 
     # Create permissions on the target client to reference this policy
-    admin.create_client_authz_scope_permission(
+    per_create_res = admin.create_client_authz_scope_permission(
         payload={
             "id": "some-id",
             "name": "test-permission",
@@ -2495,6 +2530,7 @@ def test_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None:
         },
         client_id=realm_management_id,
     )
+    assert isinstance(per_create_res, dict)
     permission_name = admin.get_client_authz_scope_permission(
         client_id=realm_management_id,
         scope_id=token_exchange_permission_id,
@@ -2517,10 +2553,11 @@ def test_email(admin: KeycloakAdmin, user: str) -> None:
     :param user: Keycloak user
     :type user: str
     """
+    admin.enable_user(user)
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
-        admin.send_update_account(user_id=user, payload={})
-    assert err.match(UNKOWN_ERROR_REGEX), err
+        admin.send_update_account(user_id=user, payload=[])
+    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email: .*'), err
 
     admin.update_user(user_id=user, payload={"enabled": True})
     with pytest.raises(KeycloakPutError) as err:
@@ -2535,7 +2572,10 @@ def test_get_sessions(admin: KeycloakAdmin) -> None:
     :param admin: Keycloak Admin client
     :type admin: KeycloakAdmin
     """
-    sessions = admin.get_sessions(user_id=admin.get_user_id(username=admin.connection.username))
+    assert admin.connection.username is not None
+    user_id = admin.get_user_id(username=admin.connection.username)
+    assert user_id is not None
+    sessions = admin.get_sessions(user_id=user_id)
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
         admin.get_sessions(user_id="bad")
@@ -2654,6 +2694,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     del flow["id"]
     flow["description"] = "test description"
     res = admin.update_authentication_flow(flow_id=browser_flow_id, payload=flow)
+    assert res == {}
     res = admin.get_authentication_flow_for_id(flow_id=browser_flow_id)
     assert res["description"] == "test description"
 
@@ -2707,7 +2748,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     payload = admin.get_authentication_flow_executions(flow_alias="test-create")[0]
     payload["displayName"] = "test"
     res = admin.update_authentication_flow_executions(payload=payload, flow_alias="test-create")
-    assert res or (res == {})
+    assert res == {}
 
     exec_id = admin.get_authentication_flow_executions(flow_alias="test-create")[0]["id"]
     res = admin.delete_authentication_flow_execution(execution_id=exec_id)
@@ -2743,7 +2784,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         flow_alias="test-create",
         skip_exists=True,
     )
-    assert res == {"msg": "Already exists"}
+    assert res == json.dumps({"msg": "Already exists"}).encode()
 
     # Test delete auth flow
     flow_id = next(x for x in admin.get_authentication_flows() if x["alias"] == "test-browser")[
@@ -2814,13 +2855,14 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
     # Test authenticator config
     executions = admin.get_authentication_flow_executions(flow_alias="browser")
     execution = next(ex for ex in executions if ex["configurable"])
-    _ = admin.create_execution_config(
+    res = admin.create_execution_config(
         execution["id"],
         {
             "alias": "test.provisioning.property",
             "config": {"test.provisioning.property": "value2"},
         },
     )
+    assert res == b""
     executions = admin.get_authentication_flow_executions(flow_alias="browser")
     execution_config_id = next(ex for ex in executions if ex.get("id") == execution["id"])[
         "authenticationConfig"
@@ -2836,9 +2878,15 @@ def test_authentication_configs(admin: KeycloakAdmin, realm: str) -> None:
         admin.update_authenticator_config(payload={}, config_id="bad")
     assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
 
+    res = admin.update_authenticator_config(payload={}, config_id=execution_config_id)
+    assert res == {}
+
     with pytest.raises(KeycloakDeleteError) as err:
         admin.delete_authenticator_config(config_id="bad")
     assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
+
+    res = admin.delete_authenticator_config(config_id=execution_config_id)
+    assert res == {}
 
 
 def test_sync_users(admin: KeycloakAdmin, realm: str) -> None:
@@ -3167,12 +3215,14 @@ def test_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
     assert res["realm"] == realm
 
     # Freeze time to simulate the access token expiring
+    assert admin.connection.expires_at is not None
     with freezegun.freeze_time("2023-02-25 10:05:00"):
         assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:05:00Z")
         assert admin.get_realm(realm_name=realm)
         assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:05:00Z")
 
     # Test bad refresh token, but first make sure access token has expired again
+    assert admin.connection.token is not None
     with freezegun.freeze_time("2023-02-25 10:10:00"):
         admin.connection.custom_headers = {"Content-Type": "application/json"}
         admin.connection.token["refresh_token"] = "bad"  # noqa: S105
@@ -3244,6 +3294,7 @@ def test_get_required_action_by_alias(admin: KeycloakAdmin, realm: str) -> None:
     admin.change_current_realm(realm)
     ractions = admin.get_required_actions()
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    assert ra is not None
     assert ra in ractions
     assert ra["alias"] == "UPDATE_PASSWORD"
     assert admin.get_required_action_by_alias("does-not-exist") is None
@@ -3260,10 +3311,13 @@ def test_update_required_action(admin: KeycloakAdmin, realm: str) -> None:
     """
     admin.change_current_realm(realm)
     ra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    assert ra is not None
     old = copy.deepcopy(ra)
     ra["enabled"] = False
-    admin.update_required_action("UPDATE_PASSWORD", ra)
+    res = admin.update_required_action("UPDATE_PASSWORD", ra)
+    assert res == {}
     newra = admin.get_required_action_by_alias("UPDATE_PASSWORD")
+    assert newra is not None
     assert old != newra
     assert newra["enabled"] is False
 
@@ -3370,7 +3424,7 @@ def test_upload_certificate(
     admin: KeycloakAdmin,
     realm: str,
     client: str,
-    selfsigned_cert: tuple,
+    selfsigned_cert: tuple[bytes, bytes],
 ) -> None:
     """
     Test upload certificate.
@@ -3387,7 +3441,8 @@ def test_upload_certificate(
     admin.change_current_realm(realm)
     cert, _ = selfsigned_cert
     cert = cert.decode("utf-8").strip()
-    admin.upload_certificate(client, cert)
+    res = admin.upload_certificate(client, cert)
+    assert "certificate" in res
     cl = admin.get_client(client)
     assert cl["attributes"]["jwt.credential.certificate"] == "".join(cert.splitlines()[1:-1])
 
@@ -3420,6 +3475,7 @@ def test_get_bruteforce_status_for_user(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
+    assert user_id is not None
     bruteforce_status = admin.get_bruteforce_detection_status(user_id)
 
     assert bruteforce_status["numFailures"] == 1
@@ -3458,10 +3514,12 @@ def test_clear_bruteforce_attempts_for_user(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
+    assert user_id is not None
     bruteforce_status = admin.get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 1
 
     res = admin.clear_bruteforce_attempts_for_user(user_id)
+    assert res == {}
     bruteforce_status = admin.get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 0
 
@@ -3499,10 +3557,12 @@ def test_clear_bruteforce_attempts_for_all_users(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
+    assert user_id is not None
     bruteforce_status = admin.get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 1
 
     res = admin.clear_all_bruteforce_attempts()
+    assert res == {}
     bruteforce_status = admin.get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 0
 
@@ -3680,7 +3740,10 @@ def test_refresh_token(admin: KeycloakAdmin) -> None:
     """
     admin.get_realms()
     assert admin.connection.token is not None
-    admin.user_logout(admin.get_user_id(admin.connection.username))
+    assert admin.connection.username is not None
+    user_id = admin.get_user_id(admin.connection.username)
+    assert user_id is not None
+    admin.user_logout(user_id=user_id)
     admin.connection.refresh_token()
 
 
@@ -3759,6 +3822,7 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     with pytest.raises(KeycloakPostError) as err:
         res = await admin.a_create_realm(payload={"realm": "test"})
 
+    assert isinstance(err.value.error_message, bytes)
     assert (
         b"Realm test already exists" in err.value.error_message
         or b"Conflict detected" in err.value.error_message
@@ -3767,9 +3831,9 @@ async def test_a_realms(admin: KeycloakAdmin) -> None:
     # Create the same realm, skip_exists true
     res = await admin.a_create_realm(payload={"realm": "test"}, skip_exists=True)
     assert res in [
-        {"errorMessage": "Realm test already exists"},
-        {"msg": "Already exists"},
-        {"errorMessage": "Conflict detected. See logs for details"},
+        json.dumps({"errorMessage": "Realm test already exists"}).encode(),
+        json.dumps({"msg": "Already exists"}).encode(),
+        json.dumps({"errorMessage": "Conflict detected. See logs for details"}).encode(),
     ], res
 
     # Get a single realm
@@ -3870,7 +3934,7 @@ async def test_a_import_export_realms(admin: KeycloakAdmin, realm: str) -> None:
     assert realm_export != {}, realm_export
 
     await admin.a_delete_realm(realm_name=realm)
-    admin.realm_name = "master"
+    admin.change_current_realm("master")
     res = await admin.a_import_realm(payload=realm_export)
     assert res == b"", res
 
@@ -3960,12 +4024,19 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     assert org["alias"] == "test-org01", org["alias"]
     assert org["domains"][0]["name"] == "org1.com", org["domains"][0]["name"]
 
+    org["name"] = "test-org01-u"
+    org_update_res = await admin.a_update_organization(org_id, org)
+    assert org_update_res == {}
+    org["name"] = "test-org01"
+    await admin.a_update_organization(org_id, org)
+
     orgs = await admin.a_get_organizations()
     assert len(orgs) == 1, orgs
     assert orgs[0]["name"] == "test-org01", orgs[0]["name"]
 
     user_id = await admin.a_create_user(payload={"username": "test", "email": "test@test.test"})
-    await admin.a_organization_user_add(user_id, org_id)
+    org_user_add_res = await admin.a_organization_user_add(user_id, org_id)
+    assert org_user_add_res == b""
 
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 1, users
@@ -3977,7 +4048,8 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
     assert len(user_orgs) == 1, user_orgs
     assert user_orgs[0]["name"] == "test-org01", user_orgs[0]["name"]
 
-    await admin.a_organization_user_remove(user_id, org_id)
+    org_user_remove_res = await admin.a_organization_user_remove(user_id, org_id)
+    assert org_user_remove_res == {}
     users = await admin.a_get_organization_members(org_id)
     assert len(users) == 0, users
     num_users = await admin.a_get_organization_members_count(org_id)
@@ -4011,17 +4083,20 @@ async def a_test_organizations(admin: KeycloakAdmin, realm: str) -> None:
         }
     )
 
-    await admin.a_organization_idp_add(org_id, "github")
+    idp_add_res = await admin.a_organization_idp_add(org_id, "github")
+    assert idp_add_res == {}
 
     idps = await admin.a_get_organization_idps(org_id)
     assert len(idps) == 1, idps
     assert idps[0]["alias"] == "github", idps[0]["alias"]
 
-    await admin.a_organization_idp_remove(org_id, "github")
+    idp_remove_res = await admin.a_organization_idp_remove(org_id, "github")
+    assert idp_remove_res == {}
     idps = await admin.a_get_organization_idps(org_id)
     assert len(idps) == 0, idps
 
-    await admin.a_delete_organization(org_id)
+    org_delete_res = await admin.a_delete_organization(org_id)
+    assert org_delete_res == {}
     orgs = await admin.a_get_organizations()
     assert len(orgs) == 0, orgs
 
@@ -4276,6 +4351,7 @@ async def test_a_user_groups_pagination(admin: KeycloakAdmin, realm: str) -> Non
     for ind in range(admin.PAGE_SIZE + 50):
         group_name = f"group_{ind}"
         group_id = await admin.a_create_group(payload={"name": group_name})
+        assert group_id is not None
         await admin.a_group_user_add(user_id=user_id, group_id=group_id)
 
     groups = await admin.a_get_user_groups(user_id=user_id)
@@ -4568,6 +4644,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
     assert {x["id"] for x in groups[0]["subGroups"]} == {subgroup_id_1, subgroup_id_2}
 
     # Test get group
+    assert subgroup_id_1 is not None
     res = await admin.a_get_group(group_id=subgroup_id_1)
     assert res["id"] == subgroup_id_1, res
     assert res["name"] == "subgroup-1"
@@ -4586,6 +4663,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
     main_group = await admin.a_get_group(group_id=group_id)
 
     # Test nested searches
+    assert subgroup_id_2 is not None
     subgroup_2 = await admin.a_get_group(group_id=subgroup_id_2)
     res = await admin.a_get_subgroups(
         group=subgroup_2,
@@ -4599,6 +4677,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
         group=await admin.a_get_group(group_id=group_id, full_hierarchy=True),
         path="/main-group/subgroup-2/subsubgroup-1",
     )
+    assert res is not None
     assert res["id"] == subsubgroup_id_1
 
     # Test nested search from all groups
@@ -4633,8 +4712,9 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
     assert res is not None, res
     assert res["id"] == subgroup_id_1, res
 
-    res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
-    assert res["error"] == "Group path does not exist"
+    with pytest.raises(KeycloakGetError) as err:
+        await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1/test")
+    assert err.match('404: b\'{"error":"Group path does not exist"}\'')
 
     res = await admin.a_get_group_by_path(path="/main-group/subgroup-2/subsubgroup-1")
     assert res is not None, res
@@ -4678,7 +4758,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
     res = await admin.a_group_set_permissions(group_id=subgroup_id_2, enabled=False)
     assert not res["enabled"], res
     with pytest.raises(KeycloakPutError) as err:
-        await admin.a_group_set_permissions(group_id=subgroup_id_2, enabled="blah")
+        await admin.a_group_set_permissions(group_id=subgroup_id_2, enabled="blah")  # pyright: ignore[reportArgumentType]
     assert err.match(UNKOWN_ERROR_REGEX), err
 
     # Test update group
@@ -4694,6 +4774,7 @@ async def test_a_groups(admin: KeycloakAdmin, user: str) -> None:
     # Test delete
     res = await admin.a_delete_group(group_id=group_id)
     assert res == {}, res
+    assert main_group_id_2 is not None
     res = await admin.a_delete_group(group_id=main_group_id_2)
     assert res == {}, res
     assert len(await admin.a_get_groups()) == 0
@@ -4883,11 +4964,12 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert res["name"] == "temp-resource", res
     temp_resource_id: str = res["_id"]
     # Test update authz resources
-    await admin.a_update_client_authz_resource(
+    res = await admin.a_update_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
         payload={"name": "temp-updated-resource"},
     )
+    assert res == {}
     res = await admin.a_get_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
@@ -4900,10 +4982,11 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             payload={"name": "temp-updated-resource"},
         )
     assert err.match("404: b''"), err
-    await admin.a_delete_client_authz_resource(
+    res = await admin.a_delete_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
     )
+    assert res == {}
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_client_authz_resource(
             client_id=auth_client_id,
@@ -4948,7 +5031,8 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     )
     res2 = await admin.a_get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
     assert res["id"] == res2["id"]
-    await admin.a_delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    res3 = await admin.a_delete_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
+    assert res3 == {}
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
     assert err.match("404: b''")
@@ -5031,6 +5115,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             "policies": [role_based_policy_id],
         },
     )
+    assert res == b""
 
     # Test getting associated policies for a permission
     associated_policies = await admin.a_get_client_authz_permission_associated_policies(
@@ -5090,7 +5175,8 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             "config": {"hourEnd": "18", "hour": "9"},
         }
     ]
-    await admin.a_import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    res = await admin.a_import_client_authz_config(client_id=auth_client_id, payload=authz_config)
+    assert res == {}
     exported = await admin.a_get_client_authz_settings(client_id=auth_client_id)
     assert (
         len(
@@ -5139,25 +5225,24 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
         await admin.a_get_client_secrets(client_id="does-not-exist")
     assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
-    secrets = await admin.a_get_client_secrets(
-        client_id=await admin.a_get_client_id(client_id="test-confidential"),
-    )
+    client_id = await admin.a_get_client_id(client_id="test-confidential")
+    assert client_id is not None
+
+    secrets = await admin.a_get_client_secrets(client_id=client_id)
     assert secrets == {"type": "secret", "value": "test-secret"}
 
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_generate_client_secrets(client_id="does-not-exist")
     assert err.match('404: b\'{"error":"Could not find client".*}\'')
 
-    res = await admin.a_generate_client_secrets(
-        client_id=await admin.a_get_client_id(client_id="test-confidential"),
-    )
+    client_id = await admin.a_get_client_id(client_id="test-confidential")
+    assert client_id is not None
+
+    res = await admin.a_generate_client_secrets(client_id=client_id)
     assert res
-    assert (
-        await admin.a_get_client_secrets(
-            client_id=await admin.a_get_client_id(client_id="test-confidential"),
-        )
-        == res
-    )
+    client_id = await admin.a_get_client_id(client_id="test-confidential")
+    assert client_id is not None
+    assert await admin.a_get_client_secrets(client_id=client_id) == res
 
 
 @pytest.mark.asyncio
@@ -5274,6 +5359,7 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
 
     # Test realm role group assignment
     group_id = await admin.a_create_group(payload={"name": "test-group"})
+    assert group_id is not None
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_assign_group_realm_roles(group_id=group_id, roles=["bad"])
     assert err.match(UNKOWN_ERROR_REGEX), err
@@ -5748,16 +5834,18 @@ async def test_a_client_default_client_scopes(
         "client": client_id,
         "clientScopeId": new_client_scope_id,
     }
-    await admin.a_add_client_default_client_scope(
+    res = await admin.a_add_client_default_client_scope(
         client_id,
         new_client_scope_id,
         new_default_client_scope_data,
     )
+    assert res == {}
     default_client_scopes = await admin.a_get_client_default_client_scopes(client_id)
     assert len(default_client_scopes) in [6, 7], default_client_scopes
 
     # Test remove a client default scope
-    await admin.a_delete_client_default_client_scope(client_id, new_client_scope_id)
+    res = await admin.a_delete_client_default_client_scope(client_id, new_client_scope_id)
+    assert res == {}
     default_client_scopes = await admin.a_get_client_default_client_scopes(client_id)
     assert len(default_client_scopes) in [5, 6], default_client_scopes
 
@@ -5803,16 +5891,18 @@ async def test_a_client_optional_client_scopes(
         "client": client_id,
         "clientScopeId": new_client_scope_id,
     }
-    await admin.a_add_client_optional_client_scope(
+    res = await admin.a_add_client_optional_client_scope(
         client_id,
         new_client_scope_id,
         new_optional_client_scope_data,
     )
+    assert res == {}
     optional_client_scopes = await admin.a_get_client_optional_client_scopes(client_id)
     assert len(optional_client_scopes) in [5, 6], optional_client_scopes
 
     # Test remove a client optional scope
-    await admin.a_delete_client_optional_client_scope(client_id, new_client_scope_id)
+    res = await admin.a_delete_client_optional_client_scope(client_id, new_client_scope_id)
+    assert res == {}
     optional_client_scopes = await admin.a_get_client_optional_client_scopes(client_id)
     assert len(optional_client_scopes) in [4, 5], optional_client_scopes
 
@@ -5935,13 +6025,14 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_delete_client_roles_of_user(user_id=user_id, client_id=client, roles=["bad"])
     assert err.match(UNKOWN_ERROR_REGEX), err
-    await admin.a_delete_client_roles_of_user(
+    res = await admin.a_delete_client_roles_of_user(
         user_id=user_id,
         client_id=client,
         roles=[
             await admin.a_get_client_role(client_id=client, role_name="client-role-test-update"),
         ],
     )
+    assert res == {}
     assert len(await admin.a_get_client_roles_of_user(user_id=user_id, client_id=client)) == 0
 
     # Test groups and client roles
@@ -5955,6 +6046,7 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
     assert err.match(COULD_NOT_FIND_ROLE_REGEX)
 
     group_id = await admin.a_create_group(payload={"name": "test-group"})
+    assert group_id is not None
     res = await admin.a_get_group_client_roles(group_id=group_id, client_id=client)
     assert len(res) == 0
     with pytest.raises(KeycloakGetError) as err:
@@ -6119,10 +6211,11 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None
         pytest.fail("Missing realm management client")
 
     # Enable permissions on the Superset client
-    await admin.a_update_client_management_permissions(
+    res = await admin.a_update_client_management_permissions(
         payload={"enabled": True},
         client_id=target_client_id,
     )
+    assert isinstance(res, dict)
 
     # Fetch various IDs and strings needed when creating the permission
     token_exchange_permission_id = (
@@ -6180,7 +6273,7 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None
             scope_id=token_exchange_permission_id,
         )
     )["name"]
-    await admin.a_update_client_authz_scope_permission(
+    res = await admin.a_update_client_authz_scope_permission(
         payload={
             "id": token_exchange_permission_id,
             "name": permission_name,
@@ -6194,9 +6287,10 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None
         client_id=realm_management_id,
         scope_id=token_exchange_permission_id,
     )
+    assert res == b""
 
     # Create permissions on the target client to reference this policy
-    await admin.a_create_client_authz_scope_permission(
+    res = await admin.a_create_client_authz_scope_permission(
         payload={
             "id": "some-id",
             "name": "test-permission",
@@ -6209,6 +6303,7 @@ async def test_a_enable_token_exchange(admin: KeycloakAdmin, realm: str) -> None
         },
         client_id=realm_management_id,
     )
+    assert isinstance(res, dict)
     permission_name = (
         await admin.a_get_client_authz_scope_permission(
             client_id=realm_management_id,
@@ -6234,10 +6329,11 @@ async def test_a_email(admin: KeycloakAdmin, user: str) -> None:
     :param user: Keycloak user
     :type user: str
     """
+    admin.enable_user(user)
     # Emails will fail as we don't have SMTP test setup
     with pytest.raises(KeycloakPutError) as err:
-        await admin.a_send_update_account(user_id=user, payload={})
-    assert err.match(UNKOWN_ERROR_REGEX), err
+        await admin.a_send_update_account(user_id=user, payload=[])
+    assert err.match('500: b\'{"errorMessage":"Failed to send execute actions email: .*'), err
 
     admin.update_user(user_id=user, payload={"enabled": True})
     with pytest.raises(KeycloakPutError) as err:
@@ -6309,9 +6405,11 @@ async def test_a_get_sessions(admin: KeycloakAdmin) -> None:
     :param admin: Keycloak Admin client
     :type admin: KeycloakAdmin
     """
-    sessions = await admin.a_get_sessions(
-        user_id=admin.get_user_id(username=admin.connection.username),
-    )
+    assert admin.connection.username is not None
+    user_id = admin.get_user_id(username=admin.connection.username)
+    assert user_id is not None
+
+    sessions = await admin.a_get_sessions(user_id=user_id)
     assert len(sessions) >= 1
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_sessions(user_id="bad")
@@ -6424,10 +6522,13 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
             payload={"alias": "test-create", "builtIn": False},
         )
     assert err.match('409: b\'{"errorMessage":"Flow test-create already exists"}\'')
-    assert await admin.a_create_authentication_flow(
-        payload={"alias": "test-create"},
-        skip_exists=True,
-    ) == {"msg": "Already exists"}
+    assert (
+        await admin.a_create_authentication_flow(
+            payload={"alias": "test-create"},
+            skip_exists=True,
+        )
+        == json.dumps({"msg": "Already exists"}).encode()
+    )
 
     # Update
     res = await admin.a_get_authentication_flows()
@@ -6437,6 +6538,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     del flow["id"]
     flow["description"] = "test description"
     res = await admin.a_update_authentication_flow(flow_id=browser_flow_id, payload=flow)
+    assert res == {}
     res = await admin.a_get_authentication_flow_for_id(flow_id=browser_flow_id)
     assert res["description"] == "test description"
 
@@ -6493,7 +6595,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         payload=payload,
         flow_alias="test-create",
     )
-    assert res or (res == {})
+    assert res == {}
 
     exec_id = (await admin.a_get_authentication_flow_executions(flow_alias="test-create"))[0]["id"]
     res = await admin.a_delete_authentication_flow_execution(execution_id=exec_id)
@@ -6529,7 +6631,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         flow_alias="test-create",
         skip_exists=True,
     )
-    assert res == {"msg": "Already exists"}
+    assert res == json.dumps({"msg": "Already exists"}).encode()
 
     # Test delete auth flow
     flow_id = next(
@@ -6603,13 +6705,14 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
     # Test authenticator config
     executions = await admin.a_get_authentication_flow_executions(flow_alias="browser")
     execution = next(ex for ex in executions if ex["configurable"])
-    _ = await admin.a_create_execution_config(
+    res = await admin.a_create_execution_config(
         execution["id"],
         {
             "alias": "test.provisioning.property",
             "config": {"test.provisioning.property": "value2"},
         },
     )
+    assert res == b""
     executions = await admin.a_get_authentication_flow_executions(flow_alias="browser")
     execution_config_id = next(ex for ex in executions if ex.get("id") == execution["id"])[
         "authenticationConfig"
@@ -6627,10 +6730,14 @@ async def test_a_authentication_configs(admin: KeycloakAdmin, realm: str) -> Non
     with pytest.raises(KeycloakPutError) as err:
         await admin.a_update_authenticator_config(payload={}, config_id="bad")
     assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
+    res = await admin.a_update_authenticator_config(payload={}, config_id=execution_config_id)
+    assert res == {}
 
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_delete_authenticator_config(config_id="bad")
     assert err.match('404: b\'{"error":"Could not find authenticator config".*}\'')
+    res = await admin.a_delete_authenticator_config(config_id=execution_config_id)
+    assert res == {}
 
 
 @pytest.mark.asyncio
@@ -6970,12 +7077,14 @@ async def test_a_auto_refresh(admin_frozen: KeycloakAdmin, realm: str) -> None:
     assert res["realm"] == realm
 
     # Freeze time to simulate the access token expiring
+    assert admin.connection.expires_at is not None
     with freezegun.freeze_time("2023-02-25 10:05:00"):
         assert admin.connection.expires_at < datetime_parser.parse("2023-02-25T10:05:00Z")
         assert await admin.a_get_realm(realm_name=realm)
         assert admin.connection.expires_at > datetime_parser.parse("2023-02-25T10:05:00Z")
 
     # Test bad refresh token, but first make sure access token has expired again
+    assert admin.connection.token is not None
     with freezegun.freeze_time("2023-02-25 10:10:00"):
         admin.connection.custom_headers = {"Content-Type": "application/json"}
         admin.connection.token["refresh_token"] = "bad"  # noqa: S105
@@ -7050,6 +7159,7 @@ async def test_a_get_required_action_by_alias(admin: KeycloakAdmin, realm: str) 
     await admin.a_change_current_realm(realm)
     ractions = await admin.a_get_required_actions()
     ra = await admin.a_get_required_action_by_alias("UPDATE_PASSWORD")
+    assert ra is not None
     assert ra in ractions
     assert ra["alias"] == "UPDATE_PASSWORD"
     assert await admin.a_get_required_action_by_alias("does-not-exist") is None
@@ -7068,9 +7178,12 @@ async def test_a_update_required_action(admin: KeycloakAdmin, realm: str) -> Non
     await admin.a_change_current_realm(realm)
     ra = await admin.a_get_required_action_by_alias("UPDATE_PASSWORD")
     old = copy.deepcopy(ra)
+    assert ra is not None
     ra["enabled"] = False
-    admin.update_required_action("UPDATE_PASSWORD", ra)
+    res = await admin.a_update_required_action("UPDATE_PASSWORD", ra)
+    assert res == {}
     newra = await admin.a_get_required_action_by_alias("UPDATE_PASSWORD")
+    assert newra is not None
     assert old != newra
     assert newra["enabled"] is False
 
@@ -7198,7 +7311,9 @@ async def test_a_upload_certificate(
     await admin.a_change_current_realm(realm)
     cert, _ = selfsigned_cert
     cert = cert.decode("utf-8").strip()
-    admin.upload_certificate(client, cert)
+    res = await admin.a_upload_certificate(client, cert)
+    assert isinstance(res, dict)
+    assert "certificate" in res
     cl = await admin.a_get_client(client)
     assert cl["attributes"]["jwt.credential.certificate"] == "".join(cert.splitlines()[1:-1])
 
@@ -7232,6 +7347,7 @@ async def test_a_get_bruteforce_status_for_user(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)
+    assert user_id is not None
     bruteforce_status = await admin.a_get_bruteforce_detection_status(user_id)
 
     assert bruteforce_status["numFailures"] == 1
@@ -7271,10 +7387,12 @@ async def test_a_clear_bruteforce_attempts_for_user(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)
+    assert user_id is not None
     bruteforce_status = await admin.a_get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 1
 
     res = await admin.a_clear_bruteforce_attempts_for_user(user_id)
+    assert res == {}
     bruteforce_status = await admin.a_get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 0
 
@@ -7313,10 +7431,12 @@ async def test_a_clear_bruteforce_attempts_for_all_users(
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)
+    assert user_id is not None
     bruteforce_status = await admin.a_get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 1
 
     res = await admin.a_clear_all_bruteforce_attempts()
+    assert res == {}
     bruteforce_status = await admin.a_get_bruteforce_detection_status(user_id)
     assert bruteforce_status["numFailures"] == 0
 
@@ -7512,7 +7632,10 @@ async def test_a_refresh_token(admin: KeycloakAdmin) -> None:
     """
     admin.get_realms()
     assert admin.connection.token is not None
-    await admin.a_user_logout(await admin.a_get_user_id(admin.connection.username))
+    assert admin.connection.username is not None
+    user_id = await admin.a_get_user_id(admin.connection.username)
+    assert user_id is not None
+    await admin.a_user_logout(user_id=user_id)
     admin.connection.refresh_token()
 
 

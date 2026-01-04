@@ -27,13 +27,16 @@ from __future__ import annotations
 try:
     from urllib.parse import urljoin
 except ImportError:  # pragma: no cover
-    from urlparse import urljoin
+    from urlparse import urljoin  # pyright: ignore[reportMissingImports]
+
+from typing import Any
 
 import httpx
 import requests
 from httpx import Response as AsyncResponse
 from requests import Response
 from requests.adapters import HTTPAdapter
+from requests_toolbelt import MultipartEncoder
 
 from .exceptions import KeycloakConnectionError
 
@@ -67,8 +70,8 @@ class ConnectionManager:
         self,
         base_url: str,
         headers: dict | None = None,
-        timeout: int = 60,
-        verify: bool = True,
+        timeout: int | None = 60,
+        verify: bool | str = True,
         proxies: dict | None = None,
         cert: str | tuple | None = None,
         max_retries: int = 1,
@@ -112,9 +115,13 @@ class ConnectionManager:
             adapter_kwargs = {"max_retries": max_retries}
             if pool_maxsize is not None:
                 adapter_kwargs["pool_maxsize"] = pool_maxsize
-            adapter = HTTPAdapter(**adapter_kwargs)
+            adapter = HTTPAdapter(**adapter_kwargs)  # pyright: ignore[reportArgumentType]
             # adds POST to retry whitelist
-            allowed_methods = set(adapter.max_retries.allowed_methods)
+            allowed_methods = (
+                set(adapter.max_retries.allowed_methods)
+                if adapter.max_retries.allowed_methods
+                else set()
+            )
             allowed_methods.add("POST")
             adapter.max_retries.allowed_methods = frozenset(allowed_methods)
 
@@ -132,8 +139,8 @@ class ConnectionManager:
                 max_keepalive_connections=20,
             ),
         )
-        self.async_s.auth = None  # don't let requests add auth headers
-        self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)
+        self.async_s.auth = None  # pyright: ignore[reportAttributeAccessIssue]
+        self.async_s.transport = httpx.AsyncHTTPTransport(retries=1)  # pyright: ignore[reportAttributeAccessIssue]
 
     async def aclose(self) -> None:
         """Close the async connection on delete."""
@@ -146,7 +153,7 @@ class ConnectionManager:
             self._s.close()
 
     @property
-    def base_url(self) -> str:
+    def base_url(self) -> str | None:
         """
         Return base url in use for requests to the server.
 
@@ -156,11 +163,11 @@ class ConnectionManager:
         return self._base_url
 
     @base_url.setter
-    def base_url(self, value: str) -> None:
+    def base_url(self, value: str | None) -> None:
         self._base_url = value
 
     @property
-    def timeout(self) -> int:
+    def timeout(self) -> int | None:
         """
         Return timeout in use for request to the server.
 
@@ -170,11 +177,11 @@ class ConnectionManager:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value: int) -> None:
+    def timeout(self, value: int | None) -> None:
         self._timeout = value
 
     @property
-    def verify(self) -> bool:
+    def verify(self) -> bool | str:
         """
         Return verify in use for request to the server.
 
@@ -184,11 +191,11 @@ class ConnectionManager:
         return self._verify
 
     @verify.setter
-    def verify(self, value: bool) -> None:
+    def verify(self, value: bool | str) -> None:
         self._verify = value
 
     @property
-    def cert(self) -> str | tuple:
+    def cert(self) -> str | tuple | None:
         """
         Return client certificates in use for request to the server.
 
@@ -198,7 +205,7 @@ class ConnectionManager:
         return self._cert
 
     @cert.setter
-    def cert(self, value: str | tuple) -> None:
+    def cert(self, value: str | tuple | None) -> None:
         self._cert = value
 
     @property
@@ -216,7 +223,7 @@ class ConnectionManager:
         self._pool_maxsize = value
 
     @property
-    def headers(self) -> dict:
+    def headers(self) -> dict | None:
         """
         Return header request to the server.
 
@@ -226,7 +233,7 @@ class ConnectionManager:
         return self._headers
 
     @headers.setter
-    def headers(self, value: dict) -> None:
+    def headers(self, value: dict | None) -> None:
         self._headers = value or {}
 
     def param_headers(self, key: str) -> str | None:
@@ -238,7 +245,7 @@ class ConnectionManager:
         :returns: If the header parameters exist, return its value.
         :rtype: str
         """
-        return self.headers.get(key)
+        return (self.headers or {}).get(key)
 
     def clean_headers(self) -> None:
         """Clear header parameters."""
@@ -264,6 +271,9 @@ class ConnectionManager:
         :param value: Value to be added.
         :type value: str
         """
+        if self.headers is None:
+            self.headers = {}
+
         self.headers[key] = value
 
     def del_param_headers(self, key: str) -> None:
@@ -273,9 +283,12 @@ class ConnectionManager:
         :param key: Key of the header parameters.
         :type key: str
         """
+        if self.headers is None:
+            return
+
         self.headers.pop(key, None)
 
-    def raw_get(self, path: str, **kwargs: dict) -> Response:
+    def raw_get(self, path: str, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Submit get request to the path.
 
@@ -287,6 +300,9 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform GET call with base_url missing."
+            raise AttributeError(msg)
         try:
             return self._s.get(
                 urljoin(self.base_url, path),
@@ -300,7 +316,7 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_post(self, path: str, data: dict, **kwargs: dict) -> Response:
+    def raw_post(self, path: str, data: dict | str | MultipartEncoder, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Submit post request to the path.
 
@@ -314,6 +330,9 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform POST call with base_url missing."
+            raise AttributeError(msg)
         try:
             return self._s.post(
                 urljoin(self.base_url, path),
@@ -328,7 +347,7 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_put(self, path: str, data: dict, **kwargs: dict) -> Response:
+    def raw_put(self, path: str, data: dict | str, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Submit put request to the path.
 
@@ -342,6 +361,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform PUT call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return self._s.put(
                 urljoin(self.base_url, path),
@@ -356,7 +379,7 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_delete(self, path: str, data: dict | None = None, **kwargs: dict) -> Response:
+    def raw_delete(self, path: str, data: dict | None = None, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Submit delete request to the path.
 
@@ -370,6 +393,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform DELETE call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return self._s.delete(
                 urljoin(self.base_url, path),
@@ -384,7 +411,7 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_get(self, path: str, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_get(self, path: str, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Submit get request to the path.
 
@@ -396,6 +423,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform GET call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return await self.async_s.get(
                 urljoin(self.base_url, path),
@@ -407,7 +438,12 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_post(self, path: str, data: dict, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_post(
+        self,
+        path: str,
+        data: dict | str | MultipartEncoder,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> AsyncResponse:
         """
         Submit post request to the path.
 
@@ -421,6 +457,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform POST call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return await self.async_s.request(
                 method="POST",
@@ -434,7 +474,7 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_put(self, path: str, data: dict, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_put(self, path: str, data: dict | str, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Submit put request to the path.
 
@@ -448,6 +488,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform PUT call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return await self.async_s.put(
                 urljoin(self.base_url, path),
@@ -464,7 +508,7 @@ class ConnectionManager:
         self,
         path: str,
         data: dict | None = None,
-        **kwargs: dict,
+        **kwargs: Any,  # noqa: ANN401
     ) -> AsyncResponse:
         """
         Submit delete request to the path.
@@ -479,6 +523,10 @@ class ConnectionManager:
         :rtype: Response
         :raises KeycloakConnectionError: HttpError Can't connect to server.
         """
+        if self.base_url is None:
+            msg = "Unable to perform DELETE call with base_url missing."
+            raise AttributeError(msg)
+
         try:
             return await self.async_s.request(
                 method="DELETE",
@@ -493,7 +541,7 @@ class ConnectionManager:
             raise KeycloakConnectionError(msg) from e
 
     @staticmethod
-    def _prepare_httpx_request_content(data: dict | str | None) -> dict:
+    def _prepare_httpx_request_content(data: dict | str | None | MultipartEncoder) -> dict:
         """
         Create the correct request content kwarg to `httpx.AsyncClient.request()`.
 
@@ -504,9 +552,13 @@ class ConnectionManager:
         :returns: A dict mapping the correct kwarg to the request content
         :rtype: dict
         """
+        if isinstance(data, MultipartEncoder):
+            return {"content": data.to_string()}
+
         if isinstance(data, str):
             # Note: this could also accept bytes, Iterable[bytes], or AsyncIterable[bytes]
             return {"content": data}
+
         return {"data": data}
 
     @staticmethod

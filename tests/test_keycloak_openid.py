@@ -160,7 +160,7 @@ def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]) -> None:
     }
 
     # Test with dummy totp
-    token = oid.token(username=username, password=password, totp="123456")
+    token = oid.token(username=username, password=password, totp=123456)
     assert token == {
         "access_token": mock.ANY,
         "expires_in": mock.ANY,
@@ -205,15 +205,14 @@ def test_exchange_token(
 
     # Allow impersonation
     admin.change_current_realm(oid.realm_name)
+    user_id = admin.get_user_id(username=username)
+    assert user_id is not None
+    client_id = admin.get_client_id(client_id="realm-management")
+    assert client_id is not None
     admin.assign_client_role(
-        user_id=admin.get_user_id(username=username),
-        client_id=admin.get_client_id(client_id="realm-management"),
-        roles=[
-            admin.get_client_role(
-                client_id=admin.get_client_id(client_id="realm-management"),
-                role_name="impersonation",
-            ),
-        ],
+        user_id=user_id,
+        client_id=client_id,
+        roles=[admin.get_client_role(client_id=client_id, role_name="impersonation")],
     )
 
     token = oid.token(username=username, password=password)
@@ -297,9 +296,9 @@ def test_entitlement(
     """
     oid, username, password = oid_with_credentials_authz
     token = oid.token(username=username, password=password)
-    resource_server_id = admin.get_client_authz_resources(
-        client_id=admin.get_client_id(oid.client_id),
-    )[0]["_id"]
+    client_id = admin.get_client_id(oid.client_id)
+    assert client_id is not None
+    resource_server_id = admin.get_client_authz_resources(client_id=client_id)[0]["_id"]
 
     with pytest.raises(KeycloakDeprecationError):
         oid.entitlement(token=token["access_token"], resource_server_id=resource_server_id)
@@ -431,11 +430,11 @@ def test_get_policies(oid_with_credentials_authz: tuple[KeycloakOpenID, str, str
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in oid.get_policies(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (oid.get_policies(token=token["access_token"], method_token_info="decode") or [])  # noqa: S106
     ] == ["Policy: test (role)"]
     assert [
         repr(x)
-        for x in oid.get_policies(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (oid.get_policies(token=token["access_token"], method_token_info="decode") or [])  # noqa: S106
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id
 
@@ -477,11 +476,15 @@ def test_get_permissions(oid_with_credentials_authz: tuple[KeycloakOpenID, str, 
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in oid.get_permissions(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (
+            oid.get_permissions(token=token["access_token"], method_token_info="decode") or []  # noqa: S106
+        )
     ] == ["Permission: test-perm (resource)"]
     assert [
         repr(x)
-        for x in oid.get_permissions(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (
+            oid.get_permissions(token=token["access_token"], method_token_info="decode") or []  # noqa: S106
+        )
     ] == ["<Permission: test-perm (resource)>"]
     oid.client_id = orig_client_id
 
@@ -538,6 +541,7 @@ def test_has_uma_access(
         str(oid.has_uma_access(token=token["access_token"], permissions=""))
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
     )
+    assert admin.connection.token is not None
     assert (
         str(
             oid.has_uma_access(
@@ -684,7 +688,7 @@ async def test_a_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]) ->
     }
 
     # Test with dummy totp
-    token = await oid.a_token(username=username, password=password, totp="123456")
+    token = await oid.a_token(username=username, password=password, totp=123456)
     assert token == {
         "access_token": mock.ANY,
         "expires_in": mock.ANY,
@@ -730,14 +734,15 @@ async def test_a_exchange_token(
 
     # Allow impersonation
     await admin.a_change_current_realm(oid.realm_name)
+    user_id = await admin.a_get_user_id(username=username)
+    assert user_id is not None
+    client_id = await admin.a_get_client_id(client_id="realm-management")
+    assert client_id is not None
     await admin.a_assign_client_role(
-        user_id=await admin.a_get_user_id(username=username),
-        client_id=await admin.a_get_client_id(client_id="realm-management"),
+        user_id=user_id,
+        client_id=client_id,
         roles=[
-            await admin.a_get_client_role(
-                client_id=admin.get_client_id(client_id="realm-management"),
-                role_name="impersonation",
-            ),
+            await admin.a_get_client_role(client_id=client_id, role_name="impersonation"),
         ],
     )
 
@@ -826,9 +831,9 @@ async def test_a_entitlement(
     """
     oid, username, password = oid_with_credentials_authz
     token = await oid.a_token(username=username, password=password)
-    resource_server_id = admin.get_client_authz_resources(
-        client_id=admin.get_client_id(oid.client_id),
-    )[0]["_id"]
+    client_id = await admin.a_get_client_id(oid.client_id)
+    assert client_id is not None
+    resource_server_id = admin.get_client_authz_resources(client_id=client_id)[0]["_id"]
 
     with pytest.raises(KeycloakDeprecationError):
         await oid.a_entitlement(token=token["access_token"], resource_server_id=resource_server_id)
@@ -989,6 +994,7 @@ async def test_a_has_uma_access(
         str(await oid.a_has_uma_access(token=token["access_token"], permissions=""))
         == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
     )
+    assert admin.connection.token is not None
     assert (
         str(
             await oid.a_has_uma_access(
@@ -1027,11 +1033,15 @@ async def test_a_get_policies(oid_with_credentials_authz: tuple[KeycloakOpenID, 
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (
+            await oid.a_get_policies(token=token["access_token"], method_token_info="decode") or []  # noqa: S106
+        )
     ] == ["Policy: test (role)"]
     assert [
         repr(x)
-        for x in await oid.a_get_policies(token=token["access_token"], method_token_info="decode")  # noqa: S106
+        for x in (
+            await oid.a_get_policies(token=token["access_token"], method_token_info="decode") or []  # noqa: S106
+        )
     ] == ["<Policy: test (role)>"]
     oid.client_id = orig_client_id
 
@@ -1078,16 +1088,22 @@ async def test_a_get_permissions(
     oid.authorization.policies["test"] = policy
     assert [
         str(x)
-        for x in await oid.a_get_permissions(
-            token=token["access_token"],
-            method_token_info="decode",  # noqa: S106
+        for x in (
+            await oid.a_get_permissions(
+                token=token["access_token"],
+                method_token_info="decode",  # noqa: S106
+            )
+            or []
         )
     ] == ["Permission: test-perm (resource)"]
     assert [
         repr(x)
-        for x in await oid.a_get_permissions(
-            token=token["access_token"],
-            method_token_info="decode",  # noqa: S106
+        for x in (
+            await oid.a_get_permissions(
+                token=token["access_token"],
+                method_token_info="decode",  # noqa: S106
+            )
+            or []
         )
     ] == ["<Permission: test-perm (resource)>"]
     oid.client_id = orig_client_id

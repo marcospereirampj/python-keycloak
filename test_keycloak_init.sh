@@ -6,9 +6,9 @@ KEYCLOAK_DOCKER_IMAGE="quay.io/keycloak/keycloak:$KEYCLOAK_DOCKER_IMAGE_TAG"
 
 function keycloak_stop() {
     if [ "$(docker ps -q -f name=unittest_keycloak)" ]; then
-      docker logs unittest_keycloak > keycloak_test_logs.txt
-      docker stop unittest_keycloak &> /dev/null
-      docker rm unittest_keycloak &> /dev/null
+        docker logs unittest_keycloak >keycloak_test_logs.txt
+        docker stop unittest_keycloak &>/dev/null
+        docker rm unittest_keycloak &>/dev/null
     fi
 }
 
@@ -23,11 +23,11 @@ function keycloak_start() {
     docker run --rm -d --name unittest_keycloak -e KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN}" -e KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD}" -p "${KEYCLOAK_PORT}:8080" -v $PWD/tests/providers:/opt/keycloak/providers "${KEYCLOAK_DOCKER_IMAGE}" start-dev --features="${KEYCLOAK_FEATURES}"
     SECONDS=0
     until curl --silent --output /dev/null localhost:$KEYCLOAK_PORT; do
-      sleep 5;
-      if [ ${SECONDS} -gt 180 ]; then
-        echo "Timeout exceeded";
-        exit 1;
-      fi
+        sleep 5
+        if [ ${SECONDS} -gt 180 ]; then
+            echo "Timeout exceeded"
+            exit 1
+        fi
     done
 }
 

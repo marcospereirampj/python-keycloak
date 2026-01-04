@@ -133,7 +133,7 @@ class Permission:
         return self._logic
 
     @logic.setter
-    def logic(self, value: str) -> str:
+    def logic(self, value: str) -> None:
         self._logic = value
 
     @property

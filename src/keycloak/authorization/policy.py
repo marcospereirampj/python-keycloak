@@ -24,6 +24,9 @@
 
 from keycloak.exceptions import KeycloakAuthorizationConfigError
 
+from .permission import Permission
+from .role import Role
+
 
 class Policy:
     """
@@ -172,7 +175,7 @@ class Policy:
     def permissions(self, value: list) -> None:
         self._permissions = value
 
-    def add_role(self, role: dict) -> None:
+    def add_role(self, role: str | Role) -> None:
         """
         Add keycloak role in policy.
 
@@ -185,7 +188,7 @@ class Policy:
             raise KeycloakAuthorizationConfigError(error_msg)
         self._roles.append(role)
 
-    def add_permission(self, permission: dict) -> None:
+    def add_permission(self, permission: str | Permission) -> None:
         """
         Add keycloak permission in policy.
 
