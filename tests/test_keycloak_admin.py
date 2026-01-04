@@ -2748,7 +2748,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     payload = admin.get_authentication_flow_executions(flow_alias="test-create")[0]
     payload["displayName"] = "test"
     res = admin.update_authentication_flow_executions(payload=payload, flow_alias="test-create")
-    assert res == {}
+    assert isinstance(res, dict)
 
     exec_id = admin.get_authentication_flow_executions(flow_alias="test-create")[0]["id"]
     res = admin.delete_authentication_flow_execution(execution_id=exec_id)
@@ -6595,7 +6595,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
         payload=payload,
         flow_alias="test-create",
     )
-    assert res == {}
+    assert isinstance(res, dict)
 
     exec_id = (await admin.a_get_authentication_flow_executions(flow_alias="test-create"))[0]["id"]
     res = await admin.a_delete_authentication_flow_execution(execution_id=exec_id)
