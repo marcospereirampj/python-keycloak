@@ -31,7 +31,7 @@ of openid tokens when required.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from httpx import Response as AsyncResponse
@@ -67,13 +67,13 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
     def __init__(
         self,
-        server_url: str,
+        server_url: str | None = None,
         grant_type: str | None = None,
         username: str | None = None,
         password: str | None = None,
-        token: str | None = None,
-        totp: str | None = None,
-        realm_name: str = "master",
+        token: dict | None = None,
+        totp: int | None = None,
+        realm_name: str | None = "master",
         client_id: str = "admin-cli",
         verify: str | bool = True,
         client_secret_key: str | None = None,
@@ -150,6 +150,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
             elif client_secret_key:
                 self.grant_type = "client_credentials"
 
+        if self.server_url is None:
+            msg = "Unable to initialize KeycloakOpenIDConnection without server_url."
+            raise ValueError(msg)
+
         super().__init__(
             base_url=self.server_url,
             headers=self.headers,
@@ -161,7 +165,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         )
 
     @property
-    def server_url(self) -> str:
+    def server_url(self) -> str | None:
         """
         Get server url.
 
@@ -171,11 +175,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self.base_url
 
     @server_url.setter
-    def server_url(self, value: str) -> None:
+    def server_url(self, value: str | None) -> None:
         self.base_url = value
 
     @property
-    def grant_type(self) -> str:
+    def grant_type(self) -> str | None:
         """
         Get grant type.
 
@@ -185,11 +189,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._grant_type
 
     @grant_type.setter
-    def grant_type(self, value: str) -> None:
+    def grant_type(self, value: str | None) -> None:
         self._grant_type = value
 
     @property
-    def realm_name(self) -> str:
+    def realm_name(self) -> str | None:
         """
         Get realm name.
 
@@ -199,11 +203,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._realm_name
 
     @realm_name.setter
-    def realm_name(self, value: str) -> None:
+    def realm_name(self, value: str | None) -> None:
         self._realm_name = value
 
     @property
-    def client_id(self) -> str:
+    def client_id(self) -> str | None:
         """
         Get client id.
 
@@ -213,11 +217,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._client_id
 
     @client_id.setter
-    def client_id(self, value: str) -> None:
+    def client_id(self, value: str | None) -> None:
         self._client_id = value
 
     @property
-    def client_secret_key(self) -> str:
+    def client_secret_key(self) -> str | None:
         """
         Get client secret key.
 
@@ -227,11 +231,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._client_secret_key
 
     @client_secret_key.setter
-    def client_secret_key(self, value: str) -> None:
+    def client_secret_key(self, value: str | None) -> None:
         self._client_secret_key = value
 
     @property
-    def username(self) -> str:
+    def username(self) -> str | None:
         """
         Get username.
 
@@ -241,11 +245,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._username
 
     @username.setter
-    def username(self, value: str) -> None:
+    def username(self, value: str | None) -> None:
         self._username = value
 
     @property
-    def password(self) -> str:
+    def password(self) -> str | None:
         """
         Get password.
 
@@ -255,11 +259,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._password
 
     @password.setter
-    def password(self, value: str) -> None:
+    def password(self, value: str | None) -> None:
         self._password = value
 
     @property
-    def totp(self) -> str:
+    def totp(self) -> int | None:
         """
         Get totp.
 
@@ -269,11 +273,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._totp
 
     @totp.setter
-    def totp(self, value: str) -> None:
+    def totp(self, value: int | None) -> None:
         self._totp = value
 
     @property
-    def token(self) -> dict:
+    def token(self) -> dict | None:
         """
         Get token.
 
@@ -283,16 +287,16 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._token
 
     @token.setter
-    def token(self, value: dict) -> None:
+    def token(self, value: dict | None) -> None:
         self._token = value
         self._expires_at = datetime.now(tz=timezone.utc) + timedelta(
-            seconds=int(self.token_lifetime_fraction * self.token["expires_in"] if value else 0),
+            seconds=int(self.token_lifetime_fraction * value["expires_in"] if value else 0),
         )
         if value is not None:
-            self.add_param_headers("Authorization", "Bearer " + value.get("access_token"))
+            self.add_param_headers("Authorization", "Bearer " + value["access_token"])
 
     @property
-    def expires_at(self) -> datetime:
+    def expires_at(self) -> datetime | None:
         """
         Get token expiry time.
 
@@ -302,7 +306,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._expires_at
 
     @property
-    def user_realm_name(self) -> str:
+    def user_realm_name(self) -> str | None:
         """
         Get user realm name.
 
@@ -312,11 +316,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._user_realm_name
 
     @user_realm_name.setter
-    def user_realm_name(self, value: str) -> None:
+    def user_realm_name(self, value: str | None) -> None:
         self._user_realm_name = value
 
     @property
-    def custom_headers(self) -> dict:
+    def custom_headers(self) -> dict | None:
         """
         Get custom headers.
 
@@ -326,9 +330,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
         return self._custom_headers
 
     @custom_headers.setter
-    def custom_headers(self, value: dict) -> None:
+    def custom_headers(self, value: dict | None) -> None:
         self._custom_headers = value
-        if self.custom_headers is not None:
+        if self.custom_headers is not None and self.headers is not None:
             # merge custom headers to main headers
             self.headers.update(self.custom_headers)
 
@@ -349,6 +353,14 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 token_realm_name = self.realm_name
             else:
                 token_realm_name = "master"  # noqa: S105
+
+            if self.client_id is None:
+                msg = "Unable to get KeycloakOpenID client without client_id set."
+                raise AttributeError(msg)
+
+            if self.server_url is None:
+                msg = "Unable to get KeycloakOpenID without server_url set."
+                raise AttributeError(msg)
 
             self._keycloak_openid = KeycloakOpenID(
                 server_url=self.server_url,
@@ -398,17 +410,17 @@ class KeycloakOpenIDConnection(ConnectionManager):
                     b"Session not active",
                 ]
                 if e.response_code == HTTP_BAD_REQUEST and any(
-                    err in e.response_body for err in list_errors
+                    err in (e.response_body or b"") for err in list_errors
                 ):
                     self.get_token()
                 else:
                     raise
 
     def _refresh_if_required(self) -> None:
-        if datetime.now(tz=timezone.utc) >= self.expires_at:
+        if self.expires_at is not None and datetime.now(tz=timezone.utc) >= self.expires_at:
             self.refresh_token()
 
-    def raw_get(self, *args: list, **kwargs: dict) -> Response:
+    def raw_get(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Call connection.raw_get.
 
@@ -430,7 +442,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    def raw_post(self, *args: list, **kwargs: dict) -> Response:
+    def raw_post(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Call connection.raw_post.
 
@@ -452,7 +464,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    def raw_put(self, *args: list, **kwargs: dict) -> Response:
+    def raw_put(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Call connection.raw_put.
 
@@ -474,7 +486,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    def raw_delete(self, *args: list, **kwargs: dict) -> Response:
+    def raw_delete(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """
         Call connection.raw_delete.
 
@@ -531,7 +543,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                     b"Session not active",
                 ]
                 if e.response_code == HTTP_BAD_REQUEST and any(
-                    err in e.response_body for err in list_errors
+                    err in (e.response_body or b"") for err in list_errors
                 ):
                     await self.a_get_token()
                 else:
@@ -539,10 +551,10 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
     async def a__refresh_if_required(self) -> None:
         """Refresh the token if it is expired."""
-        if datetime.now(tz=timezone.utc) >= self.expires_at:
+        if self.expires_at is not None and datetime.now(tz=timezone.utc) >= self.expires_at:
             await self.a_refresh_token()
 
-    async def a_raw_get(self, *args: list, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_get(self, *args: Any, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Call connection.raw_get.
 
@@ -564,7 +576,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    async def a_raw_post(self, *args: list, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_post(self, *args: Any, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Call connection.raw_post.
 
@@ -586,7 +598,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    async def a_raw_put(self, *args: list, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_put(self, *args: Any, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Call connection.raw_put.
 
@@ -608,7 +620,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         return r
 
-    async def a_raw_delete(self, *args: list, **kwargs: dict) -> AsyncResponse:
+    async def a_raw_delete(self, *args: Any, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
         """
         Call connection.raw_delete.
 

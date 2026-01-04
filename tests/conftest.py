@@ -481,6 +481,7 @@ def group(admin: KeycloakAdmin, realm: str) -> Generator[str, None, None]:
     admin.change_current_realm(realm)
     group_name = str(uuid.uuid4())
     group_id = admin.create_group(payload={"name": group_name})
+    assert group_id is not None
     yield group_id
     admin.delete_group(group_id=group_id)
 
@@ -556,7 +557,7 @@ def composite_client_role(
 
 
 @pytest.fixture
-def selfsigned_cert() -> tuple[str, str]:
+def selfsigned_cert() -> tuple[bytes, bytes]:
     """
     Generate self signed certificate for a hostname, and optional IP addresses.
 
@@ -564,7 +565,7 @@ def selfsigned_cert() -> tuple[str, str]:
     :rtype: Tuple[str, str]
     """
     hostname = "testcert"
-    ip_addresses = None
+    ip_addresses: None | list = []
     key = None
     # Generate our key
     if key is None:
@@ -575,7 +576,7 @@ def selfsigned_cert() -> tuple[str, str]:
         )
 
     name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, hostname)])
-    alt_names = [x509.DNSName(hostname)]
+    alt_names: list = [x509.DNSName(hostname)]
 
     # allow addressing by IP, for when you don't have real DNS (common in most testing scenarios
     if ip_addresses:

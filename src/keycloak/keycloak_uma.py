@@ -30,10 +30,8 @@ https://docs.kantarainitiative.org/uma/wg/rec-oauth-uma-federated-authz-2.0.html
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote_plus
-
-from async_property import async_property
 
 from .connection import ConnectionManager
 from .exceptions import (
@@ -49,7 +47,7 @@ from .exceptions import (
 from .urls_patterns import URL_UMA_WELL_KNOWN
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import AsyncGenerator, Generator, Iterable
 
     from .openid_connection import KeycloakOpenIDConnection
     from .uma_permissions import UMAPermission
@@ -75,10 +73,18 @@ class KeycloakUMA:
     def _fetch_well_known(self) -> dict:
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = self.connection.raw_get(URL_UMA_WELL_KNOWN.format(**params_path))
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     @staticmethod
-    def format_url(url: str, **kwargs: dict) -> str:
+    def format_url(url: str, **kwargs: Any) -> str:  # noqa: ANN401
         """
         Substitute url path parameters.
 
@@ -97,7 +103,7 @@ class KeycloakUMA:
         return url.format(**{k: quote_plus(v) for k, v in kwargs.items()})
 
     @staticmethod
-    async def a_format_url(url: str, **kwargs: dict) -> str:
+    async def a_format_url(url: str, **kwargs: Any) -> str:  # noqa: ANN401
         """
         Substitute url path parameters.
 
@@ -129,7 +135,7 @@ class KeycloakUMA:
 
         return self._well_known
 
-    @async_property
+    @property
     async def a_uma_well_known(self) -> dict:
         """
         Get the well_known UMA2 config async.
@@ -142,7 +148,7 @@ class KeycloakUMA:
 
         return self._well_known
 
-    def resource_set_create(self, payload: dict) -> dict | bytes:
+    def resource_set_create(self, payload: dict) -> dict:
         """
         Create a resource set.
 
@@ -161,13 +167,21 @@ class KeycloakUMA:
             self.uma_well_known["resource_registration_endpoint"],
             data=json.dumps(payload),
         )
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakPostError,
             expected_codes=[HTTP_CREATED],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    def resource_set_update(self, resource_id: str, payload: dict) -> bytes:
+        return res
+
+    def resource_set_update(self, resource_id: str, payload: dict) -> dict:
         """
         Update a resource set.
 
@@ -189,11 +203,19 @@ class KeycloakUMA:
             id=resource_id,
         )
         data_raw = self.connection.raw_put(url, data=json.dumps(payload))
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakPutError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     def resource_set_read(self, resource_id: str) -> dict:
         """
@@ -215,9 +237,17 @@ class KeycloakUMA:
             id=resource_id,
         )
         data_raw = self.connection.raw_get(url)
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        res = raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    def resource_set_delete(self, resource_id: str) -> bytes:
+        return res
+
+    def resource_set_delete(self, resource_id: str) -> dict:
         """
         Delete a resource set.
 
@@ -234,11 +264,19 @@ class KeycloakUMA:
             id=resource_id,
         )
         data_raw = self.connection.raw_delete(url)
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     def resource_set_list_ids(
         self,
@@ -303,9 +341,17 @@ class KeycloakUMA:
             self.uma_well_known["resource_registration_endpoint"],
             **query,
         )
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        res = raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        if not isinstance(res, list):
+            msg = (
+                "Unexpected response type. Expected 'list', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    def resource_set_list(self) -> list:
+        return res
+
+    def resource_set_list(self) -> Generator[dict, Any, Any]:
         """
         List all resource sets.
 
@@ -363,13 +409,21 @@ class KeycloakUMA:
             self.uma_well_known["permission_endpoint"],
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError)
+        res = raise_error_from_response(data_raw, KeycloakPostError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     def permissions_check(
         self,
         token: str,
         permissions: Iterable[UMAPermission],
-        **extra_payload: dict,
+        **extra_payload: Any,  # noqa: ANN401
     ) -> bool:
         """
         Check UMA permissions by user token with requested permissions.
@@ -401,7 +455,21 @@ class KeycloakUMA:
         if len(payload["permission"]) == 0:
             return True
 
-        connection = ConnectionManager(self.connection.base_url)
+        if self.connection.base_url is None:
+            msg = (
+                "Unable to perform permission check without base_url set on the connection object."
+            )
+            raise AttributeError(msg)
+
+        connection = ConnectionManager(
+            base_url=self.connection.base_url,
+            timeout=self.connection.timeout,
+            verify=self.connection.verify,
+            proxies=self.connection.proxies,
+            cert=self.connection.cert,
+            max_retries=self.connection.max_retries,
+            pool_maxsize=self.connection.pool_maxsize,
+        )
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = connection.raw_post(self.uma_well_known["token_endpoint"], data=payload)
@@ -409,6 +477,14 @@ class KeycloakUMA:
             data = raise_error_from_response(data_raw, KeycloakPostError)
         except KeycloakPostError:
             return False
+
+        if not isinstance(data, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(data)}', value '{data}'."
+            )
+            raise TypeError(msg)
+
         return data.get("result", False)
 
     def policy_resource_create(self, resource_id: str, payload: dict) -> dict:
@@ -430,9 +506,17 @@ class KeycloakUMA:
             self.uma_well_known["policy_endpoint"] + f"/{resource_id}",
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError)
+        res = raise_error_from_response(data_raw, KeycloakPostError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    def policy_update(self, policy_id: str, payload: dict) -> dict:
+        return res
+
+    def policy_update(self, policy_id: str, payload: dict) -> bytes:
         """
         Update permission policy.
 
@@ -444,13 +528,21 @@ class KeycloakUMA:
         :param payload: policy permission configuration
         :type payload: dict
         :return: PermissionRepresentation
-        :rtype: dict
+        :rtype: bytes
         """
         data_raw = self.connection.raw_put(
             self.uma_well_known["policy_endpoint"] + f"/{policy_id}",
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPutError)
+        res = raise_error_from_response(data_raw, KeycloakPutError)
+        if not isinstance(res, bytes):
+            msg = (
+                "Unexpected response type. Expected 'bytes', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     def policy_delete(self, policy_id: str) -> dict:
         """
@@ -467,7 +559,15 @@ class KeycloakUMA:
         data_raw = self.connection.raw_delete(
             self.uma_well_known["policy_endpoint"] + f"/{policy_id}",
         )
-        return raise_error_from_response(data_raw, KeycloakDeleteError)
+        res = raise_error_from_response(data_raw, KeycloakDeleteError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     def policy_query(
         self,
@@ -509,7 +609,18 @@ class KeycloakUMA:
             query["max"] = maximum
 
         data_raw = self.connection.raw_get(self.uma_well_known["policy_endpoint"], **query)
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if isinstance(res, dict) and res == {}:
+            return []
+
+        if not isinstance(res, list):
+            msg = (
+                "Unexpected response type. Expected 'list', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a__fetch_well_known(self) -> dict:
         """
@@ -520,7 +631,15 @@ class KeycloakUMA:
         """
         params_path = {"realm-name": self.connection.realm_name}
         data_raw = await self.connection.a_raw_get(URL_UMA_WELL_KNOWN.format(**params_path))
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_resource_set_create(self, payload: dict) -> dict:
         """
@@ -541,13 +660,21 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["resource_registration_endpoint"],
             data=json.dumps(payload),
         )
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakPostError,
             expected_codes=[HTTP_CREATED],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    async def a_resource_set_update(self, resource_id: str, payload: dict) -> bytes:
+        return res
+
+    async def a_resource_set_update(self, resource_id: str, payload: dict) -> dict:
         """
         Update a resource set  asynchronously.
 
@@ -562,18 +689,26 @@ class KeycloakUMA:
         :param payload: ResourceRepresentation
         :type payload: dict
         :return: Response dict (empty)
-        :rtype: bytes
+        :rtype: dict
         """
         url = self.format_url(
             (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_put(url, data=json.dumps(payload))
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakPutError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_resource_set_read(self, resource_id: str) -> dict:
         """
@@ -595,9 +730,17 @@ class KeycloakUMA:
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_get(url)
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        res = raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    async def a_resource_set_delete(self, resource_id: str) -> bytes:
+        return res
+
+    async def a_resource_set_delete(self, resource_id: str) -> dict:
         """
         Delete a resource set  asynchronously.
 
@@ -607,18 +750,26 @@ class KeycloakUMA:
         :param resource_id: id of the resource
         :type resource_id: str
         :return: Response dict (empty)
-        :rtype: bytes
+        :rtype: dict
         """
         url = self.format_url(
             (await self.a_uma_well_known)["resource_registration_endpoint"] + "/{id}",
             id=resource_id,
         )
         data_raw = await self.connection.a_raw_delete(url)
-        return raise_error_from_response(
+        res = raise_error_from_response(
             data_raw,
             KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_resource_set_list_ids(
         self,
@@ -683,9 +834,17 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["resource_registration_endpoint"],
             **query,
         )
-        return raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        res = raise_error_from_response(data_raw, KeycloakGetError, expected_codes=[HTTP_OK])
+        if not isinstance(res, list):
+            msg = (
+                "Unexpected response type. Expected 'list', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    async def a_resource_set_list(self) -> list:
+        return res
+
+    async def a_resource_set_list(self) -> AsyncGenerator[dict, Any]:
         """
         List all resource sets  asynchronously.
 
@@ -702,7 +861,7 @@ class KeycloakUMA:
             resource = await self.a_resource_set_read(resource_id)
             yield resource
 
-    async def a_permission_ticket_create(self, permissions: Iterable[UMAPermission]) -> bool:
+    async def a_permission_ticket_create(self, permissions: Iterable[UMAPermission]) -> dict:
         """
         Create a permission ticket  asynchronously.
 
@@ -743,13 +902,21 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["permission_endpoint"],
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError)
+        res = raise_error_from_response(data_raw, KeycloakPostError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_permissions_check(
         self,
         token: str,
         permissions: Iterable[UMAPermission],
-        **extra_payload: dict,
+        **extra_payload: Any,  # noqa: ANN401
     ) -> bool:
         """
         Check UMA permissions by user token with requested permissions  asynchronously.
@@ -781,7 +948,21 @@ class KeycloakUMA:
         if len(payload["permission"]) == 0:
             return True
 
-        connection = ConnectionManager(self.connection.base_url)
+        if self.connection.base_url is None:
+            msg = (
+                "Unable to perform permission check without base_url set on the connection object."
+            )
+            raise AttributeError(msg)
+
+        connection = ConnectionManager(
+            base_url=self.connection.base_url,
+            timeout=self.connection.timeout,
+            verify=self.connection.verify,
+            proxies=self.connection.proxies,
+            cert=self.connection.cert,
+            max_retries=self.connection.max_retries,
+            pool_maxsize=self.connection.pool_maxsize,
+        )
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await connection.a_raw_post(
@@ -792,6 +973,14 @@ class KeycloakUMA:
             data = raise_error_from_response(data_raw, KeycloakPostError)
         except KeycloakPostError:
             return False
+
+        if not isinstance(data, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(data)}', value '{data}'."
+            )
+            raise TypeError(msg)
+
         return data.get("result", False)
 
     async def a_policy_resource_create(self, resource_id: str, payload: dict) -> dict:
@@ -813,9 +1002,17 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["policy_endpoint"] + f"/{resource_id}",
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPostError)
+        res = raise_error_from_response(data_raw, KeycloakPostError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
 
-    async def a_policy_update(self, policy_id: str, payload: dict) -> dict:
+        return res
+
+    async def a_policy_update(self, policy_id: str, payload: dict) -> bytes:
         """
         Update permission policy  asynchronously.
 
@@ -827,13 +1024,21 @@ class KeycloakUMA:
         :param payload: policy permission configuration
         :type payload: dict
         :return: PermissionRepresentation
-        :rtype: dict
+        :rtype: bytes
         """
         data_raw = await self.connection.a_raw_put(
             (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}",
             data=json.dumps(payload),
         )
-        return raise_error_from_response(data_raw, KeycloakPutError)
+        res = raise_error_from_response(data_raw, KeycloakPutError)
+        if not isinstance(res, bytes):
+            msg = (
+                "Unexpected response type. Expected 'bytes', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_policy_delete(self, policy_id: str) -> dict:
         """
@@ -850,7 +1055,15 @@ class KeycloakUMA:
         data_raw = await self.connection.a_raw_delete(
             (await self.a_uma_well_known)["policy_endpoint"] + f"/{policy_id}",
         )
-        return raise_error_from_response(data_raw, KeycloakDeleteError)
+        res = raise_error_from_response(data_raw, KeycloakDeleteError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
 
     async def a_policy_query(
         self,
@@ -895,4 +1108,15 @@ class KeycloakUMA:
             (await self.a_uma_well_known)["policy_endpoint"],
             **query,
         )
-        return raise_error_from_response(data_raw, KeycloakGetError)
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if isinstance(res, dict) and res == {}:
+            return []
+
+        if not isinstance(res, list):
+            msg = (
+                "Unexpected response type. Expected 'list', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res

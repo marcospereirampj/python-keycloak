@@ -20,7 +20,7 @@ import re
 
 import pytest
 
-from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
+from keycloak.exceptions import KeycloakPermissionFormatError
 from keycloak.uma_permissions import (
     AuthStatus,
     Resource,
@@ -32,9 +32,6 @@ from keycloak.uma_permissions import (
 
 def test_uma_permission_obj() -> None:
     """Test generic UMA permission."""
-    with pytest.raises(PermissionDefinitionError):
-        UMAPermission(permission="bad")
-
     p1 = UMAPermission(permission=Resource("Resource"))
     assert p1.resource == "Resource"
     assert p1.scope == ""
@@ -75,15 +72,6 @@ def test_scope_resource_str() -> None:
     r = "Resource1"
     s = Scope("Scope1")
     assert s(resource=r) == "Resource1#Scope1"
-
-
-def test_resource_scope_list() -> None:
-    """Test resource scope as list."""
-    r = Resource("Resource1")
-    s = ["Scope1"]
-    with pytest.raises(PermissionDefinitionError) as err:
-        r(s)
-    assert err.match(re.escape("can't determine if '['Scope1']' is a resource or scope"))
 
 
 def test_build_permission_none() -> None:
@@ -170,27 +158,6 @@ def test_build_permission_misbuilt_dict_str_list_list_str() -> None:
     with pytest.raises(KeycloakPermissionFormatError) as err:
         build_permission_param({"res1": [["scope1", "scope2"]]})
     assert err.match(re.escape("misbuilt permission {'res1': [['scope1', 'scope2']]}"))
-
-
-def test_build_permission_misbuilt_list_list_str() -> None:
-    """Test bad build of permission param from list."""
-    with pytest.raises(KeycloakPermissionFormatError) as err:
-        build_permission_param([["scope1", "scope2"]])
-    assert err.match(re.escape("misbuilt permission [['scope1', 'scope2']]"))
-
-
-def test_build_permission_misbuilt_list_set_str() -> None:
-    """Test bad build of permission param from set."""
-    with pytest.raises(KeycloakPermissionFormatError) as err:
-        build_permission_param([{"scope1", "scope2"}])
-    assert err.match("misbuilt permission.*")
-
-
-def test_build_permission_misbuilt_set_set_str() -> None:
-    """Test bad build of permission param from list of set."""
-    with pytest.raises(KeycloakPermissionFormatError) as err:
-        build_permission_param([{"scope1"}])
-    assert err.match(re.escape("misbuilt permission [{'scope1'}]"))
 
 
 def test_build_permission_misbuilt_dict_non_iterable() -> None:

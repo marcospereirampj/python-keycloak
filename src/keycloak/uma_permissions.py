@@ -24,7 +24,7 @@
 
 from __future__ import annotations
 
-from keycloak.exceptions import KeycloakPermissionFormatError, PermissionDefinitionError
+from keycloak.exceptions import KeycloakPermissionFormatError
 
 
 class UMAPermission:
@@ -68,11 +68,9 @@ class UMAPermission:
         """
         self.resource = resource
         self.scope = scope
+        self.resource_id = None
 
-        if permission:
-            if not isinstance(permission, UMAPermission):
-                msg = f"can't determine if '{permission}' is a resource or scope"
-                raise PermissionDefinitionError(msg)
+        if permission is not None:
             if permission.resource:
                 self.resource = str(permission.resource)
             if permission.scope:
@@ -146,10 +144,7 @@ class UMAPermission:
         if scope:
             result_scope = str(scope)
 
-        if permission:
-            if not isinstance(permission, UMAPermission):
-                msg = f"can't determine if '{permission}' is a resource or scope"
-                raise PermissionDefinitionError(msg)
+        if permission is not None:
             if permission.resource:
                 result_resource = str(permission.resource)
             if permission.scope:
@@ -168,7 +163,7 @@ class Resource(UMAPermission):
     :type resource: str
     """
 
-    def __init__(self, resource: Resource) -> None:
+    def __init__(self, resource: str) -> None:
         """
         Init method.
 
@@ -188,7 +183,7 @@ class Scope(UMAPermission):
     :type scope: str
     """
 
-    def __init__(self, scope: Scope) -> None:
+    def __init__(self, scope: str) -> None:
         """
         Init method.
 
@@ -213,7 +208,9 @@ class AuthStatus:
     :type missing_permissions: set
     """
 
-    def __init__(self, is_logged_in: bool, is_authorized: bool, missing_permissions: set) -> None:
+    def __init__(
+        self, is_logged_in: bool, is_authorized: bool, missing_permissions: set | str
+    ) -> None:
         """
         Init method.
 
@@ -252,7 +249,9 @@ class AuthStatus:
         )
 
 
-def build_permission_param(permissions: str | list | dict) -> set:
+def build_permission_param(
+    permissions: str | list | dict | UMAPermission | None | tuple | set,
+) -> set:
     """
     Transform permissions to a set, so they are usable for requests.
 
@@ -268,6 +267,8 @@ def build_permission_param(permissions: str | list | dict) -> set:
         return {permissions}
     if isinstance(permissions, UMAPermission):
         return {str(permissions)}
+    if isinstance(permissions, (list, tuple, set)):
+        return set(permissions)
 
     try:  # treat as dictionary of permissions
         result = set()

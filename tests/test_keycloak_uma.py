@@ -216,7 +216,8 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     assert len(policies) == 1
 
     policy_id = policy["id"]
-    uma.policy_delete(policy_id)
+    policy_delete_res = uma.policy_delete(policy_id)
+    assert policy_delete_res == {}
     with pytest.raises(KeycloakDeleteError) as err:
         uma.policy_delete(policy_id)
     assert err.match(
@@ -228,7 +229,8 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     assert len(policies) == 2
 
     policy = policies[0]
-    uma.policy_update(policy_id=policy["id"], payload=policy)
+    policy_update_res = uma.policy_update(policy_id=policy["id"], payload=policy)
+    assert policy_update_res == b""
 
     policies = uma.policy_query()
     assert len(policies) == 2
@@ -254,6 +256,7 @@ def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     uma.resource_set_delete(resource_id)
     admin.delete_client(other_client_id)
     admin.delete_realm_role(role_id)
+    assert group_id is not None
     admin.delete_group(group_id)
 
 
@@ -282,6 +285,7 @@ def test_uma_access(uma: KeycloakUMA) -> None:
 
     token = uma.connection.token
     permissions = []
+    assert token is not None
     assert uma.permissions_check(token["access_token"], permissions)
 
     permissions.append(UMAPermission(resource=resource_to_create["name"]))
@@ -522,7 +526,8 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     assert len(policies) == 1
 
     policy_id = policy["id"]
-    await uma.a_policy_delete(policy_id)
+    policy_delete_res = await uma.a_policy_delete(policy_id)
+    assert policy_delete_res == {}
     with pytest.raises(KeycloakDeleteError) as err:
         await uma.a_policy_delete(policy_id)
     assert err.match(
@@ -534,7 +539,8 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     assert len(policies) == 2
 
     policy = policies[0]
-    await uma.a_policy_update(policy_id=policy["id"], payload=policy)
+    policy_update_res = await uma.a_policy_update(policy_id=policy["id"], payload=policy)
+    assert policy_update_res == b""
 
     policies = await uma.a_policy_query()
     assert len(policies) == 2
@@ -560,6 +566,7 @@ async def test_a_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
     await uma.a_resource_set_delete(resource_id)
     await admin.a_delete_client(other_client_id)
     await admin.a_delete_realm_role(role_id)
+    assert group_id is not None
     await admin.a_delete_group(group_id)
 
 
@@ -589,6 +596,7 @@ async def test_a_uma_access(uma: KeycloakUMA) -> None:
 
     token = uma.connection.token
     permissions = []
+    assert token is not None
     assert await uma.a_permissions_check(token["access_token"], permissions)
 
     permissions.append(UMAPermission(resource=resource_to_create["name"]))

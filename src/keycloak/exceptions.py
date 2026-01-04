@@ -57,7 +57,7 @@ class KeycloakError(Exception):
 
     def __init__(
         self,
-        error_message: str = "",
+        error_message: str | bytes = "",
         response_code: int | None = None,
         response_body: bytes | None = None,
     ) -> None:
@@ -147,7 +147,15 @@ class PermissionDefinitionError(Exception):
 
 def raise_error_from_response(
     response: Response | AsyncResponse,
-    error: dict | Exception,
+    error: type[
+        KeycloakGetError
+        | KeycloakPostError
+        | KeycloakDeprecationError
+        | KeycloakPutError
+        | KeycloakDeleteError
+    ]
+    | dict
+    | Exception,
     expected_codes: list[int] | None = None,
     skip_exists: bool = False,
 ) -> bytes | dict | list:
@@ -190,9 +198,9 @@ def raise_error_from_response(
     if isinstance(error, dict):
         error = error.get(response.status_code, KeycloakOperationError)
     elif response.status_code == HTTP_UNAUTHORIZED:
-        error = KeycloakAuthenticationError
+        error = KeycloakAuthenticationError  # pyright: ignore[reportAssignmentType]
 
-    raise error(
+    raise error(  # pyright: ignore[reportCallIssue]
         error_message=message,
         response_code=response.status_code,
         response_body=response.content,

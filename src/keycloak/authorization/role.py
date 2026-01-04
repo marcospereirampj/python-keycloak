@@ -61,7 +61,7 @@ class Role:
         """
         return self.name
 
-    def __eq__(self, other: str | Role) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Eq method.
 
