@@ -1,3 +1,9 @@
+## v7.0.1 (2026-01-05)
+
+### Fix
+
+- python version
+
 ## v7.0.0 (2026-01-04)
 
 ### BREAKING CHANGE
