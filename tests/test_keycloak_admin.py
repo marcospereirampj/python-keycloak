@@ -2681,10 +2681,10 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     with pytest.raises(KeycloakPostError) as err:
         admin.create_authentication_flow(payload={"alias": "test-create", "builtIn": False})
     assert err.match('409: b\'{"errorMessage":"Flow test-create already exists"}\'')
-    assert admin.create_authentication_flow(
-        payload={"alias": "test-create"},
-        skip_exists=True,
-    ) == {"msg": "Already exists"}
+    assert (
+        admin.create_authentication_flow(payload={"alias": "test-create"}, skip_exists=True)
+        == json.dumps({"msg": "Already exists"}).encode()
+    )
 
     # Update
     res = admin.get_authentication_flows()

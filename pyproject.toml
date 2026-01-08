@@ -31,7 +31,7 @@ Documentation = "https://python-keycloak.readthedocs.io/en/latest/"
 "Issue tracker" = "https://github.com/marcospereirampj/python-keycloak/issues"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4"
+python = ">=3.10,<4"
 requests = ">=2.20.0"
 requests-toolbelt = ">=0.6.0"
 deprecation = ">=2.1.0"

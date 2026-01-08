@@ -5429,7 +5429,7 @@ class KeycloakAdmin:
             skip_exists=skip_exists,
         )
         if isinstance(res, dict) and res == {"msg": "Already exists"}:
-            return res
+            return json.dumps(res).encode()
 
         if not isinstance(res, bytes):
             msg = (
