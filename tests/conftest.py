@@ -325,11 +325,25 @@ def oid_with_credentials_authz(
             "serviceAccountsEnabled": True,
         },
     )
+    admin.create_client_authz_resource(
+        client_id=client_id,
+        payload={"name": "Default Resource", "uris": ["/*"], "type": "urn.resource"},
+        skip_exists=True,
+    )
     admin.create_client_authz_role_based_policy(
         client_id=client_id,
         payload={
             "name": "test-authz-rb-policy",
             "roles": [{"id": admin.get_realm_role(role_name="offline_access")["id"]}],
+        },
+    )
+    admin.create_client_authz_resource_based_permission(
+        client_id=client_id,
+        payload={
+            "name": "default-resource-permission",
+            "resources": ["Default Resource"],
+            "policies": ["test-authz-rb-policy"],
+            "decisionStrategy": "UNANIMOUS",
         },
     )
     # Create user

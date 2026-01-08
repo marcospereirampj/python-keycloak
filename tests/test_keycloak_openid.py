@@ -298,6 +298,7 @@ def test_entitlement(
     token = oid.token(username=username, password=password)
     client_id = admin.get_client_id(oid.client_id)
     assert client_id is not None
+    assert admin.connection.realm_name == oid.realm_name
     resource_server_id = admin.get_client_authz_resources(client_id=client_id)[0]["_id"]
 
     with pytest.raises(KeycloakDeprecationError):
