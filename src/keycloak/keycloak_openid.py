@@ -902,7 +902,12 @@ class KeycloakOpenID:
 
         return list(set(permissions))
 
-    def uma_permissions(self, token: str, permissions: str = "", **extra_payload: Any) -> list:  # noqa: ANN401
+    def uma_permissions(
+        self,
+        token: str,
+        permissions: str | list | dict | tuple | set = "",
+        **extra_payload: Any,  # noqa: ANN401
+    ) -> list:
         """
         Get UMA permissions by user token with requested permissions.
 
@@ -956,7 +961,9 @@ class KeycloakOpenID:
 
         return res
 
-    def has_uma_access(self, token: str, permissions: str) -> AuthStatus:
+    def has_uma_access(
+        self, token: str, permissions: str | list | dict | tuple | set
+    ) -> AuthStatus:
         """
         Determine whether user has uma permissions with specified user token.
 
@@ -1762,7 +1769,7 @@ class KeycloakOpenID:
     async def a_uma_permissions(
         self,
         token: str,
-        permissions: str = "",
+        permissions: str | list | dict | tuple | set = "",
         **extra_payload: Any,  # noqa: ANN401
     ) -> list:
         """
@@ -1818,7 +1825,9 @@ class KeycloakOpenID:
 
         return res
 
-    async def a_has_uma_access(self, token: str, permissions: str) -> AuthStatus:
+    async def a_has_uma_access(
+        self, token: str, permissions: str | list | dict | tuple | set
+    ) -> AuthStatus:
         """
         Determine whether user has uma permissions with specified user token asynchronously.
 
