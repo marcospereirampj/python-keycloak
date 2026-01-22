@@ -4019,7 +4019,7 @@ class KeycloakAdmin:
         self,
         client_role_id: str,
         role_name: str,
-        roles: str | list,
+        roles: dict | list,
     ) -> dict:
         """
         Add composite roles to client role.
@@ -4537,7 +4537,7 @@ class KeycloakAdmin:
 
         return res
 
-    def add_composite_realm_roles_to_role(self, role_name: str, roles: str | list) -> dict:
+    def add_composite_realm_roles_to_role(self, role_name: str, roles: dict | list) -> dict:
         """
         Add composite roles to the role.
 
@@ -10881,7 +10881,7 @@ class KeycloakAdmin:
         self,
         client_role_id: str,
         role_name: str,
-        roles: str | list,
+        roles: dict | list,
     ) -> dict:
         """
         Add composite roles to client role asynchronously.
@@ -11384,7 +11384,7 @@ class KeycloakAdmin:
     async def a_add_composite_realm_roles_to_role(
         self,
         role_name: str,
-        roles: str | list,
+        roles: dict | list,
     ) -> dict:
         """
         Add composite roles to the role asynchronously.
