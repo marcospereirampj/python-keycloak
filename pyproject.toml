@@ -97,3 +97,9 @@ ignore = [
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.pyright]
+venvPath = "/Users/richardnemeth/Library/Caches/pypoetry/virtualenvs"
+venv = "python-keycloak-4PLGxl-6-py3.13"
+pythonVersion = "3.13"
+

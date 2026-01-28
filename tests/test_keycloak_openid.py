@@ -188,6 +188,24 @@ def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]) -> None:
     }
 
 
+def test_client_signed_response(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test signed userinfo response."""
+    oid, username, password = oid_with_credentials
+
+    admin.change_current_realm(oid.realm_name)
+    client_id = admin.get_client_id(oid.client_id)
+    assert client_id is not None
+    client_d = admin.get_client(client_id=client_id)
+    client_d["attributes"]["user.info.response.signature.alg"] = "ES256"
+    admin.update_client(client_id=client_id, payload=client_d)
+
+    token = oid.token(username, password)
+    res = oid.userinfo(token["access_token"])
+    assert isinstance(res, bytes)
+
+
 def test_exchange_token(
     oid_with_credentials: tuple[KeycloakOpenID, str, str],
     admin: KeycloakAdmin,
@@ -715,6 +733,25 @@ async def test_a_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]) ->
         "session_state": mock.ANY,
         "token_type": "Bearer",
     }
+
+
+@pytest.mark.asyncio
+async def test_a_client_signed_response(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test signed userinfo response."""
+    oid, username, password = oid_with_credentials
+
+    await admin.a_change_current_realm(oid.realm_name)
+    client_id = await admin.a_get_client_id(oid.client_id)
+    assert client_id is not None
+    client_d = await admin.a_get_client(client_id=client_id)
+    client_d["attributes"]["user.info.response.signature.alg"] = "ES256"
+    await admin.a_update_client(client_id=client_id, payload=client_d)
+
+    token = await oid.a_token(username, password)
+    res = await oid.a_userinfo(token["access_token"])
+    assert isinstance(res, bytes)
 
 
 @pytest.mark.asyncio
