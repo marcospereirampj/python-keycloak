@@ -394,7 +394,7 @@ class KeycloakUMA:
                     msg = "Invalid resource specified"
                     raise KeycloakPostError(msg)
 
-                permission.resource_id = resource_ids[0]
+                resource_id = resource_ids[0]
 
             resources.setdefault(resource_id, set())
             if permission.scope:
@@ -887,7 +887,7 @@ class KeycloakUMA:
                     msg = "Invalid resource specified"
                     raise KeycloakPostError(msg)
 
-                permission.resource_id = resource_ids[0]
+                resource_id = resource_ids[0]
 
             resources.setdefault(resource_id, set())
             if permission.scope:
