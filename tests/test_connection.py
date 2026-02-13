@@ -89,7 +89,7 @@ def test_counter_part() -> None:
         assert sync_sign.parameters == async_sign.parameters
 
     for async_method in async_methods:
-        if async_method in ["aclose"]:
+        if async_method == "aclose":
             continue
         if async_method[2:].startswith("_"):
             continue

@@ -115,7 +115,7 @@ class Policy:
         """
         return self._type
 
-    @type.setter
+    @type.setter  # noqa: A003
     def type(self, value: str) -> None:
         self._type = value
 
