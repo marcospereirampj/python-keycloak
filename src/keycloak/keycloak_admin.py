@@ -7518,6 +7518,35 @@ class KeycloakAdmin:
 
         return res
 
+    def get_client_certificate_key_info(self, client_id: str, attribute: str) -> dict:
+        """
+        Get client certificate key info.
+
+        :param client_id: id of the client
+        :type client_id: str
+        :param attribute: attribute to query for
+        :type attribute: str
+        :return: Certificate key info
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "attr": attribute,
+        }
+        data_raw = self.connection.raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_CERTS.format(**params_path)
+        )
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
+
     def upload_certificate(self, client_id: str, certcont: str) -> dict:
         """
         Upload a new certificate for the client.
@@ -14307,6 +14336,35 @@ class KeycloakAdmin:
         if not isinstance(res, list):
             msg = (
                 "Unexpected response type. Expected 'list', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
+
+    async def a_get_client_certificate_key_info(self, client_id: str, attribute: str) -> dict:
+        """
+        Get client certificate key info.
+
+        :param client_id: id of the client
+        :type client_id: str
+        :param attribute: attribute to query for
+        :type attribute: str
+        :return: Certificate key info
+        :rtype: dict
+        """
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "attr": attribute,
+        }
+        data_raw = await self.connection.a_raw_get(
+            urls_patterns.URL_ADMIN_CLIENT_CERTS.format(**params_path)
+        )
+        res = raise_error_from_response(data_raw, KeycloakGetError)
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
                 f"'{type(res)}', value '{res}'."
             )
             raise TypeError(msg)
