@@ -40,7 +40,7 @@ ILLEGAL_EXECUTION_REGEX = '404: b\'{"error":"Illegal execution".*}\''
 NO_CLIENT_SCOPE_REGEX = '404: b\'{"error":"Could not find client scope".*}\''
 UNKOWN_ERROR_REGEX = 'b\'{"error":"unknown_error".*}\''
 USER_NOT_FOUND_REGEX = '404: b\'{"error":"User not found".*}\''
-COULD_NOT_FIND_CLIENT_REGEX = '404: b\'{"error":"Could not find client"}\''
+COULD_NOT_FIND_CLIENT_REGEX = '404: b\'{"error":"Could not find client".*}\''
 
 
 def test_keycloak_version() -> None:
