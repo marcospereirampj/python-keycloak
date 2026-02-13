@@ -1654,7 +1654,7 @@ class KeycloakOpenID:
         if validate:
             if key is None:
                 key = jwk.JWKSet()
-                for cert in self.certs()["keys"]:
+                for cert in (await self.a_certs())["keys"]:
                     key.add(jwk.JWK(**cert))
         else:
             key = None
