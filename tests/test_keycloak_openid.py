@@ -5,6 +5,7 @@ from unittest import mock
 
 import jwcrypto.jwk
 import jwcrypto.jws
+import jwcrypto.jwt
 import pytest
 
 from keycloak import KeycloakAdmin, KeycloakOpenID
@@ -379,7 +380,7 @@ def test_decode_token_invalid_token(oid_with_credentials: tuple[KeycloakOpenID, 
     key = jwcrypto.jwk.JWK.from_pem(key.encode("utf-8"))
 
     invalid_access_token = access_token + "a"
-    with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
+    with pytest.raises(jwcrypto.jwt.JWTMissingKey):
         decoded_invalid_access_token = oid.decode_token(token=invalid_access_token, validate=True)
 
     with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
@@ -941,7 +942,7 @@ async def test_a_decode_token_invalid_token(
     key = jwcrypto.jwk.JWK.from_pem(key.encode("utf-8"))
 
     invalid_access_token = access_token + "a"
-    with pytest.raises(jwcrypto.jws.InvalidJWSSignature):
+    with pytest.raises(jwcrypto.jwt.JWTMissingKey):
         decoded_invalid_access_token = await oid.a_decode_token(
             token=invalid_access_token,
             validate=True,
@@ -1219,3 +1220,54 @@ def test_counter_part() -> None:
             continue
 
         assert async_method[2:] in sync_methods
+
+
+def test_other_signing_methods(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test other signing algs."""
+    oid, username, password = oid_with_credentials
+
+    admin.change_current_realm(oid.realm_name)
+    client_id = admin.get_client_id(oid.client_id)
+    assert client_id is not None
+    client_def = admin.get_client(client_id)
+    client_def["attributes"].update(
+        {
+            "access.token.signed.response.alg": "RS512",
+            "id.token.signed.response.alg": "RS512",
+            "userinfo.signed.response.alg": "RS512",
+        }
+    )
+    res = admin.update_client(client_id, client_def)
+    assert res == {}
+
+    token = oid.token(username, password)
+    res = oid.decode_token(token["access_token"])
+    assert res != {}
+
+
+@pytest.mark.asyncio
+async def test_a_other_signing_methods(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """Test other signing algs."""
+    oid, username, password = oid_with_credentials
+
+    await admin.a_change_current_realm(oid.realm_name)
+    client_id = await admin.a_get_client_id(oid.client_id)
+    assert client_id is not None
+    client_def = await admin.a_get_client(client_id)
+    client_def["attributes"].update(
+        {
+            "access.token.signed.response.alg": "RS512",
+            "id.token.signed.response.alg": "RS512",
+            "userinfo.signed.response.alg": "RS512",
+        }
+    )
+    res = await admin.a_update_client(client_id, client_def)
+    assert res == {}
+
+    token = await oid.a_token(username, password)
+    res = await oid.a_decode_token(token["access_token"])
+    assert res != {}

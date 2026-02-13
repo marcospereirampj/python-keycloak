@@ -40,6 +40,7 @@ ILLEGAL_EXECUTION_REGEX = '404: b\'{"error":"Illegal execution".*}\''
 NO_CLIENT_SCOPE_REGEX = '404: b\'{"error":"Could not find client scope".*}\''
 UNKOWN_ERROR_REGEX = 'b\'{"error":"unknown_error".*}\''
 USER_NOT_FOUND_REGEX = '404: b\'{"error":"User not found".*}\''
+COULD_NOT_FIND_CLIENT_REGEX = '404: b\'{"error":"Could not find client".*}\''
 
 
 def test_keycloak_version() -> None:
@@ -7695,6 +7696,23 @@ async def test_a_consents(
     with pytest.raises(KeycloakDeleteError) as err:
         await admin.a_revoke_consent(user_id=user_id, client_id=oid.client_id)
     assert err.match(CONSENT_NOT_FOUND_REGEX)
+
+
+def test_keycloak_client_get_cert_info(admin: KeycloakAdmin, client: str) -> None:
+    """Test get cert info."""
+    assert admin.get_client_certificate_key_info(client, "jwt.credential") == {}
+    with pytest.raises(KeycloakGetError) as res:
+        admin.get_client_certificate_key_info("blah", "blah")
+    assert res.match(COULD_NOT_FIND_CLIENT_REGEX)
+
+
+@pytest.mark.asyncio
+async def test_a_keycloak_client_get_cert_info(admin: KeycloakAdmin, client: str) -> None:
+    """Test get cert info."""
+    assert await admin.a_get_client_certificate_key_info(client, "jwt.credential") == {}
+    with pytest.raises(KeycloakGetError) as res:
+        await admin.a_get_client_certificate_key_info("blah", "blah")
+    assert res.match(COULD_NOT_FIND_CLIENT_REGEX)
 
 
 def test_counter_part() -> None:
