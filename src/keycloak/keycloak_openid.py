@@ -791,12 +791,9 @@ class KeycloakOpenID:
         key = kwargs.pop("key", None)
         if validate:
             if key is None:
-                key = (
-                    "-----BEGIN PUBLIC KEY-----\n"
-                    + self.public_key()
-                    + "\n-----END PUBLIC KEY-----"
-                )
-                key = jwk.JWK.from_pem(key.encode("utf-8"))
+                key = jwk.JWKSet()
+                for cert in self.certs()["keys"]:
+                    key.add(jwk.JWK(**cert))
         else:
             key = None
 
@@ -1656,12 +1653,9 @@ class KeycloakOpenID:
         key = kwargs.pop("key", None)
         if validate:
             if key is None:
-                key = (
-                    "-----BEGIN PUBLIC KEY-----\n"
-                    + await self.a_public_key()
-                    + "\n-----END PUBLIC KEY-----"
-                )
-                key = jwk.JWK.from_pem(key.encode("utf-8"))
+                key = jwk.JWKSet()
+                for cert in self.certs()["keys"]:
+                    key.add(jwk.JWK(**cert))
         else:
             key = None
 
