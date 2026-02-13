@@ -1,3 +1,9 @@
+## v7.0.3 (2026-01-28)
+
+### Fix
+
+- do not throw when processing signed userinfo response (#699)
+
 ## v7.0.2 (2026-01-08)
 
 ### Fix
