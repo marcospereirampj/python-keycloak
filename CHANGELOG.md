@@ -1,3 +1,9 @@
+## v7.1.0 (2026-02-13)
+
+### Feat
+
+- decode token with all keys, added get client certificate info method (#704)
+
 ## v7.0.3 (2026-01-28)
 
 ### Fix
