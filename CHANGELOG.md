@@ -1,3 +1,9 @@
+## v7.1.1 (2026-02-15)
+
+### Fix
+
+- **uma**: set requested resource ids correctly in permission ticket creation (#702)
+
 ## v7.1.0 (2026-02-13)
 
 ### Feat
