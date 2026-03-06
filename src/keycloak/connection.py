@@ -459,7 +459,7 @@ class ConnectionManager:
         try:
             return await self.async_s.get(
                 urljoin(self.base_url, path),
-                params=self._filter_query_params(kwargs),
+                params=self._filter_none_values(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -494,7 +494,7 @@ class ConnectionManager:
             return await self.async_s.request(
                 method="POST",
                 url=urljoin(self.base_url, path),
-                params=self._filter_query_params(kwargs),
+                params=self._filter_none_values(kwargs),
                 **self._prepare_httpx_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
@@ -529,7 +529,7 @@ class ConnectionManager:
         try:
             return await self.async_s.put(
                 urljoin(self.base_url, path),
-                params=self._filter_query_params(kwargs),
+                params=self._filter_none_values(kwargs),
                 **self._prepare_httpx_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
@@ -566,7 +566,7 @@ class ConnectionManager:
                 method="DELETE",
                 url=urljoin(self.base_url, path),
                 **self._prepare_httpx_request_content(data or {}),
-                params=self._filter_query_params(kwargs),
+                params=self._filter_none_values(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -574,8 +574,8 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    @staticmethod
-    def _prepare_httpx_request_content(data: dict | str | None | MultipartEncoder) -> dict:
+    @classmethod
+    def _prepare_httpx_request_content(cls, data: dict | str | None | MultipartEncoder) -> dict:
         """
         Create the correct request content kwarg to `httpx.AsyncClient.request()`.
 
@@ -593,19 +593,23 @@ class ConnectionManager:
             # Note: this could also accept bytes, Iterable[bytes], or AsyncIterable[bytes]
             return {"content": data}
 
+        if isinstance(data, dict):
+            return {"data": cls._filter_none_values(data)}
+
         return {"data": data}
 
-    @staticmethod
-    def _filter_query_params(query_params: dict) -> dict:
+    @classmethod
+    def _filter_none_values(cls, data: dict) -> dict:
         """
-        Explicitly filter query params with None values for compatibility.
+        Explicitly filter items with None values for compatibility.
 
-        Httpx and requests differ in the way they handle query params with the value None,
-        requests does not include params with the value None while httpx includes them as-is.
+        Httpx and requests differ in the way they handle None values: requests silently
+        drops keys with None values from both query params and form-encoded bodies,
+        while httpx serializes them as empty strings.
 
-        :param query_params: the query params
-        :type query_params: dict
-        :returns: the filtered query params
+        :param data: the dict to filter
+        :type data: dict
+        :returns: the filtered dict
         :rtype: dict
         """
-        return {k: v for k, v in query_params.items() if v is not None}
+        return {k: v for k, v in data.items() if v is not None}
