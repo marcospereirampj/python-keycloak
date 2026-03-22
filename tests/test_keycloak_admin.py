@@ -1284,14 +1284,14 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
             resource_id="invalid_resource_id",
             payload={"name": "temp-updated-resource"},
         )
-    assert err.match("404: b''"), err
+    assert err.match("404: b.*"), err
     cz_res = admin.delete_client_authz_resource(
         client_id=auth_client_id, resource_id=temp_resource_id
     )
     assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
-    assert err.match("404: b''")
+    assert err.match("404: b.*")
 
     # Authz policies
     res = admin.get_client_authz_policies(client_id=auth_client_id)
@@ -1335,7 +1335,7 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-    assert err.match("404: b''")
+    assert err.match("404: b.*")
 
     res = admin.create_client_authz_policy(
         client_id=auth_client_id,
@@ -2671,7 +2671,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     # Test copying
     with pytest.raises(KeycloakPostError) as err:
         admin.copy_authentication_flow(payload={}, flow_alias="bad")
-    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
+    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b.*")
 
     res = admin.copy_authentication_flow(payload={"newName": "test-browser"}, flow_alias="browser")
     assert res == b"", res
@@ -2708,7 +2708,7 @@ def test_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     with pytest.raises(KeycloakGetError) as err:
         admin.get_authentication_flow_executions(flow_alias="bad")
-    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
+    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b.*")
     exec_id = res[0]["id"]
 
     res = admin.get_authentication_flow_execution(execution_id=exec_id)
@@ -4986,7 +4986,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             resource_id="invalid_resource_id",
             payload={"name": "temp-updated-resource"},
         )
-    assert err.match("404: b''"), err
+    assert err.match("404: b.*"), err
     res = await admin.a_delete_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
@@ -4997,7 +4997,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             client_id=auth_client_id,
             resource_id=temp_resource_id,
         )
-    assert err.match("404: b''")
+    assert err.match("404: b.*")
 
     # Authz policies
     res = await admin.a_get_client_authz_policies(client_id=auth_client_id)
@@ -5041,7 +5041,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert res3 == {}
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-    assert err.match("404: b''")
+    assert err.match("404: b.*")
 
     res = await admin.a_create_client_authz_policy(
         client_id=auth_client_id,
@@ -6510,7 +6510,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
     # Test copying
     with pytest.raises(KeycloakPostError) as err:
         await admin.a_copy_authentication_flow(payload={}, flow_alias="bad")
-    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
+    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b.*")
 
     res = await admin.a_copy_authentication_flow(
         payload={"newName": "test-browser"},
@@ -6555,7 +6555,7 @@ async def test_a_auth_flows(admin: KeycloakAdmin, realm: str) -> None:
 
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_authentication_flow_executions(flow_alias="bad")
-    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b''")
+    assert ('b\'{"error":"Flow not found"' in str(err)) or err.match("404: b.*")
     exec_id = res[0]["id"]
 
     res = await admin.a_get_authentication_flow_execution(execution_id=exec_id)

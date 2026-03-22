@@ -30,6 +30,7 @@ of openid tokens when required.
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
@@ -143,6 +144,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.custom_headers = custom_headers
         self.headers = {**self.headers, "Content-Type": "application/json"}
         self.cert = cert
+        self._a_refresh_lock = asyncio.Lock()
 
         if not self.grant_type:
             if username and password:
@@ -530,24 +532,33 @@ class KeycloakOpenIDConnection(ConnectionManager):
 
         :raises KeycloakPostError: In case the refresh token request failed.
         """
-        refresh_token = self.token.get("refresh_token", None) if self.token else None
-        if refresh_token is None:
-            await self.a_get_token()
-        else:
-            try:
-                self.token = await self.keycloak_openid.a_refresh_token(refresh_token)
-            except KeycloakPostError as e:
-                list_errors = [
-                    b"Refresh token expired",
-                    b"Token is not active",
-                    b"Session not active",
-                ]
-                if e.response_code == HTTP_BAD_REQUEST and any(
-                    err in (e.response_body or b"") for err in list_errors
-                ):
-                    await self.a_get_token()
-                else:
-                    raise
+        current_token = self.token.get("access_token") if self.token else None
+
+        async with self._a_refresh_lock:
+            new_token = self.token.get("access_token") if self.token else None
+            if (current_token is None and new_token is not None) or (
+                current_token is not None and current_token != new_token
+            ):
+                return
+
+            refresh_token = self.token.get("refresh_token", None) if self.token else None
+            if refresh_token is None:
+                await self.a_get_token()
+            else:
+                try:
+                    self.token = await self.keycloak_openid.a_refresh_token(refresh_token)
+                except KeycloakPostError as e:
+                    list_errors = [
+                        b"Refresh token expired",
+                        b"Token is not active",
+                        b"Session not active",
+                    ]
+                    if e.response_code == HTTP_BAD_REQUEST and any(
+                        err in (e.response_body or b"") for err in list_errors
+                    ):
+                        await self.a_get_token()
+                    else:
+                        raise
 
     async def a__refresh_if_required(self) -> None:
         """Refresh the token if it is expired."""
