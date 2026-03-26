@@ -139,6 +139,35 @@ def test_auth_url(env: KeycloakTestEnv, oid: KeycloakOpenID) -> None:
     )
 
 
+@pytest.mark.parametrize("trailing_slash", [True, False])
+def test_openid_subpath_request_normalization(env: KeycloakTestEnv, trailing_slash: bool) -> None:
+    """
+    Test that KeycloakOpenID builds correct request URLs when a sub-path is present.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    :param trailing_slash: Indicator of trailing slash in server URL
+    :type trailing_slash: bool
+    """
+    host_port = f"http://{env.keycloak_host}:{env.keycloak_port}/auth"
+    server_url = f"{host_port}/" if trailing_slash else host_port
+
+    oid = KeycloakOpenID(
+        server_url=server_url,
+        realm_name="master",
+        client_id="admin-cli",
+    )
+
+    with mock.patch.object(oid.connection._s, "get") as mock_get:
+        mock_get.return_value = mock.Mock(status_code=200, json=lambda: {"issuer": "test"})
+
+        oid.well_known()
+        assert (
+            mock_get.call_args[0][0]
+            == f"http://{env.keycloak_host}:{env.keycloak_port}/auth/realms/master/.well-known/openid-configuration"
+        )
+
+
 def test_token(oid_with_credentials: tuple[KeycloakOpenID, str, str]) -> None:
     """
     Test the token method.
@@ -683,6 +712,35 @@ async def test_a_auth_url(env: KeycloakTestEnv, oid: KeycloakOpenID) -> None:
         f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
         "&redirect_uri=http://test.test/*&scope=email&state=&nonce="
     )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("trailing_slash", [True, False])
+async def test_a_openid_subpath_request_normalization(
+    env: KeycloakTestEnv, trailing_slash: bool
+) -> None:
+    """
+    Test that KeycloakOpenID builds correct request URLs when a sub-path is present asynchronously.
+
+    :param env: Environment fixture
+    :type env: KeycloakTestEnv
+    :param trailing_slash: Indicator of trailing slash in server URL
+    :type trailing_slash: bool
+    """
+    host_port = f"http://{env.keycloak_host}:{env.keycloak_port}/auth"
+    server_url = f"{host_port}/" if trailing_slash else host_port
+
+    oid = KeycloakOpenID(server_url=server_url, realm_name="master", client_id="admin-cli")
+
+    with mock.patch.object(oid.connection.async_s, "get", new_callable=mock.AsyncMock) as mock_get:
+        mock_get.return_value = mock.Mock(status_code=200, json=lambda: {"issuer": "test"})
+
+        await oid.a_well_known()
+
+        expected = f"http://{env.keycloak_host}:{env.keycloak_port}/auth/realms/master/.well-known/openid-configuration"
+
+        mock_get.assert_called()
+        assert str(mock_get.call_args[0][0]) == expected
 
 
 @pytest.mark.asyncio

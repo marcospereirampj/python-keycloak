@@ -95,3 +95,28 @@ def test_counter_part() -> None:
             continue
 
         assert async_method[2:] in sync_methods
+
+
+def test_build_url() -> None:
+    """Test URL building and sub-path preservation."""
+    # Scenario 1: Base URL WITHOUT a trailing slash
+    cm = ConnectionManager(base_url="http://test.test/auth")
+
+    assert cm._build_url("realms/master") == "http://test.test/auth/realms/master"
+    assert cm._build_url("/realms/master") == "http://test.test/auth/realms/master"
+
+    # Scenario 2: Base URL WITH a trailing slash
+    cm_slashed = ConnectionManager(base_url="http://test.test/auth/")
+
+    assert cm_slashed._build_url("realms/master") == "http://test.test/auth/realms/master"
+    assert cm_slashed._build_url("/realms/master") == "http://test.test/auth/realms/master"
+
+    # Scenario 3: Path is already an absolute URL
+    assert cm._build_url("http://absolute.test/realms") == "http://absolute.test/realms"
+    assert cm._build_url("https://absolute.test/realms") == "https://absolute.test/realms"
+
+    # Scenario 4: Empty base URL
+    cm_empty = ConnectionManager(base_url="")
+
+    assert cm_empty._build_url("realms/master") == "realms/master"
+    assert cm_empty._build_url("/realms/master") == "/realms/master"

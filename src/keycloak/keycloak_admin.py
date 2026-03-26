@@ -2386,7 +2386,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.connection.realm_name, "path": path}
+        params_path = {"realm-name": self.connection.realm_name, "path": path.lstrip("/")}
         data_raw = self.connection.raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path),
         )
@@ -9276,7 +9276,7 @@ class KeycloakAdmin:
         :return: Keycloak server response (GroupRepresentation)
         :rtype: dict
         """
-        params_path = {"realm-name": self.connection.realm_name, "path": path}
+        params_path = {"realm-name": self.connection.realm_name, "path": path.lstrip("/")}
         data_raw = await self.connection.a_raw_get(
             urls_patterns.URL_ADMIN_GROUP_BY_PATH.format(**params_path),
         )

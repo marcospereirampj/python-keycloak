@@ -24,11 +24,6 @@
 
 from __future__ import annotations
 
-try:
-    from urllib.parse import urljoin
-except ImportError:  # pragma: no cover
-    from urlparse import urljoin  # pyright: ignore[reportMissingImports]
-
 from typing import Any
 
 import httpx
@@ -166,6 +161,13 @@ class ConnectionManager:
     @base_url.setter
     def base_url(self, value: str | None) -> None:
         self._base_url = value
+
+    def _build_url(self, path: str) -> str:
+        """Join the base_url and path, and handle trailing slashes."""
+        if not self.base_url or path.startswith(("http://", "https://")):
+            return path
+
+        return f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
 
     @property
     def timeout(self) -> int | None:
@@ -334,7 +336,7 @@ class ConnectionManager:
             raise AttributeError(msg)
         try:
             return self._s.get(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=kwargs,
                 headers=self.headers,
                 timeout=self.timeout,
@@ -364,7 +366,7 @@ class ConnectionManager:
             raise AttributeError(msg)
         try:
             return self._s.post(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=kwargs,
                 data=data,
                 headers=self.headers,
@@ -396,7 +398,7 @@ class ConnectionManager:
 
         try:
             return self._s.put(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=kwargs,
                 data=data,
                 headers=self.headers,
@@ -428,7 +430,7 @@ class ConnectionManager:
 
         try:
             return self._s.delete(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=kwargs,
                 data=data or {},
                 headers=self.headers,
@@ -458,7 +460,7 @@ class ConnectionManager:
 
         try:
             return await self.async_s.get(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
@@ -493,7 +495,7 @@ class ConnectionManager:
         try:
             return await self.async_s.request(
                 method="POST",
-                url=urljoin(self.base_url, path),
+                url=self._build_url(path),
                 params=self._filter_query_params(kwargs),
                 **self._prepare_httpx_request_content(data),
                 headers=self.headers,
@@ -528,7 +530,7 @@ class ConnectionManager:
 
         try:
             return await self.async_s.put(
-                urljoin(self.base_url, path),
+                self._build_url(path),
                 params=self._filter_query_params(kwargs),
                 **self._prepare_httpx_request_content(data),
                 headers=self.headers,
@@ -564,7 +566,7 @@ class ConnectionManager:
         try:
             return await self.async_s.request(
                 method="DELETE",
-                url=urljoin(self.base_url, path),
+                url=self._build_url(path),
                 **self._prepare_httpx_request_content(data or {}),
                 params=self._filter_query_params(kwargs),
                 headers=self.headers,
