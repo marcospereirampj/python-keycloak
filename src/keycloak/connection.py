@@ -33,12 +33,29 @@ from typing import Any
 
 import httpx
 import requests
+import ssl
+
 from httpx import Response as AsyncResponse
 from requests import Response
 from requests.adapters import HTTPAdapter
 from requests_toolbelt import MultipartEncoder
 
 from .exceptions import KeycloakConnectionError
+
+
+class _HTTPAdapterWithSSLContext(HTTPAdapter):
+    """Creates an adapter that uses a custom ssl context."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Init method."""
+        self._ca_cert = kwargs.pop("ca_cert", None)
+        super().__init__(*args, **kwargs)
+
+    def init_poolmanager(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Init pool manager."""
+        super().init_poolmanager(
+            *args, **kwargs, ssl_context=ssl.create_default_context(cadata=self._ca_cert)
+        )
 
 
 class ConnectionManager:
@@ -64,6 +81,8 @@ class ConnectionManager:
     :type max_retries: int
     :param pool_maxsize: The maximum number of connections to save in the pool.
     :type pool_maxsize: int
+    :param : An optional CA certificate bundle in PEM format
+    :type : str
     """
 
     def __init__(
@@ -76,6 +95,7 @@ class ConnectionManager:
         cert: str | tuple | None = None,
         max_retries: int = 1,
         pool_maxsize: int | None = None,
+        ca_cert: str | None = None,
     ) -> None:
         """
         Init method.
@@ -99,6 +119,8 @@ class ConnectionManager:
         :type max_retries: int
         :param pool_maxsize: The maximum number of connections to save in the pool.
         :type pool_maxsize: int
+        :param ca_cert: An optional CA certificate bundle in PEM format
+        :type ca_cert: str
         """
         self.base_url = base_url
         self.headers = headers
@@ -114,10 +136,10 @@ class ConnectionManager:
         # retry once to reset connection with Keycloak after  tomcat's ConnectionTimeout
         # see https://github.com/marcospereirampj/python-keycloak/issues/36
         for protocol in ("https://", "http://"):
-            adapter_kwargs = {"max_retries": max_retries}
+            adapter_kwargs = {"ca_cert": ca_cert, "max_retries": max_retries}
             if pool_maxsize is not None:
                 adapter_kwargs["pool_maxsize"] = pool_maxsize
-            adapter = HTTPAdapter(**adapter_kwargs)  # pyright: ignore[reportArgumentType]
+            adapter = _HTTPAdapterWithSSLContext(**adapter_kwargs)  # pyright: ignore[reportArgumentType]
             # adds POST to retry whitelist
             allowed_methods = (
                 set(adapter.max_retries.allowed_methods)

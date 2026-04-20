@@ -90,6 +90,8 @@ class KeycloakOpenID:
     :param max_retries: The total number of times to retry HTTP requests.
     :param pool_maxsize: The maximum number of connections to save in the pool.
     :type pool_maxsize: int
+    :param ca_cert: An optional CA certificate bundle in PEM format
+    :type ca_cert: str
     """
 
     def __init__(
@@ -105,6 +107,7 @@ class KeycloakOpenID:
         cert: str | tuple | None = None,
         max_retries: int = 1,
         pool_maxsize: int | None = None,
+        ca_cert: str | None = None,
     ) -> None:
         """
         Init method.
@@ -134,6 +137,8 @@ class KeycloakOpenID:
         :type max_retries: int
         :param pool_maxsize: The maximum number of connections to save in the pool.
         :type pool_maxsize: int
+        :param ca_cert: An optional CA certificate bundle in PEM format
+        :type ca_cert: str
         """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
@@ -148,6 +153,7 @@ class KeycloakOpenID:
             cert=cert,
             max_retries=max_retries,
             pool_maxsize=pool_maxsize,
+            ca_cert=ca_cert,
         )
 
         self.authorization = Authorization()
