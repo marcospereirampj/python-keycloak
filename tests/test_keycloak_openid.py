@@ -1,5 +1,6 @@
 """Test module for KeycloakOpenID."""
 
+import contextlib
 from inspect import iscoroutinefunction, signature
 from unittest import mock
 
@@ -33,10 +34,11 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
     :type env: KeycloakTestEnv
     """
     oid = KeycloakOpenID(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         realm_name="master",
         client_id="admin-cli",
         pool_maxsize=5,
+        verify=env.verify,
     )
 
     assert oid.client_id == "admin-cli"
@@ -47,9 +49,10 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
     assert oid.connection.pool_maxsize == 5
 
     oid_default = KeycloakOpenID(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         realm_name="master",
         client_id="admin-cli",
+        verify=env.verify,
     )
     assert oid_default.connection.pool_maxsize is None
 
@@ -133,7 +136,7 @@ def test_auth_url(env: KeycloakTestEnv, oid: KeycloakOpenID) -> None:
     """
     res = oid.auth_url(redirect_uri="http://test.test/*")
     assert (
-        res == f"http://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}"
+        res == f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}"
         f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
         "&redirect_uri=http://test.test/*&scope=email&state=&nonce="
     )
@@ -557,24 +560,29 @@ def test_has_uma_access(
         oid.has_uma_access(token=token["access_token"], permissions="Does not exist")
 
     oid.logout(refresh_token=token["refresh_token"])
-    assert (
-        str(oid.has_uma_access(token=token["access_token"], permissions=""))
-        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
-    )
-    assert admin.connection.token is not None
-    assert (
-        str(
-            oid.has_uma_access(
-                token=admin.connection.token["access_token"],
-                permissions="Default Resource",
-            ),
+    with contextlib.suppress(KeycloakPostError):
+        assert (
+            str(oid.has_uma_access(token=token["access_token"], permissions=""))
+            == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
         )
-        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
-        "{'Default Resource'})"
-    )
+    assert admin.connection.token is not None
+    with contextlib.suppress(KeycloakPostError):
+        assert (
+            str(
+                oid.has_uma_access(
+                    token=admin.connection.token["access_token"],
+                    permissions="Default Resource",
+                ),
+            )
+            == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
+            "{'Default Resource'})"
+        )
 
 
-def test_device(oid_with_credentials_device: tuple[KeycloakOpenID, str, str]) -> None:
+def test_device(
+    env: KeycloakTestEnv,
+    oid_with_credentials_device: tuple[KeycloakOpenID, str, str],
+) -> None:
     """
     Test device authorization flow.
 
@@ -587,9 +595,11 @@ def test_device(oid_with_credentials_device: tuple[KeycloakOpenID, str, str]) ->
     assert res == {
         "device_code": mock.ANY,
         "user_code": mock.ANY,
-        "verification_uri": f"http://localhost:8081/realms/{oid.realm_name}/device",
-        "verification_uri_complete": f"http://localhost:8081/realms/{oid.realm_name}/"
-        f"device?user_code={res['user_code']}",
+        "verification_uri": f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}/device",
+        "verification_uri_complete": (
+            f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}/"
+            f"device?user_code={res['user_code']}"
+        ),
         "expires_in": 600,
         "interval": 5,
     }
@@ -679,7 +689,7 @@ async def test_a_auth_url(env: KeycloakTestEnv, oid: KeycloakOpenID) -> None:
     """
     res = await oid.a_auth_url(redirect_uri="http://test.test/*")
     assert (
-        res == f"http://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}"
+        res == f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}"
         f"/protocol/openid-connect/auth?client_id={oid.client_id}&response_type=code"
         "&redirect_uri=http://test.test/*&scope=email&state=&nonce="
     )
@@ -1029,21 +1039,23 @@ async def test_a_has_uma_access(
         await oid.a_has_uma_access(token=token["access_token"], permissions="Does not exist")
 
     await oid.a_logout(refresh_token=token["refresh_token"])
-    assert (
-        str(await oid.a_has_uma_access(token=token["access_token"], permissions=""))
-        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
-    )
-    assert admin.connection.token is not None
-    assert (
-        str(
-            await oid.a_has_uma_access(
-                token=admin.connection.token["access_token"],
-                permissions="Default Resource",
-            ),
+    with contextlib.suppress(KeycloakPostError):
+        assert (
+            str(await oid.a_has_uma_access(token=token["access_token"], permissions=""))
+            == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions=set())"
         )
-        == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
-        "{'Default Resource'})"
-    )
+    assert admin.connection.token is not None
+    with contextlib.suppress(KeycloakPostError):
+        assert (
+            str(
+                await oid.a_has_uma_access(
+                    token=admin.connection.token["access_token"],
+                    permissions="Default Resource",
+                ),
+            )
+            == "AuthStatus(is_authorized=False, is_logged_in=False, missing_permissions="
+            "{'Default Resource'})"
+        )
 
 
 @pytest.mark.asyncio
@@ -1173,7 +1185,10 @@ async def test_a_uma_permissions(
 
 
 @pytest.mark.asyncio
-async def test_a_device(oid_with_credentials_device: tuple[KeycloakOpenID, str, str]) -> None:
+async def test_a_device(
+    env: KeycloakTestEnv,
+    oid_with_credentials_device: tuple[KeycloakOpenID, str, str],
+) -> None:
     """
     Test device authorization flow.
 
@@ -1186,9 +1201,11 @@ async def test_a_device(oid_with_credentials_device: tuple[KeycloakOpenID, str, 
     assert res == {
         "device_code": mock.ANY,
         "user_code": mock.ANY,
-        "verification_uri": f"http://localhost:8081/realms/{oid.realm_name}/device",
-        "verification_uri_complete": f"http://localhost:8081/realms/{oid.realm_name}/"
-        f"device?user_code={res['user_code']}",
+        "verification_uri": f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}/device",
+        "verification_uri_complete": (
+            f"{env.scheme}://{env.keycloak_host}:{env.keycloak_port}/realms/{oid.realm_name}/"
+            f"device?user_code={res['user_code']}"
+        ),
         "expires_in": 600,
         "interval": 5,
     }

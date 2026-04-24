@@ -56,19 +56,18 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     :type env: KeycloakTestEnv
     """
     admin = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
         pool_maxsize=5,
+        verify=env.verify,
     )
-    assert admin.connection.server_url == f"http://{env.keycloak_host}:{env.keycloak_port}", (
-        admin.connection.server_url
-    )
+    assert admin.connection.server_url == env.server_url, admin.connection.server_url
     assert admin.connection.realm_name == "master", admin.connection.realm_name
     assert isinstance(admin.connection, ConnectionManager), type(admin.connection)
     assert admin.connection.client_id == "admin-cli", admin.connection.client_id
     assert admin.connection.client_secret_key is None, admin.connection.client_secret_key
-    assert admin.connection.verify, admin.connection.verify
+    assert admin.connection.verify == env.verify, admin.connection.verify
     assert admin.connection.username == env.keycloak_admin, admin.connection.username
     assert admin.connection.password == env.keycloak_admin_password, admin.connection.password
     assert admin.connection.totp is None, admin.connection.totp
@@ -78,29 +77,32 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     assert admin.connection.pool_maxsize == 5, admin.connection.pool_maxsize
 
     admin = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
         realm_name=None,
         user_realm_name="master",
+        verify=env.verify,
     )
     assert admin.connection.token is None
     admin = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
         realm_name=None,
         user_realm_name=None,
+        verify=env.verify,
     )
     assert admin.connection.token is None
 
     admin.get_realms()
     token = admin.connection.token
     admin = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         token=token,
         realm_name=None,
         user_realm_name=None,
+        verify=env.verify,
     )
     assert admin.connection.token == token
 
@@ -123,10 +125,11 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     assert client_id is not None
     secret = admin.generate_client_secrets(client_id=client_id)
     admin_auth = KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         user_realm_name="authz",
         client_id="authz-client",
         client_secret_key=secret["value"],
+        verify=env.verify,
     )
     admin_auth.connection.refresh_token()
     assert admin_auth.connection.token is not None
@@ -134,22 +137,23 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
 
     assert (
         KeycloakAdmin(
-            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+            server_url=env.server_url,
             username=None,
             password=None,
             client_secret_key=None,
             custom_headers={"custom": "header"},
+            verify=env.verify,
         ).connection.token
         is None
     )
 
     keycloak_connection = KeycloakOpenIDConnection(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
         realm_name="master",
         client_id="admin-cli",
-        verify=True,
+        verify=env.verify,
     )
     keycloak_admin = KeycloakAdmin(connection=keycloak_connection)
     keycloak_admin.connection.get_token()
@@ -1284,14 +1288,14 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
             resource_id="invalid_resource_id",
             payload={"name": "temp-updated-resource"},
         )
-    assert err.match("404: b''"), err
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*'), err
     cz_res = admin.delete_client_authz_resource(
         client_id=auth_client_id, resource_id=temp_resource_id
     )
     assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_resource(client_id=auth_client_id, resource_id=temp_resource_id)
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     # Authz policies
     res = admin.get_client_authz_policies(client_id=auth_client_id)
@@ -1335,7 +1339,7 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert cz_res == {}
     with pytest.raises(KeycloakGetError) as err:
         admin.get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     res = admin.create_client_authz_policy(
         client_id=auth_client_id,
@@ -3475,7 +3479,7 @@ def test_get_bruteforce_status_for_user(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
@@ -3514,7 +3518,7 @@ def test_clear_bruteforce_attempts_for_user(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
@@ -3557,7 +3561,7 @@ def test_clear_bruteforce_attempts_for_all_users(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = admin.get_user_id(username)
@@ -4986,7 +4990,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             resource_id="invalid_resource_id",
             payload={"name": "temp-updated-resource"},
         )
-    assert err.match("404: b''"), err
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*'), err
     res = await admin.a_delete_client_authz_resource(
         client_id=auth_client_id,
         resource_id=temp_resource_id,
@@ -4997,7 +5001,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
             client_id=auth_client_id,
             resource_id=temp_resource_id,
         )
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     # Authz policies
     res = await admin.a_get_client_authz_policies(client_id=auth_client_id)
@@ -5041,7 +5045,7 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     assert res3 == {}
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_client_authz_policy(client_id=auth_client_id, policy_id=res["id"])
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     res = await admin.a_create_client_authz_policy(
         client_id=auth_client_id,
@@ -7350,7 +7354,7 @@ async def test_a_get_bruteforce_status_for_user(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)
@@ -7390,7 +7394,7 @@ async def test_a_clear_bruteforce_attempts_for_user(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)
@@ -7434,7 +7438,7 @@ async def test_a_clear_bruteforce_attempts_for_all_users(
     assert res["bruteForceProtected"] is True
 
     # Test login user with wrong credentials
-    with contextlib.suppress(KeycloakAuthenticationError):
+    with contextlib.suppress(KeycloakAuthenticationError, KeycloakPostError):
         oid.token(username=username, password="wrongpassword")  # noqa: S106
 
     user_id = await admin.a_get_user_id(username)

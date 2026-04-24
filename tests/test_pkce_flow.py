@@ -33,9 +33,10 @@ def test_pkce_auth_url_and_token(env: KeycloakTestEnv, admin: KeycloakAdmin) -> 
     admin.create_client(client_representation)
 
     oid = KeycloakOpenID(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         realm_name="master",
         client_id="pkce-test",
+        verify=env.verify,
     )
     code_verifier = generate_code_verifier()
     code_challenge, code_challenge_method = generate_code_challenge(code_verifier)
@@ -51,6 +52,7 @@ def test_pkce_auth_url_and_token(env: KeycloakTestEnv, admin: KeycloakAdmin) -> 
     assert f"code_challenge_method={code_challenge_method}" in url
 
     session = requests.Session()
+    session.verify = env.verify
     resp = session.get(url, allow_redirects=False)
     cookies = resp.cookies.get_dict()
     assert resp.status_code == 200

@@ -110,3 +110,5 @@ s3air-authz-config.json
 _build
 .ruff_cache
 .DS_Store
+.keycloak-certs
+uv.lock

@@ -135,6 +135,46 @@ class KeycloakTestEnv:
         """
         self._keycloak_admin_password = value
 
+    @property
+    def use_https(self) -> bool:
+        """
+        Return whether test setup uses HTTPS.
+
+        :returns: True if HTTPS should be used
+        :rtype: bool
+        """
+        return os.environ.get("KEYCLOAK_USE_HTTPS", "false").lower() == "true"
+
+    @property
+    def scheme(self) -> str:
+        """
+        Return URL scheme for Keycloak.
+
+        :returns: URL scheme
+        :rtype: str
+        """
+        return "https" if self.use_https else "http"
+
+    @property
+    def verify(self) -> bool:
+        """
+        Return TLS verification mode for test clients.
+
+        :returns: True when certificate verification should be enabled
+        :rtype: bool
+        """
+        return not self.use_https
+
+    @property
+    def server_url(self) -> str:
+        """
+        Return full base URL to Keycloak server.
+
+        :returns: Server URL
+        :rtype: str
+        """
+        return f"{self.scheme}://{self.keycloak_host}:{self.keycloak_port}"
+
 
 @pytest.fixture
 def env() -> KeycloakTestEnv:
@@ -158,9 +198,10 @@ def admin(env: KeycloakTestEnv) -> KeycloakAdmin:
     :rtype: KeycloakAdmin
     """
     return KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
+        verify=env.verify,
     )
 
 
@@ -176,9 +217,10 @@ def admin_frozen(env: KeycloakTestEnv) -> KeycloakAdmin:
     :rtype: KeycloakAdmin
     """
     return KeycloakAdmin(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         username=env.keycloak_admin,
         password=env.keycloak_admin_password,
+        verify=env.verify,
     )
 
 
@@ -215,9 +257,10 @@ def oid(
     )
     # Return OID
     yield KeycloakOpenID(
-        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        server_url=env.server_url,
         realm_name=realm,
         client_id=client,
+        verify=env.verify,
     )
     # Cleanup
     admin.delete_client(client_id=client_id)
@@ -275,10 +318,11 @@ def oid_with_credentials(
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+            server_url=env.server_url,
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
+            verify=env.verify,
         ),
         username,
         password,
@@ -364,10 +408,11 @@ def oid_with_credentials_authz(
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+            server_url=env.server_url,
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
+            verify=env.verify,
         ),
         username,
         password,
@@ -431,10 +476,11 @@ def oid_with_credentials_device(
 
     yield (
         KeycloakOpenID(
-            server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+            server_url=env.server_url,
             realm_name=realm,
             client_id=client,
             client_secret_key=secret,
+            verify=env.verify,
         ),
         username,
         password,
@@ -630,6 +676,7 @@ def selfsigned_cert() -> tuple[bytes, bytes]:
 
 @pytest.fixture
 def oid_connection_with_authz(
+    env: KeycloakTestEnv,
     oid_with_credentials_authz: tuple[KeycloakOpenID, str, str],
 ) -> KeycloakOpenIDConnection:
     """
@@ -646,6 +693,7 @@ def oid_connection_with_authz(
         realm_name=oid.realm_name,
         client_id=oid.client_id,
         client_secret_key=oid.client_secret_key,
+        verify=env.verify,
         timeout=60,
     )
 

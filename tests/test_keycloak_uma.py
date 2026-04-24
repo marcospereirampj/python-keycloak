@@ -148,12 +148,12 @@ def test_uma_resource_sets(uma: KeycloakUMA) -> None:
     assert res == {}, res
     with pytest.raises(KeycloakGetError) as err:
         uma.resource_set_read(created_resource["_id"])
-    err.match("404: b''")
+    err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         uma.resource_set_delete(resource_id=created_resource["_id"])
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
 
 def test_uma_policy(uma: KeycloakUMA, admin: KeycloakAdmin) -> None:
@@ -457,12 +457,12 @@ async def test_a_uma_resource_sets(uma: KeycloakUMA) -> None:
     assert res == {}, res
     with pytest.raises(KeycloakGetError) as err:
         await uma.a_resource_set_read(created_resource["_id"])
-    err.match("404: b''")
+    err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
     # Test delete fail
     with pytest.raises(KeycloakDeleteError) as err:
         await uma.a_resource_set_delete(resource_id=created_resource["_id"])
-    assert err.match("404: b''")
+    assert err.match('404: b\'\'|404: b\\\'{"error":"HTTP 404 Not Found".*')
 
 
 @pytest.mark.asyncio
