@@ -156,6 +156,57 @@ def test_keycloak_admin_init(env: KeycloakTestEnv) -> None:
     assert keycloak_admin.connection.token
 
 
+def test_openid_connection_client_assertion_init(env: KeycloakTestEnv) -> None:
+    """Test that ``client_assertion`` is plumbed through to the inner KeycloakOpenID."""
+    conn = KeycloakOpenIDConnection(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+        client_assertion="signed.jwt.value",
+    )
+    assert conn.client_id is None
+    assert conn.client_assertion == "signed.jwt.value"
+    # client_assertion alone is enough to default to client_credentials.
+    assert conn.grant_type == "client_credentials"
+
+    inner = conn.keycloak_openid
+    assert inner.client_id is None
+    assert inner.client_assertion == "signed.jwt.value"
+
+
+def test_openid_connection_callable_client_assertion_lazy(env: KeycloakTestEnv) -> None:
+    """A callable ``client_assertion`` is forwarded as-is (lazy)."""
+    calls = []
+
+    def make_assertion() -> str:
+        calls.append(1)
+        return "fresh.jwt.value"
+
+    conn = KeycloakOpenIDConnection(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+        client_assertion=make_assertion,
+    )
+    inner = conn.keycloak_openid
+    # The callable should not have been invoked just by constructing the connection
+    # or building the inner KeycloakOpenID.
+    assert calls == []
+    # And it's the same callable reference, not a captured value.
+    assert inner.client_assertion is make_assertion
+
+
+def test_openid_connection_requires_client_id_or_assertion(env: KeycloakTestEnv) -> None:
+    """Without ``client_id`` and without ``client_assertion``, building the inner client errors."""
+    conn = KeycloakOpenIDConnection(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+    )
+    with pytest.raises(AttributeError, match="client_id or client_assertion"):
+        _ = conn.keycloak_openid
+
+
 def test_realms(admin: KeycloakAdmin) -> None:
     """
     Test realms.

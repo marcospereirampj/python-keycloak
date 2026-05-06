@@ -31,7 +31,10 @@ from __future__ import annotations
 
 import json
 import pathlib
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 import aiofiles
 from jwcrypto import jwk, jwt
@@ -76,9 +79,14 @@ class KeycloakOpenID:
     Keycloak OpenID client.
 
     :param server_url: Keycloak server url
-    :param client_id: client id
+    :param client_id: client id. May be ``None`` when authenticating with a
+        ``private_key_jwt`` client assertion whose ``sub`` claim identifies the client.
     :param realm_name: realm name
     :param client_secret_key: client secret key
+    :param client_assertion: signed JWT (or zero-arg callable returning one) used for
+        ``private_key_jwt`` client authentication. When set, the token endpoint receives
+        ``client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer``
+        and ``client_assertion=<jwt>``, and ``client_secret`` is not sent.
     :param verify: Boolean value to enable or disable certificate validation or a string
         containing a path to a CA bundle to use
     :param custom_headers: dict of custom header to pass to each HTML request
@@ -96,7 +104,7 @@ class KeycloakOpenID:
         self,
         server_url: str,
         realm_name: str,
-        client_id: str,
+        client_id: str | None,
         client_secret_key: str | None = None,
         verify: bool | str = True,
         custom_headers: dict | None = None,
@@ -105,14 +113,16 @@ class KeycloakOpenID:
         cert: str | tuple | None = None,
         max_retries: int = 1,
         pool_maxsize: int | None = None,
+        client_assertion: str | Callable[[], str] | None = None,
     ) -> None:
         """
         Init method.
 
         :param server_url: Keycloak server url
         :type server_url: str
-        :param client_id: client id
-        :type client_id: str
+        :param client_id: client id. May be ``None`` for ``private_key_jwt`` clients
+            whose identity is derived from the assertion's ``sub`` claim.
+        :type client_id: str | None
         :param realm_name: realm name
         :type realm_name: str
         :param client_secret_key: client secret key
@@ -134,9 +144,14 @@ class KeycloakOpenID:
         :type max_retries: int
         :param pool_maxsize: The maximum number of connections to save in the pool.
         :type pool_maxsize: int
+        :param client_assertion: signed JWT, or zero-arg callable returning one, for
+            ``private_key_jwt`` client authentication. When set, ``client_secret`` is
+            never sent on the wire.
+        :type client_assertion: str | Callable[[], str] | None
         """
         self.client_id = client_id
         self.client_secret_key = client_secret_key
+        self.client_assertion = client_assertion
         self.realm_name = realm_name
         headers = custom_headers if custom_headers is not None else {}
         self.connection = ConnectionManager(
@@ -153,17 +168,17 @@ class KeycloakOpenID:
         self.authorization = Authorization()
 
     @property
-    def client_id(self) -> str:
+    def client_id(self) -> str | None:
         """
         Get client id.
 
         :returns: Client id
-        :rtype: str
+        :rtype: str | None
         """
         return self._client_id
 
     @client_id.setter
-    def client_id(self, value: str) -> None:
+    def client_id(self, value: str | None) -> None:
         self._client_id = value
 
     @property
@@ -179,6 +194,20 @@ class KeycloakOpenID:
     @client_secret_key.setter
     def client_secret_key(self, value: str | None) -> None:
         self._client_secret_key = value
+
+    @property
+    def client_assertion(self) -> str | Callable[[], str] | None:
+        """
+        Get the client assertion (or callable producing one) for ``private_key_jwt``.
+
+        :returns: Client assertion
+        :rtype: str | Callable[[], str] | None
+        """
+        return self._client_assertion
+
+    @client_assertion.setter
+    def client_assertion(self, value: str | Callable[[], str] | None) -> None:
+        self._client_assertion = value
 
     @property
     def realm_name(self) -> str:
@@ -224,13 +253,36 @@ class KeycloakOpenID:
 
     def _add_secret_key(self, payload: dict) -> dict:
         """
-        Add secret key if exists.
+        Add client authentication credentials to the payload.
+
+        Emits a ``private_key_jwt`` client assertion when one is configured (or already
+        present in the payload), otherwise falls back to ``client_secret``. The two are
+        mutually exclusive on the wire.
 
         :param payload: Payload
         :type payload: dict
-        :returns: Payload with the secret key
+        :returns: Payload with the client authentication credentials
         :rtype: dict
         """
+        if "client_assertion" in payload:
+            payload.setdefault(
+                "client_assertion_type",
+                "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            )
+            return payload
+
+        if self.client_assertion is not None:
+            assertion = (
+                self.client_assertion()
+                if callable(self.client_assertion)
+                else self.client_assertion
+            )
+            payload["client_assertion_type"] = (
+                "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+            )
+            payload["client_assertion"] = assertion
+            return payload
+
         if self.client_secret_key:
             payload.update({"client_secret": self.client_secret_key})
 
@@ -342,6 +394,7 @@ class KeycloakOpenID:
         totp: int | None = None,
         scope: str = "openid",
         code_verifier: str | None = None,
+        client_assertion: str | None = None,
         **extra: Any,  # noqa: ANN401
     ) -> dict:
         """
@@ -370,6 +423,10 @@ class KeycloakOpenID:
         :type scope: str
         :param code_verifier: PKCE code verifier
         :type code_verifier: str
+        :param client_assertion: per-call ``private_key_jwt`` assertion. Overrides the
+            instance-level ``client_assertion`` for this request and suppresses
+            ``client_secret``.
+        :type client_assertion: str | None
         :param extra: Additional extra arguments
         :type extra: dict
         :returns: Keycloak token
@@ -387,6 +444,8 @@ class KeycloakOpenID:
         }
         if code_verifier:
             payload["code_verifier"] = code_verifier
+        if client_assertion is not None:
+            payload["client_assertion"] = client_assertion
         if extra:
             payload.update(extra)
 
@@ -1230,6 +1289,7 @@ class KeycloakOpenID:
         totp: int | None = None,
         scope: str = "openid",
         code_verifier: str | None = None,
+        client_assertion: str | None = None,
         **extra: Any,  # noqa: ANN401
     ) -> dict:
         """
@@ -1258,6 +1318,10 @@ class KeycloakOpenID:
         :type scope: str
         :param code_verifier: PKCE code verifier
         :type code_verifier: str
+        :param client_assertion: per-call ``private_key_jwt`` assertion. Overrides the
+            instance-level ``client_assertion`` for this request and suppresses
+            ``client_secret``.
+        :type client_assertion: str | None
         :param extra: Additional extra arguments
         :type extra: dict
         :returns: Keycloak token
@@ -1275,6 +1339,8 @@ class KeycloakOpenID:
         }
         if code_verifier:
             payload["code_verifier"] = code_verifier
+        if client_assertion is not None:
+            payload["client_assertion"] = client_assertion
         if extra:
             payload.update(extra)
 

@@ -34,6 +34,8 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from httpx import Response as AsyncResponse
     from requests import Response
 
@@ -74,7 +76,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         token: dict | None = None,
         totp: int | None = None,
         realm_name: str | None = "master",
-        client_id: str = "admin-cli",
+        client_id: str | None = "admin-cli",
         verify: str | bool = True,
         client_secret_key: str | None = None,
         custom_headers: dict | None = None,
@@ -83,6 +85,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         cert: str | tuple | None = None,
         max_retries: int = 1,
         pool_maxsize: int | None = None,
+        client_assertion: str | Callable[[], str] | None = None,
     ) -> None:
         """
         Init method.
@@ -101,8 +104,9 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type totp: str
         :param realm_name: realm name
         :type realm_name: str
-        :param client_id: client id
-        :type client_id: str
+        :param client_id: client id. May be ``None`` for ``private_key_jwt`` clients
+            whose identity is derived from the assertion's ``sub`` claim.
+        :type client_id: str | None
         :param verify: Boolean value to enable or disable certificate validation or a string
             containing a path to a CA bundle to use
         :type verify: Union[bool,str]
@@ -123,6 +127,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
         :type max_retries: int
         :param pool_maxsize: The maximum number of connections to save in the pool.
         :type pool_maxsize: int
+        :param client_assertion: signed JWT, or zero-arg callable returning one, for
+            ``private_key_jwt`` client authentication. When set, the underlying
+            ``KeycloakOpenID`` is configured to authenticate with the assertion
+            (``client_secret_key`` is not sent).
+        :type client_assertion: str | Callable[[], str] | None
         """
         # token is renewed when it hits 90% of its lifetime. This is to account for any possible
         # clock skew.
@@ -138,6 +147,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         self.client_id = client_id
         self.verify = verify
         self.client_secret_key = client_secret_key
+        self.client_assertion = client_assertion
         self.user_realm_name = user_realm_name
         self.timeout = timeout
         self.custom_headers = custom_headers
@@ -147,7 +157,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
         if not self.grant_type:
             if username and password:
                 self.grant_type = "password"
-            elif client_secret_key:
+            elif client_secret_key or client_assertion:
                 self.grant_type = "client_credentials"
 
         if self.server_url is None:
@@ -233,6 +243,20 @@ class KeycloakOpenIDConnection(ConnectionManager):
     @client_secret_key.setter
     def client_secret_key(self, value: str | None) -> None:
         self._client_secret_key = value
+
+    @property
+    def client_assertion(self) -> str | Callable[[], str] | None:
+        """
+        Get the client assertion (or callable producing one) for ``private_key_jwt``.
+
+        :returns: Client assertion
+        :rtype: str | Callable[[], str] | None
+        """
+        return self._client_assertion
+
+    @client_assertion.setter
+    def client_assertion(self, value: str | Callable[[], str] | None) -> None:
+        self._client_assertion = value
 
     @property
     def username(self) -> str | None:
@@ -354,8 +378,11 @@ class KeycloakOpenIDConnection(ConnectionManager):
             else:
                 token_realm_name = "master"  # noqa: S105
 
-            if self.client_id is None:
-                msg = "Unable to get KeycloakOpenID client without client_id set."
+            if self.client_id is None and self.client_assertion is None:
+                msg = (
+                    "Unable to get KeycloakOpenID client without client_id or "
+                    "client_assertion set."
+                )
                 raise AttributeError(msg)
 
             if self.server_url is None:
@@ -371,6 +398,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
                 timeout=self.timeout,
                 custom_headers=self.custom_headers,
                 cert=self.cert,
+                client_assertion=self.client_assertion,
             )
 
         return self._keycloak_openid

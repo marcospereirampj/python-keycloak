@@ -54,6 +54,113 @@ def test_keycloak_openid_init(env: KeycloakTestEnv) -> None:
     assert oid_default.connection.pool_maxsize is None
 
 
+def test_keycloak_openid_init_client_assertion(env: KeycloakTestEnv) -> None:
+    """Test that ``client_id=None`` and ``client_assertion=...`` are accepted."""
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+        client_assertion="signed.jwt.value",
+    )
+    assert oid.client_id is None
+    assert oid.client_assertion == "signed.jwt.value"
+    assert oid.client_secret_key is None
+
+
+def test_add_secret_key_with_instance_assertion(env: KeycloakTestEnv) -> None:
+    """An instance-level assertion adds the assertion fields and skips client_secret."""
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+        client_secret_key="should-be-ignored",  # noqa: S106
+        client_assertion="signed.jwt.value",
+    )
+    payload = oid._add_secret_key({"grant_type": "client_credentials"})
+    assert payload == {
+        "grant_type": "client_credentials",
+        "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        "client_assertion": "signed.jwt.value",
+    }
+    assert "client_secret" not in payload
+
+
+def test_add_secret_key_with_callable_assertion(env: KeycloakTestEnv) -> None:
+    """A callable assertion is invoked lazily and its return value is sent."""
+    calls = []
+
+    def make_assertion() -> str:
+        calls.append(1)
+        return "fresh.jwt.value"
+
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+        client_assertion=make_assertion,
+    )
+    payload = oid._add_secret_key({})
+    assert payload["client_assertion"] == "fresh.jwt.value"
+    assert payload["client_assertion_type"] == (
+        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    )
+    assert calls == [1]
+
+
+def test_add_secret_key_assertion_in_payload_suppresses_secret(env: KeycloakTestEnv) -> None:
+    """A per-call ``client_assertion`` in the payload suppresses ``client_secret``."""
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id="some-client",
+        client_secret_key="should-be-ignored",  # noqa: S106
+    )
+    payload = oid._add_secret_key({"client_assertion": "per.call.jwt"})
+    assert payload == {
+        "client_assertion": "per.call.jwt",
+        "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    }
+    assert "client_secret" not in payload
+
+
+def test_add_secret_key_secret_path_unchanged(env: KeycloakTestEnv) -> None:
+    """Without an assertion, ``client_secret_key`` is sent as before."""
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id="some-client",
+        client_secret_key="the-secret",  # noqa: S106
+    )
+    payload = oid._add_secret_key({"grant_type": "client_credentials"})
+    assert payload == {
+        "grant_type": "client_credentials",
+        "client_secret": "the-secret",
+    }
+
+
+def test_token_sends_private_key_jwt_payload(env: KeycloakTestEnv) -> None:
+    """``token()`` with ``client_assertion=`` produces a private_key_jwt wire payload."""
+    oid = KeycloakOpenID(
+        server_url=f"http://{env.keycloak_host}:{env.keycloak_port}",
+        realm_name="master",
+        client_id=None,
+    )
+
+    fake_response = mock.Mock(status_code=200)
+    fake_response.json.return_value = {"access_token": "x", "token_type": "Bearer"}
+    with mock.patch.object(oid.connection, "raw_post", return_value=fake_response) as raw_post:
+        oid.token(grant_type="client_credentials", client_assertion="signed.jwt.value")
+
+    sent_payload = raw_post.call_args.kwargs["data"]
+    assert sent_payload["grant_type"] == "client_credentials"
+    assert sent_payload["client_assertion"] == "signed.jwt.value"
+    assert sent_payload["client_assertion_type"] == (
+        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    )
+    assert "client_secret" not in sent_payload
+    assert sent_payload["client_id"] is None
+
+
 def test_well_known(oid: KeycloakOpenID) -> None:
     """
     Test the well_known method.
