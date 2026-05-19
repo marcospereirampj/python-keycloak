@@ -1049,7 +1049,12 @@ class KeycloakOpenID:
 
         return res
 
-    def device(self, scope: str = "") -> dict:
+    def device(
+        self,
+        scope: str = "",
+        code_challenge: str | None = None,
+        code_challenge_method: str | None = None,
+    ) -> dict:
         """
         Get device authorization grant.
 
@@ -1067,11 +1072,19 @@ class KeycloakOpenID:
 
         :param scope: Scope of authorization request, split with the blank space
         :type scope: str
+        :param code_challenge: PKCE code challenge
+        :type code_challenge: str
+        :param code_challenge_method: PKCE code challenge method
+        :type code_challenge_method: str
         :returns: Device Authorization Response
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "scope": scope}
+        if code_challenge:
+            payload["code_challenge"] = code_challenge
+        if code_challenge_method:
+            payload["code_challenge_method"] = code_challenge_method
 
         payload = self._add_secret_key(payload)
         data_raw = self.connection.raw_post(URL_DEVICE.format(**params_path), data=payload)
