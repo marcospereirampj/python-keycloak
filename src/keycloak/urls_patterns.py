@@ -77,6 +77,7 @@ URL_ADMIN_USER_GROUPS = "admin/realms/{realm-name}/users/{id}/groups"
 URL_ADMIN_USER_CREDENTIALS = "admin/realms/{realm-name}/users/{id}/credentials"
 URL_ADMIN_USER_CREDENTIAL = "admin/realms/{realm-name}/users/{id}/credentials/{credential_id}"
 URL_ADMIN_USER_LOGOUT = "admin/realms/{realm-name}/users/{id}/logout"
+URL_ADMIN_USER_LOGOUT_SESSION = "admin/realms/{realm-name}/sessions/{session-id}"
 URL_ADMIN_USER_STORAGE = "admin/realms/{realm-name}/user-storage/{id}/sync"
 
 URL_ADMIN_SERVER_INFO = "admin/serverinfo"

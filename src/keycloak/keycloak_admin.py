@@ -1898,6 +1898,56 @@ class KeycloakAdmin:
 
         return res
 
+    def user_logout_session(
+        self,
+        user_id: str,
+        session_id: str,
+        is_offline: bool = False,
+    ) -> dict:
+        """
+        Log out a single session of the user.
+
+        Unlike :func:`user_logout`, which terminates all of the user's sessions, this
+        removes only the session identified by ``session_id``.
+
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_delete_adminrealmsrealmsessionssession
+
+        :param user_id: User id
+        :type user_id: str
+        :param session_id: Id of the session to log out
+        :type session_id: str
+        :param is_offline: Whether the session to remove is an offline session
+        :type is_offline: bool
+        :returns: Keycloak server response
+        :rtype: dict
+        :raises KeycloakDeleteError: When the session does not belong to the user
+        """
+        if not is_offline:
+            sessions = self.get_sessions(user_id=user_id)
+            if session_id not in {session.get("id") for session in sessions}:
+                msg = f"User '{user_id}' has no session with id '{session_id}'."
+                raise KeycloakDeleteError(msg)
+
+        params_path = {"realm-name": self.connection.realm_name, "session-id": session_id}
+        params_query = {"isOffline": is_offline}
+        data_raw = self.connection.raw_delete(
+            urls_patterns.URL_ADMIN_USER_LOGOUT_SESSION.format(**params_path),
+            **params_query,
+        )
+        res = raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
+
     def user_consents(self, user_id: str) -> list:
         """
         Get consents granted by the user.
@@ -8782,6 +8832,56 @@ class KeycloakAdmin:
         res = raise_error_from_response(
             data_raw,
             KeycloakPostError,
+            expected_codes=[HTTP_NO_CONTENT],
+        )
+        if not isinstance(res, dict):
+            msg = (
+                "Unexpected response type. Expected 'dict', received "
+                f"'{type(res)}', value '{res}'."
+            )
+            raise TypeError(msg)
+
+        return res
+
+    async def a_user_logout_session(
+        self,
+        user_id: str,
+        session_id: str,
+        is_offline: bool = False,
+    ) -> dict:
+        """
+        Log out a single session of the user.
+
+        Unlike :func:`a_user_logout`, which terminates all of the user's sessions, this
+        removes only the session identified by ``session_id``.
+
+        https://www.keycloak.org/docs-api/24.0.2/rest-api/index.html#_delete_adminrealmsrealmsessionssession
+
+        :param user_id: User id
+        :type user_id: str
+        :param session_id: Id of the session to log out
+        :type session_id: str
+        :param is_offline: Whether the session to remove is an offline session
+        :type is_offline: bool
+        :returns: Keycloak server response
+        :rtype: dict
+        :raises KeycloakDeleteError: When the session does not belong to the user
+        """
+        if not is_offline:
+            sessions = await self.a_get_sessions(user_id=user_id)
+            if session_id not in {session.get("id") for session in sessions}:
+                msg = f"User '{user_id}' has no session with id '{session_id}'."
+                raise KeycloakDeleteError(msg)
+
+        params_path = {"realm-name": self.connection.realm_name, "session-id": session_id}
+        params_query = {"isOffline": is_offline}
+        data_raw = await self.connection.a_raw_delete(
+            urls_patterns.URL_ADMIN_USER_LOGOUT_SESSION.format(**params_path),
+            **params_query,
+        )
+        res = raise_error_from_response(
+            data_raw,
+            KeycloakDeleteError,
             expected_codes=[HTTP_NO_CONTENT],
         )
         if not isinstance(res, dict):

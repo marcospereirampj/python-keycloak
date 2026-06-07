@@ -2586,6 +2586,46 @@ def test_get_sessions(admin: KeycloakAdmin) -> None:
     assert err.match(USER_NOT_FOUND_REGEX)
 
 
+def test_user_logout_session(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """
+    Test logging out a single user session.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    oid, username, password = oid_with_credentials
+
+    # Create a session by logging the user in
+    token = oid.token(username, password)
+    user_id = oid.decode_token(token=token["access_token"])["sub"]
+
+    sessions = admin.get_sessions(user_id=user_id)
+    assert len(sessions) >= 1
+    session_id = sessions[0]["id"]
+
+    # Logging out a session that does not belong to the user is rejected locally
+    with pytest.raises(KeycloakDeleteError):
+        admin.user_logout_session(user_id=user_id, session_id="non-existent-session")
+
+    # Skipping the validation (is_offline) lets the server reject an unknown session
+    with pytest.raises(KeycloakDeleteError):
+        admin.user_logout_session(
+            user_id=user_id, session_id="non-existent-session", is_offline=True
+        )
+
+    # Log out only the specific session
+    res = admin.user_logout_session(user_id=user_id, session_id=session_id)
+    assert res == {}
+
+    # The targeted session is gone
+    sessions = admin.get_sessions(user_id=user_id)
+    assert session_id not in {session["id"] for session in sessions}
+
+
 def test_get_client_installation_provider(admin: KeycloakAdmin, client: str) -> None:
     """
     Test get client installation provider.
@@ -6421,6 +6461,47 @@ async def test_a_get_sessions(admin: KeycloakAdmin) -> None:
     with pytest.raises(KeycloakGetError) as err:
         await admin.a_get_sessions(user_id="bad")
     assert err.match(USER_NOT_FOUND_REGEX)
+
+
+@pytest.mark.asyncio
+async def test_a_user_logout_session(
+    admin: KeycloakAdmin, oid_with_credentials: tuple[KeycloakOpenID, str, str]
+) -> None:
+    """
+    Test logging out a single user session.
+
+    :param admin: Keycloak Admin client
+    :type admin: KeycloakAdmin
+    :param oid_with_credentials: Keycloak OpenID client with pre-configured user credentials
+    :type oid_with_credentials: Tuple[KeycloakOpenID, str, str]
+    """
+    oid, username, password = oid_with_credentials
+
+    # Create a session by logging the user in
+    token = oid.token(username, password)
+    user_id = oid.decode_token(token=token["access_token"])["sub"]
+
+    sessions = await admin.a_get_sessions(user_id=user_id)
+    assert len(sessions) >= 1
+    session_id = sessions[0]["id"]
+
+    # Logging out a session that does not belong to the user is rejected locally
+    with pytest.raises(KeycloakDeleteError):
+        await admin.a_user_logout_session(user_id=user_id, session_id="non-existent-session")
+
+    # Skipping the validation (is_offline) lets the server reject an unknown session
+    with pytest.raises(KeycloakDeleteError):
+        await admin.a_user_logout_session(
+            user_id=user_id, session_id="non-existent-session", is_offline=True
+        )
+
+    # Log out only the specific session
+    res = await admin.a_user_logout_session(user_id=user_id, session_id=session_id)
+    assert res == {}
+
+    # The targeted session is gone
+    sessions = await admin.a_get_sessions(user_id=user_id)
+    assert session_id not in {session["id"] for session in sessions}
 
 
 @pytest.mark.asyncio

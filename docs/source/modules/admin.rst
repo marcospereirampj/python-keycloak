@@ -196,3 +196,10 @@ Get sessions associated with the user
 .. code-block:: python
 
     sessions = keycloak_admin.get_sessions(user_id="user-id-keycloak")
+
+Log out a single session of the user
+--------------------------------------
+
+.. code-block:: python
+
+    keycloak_admin.user_logout_session(user_id="user-id-keycloak", session_id="session-id")
