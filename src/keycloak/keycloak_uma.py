@@ -33,7 +33,6 @@ import json
 from typing import TYPE_CHECKING, Any
 from urllib.parse import quote_plus
 
-from .connection import ConnectionManager
 from .exceptions import (
     HTTP_CREATED,
     HTTP_NO_CONTENT,
@@ -461,18 +460,14 @@ class KeycloakUMA:
             )
             raise AttributeError(msg)
 
-        connection = ConnectionManager(
-            base_url=self.connection.base_url,
-            timeout=self.connection.timeout,
-            verify=self.connection.verify,
-            proxies=self.connection.proxies,
-            cert=self.connection.cert,
-            max_retries=self.connection.max_retries,
-            pool_maxsize=self.connection.pool_maxsize,
+        data_raw = self.connection.raw_post(
+            self.uma_well_known["token_endpoint"],
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Bearer " + token,
+            },
         )
-        connection.add_param_headers("Authorization", "Bearer " + token)
-        connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = connection.raw_post(self.uma_well_known["token_endpoint"], data=payload)
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)
         except KeycloakPostError:
@@ -954,20 +949,13 @@ class KeycloakUMA:
             )
             raise AttributeError(msg)
 
-        connection = ConnectionManager(
-            base_url=self.connection.base_url,
-            timeout=self.connection.timeout,
-            verify=self.connection.verify,
-            proxies=self.connection.proxies,
-            cert=self.connection.cert,
-            max_retries=self.connection.max_retries,
-            pool_maxsize=self.connection.pool_maxsize,
-        )
-        connection.add_param_headers("Authorization", "Bearer " + token)
-        connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await connection.a_raw_post(
+        data_raw = await self.connection.a_raw_post(
             (await self.a_uma_well_known)["token_endpoint"],
             data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Bearer " + token,
+            },
         )
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)

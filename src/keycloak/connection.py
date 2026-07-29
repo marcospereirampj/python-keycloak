@@ -252,7 +252,7 @@ class ConnectionManager:
         self._pool_maxsize = value
 
     @property
-    def headers(self) -> dict | None:
+    def headers(self) -> dict:
         """
         Return header request to the server.
 
@@ -274,7 +274,7 @@ class ConnectionManager:
         :returns: If the header parameters exist, return its value.
         :rtype: str
         """
-        return (self.headers or {}).get(key)
+        return self.headers.get(key)
 
     def clean_headers(self) -> None:
         """Clear header parameters."""
@@ -300,9 +300,6 @@ class ConnectionManager:
         :param value: Value to be added.
         :type value: str
         """
-        if self.headers is None:
-            self.headers = {}
-
         self.headers[key] = value
 
     def del_param_headers(self, key: str) -> None:
@@ -312,12 +309,14 @@ class ConnectionManager:
         :param key: Key of the header parameters.
         :type key: str
         """
-        if self.headers is None:
-            return
-
         self.headers.pop(key, None)
 
-    def raw_get(self, path: str, **kwargs: Any) -> Response:  # noqa: ANN401
+    def raw_get(
+        self,
+        path: str,
+        headers: dict[str, str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Response:
         """
         Submit get request to the path.
 
@@ -336,7 +335,7 @@ class ConnectionManager:
             return self._s.get(
                 urljoin(self.base_url, path),
                 params=kwargs,
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
                 verify=self.verify,
                 cert=self.cert,
@@ -345,7 +344,13 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_post(self, path: str, data: dict | str | MultipartEncoder, **kwargs: Any) -> Response:  # noqa: ANN401
+    def raw_post(
+        self,
+        path: str,
+        data: dict | str | MultipartEncoder,
+        headers: dict[str, str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Response:
         """
         Submit post request to the path.
 
@@ -367,7 +372,7 @@ class ConnectionManager:
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
                 verify=self.verify,
                 cert=self.cert,
@@ -376,7 +381,13 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_put(self, path: str, data: dict | str | MultipartEncoder, **kwargs: Any) -> Response:  # noqa: ANN401
+    def raw_put(
+        self,
+        path: str,
+        data: dict | str | MultipartEncoder,
+        headers: dict[str, str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Response:
         """
         Submit put request to the path.
 
@@ -399,7 +410,7 @@ class ConnectionManager:
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data,
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
                 verify=self.verify,
                 cert=self.cert,
@@ -408,7 +419,13 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    def raw_delete(self, path: str, data: dict | None = None, **kwargs: Any) -> Response:  # noqa: ANN401
+    def raw_delete(
+        self,
+        path: str,
+        data: dict | None = None,
+        headers: dict[str, str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Response:
         """
         Submit delete request to the path.
 
@@ -431,7 +448,7 @@ class ConnectionManager:
                 urljoin(self.base_url, path),
                 params=kwargs,
                 data=data or {},
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
                 verify=self.verify,
                 cert=self.cert,
@@ -440,7 +457,12 @@ class ConnectionManager:
             msg = "Can't connect to server"
             raise KeycloakConnectionError(msg) from e
 
-    async def a_raw_get(self, path: str, **kwargs: Any) -> AsyncResponse:  # noqa: ANN401
+    async def a_raw_get(
+        self,
+        path: str,
+        headers: dict[str, str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> AsyncResponse:
         """
         Submit get request to the path.
 
@@ -460,7 +482,7 @@ class ConnectionManager:
             return await self.async_s.get(
                 urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
             )
         except Exception as e:
@@ -471,6 +493,7 @@ class ConnectionManager:
         self,
         path: str,
         data: dict | str | MultipartEncoder,
+        headers: dict[str, str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> AsyncResponse:
         """
@@ -496,7 +519,7 @@ class ConnectionManager:
                 url=urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
                 **self._prepare_httpx_request_content(data),
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
             )
         except Exception as e:
@@ -507,6 +530,7 @@ class ConnectionManager:
         self,
         path: str,
         data: dict | str | MultipartEncoder,
+        headers: dict[str, str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> AsyncResponse:
         """
@@ -531,7 +555,7 @@ class ConnectionManager:
                 urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
                 **self._prepare_httpx_request_content(data),
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
             )
         except Exception as e:
@@ -542,6 +566,7 @@ class ConnectionManager:
         self,
         path: str,
         data: dict | None = None,
+        headers: dict[str, str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> AsyncResponse:
         """
@@ -567,7 +592,7 @@ class ConnectionManager:
                 url=urljoin(self.base_url, path),
                 **self._prepare_httpx_request_content(data or {}),
                 params=self._filter_query_params(kwargs),
-                headers=self.headers,
+                headers=self.headers | (headers or {}),
                 timeout=self.timeout,
             )
         except Exception as e:

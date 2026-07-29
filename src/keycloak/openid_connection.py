@@ -332,7 +332,7 @@ class KeycloakOpenIDConnection(ConnectionManager):
     @custom_headers.setter
     def custom_headers(self, value: dict | None) -> None:
         self._custom_headers = value
-        if self.custom_headers is not None and self.headers is not None:
+        if self.custom_headers:
             # merge custom headers to main headers
             self.headers.update(self.custom_headers)
 

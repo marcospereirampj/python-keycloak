@@ -19,6 +19,9 @@ def test_connection_proxy() -> None:
 
 def test_headers() -> None:
     """Test headers manipulation."""
+    cm = ConnectionManager(base_url="http://test.test")
+    assert cm.headers == {}
+
     cm = ConnectionManager(base_url="http://test.test", headers={"H": "A"})
     assert cm.param_headers(key="H") == "A"
     assert cm.param_headers(key="A") is None

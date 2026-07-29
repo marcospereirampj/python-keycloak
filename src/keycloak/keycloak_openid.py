@@ -394,13 +394,12 @@ class KeycloakOpenID:
             payload["totp"] = totp
 
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = self.connection.raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -437,13 +436,12 @@ class KeycloakOpenID:
             "refresh_token": refresh_token,
         }
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = self.connection.raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -506,13 +504,12 @@ class KeycloakOpenID:
             "scope": scope,
         }
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = self.connection.raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -538,14 +535,10 @@ class KeycloakOpenID:
         :returns: Userinfo object
         :rtype: dict | bytes
         """
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name}
-        data_raw = self.connection.raw_get(URL_USERINFO.format(**params_path))
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = self.connection.raw_get(
+            URL_USERINFO.format(**params_path),
+            headers={"Authorization": "Bearer " + token},
         )
         res = raise_error_from_response(data_raw, KeycloakGetError)
         if not isinstance(res, (dict, bytes)):
@@ -647,14 +640,10 @@ class KeycloakOpenID:
         :returns: Entitlements
         :rtype: dict
         """
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
-        data_raw = self.connection.raw_get(URL_ENTITLEMENT.format(**params_path))
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = self.connection.raw_get(
+            URL_ENTITLEMENT.format(**params_path),
+            headers={"Authorization": "Bearer " + token},
         )
 
         if data_raw.status_code in {HTTP_NOT_FOUND, HTTP_NOT_ALLOWED}:
@@ -705,27 +694,21 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "token": token}
 
-        bearer_changed = False
-        orig_bearer = None
+        headers = {}
         if token_type_hint == "requesting_party_token":  # noqa: S105
             if rpt:
                 payload.update({"token": rpt, "token_type_hint": token_type_hint})
-                orig_bearer = (self.connection.headers or {}).get("Authorization")
-                self.connection.add_param_headers("Authorization", "Bearer " + token)
-                bearer_changed = True
+                headers = {"Authorization": "Bearer " + token}
             else:
                 msg = "Can't find RPT"
                 raise KeycloakRPTNotFound(msg)
 
         payload = self._add_secret_key(payload)
-
-        data_raw = self.connection.raw_post(URL_INTROSPECT.format(**params_path), data=payload)
-        if bearer_changed:
-            (
-                self.connection.add_param_headers("Authorization", orig_bearer)
-                if orig_bearer is not None
-                else self.connection.del_param_headers("Authorization")
-            )
+        data_raw = self.connection.raw_post(
+            URL_INTROSPECT.format(**params_path),
+            data=payload,
+            headers=headers,
+        )
 
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -933,20 +916,13 @@ class KeycloakOpenID:
             **extra_payload,
         }
 
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = self.connection.raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = self.connection.raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, list):
@@ -1021,23 +997,13 @@ class KeycloakOpenID:
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        orig_content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/json")
         data_raw = self.connection.raw_post(
             URL_CLIENT_REGISTRATION.format(**params_path),
             data=json.dumps(payload),
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
-        )
-        (
-            self.connection.add_param_headers("Content-Type", orig_content_type)
-            if orig_content_type is not None
-            else self.connection.del_param_headers("Content-Type")
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -1102,10 +1068,6 @@ class KeycloakOpenID:
         :rtype: bytes
         """
         params_path = {"realm-name": self.realm_name, "client-id": client_id}
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        orig_content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/json")
 
         # Keycloak complains if the clientId is not set in the payload
         if "clientId" not in payload:
@@ -1114,16 +1076,10 @@ class KeycloakOpenID:
         data_raw = self.connection.raw_put(
             URL_CLIENT_UPDATE.format(**params_path),
             data=json.dumps(payload),
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
-        )
-        (
-            self.connection.add_param_headers("Content-Type", orig_content_type)
-            if orig_content_type is not None
-            else self.connection.del_param_headers("Content-Type")
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPutError)
         if not isinstance(res, dict):
@@ -1282,13 +1238,12 @@ class KeycloakOpenID:
             payload["totp"] = totp
 
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = await self.connection.a_raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -1325,13 +1280,12 @@ class KeycloakOpenID:
             "refresh_token": refresh_token,
         }
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = await self.connection.a_raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -1393,13 +1347,12 @@ class KeycloakOpenID:
             "scope": scope,
         }
         payload = self._add_secret_key(payload)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
+        data_raw = await self.connection.a_raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -1425,14 +1378,10 @@ class KeycloakOpenID:
         :returns: Userinfo object
         :rtype: dict | bytes
         """
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name}
-        data_raw = await self.connection.a_raw_get(URL_USERINFO.format(**params_path))
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = await self.connection.a_raw_get(
+            URL_USERINFO.format(**params_path),
+            headers={"Authorization": "Bearer " + token},
         )
         res = raise_error_from_response(data_raw, KeycloakGetError)
         if not isinstance(res, (dict, bytes)):
@@ -1534,14 +1483,10 @@ class KeycloakOpenID:
         :returns: Entitlements
         :rtype: dict
         """
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
         params_path = {"realm-name": self.realm_name, "resource-server-id": resource_server_id}
-        data_raw = await self.connection.a_raw_get(URL_ENTITLEMENT.format(**params_path))
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = await self.connection.a_raw_get(
+            URL_ENTITLEMENT.format(**params_path),
+            headers={"Authorization": "Bearer " + token},
         )
 
         if data_raw.status_code in [HTTP_NOT_FOUND, HTTP_NOT_ALLOWED]:
@@ -1593,14 +1538,11 @@ class KeycloakOpenID:
         params_path = {"realm-name": self.realm_name}
         payload = {"client_id": self.client_id, "token": token}
 
-        orig_bearer = None
-        bearer_changed = False
+        headers = {}
         if token_type_hint == "requesting_party_token":  # noqa: S105
             if rpt:
                 payload.update({"token": rpt, "token_type_hint": token_type_hint})
-                orig_bearer = (self.connection.headers or {}).get("Authorization")
-                self.connection.add_param_headers("Authorization", "Bearer " + token)
-                bearer_changed = True
+                headers = {"Authorization": "Bearer " + token}
             else:
                 msg = "Can't find RPT."
                 raise KeycloakRPTNotFound(msg)
@@ -1610,13 +1552,8 @@ class KeycloakOpenID:
         data_raw = await self.connection.a_raw_post(
             URL_INTROSPECT.format(**params_path),
             data=payload,
+            headers=headers,
         )
-        if bearer_changed:
-            (
-                self.connection.add_param_headers("Authorization", orig_bearer)
-                if orig_bearer is not None
-                else self.connection.del_param_headers("Authorization")
-            )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
             msg = (
@@ -1794,20 +1731,13 @@ class KeycloakOpenID:
             **extra_payload,
         }
 
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = await self.connection.a_raw_post(URL_TOKEN.format(**params_path), data=payload)
-        (
-            self.connection.add_param_headers("Content-Type", content_type)
-            if content_type
-            else self.connection.del_param_headers("Content-Type")
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
+        data_raw = await self.connection.a_raw_post(
+            URL_TOKEN.format(**params_path),
+            data=payload,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, list):
@@ -1882,23 +1812,13 @@ class KeycloakOpenID:
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name}
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        orig_content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/json")
         data_raw = await self.connection.a_raw_post(
             URL_CLIENT_REGISTRATION.format(**params_path),
             data=json.dumps(payload),
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
-        )
-        (
-            self.connection.add_param_headers("Content-Type", orig_content_type)
-            if orig_content_type is not None
-            else self.connection.del_param_headers("Content-Type")
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPostError)
         if not isinstance(res, dict):
@@ -1963,10 +1883,6 @@ class KeycloakOpenID:
         :rtype: dict
         """
         params_path = {"realm-name": self.realm_name, "client-id": client_id}
-        orig_bearer = (self.connection.headers or {}).get("Authorization")
-        self.connection.add_param_headers("Authorization", "Bearer " + token)
-        orig_content_type = (self.connection.headers or {}).get("Content-Type")
-        self.connection.add_param_headers("Content-Type", "application/json")
 
         # Keycloak complains if the clientId is not set in the payload
         if "clientId" not in payload:
@@ -1975,16 +1891,10 @@ class KeycloakOpenID:
         data_raw = await self.connection.a_raw_put(
             URL_CLIENT_UPDATE.format(**params_path),
             data=json.dumps(payload),
-        )
-        (
-            self.connection.add_param_headers("Authorization", orig_bearer)
-            if orig_bearer is not None
-            else self.connection.del_param_headers("Authorization")
-        )
-        (
-            self.connection.add_param_headers("Content-Type", orig_content_type)
-            if orig_content_type is not None
-            else self.connection.del_param_headers("Content-Type")
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
         )
         res = raise_error_from_response(data_raw, KeycloakPutError)
         if not isinstance(res, dict):
