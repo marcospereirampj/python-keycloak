@@ -31,9 +31,9 @@ except ImportError:  # pragma: no cover
 
 from typing import Any
 
-import httpx
+import httpx2
 import requests
-from httpx import Response as AsyncResponse
+from httpx2 import Response as AsyncResponse
 from requests import Response
 from requests.adapters import HTTPAdapter
 from requests_toolbelt import MultipartEncoder
@@ -132,11 +132,11 @@ class ConnectionManager:
         if proxies:
             self._s.proxies.update(proxies)
 
-        self.async_s = httpx.AsyncClient(
+        self.async_s = httpx2.AsyncClient(
             verify=verify,
             mounts=proxies,
             cert=cert,
-            limits=httpx.Limits(
+            limits=httpx2.Limits(
                 max_connections=100 if pool_maxsize is None else pool_maxsize,
                 max_keepalive_connections=20,
             ),
@@ -495,7 +495,7 @@ class ConnectionManager:
                 method="POST",
                 url=urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
-                **self._prepare_httpx_request_content(data),
+                **self._prepare_httpx2_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -530,7 +530,7 @@ class ConnectionManager:
             return await self.async_s.put(
                 urljoin(self.base_url, path),
                 params=self._filter_query_params(kwargs),
-                **self._prepare_httpx_request_content(data),
+                **self._prepare_httpx2_request_content(data),
                 headers=self.headers,
                 timeout=self.timeout,
             )
@@ -565,7 +565,7 @@ class ConnectionManager:
             return await self.async_s.request(
                 method="DELETE",
                 url=urljoin(self.base_url, path),
-                **self._prepare_httpx_request_content(data or {}),
+                **self._prepare_httpx2_request_content(data or {}),
                 params=self._filter_query_params(kwargs),
                 headers=self.headers,
                 timeout=self.timeout,
@@ -575,11 +575,11 @@ class ConnectionManager:
             raise KeycloakConnectionError(msg) from e
 
     @staticmethod
-    def _prepare_httpx_request_content(data: dict | str | None | MultipartEncoder) -> dict:
+    def _prepare_httpx2_request_content(data: dict | str | None | MultipartEncoder) -> dict:
         """
-        Create the correct request content kwarg to `httpx.AsyncClient.request()`.
+        Create the correct request content kwarg to `httpx2.AsyncClient.request()`.
 
-        See https://www.python-httpx.org/compatibility/#request-content
+        See https://httpx2.pydantic.dev/compatibility/#request-content
 
         :param data: the request content
         :type data: dict | str | None | MultipartEncoder
@@ -600,8 +600,8 @@ class ConnectionManager:
         """
         Explicitly filter query params with None values for compatibility.
 
-        Httpx and requests differ in the way they handle query params with the value None,
-        requests does not include params with the value None while httpx includes them as-is.
+        HTTPX2 and requests differ in the way they handle query params with the value None,
+        requests does not include params with the value None while HTTPX2 includes them as-is.
 
         :param query_params: the query params
         :type query_params: dict

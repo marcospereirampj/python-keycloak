@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING
 import requests
 
 if TYPE_CHECKING:
-    from httpx import Response as AsyncResponse
+    from httpx2 import Response as AsyncResponse
 
 from requests import Response
 

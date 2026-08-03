@@ -34,7 +34,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from httpx import Response as AsyncResponse
+    from httpx2 import Response as AsyncResponse
     from requests import Response
 
 from .connection import ConnectionManager

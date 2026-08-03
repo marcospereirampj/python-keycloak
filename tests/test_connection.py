@@ -3,6 +3,7 @@
 from inspect import iscoroutinefunction, signature
 
 import pytest
+from httpx2 import AsyncClient
 
 from keycloak.connection import ConnectionManager
 from keycloak.exceptions import KeycloakConnectionError
@@ -15,6 +16,7 @@ def test_connection_proxy() -> None:
         proxies={"http://test.test": "http://localhost:8080"},
     )
     assert cm._s.proxies == {"http://test.test": "http://localhost:8080"}
+    assert isinstance(cm.async_s, AsyncClient)
 
 
 def test_headers() -> None:
@@ -45,7 +47,7 @@ def test_bad_connection() -> None:
 
 
 @pytest.mark.asyncio
-async def a_test_bad_connection() -> None:
+async def test_async_bad_connection() -> None:
     """Test bad connection."""
     cm = ConnectionManager(base_url="http://not.real.domain")
     with pytest.raises(KeycloakConnectionError):

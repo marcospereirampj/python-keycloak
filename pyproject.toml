@@ -36,7 +36,7 @@ requests = ">=2.20.0"
 requests-toolbelt = ">=0.6.0"
 deprecation = ">=2.1.0"
 jwcrypto = ">=1.5.4"
-httpx = ">=0.23.2"
+httpx2 = ">=2.0.0,<3.0.0"
 aiofiles = ">=24.1.0"
 
 [tool.poetry.group.docs.dependencies]
@@ -97,4 +97,3 @@ ignore = [
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
-
