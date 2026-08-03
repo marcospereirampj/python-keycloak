@@ -2,7 +2,7 @@ name: Bump version
 
 on:
   workflow_run:
-    workflows: ["Lint"]
+    workflows: ["CI"]
     branches: [master]
     types:
       - completed
