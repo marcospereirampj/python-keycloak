@@ -1144,6 +1144,26 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     )
     assert client_id == client_id_2, client_id_2
 
+    # Simulate a concurrent-create race: the client already exists, but the pre-check
+    # momentarily misses it (e.g. a second caller racing the same create), so the POST
+    # really hits the server and gets a 409. This must not raise KeyError.
+    original_get_client_id = admin.get_client_id
+    calls = {"n": 0}
+
+    def _flaky_get_client_id(**kwargs: str) -> str | None:
+        calls["n"] += 1
+        return None if calls["n"] == 1 else original_get_client_id(**kwargs)
+
+    admin.get_client_id = _flaky_get_client_id
+    try:
+        client_id_3 = admin.create_client(
+            payload={"name": "test-client", "clientId": "test-client"},
+            skip_exists=True,
+        )
+    finally:
+        admin.get_client_id = original_get_client_id
+    assert client_id == client_id_3, client_id_3
+
     # Test get client
     res = admin.get_client(client_id=client_id)
     assert res["clientId"] == "test-client", res
@@ -1584,6 +1604,25 @@ def test_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
     assert err.match('409: b\'{"errorMessage":"Role with name test-realm-role already exists"}\'')
     role_id_2 = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
     assert role_id == role_id_2
+
+    # Simulate a concurrent-create race: the role already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_get_realm_role = admin.get_realm_role
+    calls = {"n": 0}
+
+    def _flaky_get_realm_role(role_name: str) -> dict:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise KeycloakGetError(error_message="not found", response_code=404)
+        return original_get_realm_role(role_name=role_name)
+
+    admin.get_realm_role = _flaky_get_realm_role
+    try:
+        role_id_3 = admin.create_realm_role(payload={"name": "test-realm-role"}, skip_exists=True)
+    finally:
+        admin.get_realm_role = original_get_realm_role
+    assert role_id == role_id_3
 
     # Test get realm role by its id
     role_id = admin.get_realm_role(role_name="test-realm-role")["id"]
@@ -2205,6 +2244,29 @@ def test_client_roles(admin: KeycloakAdmin, client: str) -> None:
         skip_exists=True,
     )
     assert client_role_id == client_role_id_2
+
+    # Simulate a concurrent-create race: the role already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_get_client_role = admin.get_client_role
+    calls = {"n": 0}
+
+    def _flaky_get_client_role(client_id: str, role_name: str) -> dict:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise KeycloakGetError(error_message="not found", response_code=404)
+        return original_get_client_role(client_id=client_id, role_name=role_name)
+
+    admin.get_client_role = _flaky_get_client_role
+    try:
+        client_role_id_3 = admin.create_client_role(
+            client_role_id=client,
+            payload={"name": "client-role-test"},
+            skip_exists=True,
+        )
+    finally:
+        admin.get_client_role = original_get_client_role
+    assert client_role_id == client_role_id_3
 
     # Test get client role
     res = admin.get_client_role(client_id=client, role_name="client-role-test")
@@ -2956,6 +3018,26 @@ def test_client_scopes(admin: KeycloakAdmin, realm: str) -> None:
             skip_exists=False,
         )
     assert err.match('409: b\'{"errorMessage":"Client Scope test-scope already exists"}\'')
+
+    # Simulate a concurrent-create race: the scope already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_get_client_scope_by_name = admin.get_client_scope_by_name
+    calls = {"n": 0}
+
+    def _flaky_get_client_scope_by_name(**kwargs: str) -> dict | None:
+        calls["n"] += 1
+        return None if calls["n"] == 1 else original_get_client_scope_by_name(**kwargs)
+
+    admin.get_client_scope_by_name = _flaky_get_client_scope_by_name
+    try:
+        res3 = admin.create_client_scope(
+            payload={"name": "test-scope", "protocol": "openid-connect"},
+            skip_exists=True,
+        )
+    finally:
+        admin.get_client_scope_by_name = original_get_client_scope_by_name
+    assert res == res3
 
     # Test update client scope
     with pytest.raises(KeycloakPutError) as err:
@@ -4829,6 +4911,26 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
     )
     assert client_id == client_id_2, client_id_2
 
+    # Simulate a concurrent-create race: the client already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_a_get_client_id = admin.a_get_client_id
+    calls = {"n": 0}
+
+    async def _flaky_a_get_client_id(client_id: str) -> str | None:
+        calls["n"] += 1
+        return None if calls["n"] == 1 else await original_a_get_client_id(client_id=client_id)
+
+    admin.a_get_client_id = _flaky_a_get_client_id
+    try:
+        client_id_3 = await admin.a_create_client(
+            payload={"name": "test-client", "clientId": "test-client"},
+            skip_exists=True,
+        )
+    finally:
+        admin.a_get_client_id = original_a_get_client_id
+    assert client_id == client_id_3, client_id_3
+
     # Test get client
     res = await admin.a_get_client(client_id=client_id)
     assert res["clientId"] == "test-client", res
@@ -5298,6 +5400,28 @@ async def test_a_realm_roles(admin: KeycloakAdmin, realm: str) -> None:
         skip_exists=True,
     )
     assert role_id == role_id_2
+
+    # Simulate a concurrent-create race: the role already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_a_get_realm_role = admin.a_get_realm_role
+    calls = {"n": 0}
+
+    async def _flaky_a_get_realm_role(role_name: str) -> dict:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise KeycloakGetError(error_message="not found", response_code=404)
+        return await original_a_get_realm_role(role_name=role_name)
+
+    admin.a_get_realm_role = _flaky_a_get_realm_role
+    try:
+        role_id_3 = await admin.a_create_realm_role(
+            payload={"name": "test-realm-role"},
+            skip_exists=True,
+        )
+    finally:
+        admin.a_get_realm_role = original_a_get_realm_role
+    assert role_id == role_id_3
 
     # Test get realm role by its id
     role_id = (await admin.a_get_realm_role(role_name="test-realm-role"))["id"]
@@ -5949,6 +6073,29 @@ async def test_a_client_roles(admin: KeycloakAdmin, client: str) -> None:
         skip_exists=True,
     )
     assert client_role_id == client_role_id_2
+
+    # Simulate a concurrent-create race: the role already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_a_get_client_role = admin.a_get_client_role
+    calls = {"n": 0}
+
+    async def _flaky_a_get_client_role(client_id: str, role_name: str) -> dict:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise KeycloakGetError(error_message="not found", response_code=404)
+        return await original_a_get_client_role(client_id=client_id, role_name=role_name)
+
+    admin.a_get_client_role = _flaky_a_get_client_role
+    try:
+        client_role_id_3 = await admin.a_create_client_role(
+            client_role_id=client,
+            payload={"name": "client-role-test"},
+            skip_exists=True,
+        )
+    finally:
+        admin.a_get_client_role = original_a_get_client_role
+    assert client_role_id == client_role_id_3
 
     # Test get client role
     res = await admin.a_get_client_role(client_id=client, role_name="client-role-test")
@@ -6812,6 +6959,28 @@ async def test_a_client_scopes(admin: KeycloakAdmin, realm: str) -> None:
             skip_exists=False,
         )
     assert err.match('409: b\'{"errorMessage":"Client Scope test-scope already exists"}\'')
+
+    # Simulate a concurrent-create race: the scope already exists, but the pre-check
+    # momentarily misses it, so the POST really hits the server and gets a 409. This
+    # must not raise KeyError.
+    original_a_get_client_scope_by_name = admin.a_get_client_scope_by_name
+    calls = {"n": 0}
+
+    async def _flaky_a_get_client_scope_by_name(client_scope_name: str) -> dict | None:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return None
+        return await original_a_get_client_scope_by_name(client_scope_name=client_scope_name)
+
+    admin.a_get_client_scope_by_name = _flaky_a_get_client_scope_by_name
+    try:
+        res3 = await admin.a_create_client_scope(
+            payload={"name": "test-scope", "protocol": "openid-connect"},
+            skip_exists=True,
+        )
+    finally:
+        admin.a_get_client_scope_by_name = original_a_get_client_scope_by_name
+    assert res == res3
 
     # Test update client scope
     with pytest.raises(KeycloakPutError) as err:

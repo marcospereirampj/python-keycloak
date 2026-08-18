@@ -3592,6 +3592,10 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            client_id = self.get_client_id(client_id=payload["clientId"])
+            if client_id is not None:
+                return client_id
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -4012,6 +4016,12 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            try:
+                res = self.get_client_role(client_id=client_role_id, role_name=payload["name"])
+                return res["name"]
+            except KeycloakGetError:
+                pass
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -4397,6 +4407,12 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            try:
+                role = self.get_realm_role(role_name=payload["name"])
+                return role["name"]
+            except KeycloakGetError:
+                pass
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -6060,6 +6076,10 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            existing = self.get_client_scope_by_name(client_scope_name=payload["name"])
+            if existing is not None:
+                return existing["id"]
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -10483,6 +10503,10 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            client_id = await self.a_get_client_id(client_id=payload["clientId"])
+            if client_id is not None:
+                return client_id
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -10903,6 +10927,15 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            try:
+                res = await self.a_get_client_role(
+                    client_id=client_role_id,
+                    role_name=payload["name"],
+                )
+                return res["name"]
+            except KeycloakGetError:
+                pass
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -11298,6 +11331,12 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            try:
+                role = await self.a_get_realm_role(role_name=payload["name"])
+                return role["name"]
+            except KeycloakGetError:
+                pass
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
@@ -12878,6 +12917,10 @@ class KeycloakAdmin:
             expected_codes=[HTTP_CREATED],
             skip_exists=skip_exists,
         )
+        if skip_exists and data_raw.status_code == HTTP_CONFLICT:
+            existing = await self.a_get_client_scope_by_name(client_scope_name=payload["name"])
+            if existing is not None:
+                return existing["id"]
         _last_slash_idx = data_raw.headers["Location"].rindex("/")
         return data_raw.headers["Location"][_last_slash_idx + 1 :]
 
