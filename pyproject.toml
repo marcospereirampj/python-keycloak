@@ -55,7 +55,7 @@ pytest = ">=7.1.2"
 pytest-cov = ">=3.0.0"
 pytest-asyncio = ">=0.23.7"
 wheel = ">=0.38.4"
-pre-commit = ">=3.5.0"
+pre-commit = ">=4.6.2"
 commitizen = ">=2.28.0"
 cryptography = ">=42.0.0"
 codespell = ">=2.1.0"
@@ -97,4 +97,3 @@ ignore = [
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
-
