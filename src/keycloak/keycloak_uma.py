@@ -442,17 +442,23 @@ class KeycloakUMA:
         :returns: Keycloak decision
         :rtype: boolean
         """
-        payload = {
-            "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
-            "permission": ",".join(str(permission) for permission in permissions),
-            "response_mode": "decision",
-            "audience": self.connection.client_id,
-            **extra_payload,
-        }
+        payload = [
+            ("grant_type", "urn:ietf:params:oauth:grant-type:uma-ticket"),
+            ("response_mode", "decision"),
+            ("audience", self.connection.client_id),
+        ]
+        payload.extend([("permission", str(p)) for p in permissions])
+
+        if extra_payload and isinstance(extra_payload, dict):
+            for k, v in extra_payload.items():
+                payload.append((k, v))
+        elif extra_payload:
+            msg = "Attribute extra_payload needs to be of type dict."
+            raise AttributeError(msg)
 
         # Everyone always has the null set of permissions
         # However keycloak cannot evaluate the null set
-        if len(payload["permission"]) == 0:
+        if len([k for k, _ in payload if k == "permission"]) == 0:
             return True
 
         if self.connection.base_url is None:
@@ -472,7 +478,10 @@ class KeycloakUMA:
         )
         connection.add_param_headers("Authorization", "Bearer " + token)
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
-        data_raw = connection.raw_post(self.uma_well_known["token_endpoint"], data=payload)
+        data_raw = connection.raw_post(
+            self.uma_well_known["token_endpoint"],
+            data="&".join([f"{k}={v}" for k, v in payload]),
+        )
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)
         except KeycloakPostError:
@@ -935,17 +944,23 @@ class KeycloakUMA:
         :returns: Keycloak decision
         :rtype: boolean
         """
-        payload = {
-            "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
-            "permission": ",".join(str(permission) for permission in permissions),
-            "response_mode": "decision",
-            "audience": self.connection.client_id,
-            **extra_payload,
-        }
+        payload = [
+            ("grant_type", "urn:ietf:params:oauth:grant-type:uma-ticket"),
+            ("response_mode", "decision"),
+            ("audience", self.connection.client_id),
+        ]
+        payload.extend([("permission", str(p)) for p in permissions])
+
+        if extra_payload and isinstance(extra_payload, dict):
+            for k, v in extra_payload.items():
+                payload.append((k, v))
+        elif extra_payload:
+            msg = "Attribute extra_payload needs to be of type dict."
+            raise AttributeError(msg)
 
         # Everyone always has the null set of permissions
         # However keycloak cannot evaluate the null set
-        if len(payload["permission"]) == 0:
+        if len([k for k, _ in payload if k == "permission"]) == 0:
             return True
 
         if self.connection.base_url is None:
@@ -967,7 +982,7 @@ class KeycloakUMA:
         connection.add_param_headers("Content-Type", "application/x-www-form-urlencoded")
         data_raw = await connection.a_raw_post(
             (await self.a_uma_well_known)["token_endpoint"],
-            data=payload,
+            data="&".join([f"{k}={v}" for k, v in payload]),
         )
         try:
             data = raise_error_from_response(data_raw, KeycloakPostError)
