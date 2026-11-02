@@ -1144,6 +1144,18 @@ def test_clients(admin: KeycloakAdmin, realm: str) -> None:
     )
     assert client_id == client_id_2, client_id_2
 
+    # Test create client, empty payload id (#719)
+    with pytest.raises(ValueError) as err:
+        admin.create_client(payload={"name": "test-client", "clientId": "test-client", "id": ""})
+    assert err.match("id cannot be empty")
+
+    with pytest.raises(ValueError) as err:
+        admin.create_client(
+            payload={"name": "test-client", "clientId": "test-client", "id": ""},
+            skip_exists=True,
+        )
+    assert err.match("id cannot be empty")
+
     # Test get client
     res = admin.get_client(client_id=client_id)
     assert res["clientId"] == "test-client", res
@@ -4828,6 +4840,20 @@ async def test_a_clients(admin: KeycloakAdmin, realm: str) -> None:
         skip_exists=True,
     )
     assert client_id == client_id_2, client_id_2
+
+    # Test create client, empty payload id (#719)
+    with pytest.raises(ValueError) as err:
+        await admin.a_create_client(
+            payload={"name": "test-client", "clientId": "test-client", "id": ""},
+        )
+    assert err.match("id cannot be empty")
+
+    with pytest.raises(ValueError) as err:
+        await admin.a_create_client(
+            payload={"name": "test-client", "clientId": "test-client", "id": ""},
+            skip_exists=True,
+        )
+    assert err.match("id cannot be empty")
 
     # Test get client
     res = await admin.a_get_client(client_id=client_id)
