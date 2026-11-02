@@ -3574,7 +3574,12 @@ class KeycloakAdmin:
         :type payload: dict
         :return: Client ID
         :rtype: str
+        :raises ValueError: If the payload id is empty
         """
+        if "id" in payload and payload["id"] == "":
+            msg = "id cannot be empty"
+            raise ValueError(msg)
+
         if skip_exists:
             client_id = self.get_client_id(client_id=payload["clientId"])
 
@@ -10465,7 +10470,12 @@ class KeycloakAdmin:
         :type payload: dict
         :return: Client ID
         :rtype: str
+        :raises ValueError: If the payload id is empty
         """
+        if "id" in payload and payload["id"] == "":
+            msg = "id cannot be empty"
+            raise ValueError(msg)
+
         if skip_exists:
             client_id = await self.a_get_client_id(client_id=payload["clientId"])
 
